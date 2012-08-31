@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'oddb2xml'
+
+ui = Oddb2xml::Cli.new
+ui.run
