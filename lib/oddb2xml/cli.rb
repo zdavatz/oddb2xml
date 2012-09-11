@@ -1,13 +1,15 @@
 # encoding: utf-8
 
 require 'thread'
+require 'oddb2xml/builder'
 require 'oddb2xml/downloader'
 require 'oddb2xml/extractor'
 
 module Oddb2xml
   class Cli
     SUBJECTS = %w[product article]
-    LOCALES  = %w[DE FR] # EN does not exist
+    #LANGUAGES = %w[DE FR] # EN does not exist
+    LANGUAGES = %w[DE]
 
     SUBJECTS.each do |sbj|
       eval("attr_accessor :#{sbj}")
@@ -15,41 +17,61 @@ module Oddb2xml
 
     def initialize
       SUBJECTS.each do |sbj|
-        self.send("#{sbj}=", {})
+        self.send("#{sbj}=", [])
       end
-      @mutex = Mutex.new
+      @items      = []
+      @swissindex = {}
     end
 
     def run
-      LOCALES.map do |lang|
-        Thread.new do
-          downloader = Oddb2xml::Downloader.new
-          items_hash = downloader.download_by(lang)
-          Oddb2xml::Extractor.new(items_hash) do |extractor|
-            extractor.locale = lang
-            SUBJECTS.each do |sbj|
-              extractor.subject = sbj
-              xml = extractor.extract
-              @mutex.synchronize do
-                self.send(sbj)["#{lang}"] = xml
-              end
-            end
+      threads = []
+      # bag_xml
+      threads << Thread.new do
+        downloader = BagXmlDownloader.new
+        xml = downloader.download
+        extractor = BagXmlExtractor.new(xml)
+        @items = extractor.to_a
+      end
+      LANGUAGES.map do |lang|
+        # swissindex
+        # use status(active/inactive)
+        threads << Thread.new do
+          downloader = SwissIndexDownloader.new
+          xml = downloader.download_by(lang)
+          extractor = SwissIndexExtractor.new(xml) do |e|
+            e.language = lang
           end
+          @swissindex["#{lang}"] = extractor.to_hash
         end
-      end.map(&:join)
-      finalize
+      end
+      threads.map(&:join)
+      build
       report
     end
 
     private
 
-    def finalize
+    def build
       SUBJECTS.each do |sbj|
-        content = self.send(sbj)
-        File.open("oddb_#{sbj}.xml", 'w') do |fh|
-          LOCALES.each do |lang|
-            fh << content[lang]
-          end
+        # merge
+        @items.map do |item|
+          #pharmacode = item[:pharmacode]
+          #if @swissindex[pharmacode]
+          #  item[:swissindex] = {
+          #   :gtin   => @swissindex[pharmacode][:gtin],
+          #   :gln     = @swissindex[pharmacode][:gln],
+          #   :status => @swissindex[pharmacode][:status]
+          #  }
+          #end
+          self.send(sbj) << item
+        end
+        builder = Builder.new do |builder|
+          builder.subject = sbj
+          builder.objects = self.send(sbj)
+        end
+        xml = builder.to_xml
+        File.open("oddb_#{sbj}.xml", 'w:utf-8') do |fh|
+          fh << xml
         end
       end
     end
@@ -60,4 +82,3 @@ module Oddb2xml
 
   end
 end
-
