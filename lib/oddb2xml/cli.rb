@@ -12,7 +12,10 @@ module Oddb2xml
     def initialize
       @mutex = Mutex.new
       @items = {} # Preparations.xml in BAG
-      @index = {} # swissINDEX
+      @index = {}
+      LANGUAGES.each do |lang|
+        @index[lang] = {} # swissINDEX
+      end
     end
     def run
       threads = []

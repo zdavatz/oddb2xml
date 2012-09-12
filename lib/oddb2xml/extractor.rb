@@ -6,73 +6,79 @@ module Oddb2xml
   class Extractor
     attr_accessor :xml
     def initialize(xml)
-      @xml  = xml
-      @data = {}
+      @xml = xml
     end
   end
   class BagXmlExtractor < Extractor
     def to_hash
-      #File.open('bagxml.xml', 'r:ASCII-8BIT') do |f|
+      #File.open('../bagxml.xml', 'r:ASCII-8BIT') do |f|
       #  @xml = f.read
       #end
-      doc = Nokogiri::XML(@xml)
       # pharmacode => registration
-      doc.xpath('//Preparation').each do |prod|
+      data = {}
+      doc = Nokogiri::XML(@xml)
+      doc.xpath('//Preparation').each do |reg|
         item = {}
-        item[:prod_key]     = prod.attr('ProductCommercial').to_s
-        item[:desc_de]      = (desc = prod.xpath('.//DescriptionDe')) ? desc.text : ''
-        item[:desc_fr]      = (desc = prod.xpath('.//DescriptionFr')) ? desc.text : ''
-        item[:name_de]      = (name = prod.xpath('.//NameDe'))        ? name.text : ''
-        item[:name_fr]      = (name = prod.xpath('.//NameFr'))        ? name.text : ''
-        item[:org_gen_code] = (code = prod.xpath('.//OrgGenCode'))    ? code.text : ''
-        item[:act_code]     = (code = prod.xpath('.//AtcCode'))       ? code.text : ''
+        item[:product_key]  = reg.attr('ProductCommercial').to_s
+        item[:desc_de]      = (desc = reg.at_xpath('.//DescriptionDe')) ? desc.text : ''
+        item[:desc_fr]      = (desc = reg.at_xpath('.//DescriptionFr')) ? desc.text : ''
+        item[:name_de]      = (name = reg.at_xpath('.//NameDe'))        ? name.text : ''
+        item[:name_fr]      = (name = reg.at_xpath('.//NameFr'))        ? name.text : ''
+        item[:org_gen_code] = (code = reg.at_xpath('.//OrgGenCode'))    ? code.text : ''
+        item[:atc_code]     = (code = reg.at_xpath('.//AtcCode'))       ? code.text : ''
         item[:it_code]      = ''
-        prod.xpath('.//ItCode').each do |it_code|
+        reg.xpath('.//ItCode').each do |it_code|
           if item[:it_code].to_s.empty?
             code = it_code.attr('Code').to_s
             item[:it_code] = (code =~ /(\d+)\.(\d+)\.(\d+)./) ? code : ''
           end
         end
-        item[:substances]   = []
-        prod.xpath('.//Substance').each_with_index do |sub, i|
+        item[:substances] = []
+        reg.xpath('.//Substance').each_with_index do |sub, i|
           item[:substances] << {
             :index    => i.to_s,
-            :quantity => (qtty = sub.xpath('.//Quantity'))     ? qtty.text : '',
-            :unit     => (unit = sub.xpath('.//QuantityUnit')) ? unit.text : '',
+            :quantity => (qtty = sub.at_xpath('.//Quantity'))     ? qtty.text : '',
+            :unit     => (unit = sub.at_xpath('.//QuantityUnit')) ? unit.text : '',
           }
         end
-        prod.xpath('.//Pack').each do |pack|
-          if pharmacode = pack.attr('Pharmacode')
-            @data[pharmacode.to_s] = item
+        item[:pharmacodes] = []
+        reg.xpath('.//Pack').each do |pac|
+          if code = pac.attr('Pharmacode')
+            item[:pharmacodes] << code.to_s
+            data[code] = item # same data
           end
         end
       end
-      @data
+      data
     end
   end
   class SwissIndexExtractor < Extractor
     def to_hash
-      #File.open('swissindex.xml', 'r:ASCII-8BIT') do |f|
+      #File.open('../swissindex.xml', 'r:ASCII-8BIT') do |f|
       #  @xml = f.read
       #end
+      # pharmacode => package
+      data = {}
       doc = Nokogiri::XML(@xml)
       doc.remove_namespaces!
-      # pharmacode => package
-      doc.xpath('//Envelope/Body/PHARMA/ITEM').each do |pack|
+      doc.xpath('//Envelope/Body/PHARMA/ITEM').each do |pac|
         item = {}
-        item[:ean]        = (gtin = pack.xpath('.//GTIN'))   ? gtin.text : ''
-        item[:pharmacode] = (phar = pack.xpath('.//PHAR'))   ? phar.text : ''
-        item[:status]     = (stat = pack.xpath('.//STATUS')) ? stat.text : ''
-        item[:lang]       = (lang = pack.xpath('.//LANG'))   ? lang.text : ''
-        item[:desc]       = (dscr = pack.xpath('.//DSCR'))   ? dscr.text : ''
-        item[:atc_code]   = (code = pack.xpath('.//ATC'))    ? code.text : ''
-        if comp = pack.xpath('.//COMP')
-          item[:company_name] = (nam = comp.xpath('.//NAME')) ? nam.text : ''
-          item[:company_ean]  = (gln = comp.xpath('.//GLN'))  ? gln.text : ''
+        item[:ean]        = (gtin = pac.at_xpath('.//GTIN'))   ? gtin.text : ''
+        item[:pharmacode] = (phar = pac.at_xpath('.//PHAR'))   ? phar.text : ''
+        item[:status]     = (stat = pac.at_xpath('.//STATUS')) ? stat.text : ''
+        item[:stat_date]  = (date = pac.at_xpath('.//SDATE'))  ? date.text : ''
+        item[:lang]       = (lang = pac.at_xpath('.//LANG'))   ? lang.text : ''
+        item[:desc]       = (dscr = pac.at_xpath('.//DSCR'))   ? dscr.text : ''
+        item[:atc_code]   = (code = pac.at_xpath('.//ATC'))    ? code.text : ''
+        if comp = pac.xpath('.//COMP')
+          item[:company_name] = (nam = comp.at_xpath('.//NAME')) ? nam.text : ''
+          item[:company_ean]  = (gln = comp.at_xpath('.//GLN'))  ? gln.text : ''
         end
-        @data[item[:pharmacode]] = item
+        if code = item[:pharmacode]
+          data[code] = item
+        end
       end
-      @data
+      data
     end
   end
 end
