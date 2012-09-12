@@ -4,10 +4,11 @@ require 'nokogiri'
 
 module Oddb2xml
   class Builder
-    attr_accessor :subject, :objects
+    attr_accessor :subject, :index, :items
     def initialize
       @subject = nil
-      @objects = []
+      @index   = {}
+      @items   = {}
       if block_given?
         yield self
       end
@@ -19,10 +20,8 @@ module Oddb2xml
     end
     private
     def build_product
-      # debug
-      return @objects.to_s
-
-      builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+      _objects = merge_objects
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.PRODUCT(
           'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
@@ -100,11 +99,11 @@ module Oddb2xml
           }
         }
       end
-      builder.to_xml
+      _builder.to_xml
     end
-
     def build_article
-      builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+      _objects = merge_objects
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.PRODUCT(
           'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
@@ -115,7 +114,14 @@ module Oddb2xml
         ) {
         }
       end
-      builder.to_xml
+      _builder.to_xml
+    end
+    def merge_objects
+      puts
+      puts @subject
+      puts "swissindex[de]: #{@index['DE'].keys.length}"
+      #puts "swissindex[de]: #{@index['FR'].keys.length}"
+      puts "bag xml       : #{@items.keys.length}"
     end
   end
 end

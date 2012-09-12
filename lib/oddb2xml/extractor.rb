@@ -4,114 +4,50 @@ require 'nokogiri'
 
 module Oddb2xml
   class Extractor
-    attr_accessor :xml, :language
+    attr_accessor :xml
     def initialize(xml)
-      @xml = xml
-      if block_given?
-        yield self
-      end
+      @xml  = xml
+      @data = {}
     end
   end
   class BagXmlExtractor < Extractor
-    def to_a
-      items = []
-      # debug
+    def to_hash
       #File.open('bagxml.xml', 'r:ASCII-8BIT') do |f|
       #  @xml = f.read
       #end
       doc = Nokogiri::XML(@xml)
-      doc.xpath('//Preparation').to_a.each do |reg|
+      # pharmacode => registration
+      doc.xpath('//Preparation').each do |prod|
         item = {}
-        item[:PRDNO]  = reg.attr('ProductCommercial')
-        item[:DSCRD]  = reg.at_xpath('.//DescriptionDe').text
-        item[:DSCRF]  = reg.at_xpath('.//DescriptionFr').text
-        item[:BNAMD]  = reg.at_xpath('.//NameDe').text
-        item[:BNAMF]  = reg.at_xpath('.//NameFr').text
-        item[:ADNAMD] = '' # pac.at_xpath('.//DescriptionDe').text
-        item[:ADNAMF] = '' # pac.at_xpath('.//DescriptionFr').text
-        item[:SIZE]   = '' # pac.at_xpath('.//') swissindex ?
-        item[:ADINFD] = '' # reg.at_xpath('.//CommentDe').text
-        item[:ADINFF] = '' # reg.at_xpath('.//CommentFr').text
-        item[:GENCD]  = reg.at_xpath('.//OrgGenCode').text
-        item[:GENGRP] = ''
-        item[:ATC]    = reg.at_xpath('.//AtcCode').text
-        item[:IT]     = ''
-        item[:ITBAG]  = ''
-        item[:KONO]   = ''
-        item[:TRADE]  = '' # swissindex actives state iH aH or Ex
-        item[:PRTNO]  = '' # gtin? of swissindex
-        item[:MONO]   = ''
-        item[:CDGALD] = ''
-        item[:CDGALF] = ''
-        item[:FORMD]  = ''
-        item[:FORMF]  = ''
-        item[:DOSE]   = ''
-        item[:DOSEU]  = ''
-        item[:DRGFD]  = ''
-        item[:DRGFF]  = ''
-        item[:ORPH]   = ''
-        item[:BIOPHA] = ''
-        item[:BIOSIM] = ''
-        item[:BFS]    = ''
-        item[:BLOOD]  = ''
-        item[:MSCD]   = '' # always empty
-        item[:DEL]    = ''
-        item[:CPT]    = {  # packages ?
-          :CPTLNO   => '', # line ?
-          :CNAMED   => '',
-          :CNAMEF   => '',
-          :IDXIND   => '', # ?
-          :DDDD     => '', # substances of XMLPublication is multi values ...
-          :DDDU     => '',
-          :DDDA     => '', # ?
-          :IDXIA    => '',
-          :IXREL    => '',
-          :GALF     => '', # need swissmedic data ?
-          :DRGGRPCD => '', # what is special group ?
-          :PRBSUIT  => '', # currently empty
-          :CSOLV    => '', # currently empty
-          :SOLVQ    => '', # currently empty
-          :SOLVQU   => '', # currently empty
-          :PHVAL    => '', # currently empty
-          :LSPNSOL  => '', # currently empty
-          :APDURSOL => '', # currently empty
-          :EXCIP    => '', # ?
-          :EXCIPQ   => '',
-          :EXCIPCD  => '', # currently empty
-          :EXCIPCF  => '', # currently empty
-          :PQTY     => '',
-          :PQTYU    => '',
-          :SIZEMM   => '', # longest size in substances ?
-          :WEIGHT   => '',
-          :LOOKD    => '', # arrearance ?
-          :LOOKF    => '',
-          :IMG2     => '', # image ?
-          :CPTCMP   => [], # substances ?
-          :CPTIX    => [], # dose not exist interactions ...
-          :CPTROA   => [], # ?
-        }
-        reg.at_xpath('.//Substances').to_a.each_with_index do |sub, i|
-          item[:CPT][:CPTCMP] << {
-            :LINE  => i.to_s, # index of substances ?
-            :SUBNO => '',     # what is substances table ?
-            :OTY   => sub.at_xpath('.//Quantity').text,
-            :OTYU  => sub.at_xpath('.//QuantityUnit').text,
-            :WHK   => '', # ?
+        item[:prod_key]     = prod.attr('ProductCommercial').to_s
+        item[:desc_de]      = (desc = prod.xpath('.//DescriptionDe')) ? desc.text : ''
+        item[:desc_fr]      = (desc = prod.xpath('.//DescriptionFr')) ? desc.text : ''
+        item[:name_de]      = (name = prod.xpath('.//NameDe'))        ? name.text : ''
+        item[:name_fr]      = (name = prod.xpath('.//NameFr'))        ? name.text : ''
+        item[:org_gen_code] = (code = prod.xpath('.//OrgGenCode'))    ? code.text : ''
+        item[:act_code]     = (code = prod.xpath('.//AtcCode'))       ? code.text : ''
+        item[:it_code]      = ''
+        prod.xpath('.//ItCode').each do |it_code|
+          if item[:it_code].to_s.empty?
+            code = it_code.attr('Code').to_s
+            item[:it_code] = (code =~ /(\d+)\.(\d+)\.(\d+)./) ? code : ''
+          end
+        end
+        item[:substances]   = []
+        prod.xpath('.//Substance').each_with_index do |sub, i|
+          item[:substances] << {
+            :index    => i.to_s,
+            :quantity => (qtty = sub.xpath('.//Quantity'))     ? qtty.text : '',
+            :unit     => (unit = sub.xpath('.//QuantityUnit')) ? unit.text : '',
           }
         end
-        item[:PRDICD] = { # currently empty
-        }
-        items << item
+        prod.xpath('.//Pack').each do |pack|
+          if pharmacode = pack.attr('Pharmacode')
+            @data[pharmacode.to_s] = item
+          end
+        end
       end
-      items << {
-        :RESULT => {
-          :OK_ERROR   => 'OK', # data access ?
-          :NBR_RECORD => doc.xpath('//Preparation').to_a.length,
-          :ERROR_CODE => '',  # does not exist code definition
-          :MESSAGE    => '',  # dose not exist messace definition
-        }
-      }
-      items
+      @data
     end
   end
   class SwissIndexExtractor < Extractor
@@ -119,7 +55,24 @@ module Oddb2xml
       #File.open('swissindex.xml', 'r:ASCII-8BIT') do |f|
       #  @xml = f.read
       #end
-      {}
+      doc = Nokogiri::XML(@xml)
+      doc.remove_namespaces!
+      # pharmacode => package
+      doc.xpath('//Envelope/Body/PHARMA/ITEM').each do |pack|
+        item = {}
+        item[:ean]        = (gtin = pack.xpath('.//GTIN'))   ? gtin.text : ''
+        item[:pharmacode] = (phar = pack.xpath('.//PHAR'))   ? phar.text : ''
+        item[:status]     = (stat = pack.xpath('.//STATUS')) ? stat.text : ''
+        item[:lang]       = (lang = pack.xpath('.//LANG'))   ? lang.text : ''
+        item[:desc]       = (dscr = pack.xpath('.//DSCR'))   ? dscr.text : ''
+        item[:atc_code]   = (code = pack.xpath('.//ATC'))    ? code.text : ''
+        if comp = pack.xpath('.//COMP')
+          item[:company_name] = (nam = comp.xpath('.//NAME')) ? nam.text : ''
+          item[:company_ean]  = (gln = comp.xpath('.//GLN'))  ? gln.text : ''
+        end
+        @data[item[:pharmacode]] = item
+      end
+      @data
     end
   end
 end
