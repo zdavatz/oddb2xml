@@ -91,13 +91,15 @@ module Oddb2xml
       doc.remove_namespaces!
       doc.xpath('//Envelope/Body/PHARMA/ITEM').each do |pac|
         item = {}
-        item[:ean]        = (gtin = pac.at_xpath('.//GTIN'))   ? gtin.text : ''
-        item[:pharmacode] = (phar = pac.at_xpath('.//PHAR'))   ? phar.text : ''
-        item[:status]     = (stat = pac.at_xpath('.//STATUS')) ? stat.text : ''
-        item[:stat_date]  = (date = pac.at_xpath('.//SDATE'))  ? date.text : ''
-        item[:lang]       = (lang = pac.at_xpath('.//LANG'))   ? lang.text : ''
-        item[:desc]       = (dscr = pac.at_xpath('.//DSCR'))   ? dscr.text : ''
-        item[:atc_code]   = (code = pac.at_xpath('.//ATC'))    ? code.text : ''
+        item[:ean]             = (gtin = pac.at_xpath('.//GTIN'))   ? gtin.text : ''
+        item[:pharmacode]      = (phar = pac.at_xpath('.//PHAR'))   ? phar.text : ''
+        item[:status]          = (stat = pac.at_xpath('.//STATUS')) ? stat.text : ''
+        item[:stat_date]       = (date = pac.at_xpath('.//SDATE'))  ? date.text : ''
+        item[:lang]            = (lang = pac.at_xpath('.//LANG'))   ? lang.text : ''
+        item[:desc]            = (dscr = pac.at_xpath('.//DSCR'))   ? dscr.text : ''
+        item[:atc_code]        = (code = pac.at_xpath('.//ATC'))    ? code.text : ''
+        # as quantity text
+        item[:additional_desc] = (dscr = pac.at_xpath('.//ADDSCR')) ? dscr.text : ''
         if comp = pac.xpath('.//COMP')
           item[:company_name] = (nam = comp.at_xpath('.//NAME')) ? nam.text : ''
           item[:company_ean]  = (gln = comp.at_xpath('.//GLN'))  ? gln.text : ''

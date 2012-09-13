@@ -211,11 +211,11 @@ module Oddb2xml
               #xml.CDBG
               #xml.BG
               #xml.EXP
-              #xml.QTY
-              xml.DSCRD de_pac[:desc]        unless de_pac[:desc].empty?
-              xml.DSCRF fr_pac[:desc]        unless fr_pac[:desc].empty?
-              xml.SORTD de_pac[:desc].upcase unless de_pac[:desc].empty?
-              xml.SORTF fr_pac[:desc].upcase unless fr_pac[:desc].empty?
+              xml.QTY   de_pac[:additional_desc] unless de_pac[:additional_desc].empty?
+              xml.DSCRD de_pac[:desc]            unless de_pac[:desc].empty?
+              xml.DSCRF fr_pac[:desc]            unless fr_pac[:desc].empty?
+              xml.SORTD de_pac[:desc].upcase     unless de_pac[:desc].empty?
+              xml.SORTF fr_pac[:desc].upcase     unless fr_pac[:desc].empty?
               #xml.QTYUD
               #xml.QTYUF
               #xml.IMG
@@ -251,13 +251,14 @@ module Oddb2xml
               #xml.BAGNO
               #xml.LIGHT
               #xml.DEL
-              #xml.ARTCOMP {
-                #xml.COMPNO
+              xml.ARTCOMP {
+                # use ean13(gln) as COMPNO
+                xml.COMPNO de_pac[:company_ean] unless de_pac[:company_ean].empty?
                 #xml.ROLE
                 #xml.ARTNO1
                 #xml.ARTNO2
                 #xml.ARTNO3
-              #}
+              }
               xml.ARTBAR {
                 xml.CDTYP  'E13'
                 xml.BC     de_pac[:ean] unless de_pac[:ean].empty?
