@@ -22,18 +22,18 @@ module Oddb2xml
     def build_product
       # merge company info from swissINDEX
       objects = []
-      objects = @items.values.uniq.map do |reg|
+      objects = @items.values.uniq.map do |seq|
         %w[de fr].each do |lang|
-          key = "company_name_#{lang}".intern
-          reg[key] = ''
-          if pharmacode = reg[:pharmacodes].first
+          name_key = "company_name_#{lang}".intern
+          seq[name_key] = ''
+          if pharmacode = seq[:pharmacodes].first
             indices = @index[lang.upcase]
             if index = indices[pharmacode]
-              reg[key] = index[:company_name]
+              seq[name_key] = index[:company_name]
             end
           end
         end
-        reg
+        seq
       end
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.PRODUCT(
@@ -44,22 +44,30 @@ module Oddb2xml
           'PROD_DATE'         => '',
           'VALID_DATE'        => ''
         ) {
-          objects.each do |reg|
+          objects.each do |seq|
             xml.PRD('DT' => '') {
-              xml.PRDNO  reg[:product_key]     unless reg[:product_key].empty?
-              xml.DSCRD  reg[:desc_de]         unless reg[:desc_de].empty?
-              xml.DSCRF  reg[:desc_fr]         unless reg[:desc_fr].empty?
-              xml.BNAMD  reg[:name_de]         unless reg[:name_de].empty?
-              xml.BNAMF  reg[:name_fr]         unless reg[:name_fr].empty?
-              xml.ADNAMD reg[:company_name_de] unless reg[:company_name_de].empty?
-              xml.ADNAMF reg[:company_name_fr] unless reg[:company_name_fr].empty?
-              #xml.ADINFD
-              #xml.ADINFF
+              xml.PRDNO seq[:product_key] unless seq[:product_key].empty?
+              %w[de fr].each do |l|
+                name = "name_#{l}".intern
+                desc = "desc_#{l}".intern
+                elem = "DSCR" + l[0].upcase
+                if !seq[name].empty? and !seq[desc].empty?
+                  xml.send(elem, seq[name] + ' ' + seq[desc])
+                elsif !seq[desc].empty?
+                  xml.send(elem, seq[desc])
+                end
+              end
+              #xml.BNAMD
+              #xml.BNAMF
+              #xml.ADNAMD
+              #xml.ADNAMF
               #xml.SIZE
-              xml.GENCD  reg[:org_gen_code] unless reg[:org_gen_code].empty?
+              xml.ADINFD seq[:comment_de]   unless seq[:comment_de].empty?
+              xml.ADINFF seq[:comment_fr]   unless seq[:comment_fr].empty?
+              xml.GENCD  seq[:org_gen_code] unless seq[:org_gen_code].empty?
               #xml.GENGRP
-              xml.ATC    reg[:atc_code]     unless reg[:atc_code].empty?
-              xml.IT     reg[:it_code]      unless reg[:it_code].empty?
+              xml.ATC    seq[:atc_code]     unless seq[:atc_code].empty?
+              xml.IT     seq[:it_code]      unless seq[:it_code].empty?
               #xml.ITBAG
               #xml.KONO
               #xml.TRADE
@@ -71,17 +79,38 @@ module Oddb2xml
               #xml.FORMF
               #xml.DOSE
               #xml.DOSEU
+              #xml.DRGFD
+              #xml.DRGFF
+              #xml.ORPH
+              #xml.BIOPHA
+              #xml.BIOSIM
+              #xml.BFS
+              #xml.BLOOD
+              #xml.MSCD # always empty
               #xml.DEL
               xml.CPT {
                 #xml.CPTLNO
+                #xml.CNAMED
+                #xml.CNAMEF
                 #xml.IDXIND
                 #xml.DDDD
                 #xml.DDDU
                 #xml.DDDA
+                #xml.IDXIA
                 #xml.IXREL
                 #xml.GALF
+                #xml.DRGGRPCD
+                #xml.PRBSUIT
+                #xml.CSOLV
+                #xml.CSOLVQ
+                #xml.CSOLVQU
+                #xml.PHVAL
+                #xml.LSPNSOL
+                #xml.APDURSOL
                 #xml.EXCIP
                 #xml.EXCIPQ
+                #xml.EXCIPCD
+                #xml.EXCIPCF
                 #xml.PQTY
                 #xml.PQTYU
                 #xml.SIZEMM
@@ -89,9 +118,9 @@ module Oddb2xml
                 #xml.LOOKD
                 #xml.LOOKF
                 #xml.IMG2
-                reg[:substances].each do |sub|
+                seq[:substances].each do |sub|
                   xml.CPTCMP {
-                    xml.LINE  sub[:index]
+                    xml.LINE  sub[:index]    unless sub[:index].empty?
                     #xml.SUBNO
                     xml.QTY   sub[:quantity] unless sub[:quantity].empty?
                     xml.QTYU  sub[:unit]     unless sub[:unit].empty?
@@ -99,11 +128,22 @@ module Oddb2xml
                   }
                 end
                 #xml.CPTIX {
-                #  xml.IXNO
-                #  xml.GRP
-                #  xml.RLV
+                  #xml.IXNO
+                  #xml.GRP
+                  #xml.RLV
+                #}
+                #xml.CPTROA {
+                  #xml.SYSLOC
+                  #xml.ROA
                 #}
               }
+              #xml.PRDICD { # currently empty
+                #xml.ICD
+                #xml.RTYP
+                #xml.RSIG
+                #xml.REMD
+                #xml.REMF
+              #}
             }
           end
           xml.RESULT {
@@ -123,8 +163,8 @@ module Oddb2xml
           :de => index,
           :fr => @index['FR'][pharmacode],
         }
-        if reg = @items[pharmacode]
-          object[:reg] = reg
+        if seq = @items[pharmacode]
+          object[:seq] = seq
         end
         objects << object
       end
@@ -138,31 +178,45 @@ module Oddb2xml
           'VALID_DATE'        => ''
         ) {
           objects.each do |obj|
+            de_pac = obj[:de] # swiss index DE (base)
+            fr_pac = obj[:fr] # swiss index FR
+            bg_pac = nil      # BAG XML (additional data)
             xml.ART('DT' => '') {
-              pac = obj[:de]
-              xml.PHAR  pac[:pharmacode] unless pac[:pharmacode].empty?
+              if obj[:seq]
+                bg_pac = obj[:seq][:packages][de_pac[:pharmacode]]
+              end
+
+              xml.PHAR  de_pac[:pharmacode] unless de_pac[:pharmacode].empty?
               #xml.GRPCD
               #xml.CDS01
               #xml.CDS02
-              if obj[:reg]
-                xml.PRDNO obj[:reg][:product_key] unless obj[:reg][:product_key].empty?
+              if obj[:seq]
+                xml.PRDNO obj[:seq][:product_key] unless obj[:seq][:product_key].empty?
               end
-              #xml.SMCAT
-              #xml.SMNO
+              if bg_pac
+                xml.SMCAT bg_pac[:swissmedic_category] unless bg_pac[:swissmedic_category].empty?
+                xml.SMNO  bg_pac[:swissmedic_number]   unless bg_pac[:swissmedic_number].empty?
+              end
               #xml.HOSPCD
               #xml.CLINCD
               #xml.ARTTYP
               #xml.VAT
               #xml.SALECD
-              #xml.INSLIM
-              #xml.LIMPTS
+              if bg_pac
+                #xml.INSLIM
+                xml.LIMPTS bg_pac[:limitation_points] unless bg_pac[:limitation_points].empty?
+              end
               #xml.GRDFR
               #xml.COOL
               #xml.TEMP
               #xml.CDBG
-              #xml.DSCRF
-              #xml.SORTD
-              #xml.SORTF
+              #xml.BG
+              #xml.EXP
+              #xml.QTY
+              xml.DSCRD de_pac[:desc] unless de_pac[:desc].empty?
+              xml.DSCRF fr_pac[:desc] unless fr_pac[:desc].empty?
+              xml.SORTD de_pac[:desc].upcase unless de_pac[:desc].empty?
+              xml.SORTF fr_pac[:desc].upcase unless fr_pac[:desc].empty?
               #xml.QTYUD
               #xml.QTYUF
               #xml.IMG
@@ -170,9 +224,9 @@ module Oddb2xml
               #xml.PCKTYPD
               #xml.PCKTYPF
               #xml.MULT
-              if obj[:reg]
-                xml.SYN1D obj[:reg][:name_de] unless obj[:reg][:name_de].empty?
-                xml.SYN1F obj[:reg][:name_fr] unless obj[:reg][:name_fr].empty?
+              if obj[:seq]
+                xml.SYN1D obj[:seq][:name_de] unless obj[:seq][:name_de].empty?
+                xml.SYN1F obj[:seq][:name_fr] unless obj[:seq][:name_fr].empty?
               end
               #xml.SLOPLUS
               #xml.NOPCS
@@ -183,8 +237,8 @@ module Oddb2xml
               #xml.BAGSL
               #xml.BAGSLC
               #xml.LOACD
-              if pac[:status] == "I"
-                xml.OUTSAL pac[:stat_date] unless pac[:stat_date].empty?
+              if de_pac[:status] == "I"
+                xml.OUTSAL de_pac[:stat_date] unless de_pac[:stat_date].empty?
               end
               #xml.STTOX
               #xml.NOTI
@@ -206,9 +260,9 @@ module Oddb2xml
                 #xml.ARTNO3
               #}
               xml.ARTBAR {
-                xml.CDTYP   'E13'
-                xml.BC      pac[:ean] unless pac[:ean].empty?
-                #xml.BCSTAT
+                xml.CDTYP  'E13'
+                xml.BC     de_pac[:ean] unless de_pac[:ean].empty?
+                xml.BCSTAT 'A' # P is alternative
                 #xml.PHAR2
               }
               #xml.ARTCH {
@@ -217,11 +271,15 @@ module Oddb2xml
                 #xml.LINENO
                 #xml.NOUNITS
               #}
-              #xml.ARTPRI {
-                #xml.VDAT
-                #xml.PTYP
-                #xml.PRICE
-              #}
+              if bg_pac
+                bg_pac[:prices].each_pair do |key, price|
+                  xml.ARTPRI {
+                   xml.VDAT  price[:valid_date] unless price[:valid_date].empty?
+                   xml.PTYP  price[:price_code] unless price[:price_code].empty?
+                   xml.PRICE price[:price]      unless price[:price].empty?
+                  }
+                end
+              end
               #xml.ARTMIG {
                 #xml.VDAT
                 #xml.MIGCD
