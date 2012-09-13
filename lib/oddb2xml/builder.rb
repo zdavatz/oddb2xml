@@ -40,7 +40,7 @@ module Oddb2xml
           'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'     => 'http://www.e-mediat.ch/index',
-          'CREATION_DATETIME' => '',
+          'CREATION_DATETIME' => Time.new.strftime('%FT%T.%7N%z'),
           'PROD_DATE'         => '',
           'VALID_DATE'        => ''
         ) {
@@ -173,7 +173,7 @@ module Oddb2xml
           'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'     => 'http://www.e-mediat.ch/index',
-          'CREATION_DATETIME' => '',
+          'CREATION_DATETIME' => Time.new.strftime('%FT%T.%7N%z'),
           'PROD_DATE'         => '',
           'VALID_DATE'        => ''
         ) {
@@ -181,11 +181,10 @@ module Oddb2xml
             de_pac = obj[:de] # swiss index DE (base)
             fr_pac = obj[:fr] # swiss index FR
             bg_pac = nil      # BAG XML (additional data)
+            if obj[:seq]
+              bg_pac = obj[:seq][:packages][de_pac[:pharmacode]]
+            end
             xml.ART('DT' => '') {
-              if obj[:seq]
-                bg_pac = obj[:seq][:packages][de_pac[:pharmacode]]
-              end
-
               xml.PHAR  de_pac[:pharmacode] unless de_pac[:pharmacode].empty?
               #xml.GRPCD
               #xml.CDS01
@@ -213,8 +212,8 @@ module Oddb2xml
               #xml.BG
               #xml.EXP
               #xml.QTY
-              xml.DSCRD de_pac[:desc] unless de_pac[:desc].empty?
-              xml.DSCRF fr_pac[:desc] unless fr_pac[:desc].empty?
+              xml.DSCRD de_pac[:desc]        unless de_pac[:desc].empty?
+              xml.DSCRF fr_pac[:desc]        unless fr_pac[:desc].empty?
               xml.SORTD de_pac[:desc].upcase unless de_pac[:desc].empty?
               xml.SORTF fr_pac[:desc].upcase unless fr_pac[:desc].empty?
               #xml.QTYUD
