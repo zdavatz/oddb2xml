@@ -26,7 +26,6 @@ module Oddb2xml
       end
     end
   end
-
   class BagXmlDownloader < Downloader
     def init
       @url ||= 'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip'
@@ -52,7 +51,6 @@ module Oddb2xml
       end
     end
   end
-
   class SwissIndexDownloader < Downloader
     def init
       @url ||= 'https://index.ws.e-mediat.net/Swissindex/Pharma/ws_Pharma_V101.asmx?WSDL'

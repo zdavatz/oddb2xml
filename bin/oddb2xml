@@ -1,6 +1,20 @@
 #!/usr/bin/env ruby
 
+require 'pathname'
+
+root = Pathname.new(__FILE__).realpath.parent.parent
+$:.unshift root.join('lib') if $0 == __FILE__
+
 require 'oddb2xml'
 
 ui = Oddb2xml::Cli.new
-ui.run
+unless ARGV.empty?
+  ui.help
+else
+  begin
+    ui.run
+  rescue Interrupt
+    puts
+    exit
+  end
+end

@@ -17,6 +17,13 @@ module Oddb2xml
         @index[lang] = {} # swissINDEX
       end
     end
+    def help
+      puts <<EOS
+#$0 ver.#{Oddb2xml::VERSION}
+Usage:
+  oddb2xml
+EOS
+    end
     def run
       # Sometimes nokogiri crashes with ruby in Threads.
       #threads = []
@@ -45,16 +52,25 @@ module Oddb2xml
     end
     private
     def build
-      SUBJECTS.each do |sbj|
-        builder = Builder.new do |builder|
-          builder.subject = sbj
-          builder.index   = @index
-          builder.items   = @items
+      files = {}
+      SUBJECTS.each{ |sbj| files[sbj] = "oddb_#{sbj}.xml" }
+      begin
+        files.each_pair do |sbj, file|
+          builder = Builder.new do |builder|
+            builder.subject = sbj
+            builder.index   = @index
+            builder.items   = @items
+          end
+          xml = builder.to_xml
+          File.open(file, 'w:utf-8'){ |fh| fh << xml }
         end
-        xml = builder.to_xml
-        File.open("oddb_#{sbj}.xml", 'w:utf-8') do |fh|
-          fh << xml
+      rescue Interrupt
+        files.values.each do |file|
+          if File.exist? file
+            File.unlink file
+          end
         end
+        raise Interrupt
       end
     end
     def report
