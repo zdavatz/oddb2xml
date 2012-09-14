@@ -290,9 +290,13 @@ module Oddb2xml
                 #xml.LINENO
                 #xml.CDVAL
               #}
-              #xml.ARTLIM {
-                #xml.LIMCD
-              #}
+              if bg_pac
+                bg_pac[:limitations].each do |lim|
+                  xml.ARTLIM {
+                    xml.LIMCD lim[:code] unless lim[:code].empty?
+                  }
+                end
+              end
               #xml.ARTINS {
                 #xml.VDAT
                 #xml.INCD

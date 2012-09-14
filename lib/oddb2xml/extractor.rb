@@ -24,15 +24,15 @@ module Oddb2xml
         item[:desc_fr]      = (desc = seq.at_xpath('.//DescriptionFr')) ? desc.text : ''
         item[:name_de]      = (name = seq.at_xpath('.//NameDe'))        ? name.text : ''
         item[:name_fr]      = (name = seq.at_xpath('.//NameFr'))        ? name.text : ''
-        item[:org_gen_code] = (code = seq.at_xpath('.//OrgGenCode'))    ? code.text : ''
-        item[:atc_code]     = (code = seq.at_xpath('.//AtcCode'))       ? code.text : ''
+        item[:org_gen_code] = (orgc = seq.at_xpath('.//OrgGenCode'))    ? orgc.text : ''
+        item[:atc_code]     = (orgc = seq.at_xpath('.//AtcCode'))       ? orgc.text : ''
         item[:comment_de]   = (info = seq.at_xpath('.//CommentDe'))     ? info.text : ''
         item[:comment_fr]   = (info = seq.at_xpath('.//CommentFr'))     ? info.text : ''
         item[:it_code]      = ''
-        seq.xpath('.//ItCode').each do |it_code|
+        seq.xpath('.//ItCode').each do |itc|
           if item[:it_code].to_s.empty?
-            code = it_code.attr('Code').to_s
-            item[:it_code] = (code =~ /(\d+)\.(\d+)\.(\d+)./) ? code : ''
+            it_code = itc.attr('Code').to_s
+            item[:it_code] = (it_code =~ /(\d+)\.(\d+)\.(\d+)./) ? it_code : ''
           end
         end
         item[:substances] = []
@@ -46,13 +46,13 @@ module Oddb2xml
         item[:pharmacodes] = []
         item[:packages]    = {} # pharmacode => package
         seq.xpath('.//Pack').each do |pac|
-          if code = pac.attr('Pharmacode')
-            code = code.to_s
+          if phar = pac.attr('Pharmacode')
+            phar = phar.to_s
             # as common key with swissINDEX
-            item[:pharmacodes] << code
+            item[:pharmacodes] << phar
             # packages
-            item[:packages][code] = {
-              :pharmacode          => code,
+            item[:packages][phar] = {
+              :pharmacode          => phar,
               :swissmedic_category => (cat = pac.at_xpath('.//SwissmedicCategory')) ? cat.text : '',
               :swissmedic_number   => (num = pac.at_xpath('.//SwissmedicNo8'))      ? num.text : '',
               :narcosis_flag       => (flg = pac.at_xpath('.//FlagNarcosis'))       ? flg.text : '',
@@ -69,11 +69,19 @@ module Oddb2xml
                 }
               }
             }
+            # limitation
+            item[:packages][phar][:limitations] = []
+            pac.xpath('.//Limitation').each do |lim|
+              item[:packages][phar][:limitations] << {
+                :code => (lic = lim.at_xpath('.//LimitationCode')) ? lic.text : '',
+                :type => (lit = lim.at_xpath('.//LimitationType')) ? lit.text : '',
+              }
+            end
             # limitation points
-            points = pac.at_xpath('.//PointLimitations/PointLimitation/Points') # only first points
-            item[:packages][code][:limitation_points] = points ? points.text : ''
+            pts = pac.at_xpath('.//PointLimitations/PointLimitation/Points') # only first points
+            item[:packages][phar][:limitation_points] = pts ? pts.text : ''
             # pharmacode => seq (same data)
-            data[code] = item
+            data[phar] = item
           end
         end
       end
@@ -104,8 +112,8 @@ module Oddb2xml
           item[:company_name] = (nam = comp.at_xpath('.//NAME')) ? nam.text : ''
           item[:company_ean]  = (gln = comp.at_xpath('.//GLN'))  ? gln.text : ''
         end
-        if code = item[:pharmacode]
-          data[code] = item
+        unless item[:pharmacode].empty?
+          data[item[:pharmacode]] = item
         end
       end
       data
