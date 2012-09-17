@@ -4,12 +4,14 @@ require 'thread'
 require 'oddb2xml/builder'
 require 'oddb2xml/downloader'
 require 'oddb2xml/extractor'
+require 'oddb2xml/compressor'
 
 module Oddb2xml
   class Cli
     SUBJECTS  = %w[product article]
     LANGUAGES = %w[DE FR] # EN does not exist
-    def initialize
+    def initialize(args)
+      @options = args
       #@mutex = Mutex.new
       @items = {} # Preparations.xml in BAG
       @index = {}
@@ -21,7 +23,8 @@ module Oddb2xml
       puts <<EOS
 #$0 ver.#{Oddb2xml::VERSION}
 Usage:
-  oddb2xml
+  oddb2xml [option]
+    -c    compress option. currently only 'tar.gz' is available.
 EOS
     end
     def run
@@ -63,6 +66,13 @@ EOS
           end
           xml = builder.to_xml
           File.open(file, 'w:utf-8'){ |fh| fh << xml }
+        end
+        unless @options[:compress].empty?
+          compressor = Compressor.new(@options[:compress])
+          files.values.each do |file|
+            compressor.contents << file
+          end
+          compressor.finalize!
         end
       rescue Interrupt
         files.values.each do |file|

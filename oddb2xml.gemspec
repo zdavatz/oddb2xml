@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
   gem.add_dependency 'rubyzip'
+  gem.add_dependency 'archive-tar-minitar'
   gem.add_dependency 'mechanize'
   gem.add_dependency 'nokogiri'
   gem.add_dependency 'savon'

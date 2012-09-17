@@ -7,8 +7,16 @@ $:.unshift root.join('lib') if $0 == __FILE__
 
 require 'oddb2xml'
 
-ui = Oddb2xml::Cli.new
-unless ARGV.empty?
+# TODO: Parse option
+args = ARGV.dup
+opts = {}
+if args == ['-c', 'tar.gz']
+  opts = {:compress => 'tar.gz'}
+  args = {}
+end
+
+ui = Oddb2xml::Cli.new(opts)
+unless args.empty?
   ui.help
 else
   begin
