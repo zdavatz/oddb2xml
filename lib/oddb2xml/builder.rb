@@ -39,7 +39,7 @@ module Oddb2xml
         xml.PRODUCT(
           'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-          'xmlns'     => 'http://www.e-mediat.ch/index',
+          'xmlns'     => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => Time.new.strftime('%FT%T.%7N%z'),
           'PROD_DATE'         => '',
           'VALID_DATE'        => ''
@@ -172,7 +172,7 @@ module Oddb2xml
         xml.ARTICLE(
           'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-          'xmlns'     => 'http://www.e-mediat.ch/index',
+          'xmlns'     => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => Time.new.strftime('%FT%T.%7N%z'),
           'PROD_DATE'         => '',
           'VALID_DATE'        => ''
