@@ -1,0 +1,14 @@
+.gitignore
+Gemfile
+History.txt
+Manifest.txt
+README.md
+Rakefile
+bin/oddb2xml
+lib/oddb2xml.rb
+lib/oddb2xml/builder.rb
+lib/oddb2xml/cli.rb
+lib/oddb2xml/downloader.rb
+lib/oddb2xml/extractor.rb
+lib/oddb2xml/version.rb
+oddb2xml.gemspec
