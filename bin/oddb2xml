@@ -9,9 +9,11 @@ require 'oddb2xml'
 
 # TODO: Parse option
 args = ARGV.dup
-opts = {}
+opts = {
+  :compress => nil
+}
 if args == ['-c', 'tar.gz']
-  opts = {:compress => 'tar.gz'}
+  opts[:compress] = 'tar.gz'
   args = {}
 end
 

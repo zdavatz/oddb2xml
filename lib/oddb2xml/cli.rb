@@ -67,7 +67,7 @@ EOS
           xml = builder.to_xml
           File.open(file, 'w:utf-8'){ |fh| fh << xml }
         end
-        unless @options[:compress].empty?
+        if @options[:compress]
           compressor = Compressor.new(@options[:compress])
           files.values.each do |file|
             compressor.contents << file
