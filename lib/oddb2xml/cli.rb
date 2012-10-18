@@ -45,7 +45,7 @@ EOS
           extractor = SwissIndexExtractor.new(xml)
           index = extractor.to_hash
           #@mutex.synchronize do
-            @index["#{lang}"] = index
+            @index[lang] = index
           #end
         #end
       end
