@@ -36,13 +36,14 @@ module Oddb2xml
         seq
       end
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        datetime = Time.new.strftime('%FT%T.%7N%z')
         xml.PRODUCT(
-          'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
-          'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-          'xmlns'     => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
-          'CREATION_DATETIME' => Time.new.strftime('%FT%T.%7N%z'),
-          'PROD_DATE'         => '',
-          'VALID_DATE'        => ''
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'PROD_DATE'         => datetime,
+          'VALID_DATE'        => datetime,
         ) {
           objects.each do |seq|
             xml.PRD('DT' => '') {
@@ -169,13 +170,14 @@ module Oddb2xml
         objects << object
       end
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        datetime = Time.new.strftime('%FT%T.%7N%z')
         xml.ARTICLE(
-          'xmlns:xsd' => 'http://www.w3.org/2001/XMLSchema',
-          'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-          'xmlns'     => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
-          'CREATION_DATETIME' => Time.new.strftime('%FT%T.%7N%z'),
-          'PROD_DATE'         => '',
-          'VALID_DATE'        => ''
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'PROD_DATE'         => datetime,
+          'VALID_DATE'        => datetime,
         ) {
           objects.each do |obj|
             de_pac = obj[:de] # swiss index DE (base)
