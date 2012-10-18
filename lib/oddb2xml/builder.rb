@@ -200,7 +200,9 @@ module Oddb2xml
               #xml.CLINCD
               #xml.ARTTYP
               #xml.VAT
-              #xml.SALECD
+              if de_pac
+                xml.SALECD de_pac[:status].empty? ? 'N' : de_pac[:status]
+              end
               if bg_pac
                 #xml.INSLIM
                 xml.LIMPTS bg_pac[:limitation_points] unless bg_pac[:limitation_points].empty?
