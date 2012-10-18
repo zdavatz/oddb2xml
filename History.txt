@@ -1,6 +1,6 @@
-=== 1.0.0 / 2012-09-17
+=== 1.0.4 / 18.09.2012
 
-* 1 major enhancement
-
-  * Birthday!
-
+*    Updated option handling.
+    
+        $ oddb2xml
+        $ oddb2xml -c tar.gz
