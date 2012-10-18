@@ -227,7 +227,13 @@ module Oddb2xml
                 xml.SYN1D obj[:seq][:name_de] unless obj[:seq][:name_de].empty?
                 xml.SYN1F obj[:seq][:name_fr] unless obj[:seq][:name_fr].empty?
               end
-              #xml.SLOPLUS
+              if obj[:seq]
+                case obj[:seq][:deductible]
+                when 'Y'; xml.SLOPLUS 1; # 20%
+                when 'N'; xml.SLOPLUS 2; # 10%
+                else      xml.SLOPLUS '' # k.A.
+                end
+              end
               #xml.NOPCS
               #xml.HSCD
               #xml.MINI
