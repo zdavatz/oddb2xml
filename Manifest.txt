@@ -1,6 +1,8 @@
 .gitignore
+.rspec
 Gemfile
 History.txt
+LICENSE
 Manifest.txt
 README.md
 Rakefile
@@ -13,3 +15,14 @@ lib/oddb2xml/downloader.rb
 lib/oddb2xml/extractor.rb
 lib/oddb2xml/version.rb
 oddb2xml.gemspec
+spec/builder_spec.rb
+spec/cli_spec.rb
+spec/compressor_spec.rb
+spec/data/XMLPublications.zip
+spec/data/oddb_article.xml
+spec/data/oddb_product.xml
+spec/data/swissindex.xml
+spec/data/wsdl.xml
+spec/downloader_spec.rb
+spec/extractor_spec.rb
+spec/spec_helper.rb
