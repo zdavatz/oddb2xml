@@ -1,6 +1,12 @@
+=== 1.0.5 / 19.10.2012
+
+* Removed unnecessary quote
+* Added PROD_DATE, VALID_DATE as same with creation
+* Added SALECD as STATUS(I,A) of swissindex
+* Added SLOPLUS (FlagSB20) field into article.xml
+
 === 1.0.4 / 18.09.2012
 
-*    Updated option handling.
-    
-        $ oddb2xml
-        $ oddb2xml -c tar.gz
+* Updated option handling.
+  $ oddb2xml
+  $ oddb2xml -c tar.gz
