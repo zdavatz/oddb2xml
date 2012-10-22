@@ -24,8 +24,9 @@ module Oddb2xml
             File.unlink file
           end
         end
-      rescue
-        if File.exits? @compressed_file
+      rescue => error
+        puts error
+        if File.exists? @compressed_file
           File.unlink @compressed_file
         end
         return false
