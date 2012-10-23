@@ -13,19 +13,11 @@ module Oddb2xml
     def initialize(args)
       @options = args
       #@mutex = Mutex.new
-      @items = {} # Preparations.xml in BAG
-      @index = {}
+      @items = {} # Items from Preparations.xml in BAG
+      @index = {} # Base index from swissINDEX
       LANGUAGES.each do |lang|
-        @index[lang] = {} # swissINDEX
+        @index[lang] = {}
       end
-    end
-    def help
-      puts <<EOS
-#$0 ver.#{Oddb2xml::VERSION}
-Usage:
-  oddb2xml [option]
-    -c    compress option. currently only 'tar.gz' is available.
-EOS
     end
     def run
       # Sometimes nokogiri crashes with ruby in Threads.
@@ -34,20 +26,20 @@ EOS
       #threads << Thread.new do
         downloader = BagXmlDownloader.new
         xml = downloader.download
-        extractor = BagXmlExtractor.new(xml)
-        @items = extractor.to_hash
+        @items = BagXmlExtractor.new(xml).to_hash
       #end
-      LANGUAGES.map do |lang|
+      LANGUAGES.each do |lang|
         # swissindex
-        #threads << Thread.new do
-          downloader = SwissIndexDownloader.new
-          xml = downloader.download_by(lang)
-          extractor = SwissIndexExtractor.new(xml)
-          index = extractor.to_hash
-          #@mutex.synchronize do
-            @index[lang] = index
+        types.each do |type|
+          #threads << Thread.new do
+            downloader = SwissIndexDownloader.new(type)
+            xml = downloader.download_by(lang)
+            hsh = SwissIndexExtractor.new(xml, type).to_hash
+            #@mutex.synchronize do
+              @index[lang][type] = hsh
+            #end
           #end
-        #end
+        end
       end
       #threads.map(&:join)
       build
@@ -60,9 +52,16 @@ EOS
       begin
         files.each_pair do |sbj, file|
           builder = Builder.new do |builder|
+            index = {}
+            LANGUAGES.each do |lang|
+              index[lang] = {} unless index[lang]
+              types.each do |type|
+                index[lang].merge!(@index[lang][type])
+              end
+            end
             builder.subject = sbj
-            builder.index   = @index
-            builder.items   = @items
+            builder.index = index
+            builder.items = @items
           end
           xml = builder.to_xml
           File.open(file, 'w:utf-8'){ |fh| fh << xml }
@@ -84,7 +83,22 @@ EOS
       end
     end
     def report
-      # pass
+      lines = []
+      LANGUAGES.each do |lang|
+        lines << lang
+        types.each do |type|
+          key = (type == :nonpharma ? 'NonPharma' : 'Pharma')
+          lines << sprintf("\t#{key} products: %i", @index[lang][type].values.length)
+        end
+      end
+      puts lines.join("\n")
+    end
+    def types # swissindex
+      if @options[:nonpharma]
+        [:pharma, :nonpharma]
+      else
+        [:pharma]
+      end
     end
   end
 end

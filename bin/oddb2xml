@@ -5,26 +5,44 @@ require 'pathname'
 root = Pathname.new(__FILE__).realpath.parent.parent
 $:.unshift root.join('lib') if $0 == __FILE__
 
+require 'optparse'
 require 'oddb2xml'
 
-# TODO: Parse option
-args = ARGV.dup
+def help
+  <<EOS
+#$0 ver.#{Oddb2xml::VERSION}
+Usage:
+  oddb2xml [option]
+    -c F, --compress=F  Compress format F. Currently only 'tar.gz' is available.
+    -a T, --append=T    Additional target. T is only 'nonpharma' available.
+    -h,   --help        Show this help message.
+EOS
+end
+
+parser = OptionParser.new
 opts = {
-  :compress => nil
+  :compress  => nil,
+  :nonpharma => false
 }
-if args == ['-c', 'tar.gz']
-  opts[:compress] = 'tar.gz'
-  args = {}
+
+parser.on('-c v', '--compress v', /tar\.gz/) {|v| opts[:compress] = v }
+parser.on('-a v', '--append v', /nonpharma/) {|v| opts[:nonpharma] = v }
+parser.on_tail('-h', '--help') { puts help; exit }
+
+args = ARGV.dup
+begin
+  parser.parse!(args)
+rescue OptionParser::MissingArgument,
+       OptionParser::InvalidArgument,
+       OptionParser::InvalidOption
+  puts help
+  exit
 end
 
 ui = Oddb2xml::Cli.new(opts)
-unless args.empty?
-  ui.help
-else
-  begin
-    ui.run
-  rescue Interrupt
-    puts
-    exit
-  end
+begin
+  ui.run
+rescue Interrupt
+  puts
+  exit
 end

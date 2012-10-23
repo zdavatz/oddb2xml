@@ -52,8 +52,12 @@ module Oddb2xml
     end
   end
   class SwissIndexDownloader < Downloader
+    def initialize(type=:pharma)
+      @type = (type == :pharma ? 'Pharma' : 'NonPharma')
+      url = "https://index.ws.e-mediat.net/Swissindex/#{@type}/ws_#{@type}_V101.asmx?WSDL"
+      super(url)
+    end
     def init
-      @url ||= 'https://index.ws.e-mediat.net/Swissindex/Pharma/ws_Pharma_V101.asmx?WSDL'
       Savon.configure do |config|
         config.log_level    = :info
         config.log          = false # $stdout
@@ -66,12 +70,13 @@ module Oddb2xml
         wsdl.document             = @url
       end
       begin
+        type = @type
         response = client.request :download_all do
           soap.xml = <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 <soap:Body>
-  <lang xmlns="http://swissindex.e-mediat.net/SwissindexPharma_out_V101">#{lang}</lang>
+  <lang xmlns="http://swissindex.e-mediat.net/Swissindex#{type}_out_V101">#{lang}</lang>
 </soap:Body>
 </soap:Envelope>
 XML

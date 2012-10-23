@@ -11,9 +11,7 @@ module Oddb2xml
   end
   class BagXmlExtractor < Extractor
     def to_hash
-      #File.open('../bagxml.xml', 'r:ASCII-8BIT') do |f|
-      #  @xml = f.read
-      #end
+      #File.open('../bagxml.xml', 'r:ASCII-8BIT') {|f| @xml = f.read }
       # pharmacode => sequence
       data = {}
       doc = Nokogiri::XML(@xml)
@@ -90,15 +88,17 @@ module Oddb2xml
     end
   end
   class SwissIndexExtractor < Extractor
+    def initialize(xml, type)
+      @type = (type == :pharma ? 'PHARMA' : 'NONPHARMA')
+      super(xml)
+    end
     def to_hash
-      #File.open('../swissindex.xml', 'r:ASCII-8BIT') do |f|
-      #  @xml = f.read
-      #end
+      #File.open("../swissindex_#{@type.downcase}.xml", 'r:ASCII-8BIT'){|f| @xml = f.read }
       # pharmacode => package
       data = {}
       doc = Nokogiri::XML(@xml)
       doc.remove_namespaces!
-      doc.xpath('//Envelope/Body/PHARMA/ITEM').each do |pac|
+      doc.xpath("//Envelope/Body/#{@type}/ITEM").each do |pac|
         item = {}
         item[:ean]             = (gtin = pac.at_xpath('.//GTIN'))   ? gtin.text : ''
         item[:pharmacode]      = (phar = pac.at_xpath('.//PHAR'))   ? phar.text : ''

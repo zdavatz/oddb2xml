@@ -1,34 +1,6 @@
 # encoding: utf-8
 
 require 'spec_helper'
-require 'webmock/rspec'
-
-module SavonWebMock
-  def define_mock
-    # wsdl
-    stub_wsdl_url = 'https://example.com/test?wsdl'
-    stub_response = File.read(File.expand_path('../data/wsdl.xml', __FILE__))
-    stub_request(:get, stub_wsdl_url).
-      with(:headers => {
-        'Accept' => '*/*',
-        'User-Agent' => 'Ruby'}).
-      to_return(
-        :status  => 200,
-        :headers => {'Content-Type' => 'text/xml; charset=utf-8'},
-        :body    => stub_response)
-    # soap
-    stub_soap_url = 'https://example.com/test'
-    stub_response = File.read(File.expand_path('../data/swissindex.xml', __FILE__))
-    stub_request(:post, stub_soap_url).
-      with(:headers => {
-        'Accept'     => '*/*',
-        'User-Agent' => 'Ruby'}).
-      to_return(
-        :status  => 200,
-        :headers => {'Content-Type' => 'text/xml; chaprset=utf-8'},
-        :body    => stub_response)
-  end
-end
 
 shared_examples_for 'any downloader' do
   # this takes 5 sec. by call for sleep
@@ -46,9 +18,10 @@ shared_examples_for 'any downloader' do
 end
 
 describe Oddb2xml::BagXmlDownloader do
-  before(:all) do
-    test_zip    = 'file://' + File.expand_path('../data/XMLPublications.zip', __FILE__)
-    @downloader = Oddb2xml::BagXmlDownloader.new(test_zip)
+  include ServerMockHelper
+  before(:each) do
+    setup_bag_xml_server_mock
+    @downloader = Oddb2xml::BagXmlDownloader.new()
   end
   it_behaves_like 'any downloader'
   context 'when download is called' do
@@ -70,11 +43,10 @@ describe Oddb2xml::BagXmlDownloader do
 end
 
 describe Oddb2xml::SwissIndexDownloader do
-  include SavonWebMock
+  include ServerMockHelper
   before(:each) do
-    define_mock
-    test_wsdl   = 'https://example.com/test?wsdl'
-    @downloader = Oddb2xml::SwissIndexDownloader.new(test_wsdl)
+    setup_swiss_index_server_mock
+    @downloader = Oddb2xml::SwissIndexDownloader.new()
   end
   it_behaves_like 'any downloader'
   context 'when download_by is called with DE' do

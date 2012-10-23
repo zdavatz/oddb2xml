@@ -12,7 +12,54 @@ require 'bundler/setup'
 Bundler.require
 
 require 'rspec'
+require 'webmock/rspec'
 require 'oddb2xml'
+
+module ServerMockHelper
+  def setup_server_mocks
+    setup_bag_xml_server_mock
+    setup_swiss_index_server_mock
+  end
+  def setup_bag_xml_server_mock
+    # zip
+    stub_wsdl_url = 'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip'
+    stub_response = File.read(File.expand_path('../data/XMLPublications.zip', __FILE__))
+    stub_request(:get, stub_wsdl_url).
+      with(:headers => {
+        'Accept'          => '*/*',
+        'Accept-Encoding' => 'gzip,deflate,identity',
+        'Host'            => 'bag.e-mediat.net',
+      }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'application/zip; charset=utf-8'},
+        :body    => stub_response)
+  end
+  def setup_swiss_index_server_mock
+    # wsdl
+    stub_wsdl_url = 'https://index.ws.e-mediat.net/Swissindex/Pharma/ws_Pharma_V101.asmx?WSDL'
+    stub_response = File.read(File.expand_path('../data/wsdl.xml', __FILE__))
+    stub_request(:get, stub_wsdl_url).
+      with(:headers => {
+        'Accept'     => '*/*',
+        'User-Agent' => 'Ruby'}).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'text/xml; charset=utf-8'},
+        :body    => stub_response)
+    # soap (dummy)
+    stub_soap_url = 'https://example.com/test'
+    stub_response = File.read(File.expand_path('../data/swissindex.xml', __FILE__))
+    stub_request(:post, stub_soap_url).
+      with(:headers => {
+        'Accept'     => '*/*',
+        'User-Agent' => 'Ruby'}).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'text/xml; chaprset=utf-8'},
+        :body    => stub_response)
+  end
+end
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
@@ -24,4 +71,7 @@ RSpec.configure do |config|
   # the seed, which is printed after each run.
   #     --seed 1234
   config.order = 'random'
+
+  # Helper
+  config.include(ServerMockHelper)
 end
