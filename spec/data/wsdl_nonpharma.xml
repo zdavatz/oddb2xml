@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions
+  xmlns:s="http://www.w3.org/2001/XMLSchema"
+  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+  xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+  xmlns:tns="http://example.com/test"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/"
+  xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+  targetNamespace="http://example.com/test"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://example.com/test">
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="DownloadAllSoapIn">
+    <wsdl:part name="lang" element="tns:lang" />
+  </wsdl:message>
+  <wsdl:message name="DownloadAllSoapOut">
+    <wsdl:part name="DownloadAllResult" element="tns:NONPHARMA" />
+  </wsdl:message>
+  <wsdl:binding name="ws_NonPharma_V101Soap" type="tns:ws_NonPharma_V101Soap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="DownloadAll">
+      <soap:operation soapAction="http://example.com/DownloadAll" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ws_NonPharma_V101Soap12" type="tns:ws_NonPharma_V101Soap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="DownloadAll">
+      <soap12:operation soapAction="http://example.com/DownloadAll" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ws_NonPharma_V101">
+    <wsdl:port name="ws_NonPharma_V101Soap" binding="tns:ws_NonPharma_V101Soap">
+      <soap:address location="https://example.com/test" />
+    </wsdl:port>
+    <wsdl:port name="ws_NonPharma_V101Soap12" binding="tns:ws_NonPharma_V101Soap12">
+      <soap12:address location="https://example.com/test" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

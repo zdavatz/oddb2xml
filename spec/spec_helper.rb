@@ -36,28 +36,30 @@ module ServerMockHelper
         :body    => stub_response)
   end
   def setup_swiss_index_server_mock
-    # wsdl
-    stub_wsdl_url = 'https://index.ws.e-mediat.net/Swissindex/Pharma/ws_Pharma_V101.asmx?WSDL'
-    stub_response = File.read(File.expand_path('../data/wsdl.xml', __FILE__))
-    stub_request(:get, stub_wsdl_url).
-      with(:headers => {
-        'Accept'     => '*/*',
-        'User-Agent' => 'Ruby'}).
-      to_return(
-        :status  => 200,
-        :headers => {'Content-Type' => 'text/xml; charset=utf-8'},
-        :body    => stub_response)
-    # soap (dummy)
-    stub_soap_url = 'https://example.com/test'
-    stub_response = File.read(File.expand_path('../data/swissindex.xml', __FILE__))
-    stub_request(:post, stub_soap_url).
-      with(:headers => {
-        'Accept'     => '*/*',
-        'User-Agent' => 'Ruby'}).
-      to_return(
-        :status  => 200,
-        :headers => {'Content-Type' => 'text/xml; chaprset=utf-8'},
-        :body    => stub_response)
+    ['Pharma', 'NonPharma'].each do |type|
+      # wsdl
+      stub_wsdl_url = "https://index.ws.e-mediat.net/Swissindex/#{type}/ws_#{type}_V101.asmx?WSDL"
+      stub_response = File.read(File.expand_path("../data/wsdl_#{type.downcase}.xml", __FILE__))
+      stub_request(:get, stub_wsdl_url).
+        with(:headers => {
+          'Accept'     => '*/*',
+          'User-Agent' => 'Ruby'}).
+        to_return(
+          :status  => 200,
+          :headers => {'Content-Type' => 'text/xml; charset=utf-8'},
+          :body    => stub_response)
+      # soap (dummy)
+      stub_soap_url = 'https://example.com/test'
+      stub_response = File.read(File.expand_path("../data/swissindex_#{type.downcase}.xml", __FILE__))
+      stub_request(:post, stub_soap_url).
+        with(:headers => {
+          'Accept'     => '*/*',
+          'User-Agent' => 'Ruby'}).
+        to_return(
+          :status  => 200,
+          :headers => {'Content-Type' => 'text/xml; chaprset=utf-8'},
+          :body    => stub_response)
+    end
   end
 end
 
@@ -65,6 +67,8 @@ RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
+  config.filter_run_excluding :slow
+  #config.exclusion_filter = {:slow => true}
 
   # Run specs in random order to surface order dependencies. If you find an
   # order dependency and want to debug it, you can fix the order by providing

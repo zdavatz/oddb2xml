@@ -30,7 +30,20 @@ describe Oddb2xml::Compressor do
       end
     end
     context 'successfully' do
-      it 'pending'
+      it 'should create compressed file' do
+        File.stub(:unlink).and_return(false)
+        @compressor.contents << File.expand_path('../data/oddb_article.xml', __FILE__)
+        @compressor.contents << File.expand_path('../data/oddb_product.xml', __FILE__)
+        @compressor.finalize!.should == true
+        compressed_file = @compressor.instance_variable_get(:@compressed_file)
+        File.exists?(compressed_file).should == true
+        File.unstub!(:unlink)
+      end
+      after(:each) do
+        Dir.glob('oddb_xml_*.tar.gz').each do |file|
+          File.unlink(file) if File.exists?(file)
+        end
+      end
     end
   end
 end
