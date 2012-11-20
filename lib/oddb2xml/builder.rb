@@ -2,13 +2,27 @@
 
 require 'nokogiri'
 
+module Nokogiri
+  module XML
+    class Document < Nokogiri::XML::Node
+      attr_writer :tag_suffix
+      alias :create_element_origin :create_element
+      def create_element name, *args, &block
+        name += (@tag_suffix || '')
+        create_element_origin(name, *args, &block)
+      end
+    end
+  end
+end
+
 module Oddb2xml
   class Builder
-    attr_accessor :subject, :index, :items
+    attr_accessor :subject, :index, :items, :tag_suffix
     def initialize
-      @subject = nil
-      @index   = {}
-      @items   = {}
+      @subject    = nil
+      @index      = {}
+      @items      = {}
+      @tag_suffix = ''
       if block_given?
         yield self
       end
@@ -36,6 +50,7 @@ module Oddb2xml
         seq
       end
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T.%7N%z')
         xml.PRODUCT(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
@@ -170,6 +185,7 @@ module Oddb2xml
         objects << object
       end
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T.%7N%z')
         xml.ARTICLE(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',

@@ -59,9 +59,10 @@ module Oddb2xml
                 index[lang].merge!(@index[lang][type])
               end
             end
-            builder.subject = sbj
-            builder.index = index
-            builder.items = @items
+            builder.subject    = sbj
+            builder.index      = index
+            builder.items      = @items
+            builder.tag_suffix = @options[:tag_suffix]
           end
           xml = builder.to_xml
           File.open(file, 'w:utf-8'){ |fh| fh << xml }

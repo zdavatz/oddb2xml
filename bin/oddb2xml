@@ -13,20 +13,23 @@ def help
 #$0 ver.#{Oddb2xml::VERSION}
 Usage:
   oddb2xml [option]
-    -c F, --compress=F  Compress format F. Currently only 'tar.gz' is available.
-    -a T, --append=T    Additional target. T is only 'nonpharma' available.
-    -h,   --help        Show this help message.
+    -c F, --compress=F   Compress format F. Currently only 'tar.gz' is available.
+    -a T, --append=T     Additional target. T is only 'nonpharma' available.
+    -t S, --tag-suffix=S XML tag suffix S. default none. Only 'md' is available.
+    -h,   --help         Show this help message.
 EOS
 end
 
 parser = OptionParser.new
 opts = {
-  :compress  => nil,
-  :nonpharma => false
+  :compress   => nil,
+  :nonpharma  => false,
+  :tag_suffix => '',
 }
 
 parser.on('-c v', '--compress v', /tar\.gz/) {|v| opts[:compress] = v }
 parser.on('-a v', '--append v', /nonpharma/) {|v| opts[:nonpharma] = v }
+parser.on('-t v', '--tag-suffix v', /md/i)   {|v| opts[:tag_suffix] = v.upcase }
 parser.on_tail('-h', '--help') { puts help; exit }
 
 args = ARGV.dup
