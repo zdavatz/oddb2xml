@@ -22,7 +22,7 @@ module Oddb2xml
       @subject    = nil
       @index      = {}
       @items      = {}
-      @tag_suffix = ''
+      @tag_suffix = nil
       if block_given?
         yield self
       end

@@ -7,8 +7,8 @@ module Oddb2xml
  class Compressor
     include Archive::Tar
     attr_accessor :contents
-    def initialize(ext='tar.gz')
-      @compressed_file = 'oddb_xml_' + Time.now.strftime("%d.%m.%Y_%H.%M.#{ext}")
+    def initialize(prefix='oddb', ext='tar.gz')
+      @compressed_file = "#{prefix}_xml_" + Time.now.strftime("%d.%m.%Y_%H.%M.#{ext}")
       @contents = []
       super()
     end

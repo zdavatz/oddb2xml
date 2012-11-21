@@ -48,7 +48,8 @@ module Oddb2xml
     private
     def build
       files = {}
-      SUBJECTS.each{ |sbj| files[sbj] = "oddb_#{sbj}.xml" }
+      prefix = (@options[:tag_suffix] || 'oddb').gsub(/^_|_$/, '').downcase
+      SUBJECTS.each{ |sbj| files[sbj] = "#{prefix}_#{sbj}.xml" }
       begin
         files.each_pair do |sbj, file|
           builder = Builder.new do |builder|
@@ -67,8 +68,8 @@ module Oddb2xml
           xml = builder.to_xml
           File.open(file, 'w:utf-8'){ |fh| fh << xml }
         end
-        if @options[:compress]
-          compressor = Compressor.new(@options[:compress])
+        if @options[:compress_ext]
+          compressor = Compressor.new(prefix, @options[:compress_ext])
           files.values.each do |file|
             compressor.contents << file
           end

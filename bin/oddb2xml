@@ -16,18 +16,19 @@ Usage:
     -c F, --compress=F   Compress format F. Currently only 'tar.gz' is available.
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
     -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9_]
+                         If S is given, it is also used as prefix of filename.
     -h,   --help         Show this help message.
 EOS
 end
 
 parser = OptionParser.new
 opts = {
-  :compress   => nil,
-  :nonpharma  => false,
-  :tag_suffix => '',
+  :compress_ext => nil,
+  :nonpharma    => false,
+  :tag_suffix   => nil,
 }
 
-parser.on('-c v', '--compress v', /tar\.gz/) {|v| opts[:compress] = v }
+parser.on('-c v', '--compress v', /tar\.gz/) {|v| opts[:compress_ext] = v }
 parser.on('-a v', '--append v', /nonpharma/) {|v| opts[:nonpharma] = v }
 parser.on('-t v', '--tag-suffix v', /^[A-z0-9_]*$/i) {|v| opts[:tag_suffix] = v.upcase }
 parser.on_tail('-h', '--help') { puts help; exit }
