@@ -15,7 +15,7 @@ Usage:
   oddb2xml [option]
     -c F, --compress=F   Compress format F. Currently only 'tar.gz' is available.
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
-    -t S, --tag-suffix=S XML tag suffix S. Default is none. Only 'md' is available.
+    -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9_]
     -h,   --help         Show this help message.
 EOS
 end
@@ -29,7 +29,7 @@ opts = {
 
 parser.on('-c v', '--compress v', /tar\.gz/) {|v| opts[:compress] = v }
 parser.on('-a v', '--append v', /nonpharma/) {|v| opts[:nonpharma] = v }
-parser.on('-t v', '--tag-suffix v', /md/i)   {|v| opts[:tag_suffix] = v.upcase }
+parser.on('-t v', '--tag-suffix v', /^[A-z0-9_]*$/i) {|v| opts[:tag_suffix] = v.upcase }
 parser.on_tail('-h', '--help') { puts help; exit }
 
 args = ARGV.dup
