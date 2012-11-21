@@ -2,14 +2,15 @@
 
 require 'zlib'
 require 'archive/tar/minitar'
+require 'zip/zip'
 
 module Oddb2xml
  class Compressor
     include Archive::Tar
     attr_accessor :contents
     def initialize(prefix='oddb', ext='tar.gz')
-      @compressed_file = "#{prefix}_xml_" + Time.now.strftime("%d.%m.%Y_%H.%M.#{ext}")
-      @contents = []
+      @compress_file = "#{prefix}_xml_" + Time.now.strftime("%d.%m.%Y_%H.%M.#{ext}")
+      @contents      = []
       super()
     end
     def finalize!
@@ -17,17 +18,27 @@ module Oddb2xml
         return false
       end
       begin
-        tgz = Zlib::GzipWriter.new(File.open(@compressed_file, 'wb'))
-        Minitar.pack(@contents, tgz)
-        if File.exists? @compressed_file
+        case @compress_file
+        when /\.tar\.gz$/
+          tgz = Zlib::GzipWriter.new(File.open(@compress_file, 'wb'))
+          Minitar.pack(@contents, tgz)
+        when /\.zip$/
+          Zip::ZipFile.open(@compress_file, Zip::ZipFile::CREATE) do |zip|
+            @contents.each do |file|
+              filename = File.basename(file)
+              zip.add(filename, file)
+            end
+          end
+        end
+        if File.exists? @compress_file
           @contents.each do |file|
             File.unlink file
           end
         end
       rescue => error
         puts error
-        if File.exists? @compressed_file
-          File.unlink @compressed_file
+        if File.exists? @compress_file
+          File.unlink @compress_file
         end
         return false
       end

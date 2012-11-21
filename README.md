@@ -12,7 +12,7 @@ $ oddb2xml --help
 oddb2xml ver.1.0.7
 Usage:
   oddb2xml [option]
-    -c F, --compress=F   Compress format F. Currently only 'tar.gz' is available.
+    -c F, --compress=F   Compress format F. {tar.gz|zip}
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
     -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9_]
                          If S is given, it is also used as prefix of filename.
@@ -25,9 +25,9 @@ Usage:
 option examples.
 
 ```
-$ oddb2xml                            # => oddb_article.xml, oddb_product.xml
-$ oddb2xml -t md                      # => md_article.xml, md_product.xml
-$ oddb2xml -a nonpharma -t md -c zip  # => md_xml_dd.mm.yyyy_hh.mm.tar.gz
+$ oddb2xml                              # => oddb_article.xml, oddb_product.xml
+$ oddb2xml -t md                        # => md_article.xml, md_product.xml
+$ oddb2xml -a nonpharma -t md -c tar.gz # => md_xml_dd.mm.yyyy_hh.mm.tar.gz
 ```
 
 output.

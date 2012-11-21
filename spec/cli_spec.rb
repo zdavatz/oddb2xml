@@ -28,10 +28,10 @@ describe Oddb2xml::Cli do
     setup_server_mocks
   end
   context 'when -c tar.gz option is given' do
-    let(:cli) { Oddb2xml::Cli.new({:compress => 'tar.gz', :nonpharma => false}) }
+    let(:cli) { Oddb2xml::Cli.new({:compress_ext => 'tar.gz', :nonpharma => false}) }
     it_behaves_like 'any interface'
     it 'should have compress option' do
-      cli.should have_option(:compress => 'tar.gz')
+      cli.should have_option(:compress_ext => 'tar.gz')
     end
     it 'should create tar.gz file' do
       $stdout.should_receive(:puts).with(/Pharma/)
@@ -53,7 +53,7 @@ describe Oddb2xml::Cli do
     end
   end
   context 'when -a nonpharma option is given' do
-    let(:cli) { Oddb2xml::Cli.new({:compress => nil, :nonpharma => true}) }
+    let(:cli) { Oddb2xml::Cli.new({:compress_ext => nil, :nonpharma => true}) }
     it_behaves_like 'any interface'
     it 'should have nonpharma option' do
       cli.should have_option(:nonpharma => true)
