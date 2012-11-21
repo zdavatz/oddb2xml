@@ -1,5 +1,13 @@
 === 1.0.7 / 20.11.2012
 
+* Update spec for cli
+* Add zip compress option
+* Use -t option also as prefix of filename
+* Allow tag suffix as flexible word
+* Update help message
+
+=== 1.0.7 / 20.11.2012
+
 * Add -t --tag-suffix option for 'md'
 
 === 1.0.6 / 23.10.2012
