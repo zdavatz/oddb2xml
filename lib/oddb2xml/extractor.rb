@@ -36,8 +36,9 @@ module Oddb2xml
         seq.xpath('.//Substance').each_with_index do |sub, i|
           item[:substances] << {
             :index    => i.to_s,
-            :quantity => (qtty = sub.at_xpath('.//Quantity'))     ? qtty.text : '',
-            :unit     => (unit = sub.at_xpath('.//QuantityUnit')) ? unit.text : '',
+            :name     => (name = sub.at_xpath('.//DescriptionLa')) ? name.text : '',
+            :quantity => (qtty = sub.at_xpath('.//Quantity'))      ? qtty.text : '',
+            :unit     => (unit = sub.at_xpath('.//QuantityUnit'))  ? unit.text : '',
           }
         end
         item[:pharmacodes] = []
