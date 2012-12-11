@@ -65,12 +65,19 @@ module Oddb2xml
             builder.items      = @items
             builder.tag_suffix = @options[:tag_suffix]
           end
+          if file =~ /(product)/
+            xml = builder.to_xml('substance')
+            File.open(file.gsub($1, 'substance'), 'w:utf-8'){ |fh| fh << xml }
+          end
           xml = builder.to_xml
           File.open(file, 'w:utf-8'){ |fh| fh << xml }
         end
         if @options[:compress_ext]
           compressor = Compressor.new(prefix, @options[:compress_ext])
           files.values.each do |file|
+            if file =~ /(product)/
+              compressor.contents << file.gsub($1, 'substance')
+            end
             compressor.contents << file
           end
           compressor.finalize!

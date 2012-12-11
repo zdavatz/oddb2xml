@@ -14,7 +14,7 @@ module Oddb2xml
       super()
     end
     def finalize!
-      unless @contents.select{ |file| File.exists?(file) }.length == 2
+      unless @contents.select{ |file| File.exists?(file) }.length == 3
         return false
       end
       begin

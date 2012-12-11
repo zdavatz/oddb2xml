@@ -27,12 +27,53 @@ module Oddb2xml
         yield self
       end
     end
-    def to_xml
-      if @subject
+    def to_xml(subject=nil)
+      if subject
+        self.send('build_' + subject)
+      elsif @subject
         self.send('build_' + @subject)
       end
     end
     private
+    def build_substance
+      @substances = []
+      @items.values.uniq.each do |seq|
+        seq[:substances].each do |sub|
+          @substances << sub[:name]
+        end
+      end
+      @substances.uniq!
+      @substances.sort!
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T.%7N%z')
+        xml.SUBSTANCE(
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'PROD_DATE'         => datetime,
+          'VALID_DATE'        => datetime,
+        ) {
+          @substances.each_with_index do |sub_name, i|
+            xml.SB('DT' => '') {
+              xml.SUBNO (i + 1).to_i
+              #xml.NAMD
+              #xml.ANAMD
+              #xml.NAMF
+              xml.NAML sub_name
+            }
+          end
+          xml.RESULT {
+            xml.OK_ERROR   'OK'
+            xml.NBR_RECORD @substances.length.to_s
+            xml.ERROR_CODE ''
+            xml.MESSAGE    ''
+          }
+        }
+      end
+      _builder.to_xml
+    end
     def build_product
       # merge company info from swissINDEX
       objects = []
@@ -137,7 +178,7 @@ module Oddb2xml
                 seq[:substances].each do |sub|
                   xml.CPTCMP {
                     xml.LINE  sub[:index]    unless sub[:index].empty?
-                    #xml.SUBNO
+                    xml.SUBNO @substances.index(sub[:name]) + 1 if @substances.include?(sub[:name])
                     xml.QTY   sub[:quantity] unless sub[:quantity].empty?
                     xml.QTYU  sub[:unit]     unless sub[:unit].empty?
                     #xml.WHK
