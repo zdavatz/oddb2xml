@@ -12,7 +12,7 @@ module Oddb2xml
     LANGUAGES = %w[DE FR] # EN does not exist
     def initialize(args)
       @options = args
-      #@mutex = Mutex.new
+      @mutex = Mutex.new
       @items = {} # Items from Preparations.xml in BAG
       @index = {} # Base index from swissINDEX
       LANGUAGES.each do |lang|
@@ -20,28 +20,27 @@ module Oddb2xml
       end
     end
     def run
-      # Sometimes nokogiri crashes with ruby in Threads.
-      #threads = []
+      threads = []
       # bag_xml
-      #threads << Thread.new do
+      threads << Thread.new do
         downloader = BagXmlDownloader.new
         xml = downloader.download
         @items = BagXmlExtractor.new(xml).to_hash
-      #end
+      end
       LANGUAGES.each do |lang|
         # swissindex
         types.each do |type|
-          #threads << Thread.new do
+          threads << Thread.new do
             downloader = SwissIndexDownloader.new(type)
             xml = downloader.download_by(lang)
-            hsh = SwissIndexExtractor.new(xml, type).to_hash
-            #@mutex.synchronize do
+            @mutex.synchronize do
+              hsh = SwissIndexExtractor.new(xml, type).to_hash
               @index[lang][type] = hsh
-            #end
-          #end
+            end
+          end
         end
       end
-      #threads.map(&:join)
+      threads.map(&:join)
       build
       report
     end
