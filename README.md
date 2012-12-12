@@ -1,6 +1,6 @@
 # oddb2xml
 
-oddb2xml, creates xml files using swissINDEX, BAG-XML and Swissmedic XLS.
+oddb2xml, creates xml files using swissINDEX and BAG-XML.
 
 
 ## usage
@@ -25,8 +25,8 @@ Usage:
 option examples.
 
 ```
-$ oddb2xml                              # => oddb_article.xml, oddb_product.xml
-$ oddb2xml -t md                        # => md_article.xml, md_product.xml
+$ oddb2xml                              # => oddb_article.xml, oddb_product.xml, oddb_substance.xml
+$ oddb2xml -t md                        # => md_article.xml, md_product.xml, md_substance.xml
 $ oddb2xml -a nonpharma -t md -c tar.gz # => md_xml_dd.mm.yyyy_hh.mm.tar.gz
 ```
 
@@ -104,11 +104,13 @@ For example, if `-t _swiss` is given then oddb2xml creates product.xml as swiss_
     <CPT_SWISS>
       <CPTCMP_SWISS>
         <LINE_SWISS>0</LINE_SWISS>
+        <SUBNO_SWISS>100</SUBNO_SWISS>
         <QTY_SWISS>1000</QTY_SWISS>
         <QTYU_SWISS>U.</QTYU_SWISS>
       </CPTCMP_SWISS>
       <CPTCMP_SWISS>
         <LINE_SWISS>1</LINE_SWISS>
+        <SUBNO_SWISS>105</SUBNO_SWISS>
         <QTY_SWISS>10000</QTY_SWISS>
         <QTYU_SWISS>U.</QTYU_SWISS>
       </CPTCMP_SWISS>
@@ -122,4 +124,29 @@ For example, if `-t _swiss` is given then oddb2xml creates product.xml as swiss_
     <MESSAGE_SWISS/>
   </RESULT_SWISS>
 </PRODUCT_SWISS>
+```
+
+### substance.xml
+
+product.xml has relation to substance as `<SUBNO>`.
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<SUBSTANCE xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration" CREATION_DATETIME="2012-12-11T14:27:17.4444763+0900" PROD_DATE="2012-12-11T14:27:17.4444763+0900" VALID_DATE="2012-12-11T14:27:17.4444763+0900">
+  <SB DT="">
+    <SUBNO>1</SUBNO>
+    <NAML>3-Methoxy-butylis acetas</NAML>
+  </SB>
+  <SB DT="">
+    <SUBNO>2</SUBNO>
+    <NAML>4-Methylbenzylidene camphor</NAML>
+  </SB>
+  ...
+  <RESULT>
+    <OK_ERROR>OK</OK_ERROR>
+    <NBR_RECORD>1441</NBR_RECORD>
+    <ERROR_CODE/>
+    <MESSAGE/>
+  </RESULT>
+</SUBSTANCE>
 ```
