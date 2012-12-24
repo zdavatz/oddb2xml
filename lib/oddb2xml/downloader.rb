@@ -96,4 +96,36 @@ XML
       end
     end
   end
+  class SwissmedicDownloader < Downloader
+    HOST = 'http://www.swissmedic.ch'
+    def init
+    end
+    def download_by(index=:orphans)
+      case index
+      when :orphans
+        @url ||= "#{HOST}/daten/00081/index.html?lang=de"
+        xpath =  "//div[@id='sprungmarke0_4']//a[@title='Humanarzneimittel']"
+      when :fridges
+        @url ||= "#{HOST}/daten/00080/00254/index.html?lang=de"
+        xpath =  "//table[@class='swmTableFlex']//a[@title='B3.1.35-d.xls']"
+      end
+      file = "swissmedic_#{index}.xls"
+      begin
+        agent = Mechanize.new
+        page = agent.get(@url)
+        if link = page.search(xpath).first
+          url = HOST + link['href']
+          response = agent.get(url)
+          response.save_as file
+        end
+        return File.open(file, 'rb')
+      rescue Timeout::Error
+        retrievable? ? retry : raise
+      ensure
+        if File.exists? file
+          File.unlink file
+        end
+      end
+    end
+  end
 end

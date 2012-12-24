@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'nokogiri'
+require 'spreadsheet'
 
 module Oddb2xml
   class Extractor
@@ -115,6 +116,45 @@ module Oddb2xml
         end
       end
       data
+    end
+  end
+  class SwissmedicExtractor < Extractor
+    def initialize(io, type)
+      book = Spreadsheet.open(io)
+      @sheet = book.worksheet(0)
+      @type  = type
+    end
+    def to_arry
+      data = []
+      case @type
+      when :orphans
+        i = 1
+        @sheet.each do |row|
+          if number = extract_number(row, i)
+            data << number
+          end
+        end
+      when :fridges
+        i,c = 1,7
+        @sheet.each do |row|
+          if number = extract_number(row, i) and row[c] and row[c].to_s == 'x'
+            data << row[i].to_i.to_s
+          end
+        end
+      end
+      data.uniq
+    end
+    private
+    def extract_number(row, i)
+      begin
+        if (row[i] and number = row[i].to_i.to_s and number =~ /^\d{5}$/)
+          return number
+        else
+          nil
+        end
+      rescue NoMethodError
+        nil
+      end
     end
   end
 end

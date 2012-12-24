@@ -17,11 +17,14 @@ end
 
 module Oddb2xml
   class Builder
-    attr_accessor :subject, :index, :items, :tag_suffix
+    attr_accessor :subject, :index, :items, :orphans, :fridges,
+                  :tag_suffix
     def initialize
       @subject    = nil
       @index      = {}
       @items      = {}
+      @orphans    = []
+      @fridges    = []
       @tag_suffix = nil
       if block_given?
         yield self
@@ -138,7 +141,8 @@ module Oddb2xml
               #xml.DOSEU
               #xml.DRGFD
               #xml.DRGFF
-              #xml.ORPH
+              seq[:packages].values.first[:swissmedic_number] =~ /(\d{5})(\d{3})/
+              xml.ORPH @orphans.include?($1.to_s) ? true : false
               #xml.BIOPHA
               #xml.BIOSIM
               #xml.BFS
@@ -267,7 +271,12 @@ module Oddb2xml
                 xml.LIMPTS bg_pac[:limitation_points] unless bg_pac[:limitation_points].empty?
               end
               #xml.GRDFR
-              #xml.COOL
+              if bg_pac
+                if !bg_pac[:swissmedic_number].empty? and
+                   bg_pac[:swissmedic_number].to_s =~ /(\d{5})(\d{3})/
+                  xml.COOL 1 if @fridges.include?($1.to_s)
+                end
+              end
               #xml.TEMP
               #xml.CDBG
               #xml.BG

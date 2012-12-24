@@ -22,6 +22,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'mechanize'
   gem.add_dependency 'nokogiri'
   gem.add_dependency 'savon'
+  gem.add_dependency 'spreadsheet'
 
   gem.add_development_dependency 'rspec'
   gem.add_development_dependency 'webmock'

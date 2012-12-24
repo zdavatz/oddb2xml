@@ -15,13 +15,23 @@ module Oddb2xml
       @mutex = Mutex.new
       @items = {} # Items from Preparations.xml in BAG
       @index = {} # Base index from swissINDEX
+      @orphans = [] # Orphaned drugs from Swissmedic xls
+      @fridges = [] # ReFridge drugs from Swissmedic xls
       LANGUAGES.each do |lang|
         @index[lang] = {}
       end
     end
     def run
       threads = []
-      # bag_xml
+      # swissmedic
+      [:orphans, :fridges].each do |type|
+        threads << Thread.new do
+          downloader = SwissmedicDownloader.new
+          io = downloader.download_by(type)
+          self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(io, type).to_arry)
+        end
+      end
+      # bag
       threads << Thread.new do
         downloader = BagXmlDownloader.new
         xml = downloader.download
@@ -62,6 +72,8 @@ module Oddb2xml
             builder.subject    = sbj
             builder.index      = index
             builder.items      = @items
+            builder.orphans    = @orphans
+            builder.fridges    = @fridges
             builder.tag_suffix = @options[:tag_suffix]
           end
           if file =~ /(product)/
