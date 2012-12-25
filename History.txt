@@ -1,3 +1,7 @@
+=== 1.0.10 / 25.12.2012
+
+* Add ORPH and COOL from swissmedic xls
+
 === 1.0.9 / 11.12.2012
 
 * Added Substance Updater via BAG-XML from the Substance Branch.
