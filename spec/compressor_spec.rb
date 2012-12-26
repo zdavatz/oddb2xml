@@ -7,6 +7,7 @@ shared_examples_for 'any compressor' do
     File.stub(:unlink).and_return(false)
     @compressor.contents << File.expand_path('../data/oddb_article.xml', __FILE__)
     @compressor.contents << File.expand_path('../data/oddb_product.xml', __FILE__)
+    @compressor.contents << File.expand_path('../data/oddb_substance.xml', __FILE__)
     @compressor.finalize!.should == true
     compress_file = @compressor.instance_variable_get(:@compress_file)
     File.exists?(compress_file).should == true
