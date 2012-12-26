@@ -1,6 +1,6 @@
 # oddb2xml
 
-oddb2xml, creates xml files using swissINDEX and BAG-XML.
+oddb2xml, creates xml files using swissINDEX, BAG-XML and Swissmedic.
 
 
 ## usage
