@@ -23,9 +23,9 @@ module ServerMockHelper
   end
   def setup_bag_xml_server_mock
     # zip
-    stub_wsdl_url = 'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip'
+    stub_zip_url = 'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip'
     stub_response = File.read(File.expand_path('../data/XMLPublications.zip', __FILE__))
-    stub_request(:get, stub_wsdl_url).
+    stub_request(:get, stub_zip_url).
       with(:headers => {
         'Accept'          => '*/*',
         'Accept-Encoding' => 'gzip,deflate,identity',
