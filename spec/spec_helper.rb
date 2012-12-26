@@ -19,6 +19,7 @@ module ServerMockHelper
   def setup_server_mocks
     setup_bag_xml_server_mock
     setup_swiss_index_server_mock
+    setup_swissmedic_server_mock
   end
   def setup_bag_xml_server_mock
     # zip
@@ -58,6 +59,39 @@ module ServerMockHelper
         to_return(
           :status  => 200,
           :headers => {'Content-Type' => 'text/xml; chaprset=utf-8'},
+          :body    => stub_response)
+    end
+  end
+  def setup_swissmedic_server_mock
+    host = 'www.swissmedic.ch'
+    {
+      :orphans => {:html => '/daten/00081/index.html?lang=de',       :xls => '/download'},
+      :fridges => {:html => '/daten/00080/00254/index.html?lang=de', :xls => '/download'}
+    }.each_pair do |type, urls|
+      # html (dummy)
+      stub_html_url = "http://#{host}" + urls[:html]
+      stub_response = File.read(File.expand_path("../data/swissmedic_#{type.to_s}.html", __FILE__))
+      stub_request(:get, stub_html_url).
+        with(:headers => {
+          'Accept' => '*/*',
+          'Host'   => host,
+        }).
+        to_return(
+          :status  => 200,
+          :headers => {'Content-Type' => 'text/html; charset=utf-8'},
+          :body    => stub_response)
+      # xls
+      stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xls"
+      stub_response = File.read(File.expand_path("../data/swissmedic_#{type.to_s}.xls", __FILE__))
+      stub_request(:get, stub_xls_url).
+        with(:headers => {
+          'Accept'          => '*/*',
+          'Accept-Encoding' => 'gzip,deflate,identity',
+          'Host'            => host,
+        }).
+        to_return(
+          :status  => 200,
+          :headers => {'Content-Type' => 'application/octet-stream; charset=utf-8'},
           :body    => stub_response)
     end
   end

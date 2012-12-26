@@ -84,4 +84,35 @@ describe Oddb2xml::SwissIndexDownloader do
     end
   end
 
+describe Oddb2xml::SwissmedicDownloader do
+  include ServerMockHelper
+  before(:each) do
+    setup_swissmedic_server_mock
+    @downloader = Oddb2xml::SwissmedicDownloader.new()
+  end
+  it_behaves_like 'any downloader'
+  context 'download_by for orphans xls' do
+    let(:io) { @downloader.download_by(:orphans) }
+    it 'should return valid IO' do
+      io.should be_a IO
+      io.bytes.should_not nil
+    end
+    it 'should clean up current directory' do
+      io.should_not raise_error(Timeout::Error)
+      File.exist?('oddb_orphans.xls').should be(false)
+    end
+  end
+  context 'download_by for fridges xls' do
+    let(:io) { @downloader.download_by(:fridges) }
+    it 'should return valid IO' do
+      io.should be_a IO
+      io.bytes.should_not nil
+    end
+    it 'should clean up current directory' do
+      io.should_not raise_error(Timeout::Error)
+      File.exist?('oddb_fridges.xls').should be(false)
+    end
+  end
+end
+
 end
