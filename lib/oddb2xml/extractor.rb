@@ -23,7 +23,7 @@ module Oddb2xml
         item[:name_fr]      = (name = seq.at_xpath('.//NameFr'))        ? name.text : ''
         item[:org_gen_code] = (orgc = seq.at_xpath('.//OrgGenCode'))    ? orgc.text : ''
         item[:deductible]   = (ddbl = seq.at_xpath('.//FlagSB20'))      ? ddbl.text : ''
-        item[:atc_code]     = (orgc = seq.at_xpath('.//AtcCode'))       ? orgc.text : ''
+        item[:atc_code]     = (atcc = seq.at_xpath('.//AtcCode'))       ? atcc.text : ''
         item[:comment_de]   = (info = seq.at_xpath('.//CommentDe'))     ? info.text : ''
         item[:comment_fr]   = (info = seq.at_xpath('.//CommentFr'))     ? info.text : ''
         item[:it_code]      = ''
