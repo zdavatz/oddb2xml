@@ -71,10 +71,25 @@ module Oddb2xml
             # limitation
             item[:packages][phar][:limitations] = []
             pac.xpath('.//Limitation').each do |lim|
-              item[:packages][phar][:limitations] << {
-                :code => (lic = lim.at_xpath('.//LimitationCode')) ? lic.text : '',
-                :type => (lit = lim.at_xpath('.//LimitationType')) ? lit.text : '',
+              limitation = {
+                :it      => item[:it_code],
+                :code    => (lic = lim.at_xpath('.//LimitationCode'))  ? lic.text : '',
+                :type    => (lit = lim.at_xpath('.//LimitationType'))  ? lit.text : '',
+                :value   => (liv = lim.at_xpath('.//LimitationValue')) ? liv.text : '',
+                :desc_de => (dsc = lim.at_xpath('.//DescriptionDe'))   ? dsc.text : '',
+                :desc_fr => (dsc = lim.at_xpath('.//DescriptionDe'))   ? dsc.text : '',
+                :vdate   => (dat = lim.at_xpath('.//ValidFromDate'))   ? dat.text : '',
               }
+              deleted = false
+              if upto = ((thr = lim.at_xpath('.//ValidThruDate')) ? thr.text : nil) and
+                 upto =~ /\d{2}\.\d{2}\.\d{2}/
+                begin
+                  deleted = true if Date.strptime(upto, '%d.%m.%y') >= Date.today
+                rescue ArgumentError
+                end
+              end
+              limitation[:del] = deleted
+              item[:packages][phar][:limitations] << limitation
             end
             # limitation points
             pts = pac.at_xpath('.//PointLimitations/PointLimitation/Points') # only first points

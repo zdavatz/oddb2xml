@@ -14,7 +14,7 @@ module Oddb2xml
       super()
     end
     def finalize!
-      unless @contents.select{ |file| File.exists?(file) }.length == 3
+      if @contents.empty?
         return false
       end
       begin
@@ -35,8 +35,7 @@ module Oddb2xml
             File.unlink file
           end
         end
-      rescue => error
-        puts error
+      rescue Errno::ENOENT, StandardError
         if File.exists? @compress_file
           File.unlink @compress_file
         end

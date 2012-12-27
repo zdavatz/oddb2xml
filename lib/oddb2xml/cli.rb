@@ -9,6 +9,7 @@ require 'oddb2xml/compressor'
 module Oddb2xml
   class Cli
     SUBJECTS  = %w[product article]
+    ADDITIONS = %w[substance limitation]
     LANGUAGES = %w[DE FR] # EN does not exist
     def initialize(args)
       @options = args
@@ -35,7 +36,10 @@ module Oddb2xml
       threads << Thread.new do
         downloader = BagXmlDownloader.new
         xml = downloader.download
-        @items = BagXmlExtractor.new(xml).to_hash
+        @mutex.synchronize do
+          hsh = BagXmlExtractor.new(xml).to_hash
+          @items = hsh
+        end
       end
       LANGUAGES.each do |lang|
         # swissindex
@@ -52,13 +56,11 @@ module Oddb2xml
       end
       threads.map(&:join)
       build
+      compress if @options[:compress_ext]
       report
     end
     private
     def build
-      files = {}
-      prefix = (@options[:tag_suffix] || 'oddb').gsub(/^_|_$/, '').downcase
-      SUBJECTS.each{ |sbj| files[sbj] = "#{prefix}_#{sbj}.xml" }
       begin
         files.each_pair do |sbj, file|
           builder = Builder.new do |builder|
@@ -76,22 +78,8 @@ module Oddb2xml
             builder.fridges    = @fridges
             builder.tag_suffix = @options[:tag_suffix]
           end
-          if file =~ /(product)/
-            xml = builder.to_xml('substance')
-            File.open(file.gsub($1, 'substance'), 'w:utf-8'){ |fh| fh << xml }
-          end
           xml = builder.to_xml
           File.open(file, 'w:utf-8'){ |fh| fh << xml }
-        end
-        if @options[:compress_ext]
-          compressor = Compressor.new(prefix, @options[:compress_ext])
-          files.values.each do |file|
-            if file =~ /(product)/
-              compressor.contents << file.gsub($1, 'substance')
-            end
-            compressor.contents << file
-          end
-          compressor.finalize!
         end
       rescue Interrupt
         files.values.each do |file|
@@ -101,6 +89,27 @@ module Oddb2xml
         end
         raise Interrupt
       end
+    end
+    def compress
+      compressor = Compressor.new(prefix, @options[:compress_ext])
+      files.values.each do |file|
+        if File.exists?(file)
+          compressor.contents << file
+        end
+      end
+      compressor.finalize!
+    end
+    def files
+      unless @_files
+        @_files = {}
+        (ADDITIONS + SUBJECTS).each do|sbj|
+          @_files[sbj] = "#{prefix}_#{sbj.to_s}.xml"
+        end
+      end
+      @_files
+    end
+    def prefix
+      @_prefix ||= (@options[:tag_suffix] || 'oddb').gsub(/^_|_$/, '').downcase
     end
     def report
       lines = []
@@ -114,11 +123,12 @@ module Oddb2xml
       puts lines.join("\n")
     end
     def types # swissindex
-      if @options[:nonpharma]
-        [:pharma, :nonpharma]
-      else
-        [:pharma]
-      end
+      @_types ||= 
+        if @options[:nonpharma]
+          [:pharma, :nonpharma]
+        else
+          [:pharma]
+        end
     end
   end
 end

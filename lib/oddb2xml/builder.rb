@@ -38,15 +38,32 @@ module Oddb2xml
       end
     end
     private
-    def build_substance
-      @substances = []
-      @items.values.uniq.each do |seq|
-        seq[:substances].each do |sub|
-          @substances << sub[:name]
+    def prepare_substances
+      unless @substances
+        @substances = []
+        @items.values.uniq.each do |seq|
+          seq[:substances].each do |sub|
+            @substances << sub[:name]
+          end
         end
+        @substances.uniq!
+        @substances.sort!
       end
-      @substances.uniq!
-      @substances.sort!
+    end
+    def prepare_limitations
+      unless @limitations
+        @limitations = []
+        @items.values.uniq.each do |seq|
+          seq[:packages].each_value do |pac|
+            @limitations += pac[:limitations]
+          end
+        end
+        @limitations.uniq!
+        @limitations.sort_by!{|lim| lim[:code] }
+      end
+    end
+    def build_substance
+      prepare_substances
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T.%7N%z')
@@ -77,7 +94,45 @@ module Oddb2xml
       end
       _builder.to_xml
     end
+    def build_limitation
+      prepare_limitations
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T.%7N%z')
+        xml.LIMITATION(
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'PROD_DATE'         => datetime,
+          'VALID_DATE'        => datetime,
+        ) {
+          @limitations.each do |lim|
+            xml.LIM('DT' => '') {
+              xml.LIMCD  lim[:code]
+              xml.IT     lim[:it]
+              xml.LIMTYP lim[:type]
+              xml.LIMVAL lim[:value]
+              xml.DSCRD  lim[:desc_de]
+              xml.DSCRF  lim[:desc_fr]
+              xml.VDAT   lim[:vdate]
+              if lim[:del]
+                xml.DEL 3
+              end
+            }
+          end
+          xml.RESULT {
+            xml.OK_ERROR   'OK'
+            xml.NBR_RECORD @limitations.length.to_s
+            xml.ERROR_CODE ''
+            xml.MESSAGE    ''
+          }
+        }
+      end
+      _builder.to_xml
+    end
     def build_product
+      prepare_substances
       # merge company info from swissINDEX
       objects = []
       objects = @items.values.uniq.map do |seq|
@@ -218,6 +273,7 @@ module Oddb2xml
       _builder.to_xml
     end
     def build_article
+      prepare_limitations
       objects = [] # base is 'DE'
       @index['DE'].each_pair do |pharmacode, index|
         object = {
