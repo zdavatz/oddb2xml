@@ -58,21 +58,19 @@ module Oddb2xml
       super(url)
     end
     def init
-      Savon.configure do |config|
-        config.log_level    = :info
-        config.log          = false # $stdout
-        config.raise_errors = true
-      end
+      @config = {
+        :log_level       => :info,
+        :log             => false, # $stdout
+        :raise_errors    => true,
+        :ssl_verify_mode => :none,
+        :wsdl            => @url
+      }
     end
     def download_by(lang = 'DE')
-      client = Savon::Client.new do |wsdl, http|
-        http.auth.ssl.verify_mode = :none
-        wsdl.document             = @url
-      end
+      client = Savon::Client.new(@config)
       begin
         type = @type
-        response = client.request :download_all do
-          soap.xml = <<XML
+        soap = <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 <soap:Body>
@@ -80,7 +78,7 @@ module Oddb2xml
 </soap:Body>
 </soap:Envelope>
 XML
-        end
+        response = client.call(:download_all, :xml => soap)
         if response.success?
           if xml = response.to_xml
             return xml
