@@ -126,4 +126,44 @@ XML
       end
     end
   end
+  class SwissmedicInfoDownloader < Downloader
+    def init
+      @url ||= "http://download.swissmedicinfo.ch/Accept.aspx?ReturnUrl=%2f"
+    end
+    def download
+      file = "swissmedic_info.zip"
+      begin
+        response = nil
+        agent = Mechanize.new
+        agent.ignore_bad_chunking = true
+        if home = agent.get(@url)
+          form = home.form_with(:id => 'Form1')
+          bttn = form.button_with(:name => 'ctl00$MainContent$btnOK')
+          if page = form.submit(bttn)
+            form = page.form_with(:id => 'Form1')
+            bttn = form.button_with(:name => 'ctl00$MainContent$BtnYes')
+            response = form.submit(bttn)
+          end
+        end
+        if response
+          response.save_as file
+        end
+        xml = ''
+        Zip::ZipFile.foreach(file) do |entry|
+          if entry.name =~ /^AipsDownload_/iu
+            entry.get_input_stream{ |io| xml = io.read }
+          end
+        end
+        return xml
+      rescue Timeout::Error
+        retrievable? ? retry : raise
+      rescue NoMethodError => e
+        # pass
+      ensure
+        if File.exists? file
+          File.unlink file
+        end
+      end
+    end
+  end
 end

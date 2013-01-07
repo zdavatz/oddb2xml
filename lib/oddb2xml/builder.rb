@@ -17,12 +17,14 @@ end
 
 module Oddb2xml
   class Builder
-    attr_accessor :subject, :index, :items, :orphans, :fridges,
+    attr_accessor :subject, :index, :items, :infos,
+                  :orphans, :fridges,
                   :tag_suffix
     def initialize
       @subject    = nil
       @index      = {}
       @items      = {}
+      @infos      = {}
       @orphans    = []
       @fridges    = []
       @tag_suffix = nil
@@ -439,6 +441,48 @@ module Oddb2xml
           xml.RESULT {
             xml.OK_ERROR   'OK'
             xml.NBR_RECORD objects.length.to_s
+            xml.ERROR_CODE ''
+            xml.MESSAGE    ''
+          }
+        }
+      end
+      _builder.to_xml
+    end
+    def build_fi
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T.%7N%z')
+        xml.KOMPENDIUM(
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'PROD_DATE'         => datetime,
+          'VALID_DATE'        => datetime,
+        ) {
+          length = 0
+          %w[de fr].each do |lang|
+            length += @infos[lang].length
+            @infos[lang].each_with_index do |info, i|
+              xml.ART(
+                'MONTYPE' => 'fi', # only
+                'LANG'    => lang.upcase,
+                'DT'      => '',
+              ) {
+                unless info[:name].empty?
+                  xml.name { xml.p info[:name] }
+                end
+                unless info[:owner].empty?
+                  xml.owner { xml.p info[:owner] }
+                end
+                xml.monid info[:monid] unless info[:monid].empty?
+                xml.paragraph { xml.cdata info[:paragraph] unless info[:paragraph].empty? }
+              }
+            end
+          end
+          xml.RESULT {
+            xml.OK_ERROR   'OK'
+            xml.NBR_RECORD length
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }

@@ -172,4 +172,32 @@ module Oddb2xml
       end
     end
   end
+  class SwissmedicInfoExtractor < Extractor
+    def to_hash
+      data = Hash.new{|h,k| h[k] = [] }
+      doc = Nokogiri::XML(@xml)
+      doc.xpath("//medicalInformations/medicalInformation[@type='fi']").each do |fi|
+        lang = fi.attr('lang').to_s
+        next unless lang =~ /de|fr/
+        item = {}
+        item[:name]  = (name = fi.at_xpath('.//title')) ? name.text : ''
+        item[:owner] = (ownr = fi.at_xpath('.//authHolder')) ? ownr.text : ''
+        if content = fi.at_xpath('.//content').children.detect{|child| child.cdata? }
+          html = Nokogiri::HTML(content.to_s)
+          # all HTML contents without MonTitle and ownerCompany
+          item[:paragraph] =  "<title><p>#{item[:name]}</p></title>" +
+             ((paragraph = html.xpath("///div[@class='paragraph']")) ? paragraph.to_s : '')
+          if text = html.xpath("///div[@id='Section7750']/p").text
+            if text =~ /(\d{5})[,\s]*(\d{5})?/ 
+              [$1, $2].compact.each do |n|
+                item[:monid] = n
+                data[lang] << item
+              end
+            end
+          end
+        end
+      end
+      data
+    end
+  end
 end

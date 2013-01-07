@@ -10,12 +10,14 @@ module Oddb2xml
   class Cli
     SUBJECTS  = %w[product article]
     ADDITIONS = %w[substance limitation]
+    OPTIONALS = %w[fi]
     LANGUAGES = %w[DE FR] # EN does not exist
     def initialize(args)
       @options = args
       @mutex = Mutex.new
       @items = {} # Items from Preparations.xml in BAG
       @index = {} # Base index from swissINDEX
+      @infos = {} # FI from SwissmedicInfo
       @orphans = [] # Orphaned drugs from Swissmedic xls
       @fridges = [] # ReFridge drugs from Swissmedic xls
       LANGUAGES.each do |lang|
@@ -25,6 +27,14 @@ module Oddb2xml
     def run
       threads = []
       # swissmedic
+      threads << Thread.new do
+        downloader = SwissmedicInfoDownloader.new
+        xml = downloader.download
+        @mutex.synchronize do
+          hsh = SwissmedicInfoExtractor.new(xml).to_hash
+          @infos = hsh
+        end
+      end
       [:orphans, :fridges].each do |type|
         threads << Thread.new do
           downloader = SwissmedicDownloader.new
@@ -68,14 +78,17 @@ module Oddb2xml
             LANGUAGES.each do |lang|
               index[lang] = {} unless index[lang]
               types.each do |type|
-                index[lang].merge!(@index[lang][type])
+                index[lang].merge!(@index[lang][type]) if @index[lang][type]
               end
             end
-            builder.subject    = sbj
-            builder.index      = index
-            builder.items      = @items
-            builder.orphans    = @orphans
-            builder.fridges    = @fridges
+            builder.subject = sbj
+            builder.index   = index
+            builder.items   = @items
+            # additions
+            builder.orphans = @orphans
+            builder.fridges = @fridges
+            # optionals
+            builder.infos = @infos
             builder.tag_suffix = @options[:tag_suffix]
           end
           xml = builder.to_xml
@@ -102,7 +115,9 @@ module Oddb2xml
     def files
       unless @_files
         @_files = {}
-        (ADDITIONS + SUBJECTS).each do|sbj|
+        _files = (ADDITIONS + SUBJECTS)
+        _files += OPTIONALS if @options[:fi]
+        _files.each do|sbj|
           @_files[sbj] = "#{prefix}_#{sbj.to_s}.xml"
         end
       end
@@ -117,7 +132,10 @@ module Oddb2xml
         lines << lang
         types.each do |type|
           key = (type == :nonpharma ? 'NonPharma' : 'Pharma')
-          lines << sprintf("\t#{key} products: %i", @index[lang][type].values.length)
+          if @index[lang][type]
+            lines << sprintf(
+              "\t#{key} products: %i", @index[lang][type].values.length)
+          end
         end
       end
       puts lines.join("\n")

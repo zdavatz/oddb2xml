@@ -20,6 +20,7 @@ module ServerMockHelper
     setup_bag_xml_server_mock
     setup_swiss_index_server_mock
     setup_swissmedic_server_mock
+    setup_swissmedic_info_server_mock
   end
   def setup_bag_xml_server_mock
     # zip
@@ -94,6 +95,34 @@ module ServerMockHelper
           :headers => {'Content-Type' => 'application/octet-stream; charset=utf-8'},
           :body    => stub_response)
     end
+  end
+  def setup_swissmedic_info_server_mock
+    # html (dummy)
+    stub_html_url = "http://download.swissmedicinfo.ch/Accept.aspx?ReturnUrl=%2f"
+    stub_response = File.read(File.expand_path("../data/swissmedic_info.html", __FILE__))
+    stub_request(:get, stub_html_url).
+      with(:headers => {
+        'Accept' => '*/*',
+        'Host'   => 'download.swissmedicinfo.ch',
+      }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'text/html; charset=utf-8'},
+        :body    => stub_response)
+    # zip
+    stub_zip_url = "http://download.swissmedicinfo.ch/"
+    stub_response = File.read(File.expand_path('../data/swissmedic_info.zip', __FILE__))
+    stub_request(:get, stub_zip_url).
+      with(:headers => {
+        'Accept'          => '*/*',
+        'Accept-Encoding' => 'gzip,deflate,identity',
+        'Host'            => 'download.swisssmedicinfo.ch',
+      }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'application/zip; charset=utf-8'},
+        :body    => stub_response)
+
   end
 end
 
