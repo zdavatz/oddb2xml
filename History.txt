@@ -1,3 +1,8 @@
+=== 1.1.1 / 07.01.2013
+
+* Create oddb_fi.xml file with using swissmedicinfo
+    -needs -o or --optional fi
+
 === 1.1.0 / 27.12.2012
 
 * Add new additional file limitation.xml
