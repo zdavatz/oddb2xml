@@ -464,7 +464,7 @@ module Oddb2xml
           %w[de fr].each do |lang|
             length += @infos[lang].length
             @infos[lang].each_with_index do |info, i|
-              xml.ART(
+              xml.KMP(
                 'MONTYPE' => 'fi', # only
                 'LANG'    => lang.upcase,
                 'DT'      => '',
