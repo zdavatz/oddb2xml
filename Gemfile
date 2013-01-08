@@ -1,4 +1,14 @@
-source 'https://rubygems.org'
+source :rubygems
 
-# Specify your gem's dependencies in oddb2xml.gemspec
-gemspec
+gem 'rubyzip'
+gem 'archive-tar-minitar'
+gem 'mechanize'
+gem 'nokogiri'
+gem 'savon', '>= 2.0'
+gem 'spreadsheet'
+
+group :development do
+  'rspec'
+  'webmock'
+  'ZenTest'
+end
