@@ -141,7 +141,7 @@ module Oddb2xml
       puts lines.join("\n")
     end
     def types # swissindex
-      @_types ||= 
+      @_types ||=
         if @options[:nonpharma]
           [:pharma, :nonpharma]
         else
