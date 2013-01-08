@@ -14,6 +14,7 @@ lib/oddb2xml/compressor.rb
 lib/oddb2xml/downloader.rb
 lib/oddb2xml/extractor.rb
 lib/oddb2xml/version.rb
+oddb2xml.gemspec
 spec/builder_spec.rb
 spec/cli_spec.rb
 spec/compressor_spec.rb
