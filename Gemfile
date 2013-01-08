@@ -8,7 +8,7 @@ gem 'savon', '>= 2.0'
 gem 'spreadsheet'
 
 group :development do
-  'rspec'
-  'webmock'
-  'ZenTest'
+  gem 'rspec'
+  gem 'webmock'
+  gem 'ZenTest'
 end
