@@ -1,3 +1,11 @@
+=== 1.1.2 / 08.01.2013
+
+* Update Gemfile for development
+* Fix oddb_fi.xml tag name
+* Update to be suitable for release with Hoe
+* Add missing files
+* Remove white spaces
+
 === 1.1.1 / 07.01.2013
 
 * Create oddb_fi.xml file with using swissmedicinfo
