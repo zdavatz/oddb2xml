@@ -10,7 +10,7 @@ module Oddb2xml
   class Cli
     SUBJECTS  = %w[product article]
     ADDITIONS = %w[substance limitation]
-    OPTIONALS = %w[fi]
+    OPTIONALS = %w[fi fi_product]
     LANGUAGES = %w[DE FR] # EN does not exist
     def initialize(args)
       @options = args
@@ -115,6 +115,11 @@ module Oddb2xml
     def files
       unless @_files
         @_files = {}
+        ##
+        # building order
+        #   1. addtions
+        #   2. subjects
+        #   3. optionals
         _files = (ADDITIONS + SUBJECTS)
         _files += OPTIONALS if @options[:fi]
         _files.each do|sbj|

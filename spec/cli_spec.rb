@@ -32,6 +32,7 @@ describe Oddb2xml::Cli do
       opts = {
         :compress_ext => 'tar.gz',
         :nonpharma    => false,
+        :fi           => false,
         :tag_suffix   => nil,
       }
       Oddb2xml::Cli.new(opts)
@@ -64,6 +65,7 @@ describe Oddb2xml::Cli do
       opts = {
         :compress_ext => 'zip',
         :nonpharma    => false,
+        :fi           => false,
         :tag_suffix   => nil,
       }
       Oddb2xml::Cli.new(opts)
@@ -96,6 +98,7 @@ describe Oddb2xml::Cli do
       opts = {
         :compress_ext => nil,
         :nonpharma    => true,
+        :fi           => false,
         :tag_suffix   => nil,
       }
       Oddb2xml::Cli.new(opts)
@@ -110,12 +113,18 @@ describe Oddb2xml::Cli do
       Dir.glob('oddb_*.tar.gz').first.should be_nil
       Dir.glob('oddb_*.zip').first.should be_nil
     end
-    it 'should create 2 xml files' do
+    it 'should create xml files' do
       $stdout.should_receive(:puts).with(/NonPharma/)
       cli.run
+      expected = [
+        'oddb_product.xml',
+        'oddb_article.xml',
+        'oddb_limitation.xml',
+        'oddb_substance.xml'
+      ].length
       Dir.glob('oddb_*.xml').each do |file|
         File.exists?(file).should be_true
-      end
+      end.to_a.length.should equal expected
     end
     after(:each) do
       Dir.glob('oddb_*.xml').each do |file|
@@ -128,6 +137,7 @@ describe Oddb2xml::Cli do
       opts = {
         :compress_ext => nil,
         :nonpharma    => false,
+        :fi           => false,
         :tag_suffix   => '_swiss'.upcase,
       }
       Oddb2xml::Cli.new(opts)
@@ -142,12 +152,18 @@ describe Oddb2xml::Cli do
       Dir.glob('oddb_*.tar.gz').first.should be_nil
       Dir.glob('oddb_*.zip').first.should be_nil
     end
-    it 'should create 2 xml files with prefix swiss_' do
+    it 'should create xml files with prefix swiss_' do
       $stdout.should_receive(:puts).with(/Pharma/)
       cli.run
+      expected = [
+        'swiss_product.xml',
+        'swiss_article.xml',
+        'swiss_limitation.xml',
+        'swiss_substance.xml'
+      ].length
       Dir.glob('swiss_*.xml').each do |file|
         File.exists?(file).should be_true
-      end
+      end.to_a.length.should equal expected
     end
     after(:each) do
       Dir.glob('swiss_*.xml').each do |file|
@@ -155,4 +171,46 @@ describe Oddb2xml::Cli do
       end
     end
   end
+  context 'when -o fi option is given' do
+    let(:cli) do
+      opts = {
+        :compress_ext => nil,
+        :nonpharma    => false,
+        :fi           => true,
+        :tag_suffix   => nil,
+      }
+      Oddb2xml::Cli.new(opts)
+    end
+    it_behaves_like 'any interface'
+    it 'should have nonpharma option' do
+      cli.should have_option(:fi => true)
+    end
+    it 'should not create any compressed file' do
+      $stdout.should_receive(:puts).with(/Pharma/)
+      cli.run
+      Dir.glob('oddb_*.tar.gz').first.should be_nil
+      Dir.glob('oddb_*.zip').first.should be_nil
+    end
+    it 'should create xml files' do
+      $stdout.should_receive(:puts).with(/Pharma/)
+      cli.run
+      expected = [
+        'oddb_fi.xml',
+        'oddb_fi_product.xml',
+        'oddb_product.xml',
+        'oddb_article.xml',
+        'oddb_limitation.xml',
+        'oddb_substance.xml'
+      ].length
+      Dir.glob('oddb_*.xml').each do |file|
+        File.exists?(file).should be_true
+      end.to_a.length.should equal expected
+    end
+    after(:each) do
+      Dir.glob('oddb_*.xml').each do |file|
+        File.unlink(file) if File.exists?(file)
+      end
+    end
+  end
+
 end

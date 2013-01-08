@@ -101,28 +101,42 @@ module ServerMockHelper
     stub_html_url = "http://download.swissmedicinfo.ch/Accept.aspx?ReturnUrl=%2f"
     stub_response = File.read(File.expand_path("../data/swissmedic_info.html", __FILE__))
     stub_request(:get, stub_html_url).
-      with(:headers => {
-        'Accept' => '*/*',
-        'Host'   => 'download.swissmedicinfo.ch',
-      }).
+      with(
+        :headers => {
+          'Accept' => '*/*',
+          'Host'   => 'download.swissmedicinfo.ch',
+        }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'text/html; charset=utf-8'},
+        :body    => stub_response)
+    # html (dummy 2)
+    stub_html_url = 'http://download.swissmedicinfo.ch/Accept.aspx?ctl00$MainContent$btnOK=1'
+    stub_response = File.read(File.expand_path("../data/swissmedic_info_2.html", __FILE__))
+    stub_request(:get, stub_html_url).
+      with(
+        :headers => {
+          'Accept' => '*/*',
+          'Host'   => 'download.swissmedicinfo.ch',
+        }).
       to_return(
         :status  => 200,
         :headers => {'Content-Type' => 'text/html; charset=utf-8'},
         :body    => stub_response)
     # zip
-    stub_zip_url = "http://download.swissmedicinfo.ch/"
+    stub_zip_url = 'http://download.swissmedicinfo.ch/Accept.aspx?ctl00$MainContent$BtnYes=1'
     stub_response = File.read(File.expand_path('../data/swissmedic_info.zip', __FILE__))
     stub_request(:get, stub_zip_url).
-      with(:headers => {
-        'Accept'          => '*/*',
-        'Accept-Encoding' => 'gzip,deflate,identity',
-        'Host'            => 'download.swisssmedicinfo.ch',
-      }).
+      with(
+        :headers => {
+          'Accept'          => '*/*',
+          'Accept-Encoding' => 'gzip,deflate,identity',
+          'Host'            => 'download.swissmedicinfo.ch',
+        }).
       to_return(
         :status  => 200,
         :headers => {'Content-Type' => 'application/zip; charset=utf-8'},
         :body    => stub_response)
-
   end
 end
 

@@ -40,6 +40,21 @@ module Oddb2xml
       end
     end
     private
+    def prepare_articles
+      unless @articles
+        @articles = [] # base is 'DE'
+        @index['DE'].each_pair do |pharmacode, index|
+          object = {
+            :de => index,
+            :fr => @index['FR'][pharmacode],
+          }
+          if seq = @items[pharmacode]
+            object[:seq] = seq
+          end
+          @articles << object
+        end
+      end
+    end
     def prepare_substances
       unless @substances
         @substances = []
@@ -62,6 +77,25 @@ module Oddb2xml
         end
         @limitations.uniq!
         @limitations.sort_by!{|lim| lim[:code] }
+      end
+    end
+    def prepare_products
+      unless @products
+        # merge company info from swissINDEX
+        @products = []
+        @products = @items.values.uniq.map do |seq|
+          %w[de fr].each do |lang|
+            name_key = "company_name_#{lang}".intern
+            seq[name_key] = ''
+            if pharmacode = seq[:pharmacodes].first
+              indices = @index[lang.upcase]
+              if index = indices[pharmacode]
+                seq[name_key] = index[:company_name]
+              end
+            end
+          end
+          seq
+        end
       end
     end
     def build_substance
@@ -135,21 +169,7 @@ module Oddb2xml
     end
     def build_product
       prepare_substances
-      # merge company info from swissINDEX
-      objects = []
-      objects = @items.values.uniq.map do |seq|
-        %w[de fr].each do |lang|
-          name_key = "company_name_#{lang}".intern
-          seq[name_key] = ''
-          if pharmacode = seq[:pharmacodes].first
-            indices = @index[lang.upcase]
-            if index = indices[pharmacode]
-              seq[name_key] = index[:company_name]
-            end
-          end
-        end
-        seq
-      end
+      prepare_products
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T.%7N%z')
@@ -161,7 +181,7 @@ module Oddb2xml
           'PROD_DATE'         => datetime,
           'VALID_DATE'        => datetime,
         ) {
-          objects.each do |seq|
+          @products.each do |seq|
             xml.PRD('DT' => '') {
               xml.PRDNO seq[:product_key] unless seq[:product_key].empty?
               %w[de fr].each do |l|
@@ -266,7 +286,7 @@ module Oddb2xml
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD objects.length.to_s
+            xml.NBR_RECORD @products.length.to_s
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -276,17 +296,7 @@ module Oddb2xml
     end
     def build_article
       prepare_limitations
-      objects = [] # base is 'DE'
-      @index['DE'].each_pair do |pharmacode, index|
-        object = {
-          :de => index,
-          :fr => @index['FR'][pharmacode],
-        }
-        if seq = @items[pharmacode]
-          object[:seq] = seq
-        end
-        objects << object
-      end
+      prepare_articles
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T.%7N%z')
@@ -298,7 +308,7 @@ module Oddb2xml
           'PROD_DATE'         => datetime,
           'VALID_DATE'        => datetime,
         ) {
-          objects.each do |obj|
+          @articles.each do |obj|
             de_pac = obj[:de] # swiss index DE (base)
             fr_pac = obj[:fr] # swiss index FR
             bg_pac = nil      # BAG XML (additional data)
@@ -440,7 +450,7 @@ module Oddb2xml
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD objects.length.to_s
+            xml.NBR_RECORD @articles.length.to_s
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -478,6 +488,53 @@ module Oddb2xml
                 xml.monid info[:monid] unless info[:monid].empty?
                 xml.paragraph { xml.cdata info[:paragraph] unless info[:paragraph].empty? }
               }
+            end
+          end
+          xml.RESULT {
+            xml.OK_ERROR   'OK'
+            xml.NBR_RECORD length
+            xml.ERROR_CODE ''
+            xml.MESSAGE    ''
+          }
+        }
+      end
+      _builder.to_xml
+    end
+    def build_fi_product
+      prepare_products
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T.%7N%z')
+        xml.KOMPENDIUM_PRODUCT(
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'PROD_DATE'         => datetime,
+          'VALID_DATE'        => datetime,
+        ) {
+          length = 0
+          %w[de fr].each do |lang|
+            info_index = {}
+            @infos[lang].each_with_index do |info, i|
+              info_index[info[:monid]] = i
+            end
+            # prod
+            @products.each do |seq|
+              seq[:packages].values.each do |pac|
+                if pac[:swissmedic_number] =~ /(\d{5})(\d{3})/
+                  number = $1.to_s
+                  if i = info_index[number]
+                    length += 1
+                    xml.KP('DT' => '') {
+                      xml.MONID @infos[lang][i][:monid]
+                      xml.PRDNO seq[:product_key] unless seq[:product_key].empty?
+                      # as orphans ?
+                      xml.DEL   @orphans.include?(number) ? true : false
+                    }
+                  end
+                end
+              end
             end
           end
           xml.RESULT {

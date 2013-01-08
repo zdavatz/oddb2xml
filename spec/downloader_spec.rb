@@ -83,6 +83,7 @@ describe Oddb2xml::SwissIndexDownloader do
       end
     end
   end
+end
 
 describe Oddb2xml::SwissmedicDownloader do
   include ServerMockHelper
@@ -115,4 +116,28 @@ describe Oddb2xml::SwissmedicDownloader do
   end
 end
 
+describe Oddb2xml::SwissmedicInfoDownloader do
+  include ServerMockHelper
+  before(:each) do
+    setup_swissmedic_info_server_mock
+    @downloader = Oddb2xml::SwissmedicInfoDownloader.new()
+  end
+  it_behaves_like 'any downloader'
+  context 'when download is called' do
+    let(:xml) { @downloader.download }
+    it 'should parse zip to string' do
+      xml.should be_a String
+      xml.length.should_not == 0
+    end
+    it 'should return valid xml' do
+      xml.should =~ /xml\sversion="1.0"/
+      xml.should =~ /medicalInformations/
+      xml.should =~ /content/
+    end
+    it 'should clean up current directory' do
+      xml.should_not raise_error(Timeout::Error)
+      File.exist?('swissmedic_info.zip').should be(false)
+    end
+  end
 end
+
