@@ -9,7 +9,7 @@ require 'oddb2xml/compressor'
 module Oddb2xml
   class Cli
     SUBJECTS  = %w[product article]
-    ADDITIONS = %w[substance limitation]
+    ADDITIONS = %w[substance limitation interaction code]
     OPTIONALS = %w[fi fi_product]
     LANGUAGES = %w[DE FR] # EN does not exist
     def initialize(args)
@@ -17,9 +17,10 @@ module Oddb2xml
       @mutex = Mutex.new
       @items = {} # Items from Preparations.xml in BAG
       @index = {} # Base index from swissINDEX
-      @infos = {} # FI from SwissmedicInfo
-      @orphans = [] # Orphaned drugs from Swissmedic xls
-      @fridges = [] # ReFridge drugs from Swissmedic xls
+      @infos = {} # [option] FI from SwissmedicInfo
+      @actions = [] # [addition] interactions from epha
+      @orphans = [] # [addition] Orphaned drugs from Swissmedic xls
+      @fridges = [] # [addition] ReFridge drugs from Swissmedic xls
       LANGUAGES.each do |lang|
         @index[lang] = {}
       end
@@ -43,6 +44,14 @@ module Oddb2xml
           downloader = SwissmedicDownloader.new(type)
           io = downloader.download
           self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(io, type).to_arry)
+        end
+      end
+      # epha
+      threads << Thread.new do
+        downloader = EphaDownloader.new
+        io = downloader.download
+        @mutex.synchronize do
+          @actions = EphaExtractor.new(io).to_hash
         end
       end
       # bag
@@ -88,8 +97,12 @@ module Oddb2xml
             builder.index   = index
             builder.items   = @items
             # additions
-            builder.orphans = @orphans
-            builder.fridges = @fridges
+            %w[actions orphans fridges].each do |addition|
+              builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
+            end
+            #builder.actions = @actions
+            #builder.orphans = @orphans
+            #builder.fridges = @fridges
             # optionals
             builder.infos = @infos
             builder.tag_suffix = @options[:tag_suffix]

@@ -149,3 +149,24 @@ describe Oddb2xml::SwissmedicInfoDownloader do
   end
 end
 
+describe Oddb2xml::EphaDownloader do
+  include ServerMockHelper
+  before(:each) do
+    setup_epha_server_mock
+    @downloader = Oddb2xml::EphaDownloader.new
+  end
+  it_behaves_like 'any downloader'
+  context 'when download is called' do
+    let(:xml) { @downloader.download }
+    it 'should read csv to IO Object' do
+      xml.should be_a IO
+      xml.bytes.should_not nil
+    end
+    it 'should clean up current directory' do
+      xml.should_not raise_error(Timeout::Error)
+      File.exist?('epha_interactions.csv').should be(false)
+    end
+  end
+end
+
+

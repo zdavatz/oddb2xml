@@ -120,7 +120,9 @@ describe Oddb2xml::Cli do
         'oddb_product.xml',
         'oddb_article.xml',
         'oddb_limitation.xml',
-        'oddb_substance.xml'
+        'oddb_substance.xml',
+        'oddb_interaction.xml',
+        'oddb_code.xml'
       ].length
       Dir.glob('oddb_*.xml').each do |file|
         File.exists?(file).should be_true
@@ -159,7 +161,9 @@ describe Oddb2xml::Cli do
         'swiss_product.xml',
         'swiss_article.xml',
         'swiss_limitation.xml',
-        'swiss_substance.xml'
+        'swiss_substance.xml',
+        'swiss_interaction.xml',
+        'swiss_code.xml'
       ].length
       Dir.glob('swiss_*.xml').each do |file|
         File.exists?(file).should be_true
@@ -200,7 +204,9 @@ describe Oddb2xml::Cli do
         'oddb_product.xml',
         'oddb_article.xml',
         'oddb_limitation.xml',
-        'oddb_substance.xml'
+        'oddb_substance.xml',
+        'oddb_interaction.xml',
+        'oddb_code.xml'
       ].length
       Dir.glob('oddb_*.xml').each do |file|
         File.exists?(file).should be_true
@@ -212,5 +218,4 @@ describe Oddb2xml::Cli do
       end
     end
   end
-
 end

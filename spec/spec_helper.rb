@@ -21,6 +21,7 @@ module ServerMockHelper
     setup_swiss_index_server_mock
     setup_swissmedic_server_mock
     setup_swissmedic_info_server_mock
+    setup_epha_server_mock
   end
   def setup_bag_xml_server_mock
     # zip
@@ -136,6 +137,20 @@ module ServerMockHelper
       to_return(
         :status  => 200,
         :headers => {'Content-Type' => 'application/zip; charset=utf-8'},
+        :body    => stub_response)
+  end
+  def setup_epha_server_mock
+    # csv
+    stub_csv_url = 'http://community.epha.ch/interactions_de_utf8.csv'
+    stub_response = File.read(File.expand_path('../data/epha_interactions.csv', __FILE__))
+    stub_request(:get, stub_csv_url).
+      with(:headers => {
+        'Accept' => '*/*',
+        'Host'   => 'community.epha.ch',
+      }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'text/csv; charset=utf-8'},
         :body    => stub_response)
   end
 end

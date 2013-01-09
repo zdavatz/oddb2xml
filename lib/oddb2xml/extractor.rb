@@ -200,4 +200,28 @@ module Oddb2xml
       data
     end
   end
+  class EphaExtractor < Extractor
+    def initialize(io)
+      @io = io
+    end
+    def to_hash
+      data = []
+      ixno = 0
+      while line = @io.gets
+        next if line =~ /^ATC1;Name1;ATC2;Name2;/
+        row = line.chomp.gsub("\"", '').split(';')
+        ixno += 1
+        action = {}
+        action[:ixno] = ixno
+        action[:atc1] = row[0]
+        action[:atc2] = row[2]
+        action[:mechanism] = row[5]
+        action[:effect]    = row[6]
+        action[:measures]  = row[7]
+        action[:grad]      = row[8]
+        data << action
+      end
+      data
+    end
+  end
 end

@@ -17,14 +17,17 @@ end
 
 module Oddb2xml
   class Builder
-    attr_accessor :subject, :index, :items, :infos,
+    attr_accessor :subject, :index, :items,
+                  :actions,
                   :orphans, :fridges,
+                  :infos,
                   :tag_suffix
     def initialize
       @subject    = nil
       @index      = {}
       @items      = {}
       @infos      = {}
+      @actions    = []
       @orphans    = []
       @fridges    = []
       @tag_suffix = nil
@@ -77,6 +80,26 @@ module Oddb2xml
         end
         @limitations.uniq!
         @limitations.sort_by!{|lim| lim[:code] }
+      end
+    end
+    def prepare_interactions
+      unless @interactions
+        @interactions = []
+        @actions.each do |act|
+          @interactions << act
+        end
+      end
+    end
+    def prepare_codes
+      unless @codes
+        @codes = {
+          'X' => {:int => 11, :txt => 'Kontraindiziert'},
+          'E' => {:int => 12, :txt => 'Kontraindiziert'},
+          'D' => {:int => 13, :txt => 'Kombination meiden'},
+          'C' => {:int => 14, :txt => 'Monitorisieren'},
+          'B' => {:int => 15, :txt => 'Vorsichtsmassnahmen'},
+          'A' => {:int => 16, :txt => 'keine Massnahmen'}
+        }
       end
     end
     def prepare_products
@@ -167,9 +190,109 @@ module Oddb2xml
       end
       _builder.to_xml
     end
+    def build_interaction
+      prepare_interactions
+      prepare_codes
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T.%7N%z')
+        xml.INTERACTION(
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'PROD_DATE'         => datetime,
+          'VALID_DATE'        => datetime,
+        ) {
+          @interactions.sort_by{|ix| ix[:ixno] }.each do |ix|
+            xml.IX('DT' => '') {
+              xml.IXNO ix[:ixno]
+              #xml.TITD
+              #xml.TITF
+              xml.GRP1D ix[:atc1]
+              #xml.GRP1F
+              xml.GRP2D ix[:atc2]
+              #xml.GRP2F
+              xml.EFFD  ix[:effect]
+              #xml.EFFF
+              if dict = @codes[ix[:grad].upcase]
+                xml.RLV  dict[:int]
+                xml.RLVD dict[:txt]
+                #xml.RLVF
+              end
+              #xml.EFFTXTD
+              #xml.EFFTXTF
+              xml.MECHD ix[:mechanism]
+              #xml.MECHF
+              xml.MEASD ix[:measures]
+              #xml.MEASF
+              #xml.REMD
+              #xml.REMF
+              #xml.LIT
+              xml.DEL false
+              #xml.IXMCH {
+              #  xml.TYP
+              #  xml.TYPD
+              #  xml.TYPF
+              #  xml.CD
+              #  xml.CDD
+              #  xml.CDF
+              #  xml.TXTD
+              #  xml.TXTF
+              #}
+            }
+          end
+          xml.RESULT {
+            xml.OK_ERROR   'OK'
+            xml.NBR_RECORD @interactions.length.to_s
+            xml.ERROR_CODE ''
+            xml.MESSAGE    ''
+          }
+        }
+      end
+      _builder.to_xml
+    end
+    def build_code
+      prepare_codes
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T.%7N%z')
+        xml.CODE(
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'PROD_DATE'         => datetime,
+          'VALID_DATE'        => datetime,
+        ) {
+          @codes.each_pair do |val, definition|
+            xml.CD('DT' => '') {
+              xml.CDTYP   definition[:int]
+              xml.CDVAL   val
+              xml.DSCRSD  definition[:txt]
+              #xml.DSCRSF
+              #xml.DSCRMD
+              #xml.DSCRMF
+              #xml.DSCRD
+              #xml.DSCRF
+              xml.DEL false
+            }
+          end
+          xml.RESULT {
+            xml.OK_ERROR   'OK'
+            xml.NBR_RECORD @codes.keys.length
+            xml.ERROR_CODE ''
+            xml.MESSAGE    ''
+          }
+        }
+      end
+      _builder.to_xml
+    end
     def build_product
       prepare_substances
       prepare_products
+      prepare_interactions
+      prepare_codes
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T.%7N%z')
@@ -265,11 +388,15 @@ module Oddb2xml
                     #xml.WHK
                   }
                 end
-                #xml.CPTIX {
-                  #xml.IXNO
-                  #xml.GRP
-                  #xml.RLV
-                #}
+                @interactions.each do |ix|
+                  if [ix[:act1], ix[:act2]].include?(seq[:atc_code])
+                    xml.CPTIX {
+                      xml.IXNO ix[:ixno]
+                      #xml.GRP
+                      xml.RLV  @codes[ix[:grad]]
+                    }
+                  end
+                end
                 #xml.CPTROA {
                   #xml.SYSLOC
                   #xml.ROA
