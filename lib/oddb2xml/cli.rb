@@ -26,15 +26,18 @@ module Oddb2xml
     end
     def run
       threads = []
-      # swissmedic
-      threads << Thread.new do
-        downloader = SwissmedicInfoDownloader.new
-        xml = downloader.download
-        @mutex.synchronize do
-          hsh = SwissmedicInfoExtractor.new(xml).to_hash
-          @infos = hsh
+      # swissmedic-info
+      if @options[:fi]
+        threads << Thread.new do
+          downloader = SwissmedicInfoDownloader.new
+          xml = downloader.download
+          @mutex.synchronize do
+            hsh = SwissmedicInfoExtractor.new(xml).to_hash
+            @infos = hsh
+          end
         end
       end
+      # swissmedic
       [:orphans, :fridges].each do |type|
         threads << Thread.new do
           downloader = SwissmedicDownloader.new(type)
