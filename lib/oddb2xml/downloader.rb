@@ -13,7 +13,11 @@ module Oddb2xml
       init
     end
     def init
-      # pass
+      @agent = Mechanize.new
+      @agent.user_agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:16.0) Gecko/20100101 Firefox/16.0'
+      @agent.redirect_ok         = true
+      @agent.redirection_limit   = 5
+      @agent.follow_meta_refresh = true
     end
     protected
     def retrievable?
@@ -25,23 +29,39 @@ module Oddb2xml
         false
       end
     end
+    def read_xml_form_zip(target, zipfile)
+      xml = ''
+      if RUBY_PLATFORM =~ /mswin/i # for memory error
+        Zip::ZipFile.foreach(zipfile) do |entry|
+          if entry.name =~ target
+            entry.get_input_stream do |io|
+              while line = io.gets
+                xml << line
+              end
+            end
+          end
+        end
+      else
+        Zip::ZipFile.foreach(zipfile) do |entry|
+          if entry.name =~ target
+            entry.get_input_stream { |io| xml = io.read }
+          end
+        end
+      end
+      xml
+    end
   end
   class BagXmlDownloader < Downloader
     def init
+      super
       @url ||= 'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip'
     end
     def download
       file = 'XMLPublications.zip'
       begin
-        response = Mechanize.new.get(@url)
+        response = @agent.get(@url)
         response.save_as file
-        xml = ''
-        Zip::ZipFile.foreach(file) do |entry|
-          if entry.name =~ /^Preparation/iu
-            entry.get_input_stream{ |io| xml = io.read }
-          end
-        end
-        return xml
+        return read_xml_form_zip(/^Preparation/iu, file)
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
@@ -52,33 +72,33 @@ module Oddb2xml
     end
   end
   class SwissIndexDownloader < Downloader
-    def initialize(type=:pharma)
+    def initialize(type=:pharma, lang='DE')
       @type = (type == :pharma ? 'Pharma' : 'NonPharma')
+      @lang = lang
       url = "https://index.ws.e-mediat.net/Swissindex/#{@type}/ws_#{@type}_V101.asmx?WSDL"
       super(url)
     end
     def init
-      @config = {
+      config = {
         :log_level       => :info,
         :log             => false, # $stdout
         :raise_errors    => true,
         :ssl_verify_mode => :none,
         :wsdl            => @url
       }
+      @client = Savon::Client.new(config)
     end
-    def download_by(lang = 'DE')
-      client = Savon::Client.new(@config)
+    def download
       begin
-        type = @type
         soap = <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 <soap:Body>
-  <lang xmlns="http://swissindex.e-mediat.net/Swissindex#{type}_out_V101">#{lang}</lang>
+  <lang xmlns="http://swissindex.e-mediat.net/Swissindex#{@type}_out_V101">#{@lang}</lang>
 </soap:Body>
 </soap:Envelope>
 XML
-        response = client.call(:download_all, :xml => soap)
+        response = @client.call(:download_all, :xml => soap)
         if response.success?
           if xml = response.to_xml
             return xml
@@ -95,25 +115,26 @@ XML
     end
   end
   class SwissmedicDownloader < Downloader
-    HOST = 'http://www.swissmedic.ch'
-    def init
-    end
-    def download_by(index=:orphans)
-      case index
+    def initialize(type=:orphans)
+      @type = type
+      case @type
       when :orphans
-        @url ||= "#{HOST}/daten/00081/index.html?lang=de"
-        xpath =  "//div[@id='sprungmarke0_4']//a[@title='Humanarzneimittel']"
+        action = "daten/00081/index.html?lang=de"
+        @xpath = "//div[@id='sprungmarke0_4']//a[@title='Humanarzneimittel']"
       when :fridges
-        @url ||= "#{HOST}/daten/00080/00254/index.html?lang=de"
-        xpath =  "//table[@class='swmTableFlex']//a[@title='B3.1.35-d.xls']"
+        action = "daten/00080/00254/index.html?lang=de"
+        @xpath = "//table[@class='swmTableFlex']//a[@title='B3.1.35-d.xls']"
       end
-      file = "swissmedic_#{index}.xls"
+      url = "http://www.swissmedic.ch/#{action}"
+      super(url)
+    end
+    def download
+      file = "swissmedic_#{@type}.xls"
       begin
-        agent = Mechanize.new
-        page = agent.get(@url)
-        if link = page.search(xpath).first
-          url = HOST + link['href']
-          response = agent.get(url)
+        page = @agent.get(@url)
+        if link_node = page.search(@xpath).first
+          link = Mechanize::Page::Link.new(link_node, @agent, page)
+          response = link.click
           response.save_as file
         end
         return File.open(file, 'rb')
@@ -128,15 +149,15 @@ XML
   end
   class SwissmedicInfoDownloader < Downloader
     def init
+      super
+      @agent.ignore_bad_chunking = true
       @url ||= "http://download.swissmedicinfo.ch/Accept.aspx?ReturnUrl=%2f"
     end
     def download
       file = "swissmedic_info.zip"
       begin
         response = nil
-        agent = Mechanize.new
-        agent.ignore_bad_chunking = true
-        if home = agent.get(@url)
+        if home = @agent.get(@url)
           form = home.form_with(:id => 'Form1')
           bttn = form.button_with(:name => 'ctl00$MainContent$btnOK')
           if page = form.submit(bttn)
@@ -148,13 +169,7 @@ XML
         if response
           response.save_as file
         end
-        xml = ''
-        Zip::ZipFile.foreach(file) do |entry|
-          if entry.name =~ /^AipsDownload_/iu
-            entry.get_input_stream{ |io| xml = io.read }
-          end
-        end
-        return xml
+        return read_xml_form_zip(/^AipsDownload_/iu, file)
       rescue Timeout::Error
         retrievable? ? retry : raise
       rescue NoMethodError => e

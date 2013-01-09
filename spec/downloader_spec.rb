@@ -21,7 +21,7 @@ describe Oddb2xml::BagXmlDownloader do
   include ServerMockHelper
   before(:each) do
     setup_bag_xml_server_mock
-    @downloader = Oddb2xml::BagXmlDownloader.new()
+    @downloader = Oddb2xml::BagXmlDownloader.new
   end
   it_behaves_like 'any downloader'
   context 'when download is called' do
@@ -47,13 +47,13 @@ describe Oddb2xml::SwissIndexDownloader do
   before(:each) do
     setup_swiss_index_server_mock
   end
-  context 'Pharma' do
+  context 'Pharma with DE' do
     before(:each) do
-      @downloader = Oddb2xml::SwissIndexDownloader.new(:pharma)
+      @downloader = Oddb2xml::SwissIndexDownloader.new(:pharma, 'DE')
     end
     it_behaves_like 'any downloader'
     context 'when download_by is called with DE' do
-      let(:xml) { @downloader.download_by('DE') }
+      let(:xml) { @downloader.download }
       it 'should parse response hash to xml' do
         xml.should be_a String
         xml.length.should_not == 0
@@ -65,13 +65,13 @@ describe Oddb2xml::SwissIndexDownloader do
       end
     end
   end
-  context 'NonPharma' do
+  context 'NonPharma with FR' do
     before(:each) do
-      @downloader = Oddb2xml::SwissIndexDownloader.new(:nonpharma)
+      @downloader = Oddb2xml::SwissIndexDownloader.new(:nonpharma, 'FR')
     end
     it_behaves_like 'any downloader'
-    context 'when download_by is called with DE' do
-      let(:xml) { @downloader.download_by('DE') }
+    context 'when download_by is called with FR' do
+      let(:xml) { @downloader.download }
       it 'should parse response hash to xml' do
         xml.should be_a String
         xml.length.should_not == 0
@@ -87,31 +87,39 @@ end
 
 describe Oddb2xml::SwissmedicDownloader do
   include ServerMockHelper
-  before(:each) do
-    setup_swissmedic_server_mock
-    @downloader = Oddb2xml::SwissmedicDownloader.new()
+  context 'orphans' do
+    before(:each) do
+      setup_swissmedic_server_mock
+      @downloader = Oddb2xml::SwissmedicDownloader.new(:orphans)
+    end
+    it_behaves_like 'any downloader'
+    context 'download_by for orphans xls' do
+      let(:io) { @downloader.download }
+      it 'should return valid IO' do
+        io.should be_a IO
+        io.bytes.should_not nil
+      end
+      it 'should clean up current directory' do
+        io.should_not raise_error(Timeout::Error)
+        File.exist?('oddb_orphans.xls').should be(false)
+      end
+    end
   end
-  it_behaves_like 'any downloader'
-  context 'download_by for orphans xls' do
-    let(:io) { @downloader.download_by(:orphans) }
-    it 'should return valid IO' do
-      io.should be_a IO
-      io.bytes.should_not nil
+  context 'fridges' do
+    before(:each) do
+      setup_swissmedic_server_mock
+      @downloader = Oddb2xml::SwissmedicDownloader.new(:fridges)
     end
-    it 'should clean up current directory' do
-      io.should_not raise_error(Timeout::Error)
-      File.exist?('oddb_orphans.xls').should be(false)
-    end
-  end
-  context 'download_by for fridges xls' do
-    let(:io) { @downloader.download_by(:fridges) }
-    it 'should return valid IO' do
-      io.should be_a IO
-      io.bytes.should_not nil
-    end
-    it 'should clean up current directory' do
-      io.should_not raise_error(Timeout::Error)
-      File.exist?('oddb_fridges.xls').should be(false)
+    context 'download_by for fridges xls' do
+      let(:io) { @downloader.download }
+      it 'should return valid IO' do
+        io.should be_a IO
+        io.bytes.should_not nil
+      end
+      it 'should clean up current directory' do
+        io.should_not raise_error(Timeout::Error)
+        File.exist?('oddb_fridges.xls').should be(false)
+      end
     end
   end
 end
@@ -120,7 +128,7 @@ describe Oddb2xml::SwissmedicInfoDownloader do
   include ServerMockHelper
   before(:each) do
     setup_swissmedic_info_server_mock
-    @downloader = Oddb2xml::SwissmedicInfoDownloader.new()
+    @downloader = Oddb2xml::SwissmedicInfoDownloader.new
   end
   it_behaves_like 'any downloader'
   context 'when download is called' do

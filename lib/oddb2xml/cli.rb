@@ -37,8 +37,8 @@ module Oddb2xml
       end
       [:orphans, :fridges].each do |type|
         threads << Thread.new do
-          downloader = SwissmedicDownloader.new
-          io = downloader.download_by(type)
+          downloader = SwissmedicDownloader.new(type)
+          io = downloader.download
           self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(io, type).to_arry)
         end
       end
@@ -55,8 +55,8 @@ module Oddb2xml
         # swissindex
         types.each do |type|
           threads << Thread.new do
-            downloader = SwissIndexDownloader.new(type)
-            xml = downloader.download_by(lang)
+            downloader = SwissIndexDownloader.new(type, lang)
+            xml = downloader.download
             @mutex.synchronize do
               hsh = SwissIndexExtractor.new(xml, type).to_hash
               @index[lang][type] = hsh
