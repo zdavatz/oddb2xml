@@ -19,7 +19,10 @@ spec/builder_spec.rb
 spec/cli_spec.rb
 spec/compressor_spec.rb
 spec/data/XMLPublications.zip
+spec/data/epha_interactions.csv
 spec/data/oddb_article.xml
+spec/data/oddb_fi.xml
+spec/data/oddb_fi_product.xml
 spec/data/oddb_limitation.xml
 spec/data/oddb_product.xml
 spec/data/oddb_substance.xml
@@ -30,6 +33,7 @@ spec/data/swissmedic_fridges.html
 spec/data/swissmedic_fridges.xls
 spec/data/swissmedic_info.html
 spec/data/swissmedic_info.zip
+spec/data/swissmedic_info_2.html
 spec/data/swissmedic_orphans.html
 spec/data/swissmedic_orphans.xls
 spec/data/wsdl.xml
