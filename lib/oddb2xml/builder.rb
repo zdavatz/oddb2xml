@@ -206,8 +206,8 @@ module Oddb2xml
         ) {
           @interactions.sort_by{|ix| ix[:ixno] }.each do |ix|
             xml.IX('DT' => '') {
-              xml.IXNO ix[:ixno]
-              #xml.TITD
+              xml.IXNO  ix[:ixno]
+              xml.TITD  ix[:title]
               #xml.TITF
               xml.GRP1D ix[:atc1]
               #xml.GRP1F

@@ -212,9 +212,10 @@ module Oddb2xml
         row = line.chomp.gsub("\"", '').split(';')
         ixno += 1
         action = {}
-        action[:ixno] = ixno
-        action[:atc1] = row[0]
-        action[:atc2] = row[2]
+        action[:ixno]      = ixno
+        action[:title]     = row[4]
+        action[:atc1]      = row[0]
+        action[:atc2]      = row[2]
         action[:mechanism] = row[5]
         action[:effect]    = row[6]
         action[:measures]  = row[7]
