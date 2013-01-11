@@ -22,6 +22,7 @@ module ServerMockHelper
     setup_swissmedic_server_mock
     setup_swissmedic_info_server_mock
     setup_epha_server_mock
+    setup_ywesee_server_mock
   end
   def setup_bag_xml_server_mock
     # zip
@@ -151,6 +152,20 @@ module ServerMockHelper
       to_return(
         :status  => 200,
         :headers => {'Content-Type' => 'text/csv; charset=utf-8'},
+        :body    => stub_response)
+  end
+  def setup_ywesee_server_mock
+    # txt
+    stub_txt_url = 'http://www.ywesee.com/uploads/Main/BM_Update.txt'
+    stub_response = File.read(File.expand_path('../data/ywesee_bm_update.txt', __FILE__))
+    stub_request(:get, stub_txt_url).
+      with(:headers => {
+        'Accept' => '*/*',
+        'Host'   => 'www.ywesee.com',
+      }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'text/plain; charset=utf-8'},
         :body    => stub_response)
   end
 end

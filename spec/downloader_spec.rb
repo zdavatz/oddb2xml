@@ -169,4 +169,22 @@ describe Oddb2xml::EphaDownloader do
   end
 end
 
-
+describe Oddb2xml::YweseeBMDownloader do
+  include ServerMockHelper
+  before(:each) do
+    setup_ywesee_server_mock
+    @downloader = Oddb2xml::YweseeBMDownloader.new
+  end
+  it_behaves_like 'any downloader'
+  context 'when download is called' do
+    let(:io) { @downloader.download }
+    it 'should read txt to IO Object' do
+      io.should be_a IO
+      io.bytes.should_not nil
+    end
+    it 'should clean up current directory' do
+      io.should_not raise_error(Timeout::Error)
+      File.exist?('ywesee_bm_update.txt').should be(false)
+    end
+  end
+end

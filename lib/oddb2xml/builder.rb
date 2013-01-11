@@ -17,7 +17,7 @@ end
 
 module Oddb2xml
   class Builder
-    attr_accessor :subject, :index, :items,
+    attr_accessor :subject, :index, :items, :flags,
                   :actions,
                   :orphans, :fridges,
                   :infos,
@@ -26,6 +26,7 @@ module Oddb2xml
       @subject    = nil
       @index      = {}
       @items      = {}
+      @flags      = {}
       @infos      = {}
       @actions    = []
       @orphans    = []
@@ -473,8 +474,12 @@ module Oddb2xml
                 end
               end
               #xml.TEMP
-              #xml.CDBG
-              #xml.BG
+              unless de_pac[:ean].empty?
+                flag = @flags[de_pac[:ean]]
+                # as same flag
+                xml.CDBG (flag ? 'Y' : 'N')
+                xml.BG   (flag ? 'Y' : 'N')
+              end
               #xml.EXP
               xml.QTY   de_pac[:additional_desc] unless de_pac[:additional_desc].empty?
               xml.DSCRD de_pac[:desc]            unless de_pac[:desc].empty?

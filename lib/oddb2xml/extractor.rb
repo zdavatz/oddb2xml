@@ -225,4 +225,18 @@ module Oddb2xml
       data
     end
   end
+  class YweseeBMExtractor < Extractor
+    def initialize(io)
+      @io = io
+    end
+    def to_hash
+      data = {}
+      while line = @io.gets
+        next if line =~ /\d{13}/
+        ean = line.chomp.gsub("\"", '')
+        data[ean] = true
+      end
+      data
+    end
+  end
 end

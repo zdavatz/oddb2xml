@@ -201,4 +201,24 @@ XML
       end
     end
   end
+  class YweseeBMDownloader < Downloader
+    def init
+      super
+      @url ||= 'http://www.ywesee.com/uploads/Main/BM_Update.txt'
+    end
+    def download
+      file = 'ywesee_bm_update.txt'
+      begin
+        response = @agent.get(@url)
+        response.save_as file
+        return File.open(file, 'r')
+      rescue Timeout::Error
+        retrievable? ? retry : raise
+      ensure
+        if File.exists? file
+          File.unlink file
+        end
+      end
+    end
+  end
 end

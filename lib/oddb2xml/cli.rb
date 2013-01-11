@@ -17,6 +17,7 @@ module Oddb2xml
       @mutex = Mutex.new
       @items = {} # Items from Preparations.xml in BAG
       @index = {} # Base index from swissINDEX
+      @flags = {} # narcotics flag from ywesee
       @infos = {} # [option] FI from SwissmedicInfo
       @actions = [] # [addition] interactions from epha
       @orphans = [] # [addition] Orphaned drugs from Swissmedic xls
@@ -63,6 +64,14 @@ module Oddb2xml
           @items = hsh
         end
       end
+      # ywesee
+      threads << Thread.new do
+        downloader = YweseeBMDownloader.new
+        io = downloader.download
+        @mutex.synchronize do
+          @flags = YweseeBMExtractor.new(io).to_hash
+        end
+      end
       LANGUAGES.each do |lang|
         # swissindex
         types.each do |type|
@@ -96,6 +105,7 @@ module Oddb2xml
             builder.subject = sbj
             builder.index   = index
             builder.items   = @items
+            builder.flags   = @flags
             # additions
             %w[actions orphans fridges].each do |addition|
               builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
