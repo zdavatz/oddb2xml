@@ -157,13 +157,13 @@ describe Oddb2xml::EphaDownloader do
   end
   it_behaves_like 'any downloader'
   context 'when download is called' do
-    let(:xml) { @downloader.download }
+    let(:io) { @downloader.download }
     it 'should read csv to IO Object' do
-      xml.should be_a IO
-      xml.bytes.should_not nil
+      io.should be_a IO
+      io.bytes.should_not nil
     end
     it 'should clean up current directory' do
-      xml.should_not raise_error(Timeout::Error)
+      io.should_not raise_error(Timeout::Error)
       File.exist?('epha_interactions.csv').should be(false)
     end
   end
