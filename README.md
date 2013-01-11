@@ -4,6 +4,7 @@ oddb2xml, creates xml files using swissINDEX, BAG-XML and Swissmedic.
 
 The following additional data is in the files:
 
+* Wirkstoffe
 * Kühlkette (gemäss Swissmedic)
 * Orphan Drugs (gemäss Swissmedic)
 * FI (de und fr)
