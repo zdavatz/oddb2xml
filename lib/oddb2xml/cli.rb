@@ -100,9 +100,6 @@ module Oddb2xml
             %w[actions orphans fridges].each do |addition|
               builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
             end
-            #builder.actions = @actions
-            #builder.orphans = @orphans
-            #builder.fridges = @fridges
             # optionals
             builder.infos = @infos
             builder.tag_suffix = @options[:tag_suffix]
