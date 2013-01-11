@@ -51,7 +51,7 @@ module Oddb2xml
         downloader = EphaDownloader.new
         io = downloader.download
         @mutex.synchronize do
-          @actions = EphaExtractor.new(io).to_hash
+          @actions = EphaExtractor.new(io).to_arry
         end
       end
       # bag

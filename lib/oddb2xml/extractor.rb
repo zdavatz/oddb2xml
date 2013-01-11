@@ -204,7 +204,7 @@ module Oddb2xml
     def initialize(io)
       @io = io
     end
-    def to_hash
+    def to_arry
       data = []
       ixno = 0
       while line = @io.gets
