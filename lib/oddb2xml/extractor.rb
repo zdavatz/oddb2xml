@@ -2,6 +2,7 @@
 
 require 'nokogiri'
 require 'spreadsheet'
+require 'stringio'
 
 module Oddb2xml
   class Extractor
@@ -134,7 +135,8 @@ module Oddb2xml
     end
   end
   class SwissmedicExtractor < Extractor
-    def initialize(io, type)
+    def initialize(bin, type)
+      io = StringIO.new(bin)
       book = Spreadsheet.open(io)
       @sheet = book.worksheet(0)
       @type  = type
@@ -201,8 +203,8 @@ module Oddb2xml
     end
   end
   class EphaExtractor < Extractor
-    def initialize(io)
-      @io = io
+    def initialize(str)
+      @io = StringIO.new(str)
     end
     def to_arry
       data = []
@@ -226,8 +228,8 @@ module Oddb2xml
     end
   end
   class YweseeBMExtractor < Extractor
-    def initialize(io)
-      @io = io
+    def initialize(str)
+      @io = StringIO.new(str)
     end
     def to_hash
       data = {}

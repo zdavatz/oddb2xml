@@ -60,13 +60,14 @@ module Oddb2xml
       file = 'XMLPublications.zip'
       begin
         response = @agent.get(@url)
-        response.save_as file
+        response.save_as(file)
+        response = nil # mswin
         return read_xml_form_zip(/^Preparation/iu, file)
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
-        if File.exists? file
-          File.unlink file
+        if File.exists?(file)
+          File.unlink(file)
         end
       end
     end
@@ -101,6 +102,7 @@ XML
         response = @client.call(:download_all, :xml => soap)
         if response.success?
           if xml = response.to_xml
+            response = nil # mswin
             return xml
           else
             # received broken data or internal error
@@ -139,14 +141,17 @@ XML
         if link_node = page.search(@xpath).first
           link = Mechanize::Page::Link.new(link_node, @agent, page)
           response = link.click
-          response.save_as file
+          response.save_as(file)
+          response = nil # mswin
         end
-        return File.open(file, 'rb')
+        io = File.open(file, 'rb')
+        return io.read
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
-        if File.exists? file
-          File.unlink file
+        io.close unless io.closed?
+        if File.exists?(file)
+          File.unlink(file)
         end
       end
     end
@@ -171,7 +176,8 @@ XML
           end
         end
         if response
-          response.save_as file
+          response.save_as(file)
+          response = nil # msmin
         end
         return read_xml_form_zip(/^AipsDownload_/iu, file)
       rescue Timeout::Error
@@ -179,8 +185,8 @@ XML
       rescue NoMethodError => e
         # pass
       ensure
-        if File.exists? file
-          File.unlink file
+        if File.exists?(file)
+          File.unlink(file)
         end
       end
     end
@@ -194,13 +200,16 @@ XML
       file = "epha_interactions.csv"
       begin
         response = @agent.get(@url)
-        response.save_as file
-        return File.open(file, 'r')
+        response.save_as(file)
+        response = nil # mswin
+        io = File.open(file, 'r')
+        return io.read
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
-        if File.exists? file
-          File.unlink file
+        io.close unless io.closed? # mswin
+        if File.exists?(file)
+          File.unlink(file)
         end
       end
     end
@@ -214,13 +223,16 @@ XML
       file = 'ywesee_bm_update.txt'
       begin
         response = @agent.get(@url)
-        response.save_as file
-        return File.open(file, 'r')
+        response.save_as(file)
+        response = nil # mswin
+        io = File.open(file, 'r')
+        return io.read
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
-        if File.exists? file
-          File.unlink file
+        io.close unless io.closed? # mswin
+        if File.exists?(file)
+          File.unlink(file)
         end
       end
     end

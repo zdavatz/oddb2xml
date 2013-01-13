@@ -43,16 +43,16 @@ module Oddb2xml
       [:orphans, :fridges].each do |type|
         threads << Thread.new do
           downloader = SwissmedicDownloader.new(type)
-          io = downloader.download
-          self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(io, type).to_arry)
+          bin = downloader.download
+          self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(bin, type).to_arry)
         end
       end
       # epha
       threads << Thread.new do
         downloader = EphaDownloader.new
-        io = downloader.download
+        str = downloader.download
         @mutex.synchronize do
-          @actions = EphaExtractor.new(io).to_arry
+          @actions = EphaExtractor.new(str).to_arry
         end
       end
       # bag
@@ -67,9 +67,9 @@ module Oddb2xml
       # ywesee
       threads << Thread.new do
         downloader = YweseeBMDownloader.new
-        io = downloader.download
+        str = downloader.download
         @mutex.synchronize do
-          @flags = YweseeBMExtractor.new(io).to_hash
+          @flags = YweseeBMExtractor.new(str).to_hash
         end
       end
       LANGUAGES.each do |lang|
