@@ -112,8 +112,10 @@ XML
           raise Timeout::Error
         end
       rescue HTTPI::SSLError
+        puts
         puts "Please install SSLv3 cert on your machine."
-        puts "You can check location of cert file with `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`"
+        puts "You can check location of cert file with `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`."
+        puts "Or confirm SSL_CERT_FILE environment."
         exit
       rescue Timeout::Error
         retrievable? ? retry : raise
