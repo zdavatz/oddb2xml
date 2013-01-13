@@ -83,7 +83,7 @@ module Oddb2xml
         :log_level       => :info,
         :log             => false, # $stdout
         :raise_errors    => true,
-        :ssl_verify_mode => :none,
+        :ssl_version     => :SSLv3,
         :wsdl            => @url
       }
       @client = Savon::Client.new(config)
@@ -109,6 +109,10 @@ XML
         else
           raise Timeout::Error
         end
+      rescue HTTPI::SSLError
+        puts "Please install SSLv3 cert on your machine."
+        puts "You can check location of cert file with `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`"
+        exit
       rescue Timeout::Error
         retrievable? ? retry : raise
       end
