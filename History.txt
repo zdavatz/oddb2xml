@@ -1,3 +1,8 @@
+=== 1.1.7 / 15.01.2013
+
+* Updated Manifest.text
+* added set.bat and win_fetch_cacerts.rb for Windows-Users and SSLv3 support
+
 === 1.1.6 / 13.01.2013
 
 * Update message for SSLv3 Error
