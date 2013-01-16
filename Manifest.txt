@@ -7,6 +7,7 @@ Manifest.txt
 README.md
 Rakefile
 bin/oddb2xml
+cacert.pem
 lib/oddb2xml.rb
 lib/oddb2xml/builder.rb
 lib/oddb2xml/cli.rb
