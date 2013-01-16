@@ -160,3 +160,8 @@ product.xml has relation to substance as `<SUBNO>`.
   </RESULT>
 </SUBSTANCE>
 ```
+## For Windows Users: You have to save the Certificate file permanently
+1. Control Panel > System > Advanced system settings (Das öffnet "System Properties" Window.)
+2. Click "Advanced" Tab.
+3. Click "Environment Variables" Button.
+4. User kann einfach set ewig Variable "SSL_CERT_FILE=C:\Path/to/cacert.pem".
