@@ -164,4 +164,4 @@ product.xml has relation to substance as `<SUBNO>`.
 1. Control Panel > System > Advanced system settings (Das öffnet "System Properties" Window.)
 2. Click "Advanced" Tab.
 3. Click "Environment Variables" Button.
-4. User kann einfach set ewig Variable "SSL_CERT_FILE=C:\Path/to/cacert.pem".
+4. User kann einfach die Umgebungsvariable "SSL_CERT_FILE=C:\Ruby193\lib\ruby\gems\1.9.1\gems\oddb2xml-x.x.x\cacert.pem setzen.
