@@ -1,3 +1,8 @@
+=== 1.1.8 / 17.01.2013
+
+* Improve File reading on Windows
+* Update ssl connection handling and information
+
 === 1.1.7 / 15.01.2013
 
 * Updated Manifest.text
