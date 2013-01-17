@@ -72,18 +72,36 @@ module Oddb2xml
           @flags = YweseeBMExtractor.new(str).to_hash
         end
       end
+      ssl = true
+      catch :ssl do
       LANGUAGES.each do |lang|
-        # swissindex
-        types.each do |type|
-          threads << Thread.new do
-            downloader = SwissIndexDownloader.new(type, lang)
-            xml = downloader.download
-            @mutex.synchronize do
-              hsh = SwissIndexExtractor.new(xml, type).to_hash
-              @index[lang][type] = hsh
+          # swissindex
+          types.each do |type|
+            begin
+              thread = thread.new do
+                downloader = SwissIndexDownloader.new(type, lang)
+                xml = downloader.download
+                @mutex.synchronize do
+                  hsh = SwissIndexExtractor.new(xml, type).to_hash
+                  @index[lang][type] = hsh
+                end
+              end
+              thread.abort_on_exception = true
+              threads << thread
+            rescue Exception
+              ssl = false
+              throw :ssl
             end
           end
         end
+      end
+      unless ssl
+        puts
+        puts "(Aborted)"
+        puts "Please install SSLv3 CA certificates on your machine."
+        puts "You can check with `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`."
+        puts "See README."
+        exit
       end
       threads.map(&:join)
       build

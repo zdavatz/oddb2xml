@@ -160,8 +160,21 @@ product.xml has relation to substance as `<SUBNO>`.
   </RESULT>
 </SUBSTANCE>
 ```
-## For Windows Users: You have to save the Certificate file permanently
-1. Control Panel > System > Advanced system settings (Das öffnet "System Properties" Window.)
+
+## About SSLv3 cert
+
+Some websites need SSLv3 connection.  
+If you don't have these root CA files (x509), Please install these Certificates before running.  
+Please confirm wit `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`.
+
+see [cURL Website](http://curl.haxx.se/ca/)
+
+
+### Windows User
+
+1. Download this [cacert.pem](http://curl.haxx.se/ca/cacert.pem) (cURL) into your HOME directory.
+1. Then Choose Menu "Control Panel" > "System" > "Advanced system settings" (This open "System Properties" Window.)
 2. Click "Advanced" Tab.
-3. Click "Environment Variables" Button.
-4. User kann einfach die Umgebungsvariable "SSL_CERT_FILE=C:\Ruby193\lib\ruby\gems\1.9.1\gems\oddb2xml-x.x.x\cacert.pem setzen.
+3. Click "Environment Variables" button.
+4. Add set variable entry "SSL\_CERT\_FILE=%HOMEPATH%\cacert.pem" (Variable name: SSL\_CCERT\_FILE, Variable value: %HOMEPATH%\cacert.pem) with "New..." button into upper are "User variables for xxx"
+5. (Please do not remove this cacert.pem. All SSLv3 connections use this file.)
