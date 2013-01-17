@@ -42,5 +42,6 @@ spec/data/ywesee_bm_update.txt
 spec/downloader_spec.rb
 spec/extractor_spec.rb
 spec/spec_helper.rb
-tools/win_fetch_cacerts.rb
+tools/cacert.pem
 tools/set.bat
+tools/win_fetch_cacerts.rb
