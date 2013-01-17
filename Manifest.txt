@@ -7,7 +7,6 @@ Manifest.txt
 README.md
 Rakefile
 bin/oddb2xml
-cacert.pem
 lib/oddb2xml.rb
 lib/oddb2xml/builder.rb
 lib/oddb2xml/cli.rb
@@ -15,7 +14,6 @@ lib/oddb2xml/compressor.rb
 lib/oddb2xml/downloader.rb
 lib/oddb2xml/extractor.rb
 lib/oddb2xml/version.rb
-set.bat
 spec/builder_spec.rb
 spec/cli_spec.rb
 spec/compressor_spec.rb
@@ -44,4 +42,5 @@ spec/data/ywesee_bm_update.txt
 spec/downloader_spec.rb
 spec/extractor_spec.rb
 spec/spec_helper.rb
-win_fetch_cacerts.rb
+tools/win_fetch_cacerts.rb
+tools/set.bat
