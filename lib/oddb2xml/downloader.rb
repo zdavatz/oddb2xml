@@ -114,7 +114,7 @@ XML
           raise Timeout::Error
         end
       rescue HTTPI::SSLError
-        raise Exception # catch me in Cli class
+        exit # catch me in Cli class
       rescue Timeout::Error
         retrievable? ? retry : raise
       end

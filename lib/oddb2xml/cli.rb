@@ -72,38 +72,42 @@ module Oddb2xml
           @flags = YweseeBMExtractor.new(str).to_hash
         end
       end
-      ssl = true
-      catch :ssl do
+      @_message = false
       LANGUAGES.each do |lang|
-          # swissindex
-          types.each do |type|
+        # swissindex
+        types.each do |type|
+          threads << Thread.new do
+            downloader = SwissIndexDownloader.new(type, lang)
             begin
-              thread = thread.new do
-                downloader = SwissIndexDownloader.new(type, lang)
-                xml = downloader.download
-                @mutex.synchronize do
-                  hsh = SwissIndexExtractor.new(xml, type).to_hash
-                  @index[lang][type] = hsh
+              xml = downloader.download
+            rescue SystemExit
+              @mutex.synchronize do
+                unless @_message # hook only one exit
+                  @_message = true
+                  exit
                 end
               end
-              thread.abort_on_exception = true
-              threads << thread
-            rescue Exception
-              ssl = false
-              throw :ssl
+            end
+            @mutex.synchronize do
+              hsh = SwissIndexExtractor.new(xml, type).to_hash
+              @index[lang][type] = hsh
             end
           end
         end
       end
-      unless ssl
-        puts
-        puts "(Aborted)"
-        puts "Please install SSLv3 CA certificates on your machine."
-        puts "You can check with `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`."
-        puts "See README."
+      begin
+        threads.map(&:join)
+      rescue SystemExit
+        @mutex.synchronize do
+          if @_message
+            puts "(Aborted)"
+            puts "Please install SSLv3 CA certificates on your machine."
+            puts "You can check with `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`."
+            puts "See README."
+          end
+        end
         exit
       end
-      threads.map(&:join)
       build
       compress if @options[:compress_ext]
       report
