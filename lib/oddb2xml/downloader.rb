@@ -31,14 +31,16 @@ module Oddb2xml
     end
     def read_xml_form_zip(target, zipfile)
       xml = ''
-      if RUBY_PLATFORM =~ /mswin/i # for memory error
+      if RUBY_PLATFORM =~ /mswin|mingw|bccwin|cygwin/i # for memory error
         Zip::ZipFile.foreach(zipfile) do |entry|
           if entry.name =~ target
-            entry.get_input_stream do |io|
-              while line = io.gets
-                xml << line
-              end
+            io = entry.get_input_stream
+            until io.eof?
+              bytes = io.read(1024)
+              xml << bytes
+              bytes = nil
             end
+            io.close
           end
         end
       else
@@ -61,7 +63,7 @@ module Oddb2xml
       begin
         response = @agent.get(@url)
         response.save_as(file)
-        response = nil # mswin
+        response = nil # win
         return read_xml_form_zip(/^Preparation/iu, file)
       rescue Timeout::Error
         retrievable? ? retry : raise
@@ -102,7 +104,7 @@ XML
         response = @client.call(:download_all, :xml => soap)
         if response.success?
           if xml = response.to_xml
-            response = nil # mswin
+            response = nil # win
             return xml
           else
             # received broken data or internal error
@@ -112,11 +114,7 @@ XML
           raise Timeout::Error
         end
       rescue HTTPI::SSLError
-        puts
-        puts "Please install SSLv3 cert on your machine."
-        puts "You can check location of cert file with `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`."
-        puts "Or confirm SSL_CERT_FILE environment."
-        exit
+        raise Exception # catch me in Cli class
       rescue Timeout::Error
         retrievable? ? retry : raise
       end
@@ -144,7 +142,7 @@ XML
           link = Mechanize::Page::Link.new(link_node, @agent, page)
           response = link.click
           response.save_as(file)
-          response = nil # mswin
+          response = nil # win
         end
         io = File.open(file, 'rb')
         return io.read
@@ -203,13 +201,13 @@ XML
       begin
         response = @agent.get(@url)
         response.save_as(file)
-        response = nil # mswin
+        response = nil # win
         io = File.open(file, 'r')
         return io.read
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
-        io.close unless io.closed? # mswin
+        io.close unless io.closed? # win
         if File.exists?(file)
           File.unlink(file)
         end
@@ -226,13 +224,13 @@ XML
       begin
         response = @agent.get(@url)
         response.save_as(file)
-        response = nil # mswin
+        response = nil # win
         io = File.open(file, 'r')
         return io.read
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
-        io.close unless io.closed? # mswin
+        io.close unless io.closed? # win
         if File.exists?(file)
           File.unlink(file)
         end
