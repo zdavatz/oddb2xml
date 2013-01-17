@@ -1,3 +1,7 @@
+=== 1.1.9 / 17.01.2013
+
+* Improve SSLv3 Error message output
+
 === 1.1.8 / 17.01.2013
 
 * Improve File reading on Windows
