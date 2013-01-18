@@ -31,18 +31,21 @@ module Oddb2xml
     end
     def read_xml_form_zip(target, zipfile)
       xml = ''
-      if RUBY_PLATFORM =~ /mswin|mingw|bccwin|cygwin/i # for memory error
-        Zip::ZipFile.foreach(zipfile) do |entry|
-          if entry.name =~ target
-            io = entry.get_input_stream
-            until io.eof?
-              bytes = io.read(1024)
-              xml << bytes
-              bytes = nil
+      if RUBY_PLATFORM =~ /mswin|mingw|bccwin|cygwin/i
+        zip = ZipFile.open(zipfile) do |zipFile|
+          zipFile.each do |entry|
+            if entry.name =~ target
+              io = entry.get_input_stream
+              until io.eof?
+                bytes = io.read(1024)
+                xml << bytes
+                bytes = nil
+              end
+              io.close
             end
-            io.close
           end
         end
+        zip.close
       else
         Zip::ZipFile.foreach(zipfile) do |entry|
           if entry.name =~ target
@@ -177,16 +180,24 @@ XML
         end
         if response
           response.save_as(file)
-          response = nil # msmin
+          response = nil # win
         end
         return read_xml_form_zip(/^AipsDownload_/iu, file)
       rescue Timeout::Error
         retrievable? ? retry : raise
-      rescue NoMethodError => e
+      rescue NoMethodError
         # pass
       ensure
+        # win
+        deleted = false
         if File.exists?(file)
-          File.unlink(file)
+          until deleted
+            begin
+              File.unlink(file)
+              deleted = true
+            rescue Errno::EACCES # Permission Denied on Windows
+            end
+          end
         end
       end
     end
