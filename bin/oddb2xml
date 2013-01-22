@@ -13,8 +13,10 @@ def help
 #$0 ver.#{Oddb2xml::VERSION}
 Usage:
   oddb2xml [option]
-    -c F, --compress=F   Compress format F. {tar.gz|zip}
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
+    -c F, --compress=F   Compress format F. {tar.gz|zip}
+    -f F, --format=F     File format F, default is xml. {xml|dat}
+                         If F is given, -o option is ignored.
     -o O, --optional=O   Optional output. O, only 'fi' is available.
     -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9_]
                          If S is given, it is also used as prefix of filename.
@@ -24,15 +26,20 @@ end
 
 parser = OptionParser.new
 opts = {
-  :compress_ext => nil,
   :nonpharma    => false,
+  :compress_ext => nil,
+  :format       => :xml,
+  :fi           => false,
   :tag_suffix   => nil,
+  :debug        => false,
 }
 
-parser.on('-c v', '--compress v',   /tar\.gz|zip/)   {|v| opts[:compress_ext] = v }
 parser.on('-a v', '--append v',     /nonpharma/)     {|v| opts[:nonpharma] = true }
+parser.on('-c v', '--compress v',   /tar\.gz|zip/)   {|v| opts[:compress_ext] = v }
+parser.on('-f v', '--format v',     /dat/)           {|v| opts[:format] = :dat }
 parser.on('-o v', '--optional v',   /fi/)            {|v| opts[:fi] = true }
 parser.on('-t v', '--tag-suffix v', /^[A-z0-9_]*$/i) {|v| opts[:tag_suffix] = v.upcase }
+#parser.on('--debug') {|v| opts[:debug] = true }
 parser.on_tail('-h', '--help') { puts help; exit }
 
 args = ARGV.dup
@@ -47,6 +54,7 @@ end
 
 ui = Oddb2xml::Cli.new(opts)
 begin
+  #puts opts if opts[:debug]
   ui.run
 rescue Interrupt
   puts

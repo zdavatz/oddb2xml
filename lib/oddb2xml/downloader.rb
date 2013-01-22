@@ -6,7 +6,8 @@ require 'savon'
 
 module Oddb2xml
   class Downloader
-    def initialize(url=nil)
+    def initialize(options={}, url=nil)
+      @options     = options
       @url         = url
       @retry_times = 3
       HTTPI.log = false # disable httpi warning
@@ -64,9 +65,13 @@ module Oddb2xml
     def download
       file = 'XMLPublications.zip'
       begin
-        response = @agent.get(@url)
-        response.save_as(file)
-        response = nil # win
+        if @options[:debug]
+          FileUtils.copy(File.expand_path("../../../spec/data/#{file}", __FILE__), '.')
+        else
+          response = @agent.get(@url)
+          response.save_as(file)
+          response = nil # win
+        end
         return read_xml_form_zip(/^Preparation/iu, file)
       rescue Timeout::Error
         retrievable? ? retry : raise
@@ -78,11 +83,11 @@ module Oddb2xml
     end
   end
   class SwissIndexDownloader < Downloader
-    def initialize(type=:pharma, lang='DE')
+    def initialize(options={}, type=:pharma, lang='DE')
       @type = (type == :pharma ? 'Pharma' : 'NonPharma')
       @lang = lang
       url = "https://index.ws.e-mediat.net/Swissindex/#{@type}/ws_#{@type}_V101.asmx?WSDL"
-      super(url)
+      super(options, url)
     end
     def init
       config = {
@@ -96,6 +101,9 @@ module Oddb2xml
     end
     def download
       begin
+        if @options[:debug]
+          return File.read(File.expand_path("../../../spec/data/swissindex_#{@type}_#{@lang}.xml", __FILE__))
+        end
         soap = <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -135,7 +143,7 @@ XML
         @xpath = "//table[@class='swmTableFlex']//a[@title='B3.1.35-d.xls']"
       end
       url = "http://www.swissmedic.ch/#{action}"
-      super(url)
+      super({}, url)
     end
     def download
       file = "swissmedic_#{@type}.xls"

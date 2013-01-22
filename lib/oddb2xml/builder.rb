@@ -38,9 +38,16 @@ module Oddb2xml
     end
     def to_xml(subject=nil)
       if subject
-        self.send('build_' + subject)
+        self.send('build_' + subject.to_s)
       elsif @subject
-        self.send('build_' + @subject)
+        self.send('build_' + @subject.to_s)
+      end
+    end
+    def to_dat(subject=nil)
+      if subject
+        self.send('build_' + subject.to_s)
+      elsif @subject
+        self.send('build_' + @subject.to_s)
       end
     end
     private
@@ -678,6 +685,88 @@ module Oddb2xml
         }
       end
       _builder.to_xml
+    end
+
+    ### --- see oddb2tdat
+    def format_price(price_str, len=6, int_len=4, frac_len=2)
+      price = price_str.split('.')
+      pre = ''
+      las = ''
+      pre = "%0#{int_len}d" % (price[0] ? price[0] : '0')
+      las = if price[1]
+              if price[1].size < frac_len
+                price[1] + "0"*(frac_len-price[2].to_s.size)
+              else
+                price[1][0,frac_len]
+              end
+            else
+              '0'*frac_len
+            end
+      (pre.to_s + las.to_s)[0,len]
+    end
+    def format_date(date_str, len=7)
+      date = date_str.gsub('.','')
+      if date.size < len
+        date = date + '0'*(len-date.size)
+      end
+      date[0,len]
+    end
+    DAT_LEN = {
+      :RECA =>  2,
+      :CMUT =>  1,
+      :PHAR =>  7,
+      :ABEZ => 50,
+      :PRMO =>  6,
+      :PRPU =>  6,
+      :CKZL =>  1,
+      :CLAG =>  1,
+      :CBGG =>  1,
+      :CIKS =>  1,
+      :ITHE =>  7,
+      :CEAN => 13,
+      :CMWS =>  1,
+    }
+    def build_dat
+      prepare_articles
+      rows = []
+      @articles.each do |obj|
+        row = ''
+        de_pac = obj[:de]
+        fr_pac = obj[:fr]
+        # Oddb2tdat.parse
+        if obj[:de][:status] =~ /A|I/
+          bg_pac = nil
+          if obj[:seq]
+            pac = obj[:seq][:packages][de_pac[:pharmacode]]
+            row << "%#{DAT_LEN[:RECA]}s"  % '11'
+            row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = pac[:pharmacode] and phar.size > 3) # does not check expiration_date
+                                              obj[:de][:status] == "I" ? '3' : '1'
+                                            else
+                                              '3'
+                                            end
+            row << "%0#{DAT_LEN[:PHAR]}d" % pac[:pharmacode].to_i
+            row << "%-#{DAT_LEN[:ABEZ]}s" % (de_pac[:desc].to_s.gsub(/"/, '') + " " + pac[:name_de].to_s).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
+            row << "%#{DAT_LEN[:PRMO]}s"  % format_price(pac[:prices][:exf_price][:price].to_s)
+            row << "%#{DAT_LEN[:PRPU]}s"  % format_price(pac[:prices][:pub_price][:price].to_s)
+            row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
+            row << "%#{DAT_LEN[:CLAG]}s"  % '0'
+            row << "%#{DAT_LEN[:CBGG]}s"  % (pac[:narcosis_flag] == 'Y' ? '1' : '0')
+            row << "%#{DAT_LEN[:CIKS]}s"  % if (pac[:swissmedic_category] =~ /^[ABCDE]$/)
+                                              pac[:swissmedic_category].gsub(/(\+|\s)/, '')
+                                            else
+                                              '0'
+                                            end
+            row << "%#{DAT_LEN[:ITHE]}s"  % '       ' # ith_swissmedic
+            row << "%#{DAT_LEN[:CEAN]}s"  % de_pac[:ean].to_s
+            row << "%#{DAT_LEN[:CMWS]}s"  % '2'
+            rows << row
+          end
+        end
+      end
+      rows.join("\n")
+    end
+    def build_with_migel_dat
+      ''
     end
   end
 end

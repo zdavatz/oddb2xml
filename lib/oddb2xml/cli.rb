@@ -29,35 +29,37 @@ module Oddb2xml
     def run
       threads = []
       # swissmedic-info
-      if @options[:fi]
-        threads << Thread.new do
-          downloader = SwissmedicInfoDownloader.new
-          xml = downloader.download
-          @mutex.synchronize do
-            hsh = SwissmedicInfoExtractor.new(xml).to_hash
-            @infos = hsh
+      if @options[:format] != :dat
+        if @options[:fi]
+          threads << Thread.new do
+            downloader = SwissmedicInfoDownloader.new
+            xml = downloader.download
+            @mutex.synchronize do
+              hsh = SwissmedicInfoExtractor.new(xml).to_hash
+              @infos = hsh
+            end
           end
         end
-      end
-      # swissmedic
-      [:orphans, :fridges].each do |type|
-        threads << Thread.new do
-          downloader = SwissmedicDownloader.new(type)
-          bin = downloader.download
-          self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(bin, type).to_arry)
+        # swissmedic
+        [:orphans, :fridges].each do |type|
+          threads << Thread.new do
+            downloader = SwissmedicDownloader.new(type)
+            bin = downloader.download
+            self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(bin, type).to_arry)
+          end
         end
-      end
-      # epha
-      threads << Thread.new do
-        downloader = EphaDownloader.new
-        str = downloader.download
-        @mutex.synchronize do
-          @actions = EphaExtractor.new(str).to_arry
+        # epha
+        threads << Thread.new do
+          downloader = EphaDownloader.new
+          str = downloader.download
+          @mutex.synchronize do
+            @actions = EphaExtractor.new(str).to_arry
+          end
         end
       end
       # bag
       threads << Thread.new do
-        downloader = BagXmlDownloader.new
+        downloader = BagXmlDownloader.new(@options)
         xml = downloader.download
         @mutex.synchronize do
           hsh = BagXmlExtractor.new(xml).to_hash
@@ -77,7 +79,7 @@ module Oddb2xml
         # swissindex
         types.each do |type|
           threads << Thread.new do
-            downloader = SwissIndexDownloader.new(type, lang)
+            downloader = SwissIndexDownloader.new(@options, type, lang)
             begin
               xml = downloader.download
             rescue SystemExit
@@ -120,8 +122,15 @@ module Oddb2xml
             index = {}
             LANGUAGES.each do |lang|
               index[lang] = {} unless index[lang]
-              types.each do |type|
-                index[lang].merge!(@index[lang][type]) if @index[lang][type]
+              # TODO
+              #   to fix @index structure
+              if @options[:format] == :dat
+                type = (sbj == :dat ? :pharma : :nonpharma)
+                index[lang] = @index[lang][type]
+              else
+                types.each do |type|
+                  index[lang].merge!(@index[lang][type]) if @index[lang][type]
+                end
               end
             end
             builder.subject = sbj
@@ -136,8 +145,13 @@ module Oddb2xml
             builder.infos = @infos
             builder.tag_suffix = @options[:tag_suffix]
           end
-          xml = builder.to_xml
-          File.open(file, 'w:utf-8'){ |fh| fh << xml }
+          output = ''
+          if @options[:format] == :dat
+            output = builder.to_dat
+          else
+            output = builder.to_xml
+          end
+          File.open(file, 'w:utf-8'){ |fh| fh << output }
         end
       rescue Interrupt
         files.values.each do |file|
@@ -160,15 +174,22 @@ module Oddb2xml
     def files
       unless @_files
         @_files = {}
-        ##
-        # building order
-        #   1. addtions
-        #   2. subjects
-        #   3. optionals
-        _files = (ADDITIONS + SUBJECTS)
-        _files += OPTIONALS if @options[:fi]
-        _files.each do|sbj|
-          @_files[sbj] = "#{prefix}_#{sbj.to_s}.xml"
+        if @options[:format] == :dat
+          @_files[:dat] = "#{prefix}.dat"
+          if @options[:nonpharma]
+            @_files[:with_migel_dat] = "#{prefix}_with_migel.dat"
+          end
+        else # xml
+          ##
+          # building order
+          #   1. addtions
+          #   2. subjects
+          #   3. optionals
+          _files = (ADDITIONS + SUBJECTS)
+          _files += OPTIONALS if @options[:fi]
+          _files.each do|sbj|
+            @_files[sbj] = "#{prefix}_#{sbj.to_s}.xml"
+          end
         end
       end
       @_files
