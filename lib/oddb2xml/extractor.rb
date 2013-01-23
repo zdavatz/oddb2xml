@@ -166,15 +166,11 @@ module Oddb2xml
       case @type
       when :packages
         i_5,i_3 = 0,10 # :swissmedic_number
-        date    = 9    # :expiration_date
+        ith     = 4    # :ith_swissmedic (swissmedic-diff)
         @sheet.each do |row|
           no8 = extract_number(row, i_5).to_s + extract_number(row, i_3, /^\d{3}$/).to_s
           unless no8.empty?
-            text = ''
-            if row[date].is_a? DateTime
-              text = row[date].strftime("%y.%m.%d")
-            end
-            data[no8.intern] = text
+            data[no8.intern] = row[ith].to_s
           end
         end
       end
