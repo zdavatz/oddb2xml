@@ -1,3 +1,9 @@
+=== 1.2.1 / 23.01.2013
+
+* Update ith column for dat
+* Add Packungen.xls for ith_swissmedic
+* Add ADDSCR from swissINDEX into name as quantity
+
 === 1.2.0 / 22.01.2013
 
 * Add dat format output
