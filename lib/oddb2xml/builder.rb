@@ -20,7 +20,7 @@ module Oddb2xml
     attr_accessor :subject, :index, :items, :flags,
                   :actions,
                   :orphans, :fridges,
-                  :infos,
+                  :infos, :packs,
                   :tag_suffix
     def initialize
       @subject    = nil
@@ -28,6 +28,7 @@ module Oddb2xml
       @items      = {}
       @flags      = {}
       @infos      = {}
+      @packs      = {}
       @actions    = []
       @orphans    = []
       @fridges    = []
@@ -760,7 +761,7 @@ module Oddb2xml
                                             else
                                               '0'
                                             end
-            row << "%#{DAT_LEN[:ITHE]}s"  % '       ' # ith_swissmedic
+            row << "%#{DAT_LEN[:ITHE]}s"  % format_date(@packs[pac[:swissmedic_number].intern].to_s)
             row << "%#{DAT_LEN[:CEAN]}s"  % de_pac[:ean].to_s
             row << "%#{DAT_LEN[:CMWS]}s"  % '2'
             rows << row

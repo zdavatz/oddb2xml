@@ -19,6 +19,7 @@ module Oddb2xml
       @index = {} # Base index from swissINDEX
       @flags = {} # narcotics flag from ywesee
       @infos = {} # [option] FI from SwissmedicInfo
+      @packs = {} # [option] Packungen from Swissmedic for dat
       @actions = [] # [addition] interactions from epha
       @orphans = [] # [addition] Orphaned drugs from Swissmedic xls
       @fridges = [] # [addition] ReFridge drugs from Swissmedic xls
@@ -40,7 +41,7 @@ module Oddb2xml
             end
           end
         end
-        # swissmedic
+        # swissmedic - orphan, fridge
         [:orphans, :fridges].each do |type|
           threads << Thread.new do
             downloader = SwissmedicDownloader.new(type)
@@ -56,6 +57,23 @@ module Oddb2xml
             @actions = EphaExtractor.new(str).to_arry
           end
         end
+        # ywesee
+        threads << Thread.new do
+          downloader = YweseeBMDownloader.new
+          str = downloader.download
+          @mutex.synchronize do
+            @flags = YweseeBMExtractor.new(str).to_hash
+          end
+        end
+      else # dat
+        # swissmedic - package
+        threads << Thread.new do
+          downloader = SwissmedicDownloader.new(:packages)
+          bin = downloader.download
+          @mutex.synchronize do
+            @packs = SwissmedicExtractor.new(bin, :packages).to_hash
+          end
+        end
       end
       # bag
       threads << Thread.new do
@@ -64,14 +82,6 @@ module Oddb2xml
         @mutex.synchronize do
           hsh = BagXmlExtractor.new(xml).to_hash
           @items = hsh
-        end
-      end
-      # ywesee
-      threads << Thread.new do
-        downloader = YweseeBMDownloader.new
-        str = downloader.download
-        @mutex.synchronize do
-          @flags = YweseeBMExtractor.new(str).to_hash
         end
       end
       @_message = false
@@ -143,6 +153,7 @@ module Oddb2xml
             end
             # optionals
             builder.infos = @infos
+            builder.packs = @packs
             builder.tag_suffix = @options[:tag_suffix]
           end
           output = ''

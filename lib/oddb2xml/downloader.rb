@@ -141,6 +141,9 @@ XML
       when :fridges
         action = "daten/00080/00254/index.html?lang=de"
         @xpath = "//table[@class='swmTableFlex']//a[@title='B3.1.35-d.xls']"
+      when :packages
+        action = "daten/00080/00251/index.html?lang=de"
+        @xpath = "//div[@id='sprungmarke0_7']//a[@title='Excel-Version Zugelassene Verpackungen*']"
       end
       url = "http://www.swissmedic.ch/#{action}"
       super({}, url)
