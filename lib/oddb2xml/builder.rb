@@ -745,7 +745,11 @@ module Oddb2xml
                                               '3'
                                             end
             row << "%0#{DAT_LEN[:PHAR]}d" % pac[:pharmacode].to_i
-            row << "%-#{DAT_LEN[:ABEZ]}s" % (de_pac[:desc].to_s.gsub(/"/, '') + " " + pac[:name_de].to_s).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
+            row << "%-#{DAT_LEN[:ABEZ]}s" % (
+                                              de_pac[:desc].to_s.gsub(/"/, '') + " " +
+                                              pac[:name_de].to_s +
+                                              de_pac[:additional_desc]
+                                            ).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
             row << "%#{DAT_LEN[:PRMO]}s"  % format_price(pac[:prices][:exf_price][:price].to_s)
             row << "%#{DAT_LEN[:PRPU]}s"  % format_price(pac[:prices][:pub_price][:price].to_s)
             row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
