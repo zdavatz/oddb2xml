@@ -1,3 +1,8 @@
+=== 1.2.0 / 22.01.2013
+
+* Add dat format output
+* Update file deletion on Windows
+
 === 1.1.9 / 17.01.2013
 
 * Improve SSLv3 Error message output
