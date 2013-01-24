@@ -761,8 +761,8 @@ module Oddb2xml
                                           else
                                             '0'
                                           end
-          row << "%#{DAT_LEN[:ITHE]}s"  % (pac ? format_date(@packs[pac[:swissmedic_number].intern].to_s) : ('0' * DAT_LEN[:ITHE]))
-          row << "%#{DAT_LEN[:CEAN]}s"  % de_pac[:ean].to_s
+          row << "%0#{DAT_LEN[:ITHE]}d" % (pac ? format_date(@packs[pac[:swissmedic_number].intern].to_s) : ('0' * DAT_LEN[:ITHE])).to_i
+          row << "%0#{DAT_LEN[:CEAN]}d" % de_pac[:ean].to_i
           row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
           rows << row
         end
@@ -787,8 +787,8 @@ module Oddb2xml
                                           de_pac[:desc].to_s.gsub(/"/, '') + " " +
                                           de_pac[:additional_desc]
                                         ).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
-        row << "%#{DAT_LEN[:PRMO]}s"  % '000000'
-        row << "%#{DAT_LEN[:PRPU]}s"  % '000000'
+        row << "%#{DAT_LEN[:PRMO]}s"  % ('0' * DAT_LEN[:PRMO])
+        row << "%#{DAT_LEN[:PRPU]}s"  % ('0' * DAT_LEN[:PRPU])
         row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
         row << "%#{DAT_LEN[:CLAG]}s"  % '0'
         row << "%#{DAT_LEN[:CBGG]}s"  % '0'
