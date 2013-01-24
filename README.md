@@ -13,7 +13,7 @@ oddb2xml, creates xml
 
 and 
 
-dat (IGM-11) 
+dat [IGM-11](http://dev.ywesee.com/uploads/att/IGM.pdf)
 
 * oddb.dat
 * oddb_with_migel.dat

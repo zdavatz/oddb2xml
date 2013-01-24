@@ -1,3 +1,12 @@
+=== 1.2.2 / 24.01.2013
+
+* Improve compressor for dat
+* Improve dat format builder
+* Add all products from swissINDEX into dat
+* Add oddb_with_migel.dat output
+* Fix closing of Zip on Windows
+* Fix Windows unzip
+
 === 1.2.1 / 23.01.2013
 
 * Update ith column for dat
