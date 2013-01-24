@@ -27,9 +27,9 @@ the files are using [swissINDEX](http://www.refdata.ch/downloads/company/downloa
 
 The following additional data is in the files:
 
-* Wirkstoffe (BAG XML)
-* Kühlkette (Swissmedic)
-* Orphan Drugs (Swissmedic)
+* [Wirkstoffe](http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip) (BAG XML)
+* [Kühlkette](http://www.swissmedic.ch/daten/00080/00254/index.html?lang=de&download=NHzLpZeg7t,lnp6I0NTU042l2Z6ln1acy4Zn4Z2qZpnO2Yuq2Z6gpJCDdH57e2ym162epYbg2c_JjKbNoKOn6A--) (Swissmedic)
+* [Orphan Drugs](http://www.swissmedic.ch/daten/00081/index.html?lang=de&download=NHzLpZeg7t,lnp6I0NTU042l2Z6ln1acy4Zn4Z2qZpnO2Yuq2Z6gpJCDdH55f2ym162epYbg2c_JjKbNoKSn6A--&.xls) (Swissmedic)
 * FI: de, fr (Swissmedic)
 * Limitation-Texte (BAG XML)
 * Interaktionen [EPha.ch](http://epha.ch)
