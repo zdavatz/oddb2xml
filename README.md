@@ -81,14 +81,14 @@ this will generate you a valid XSD file that can be used to validate against the
 
 xml files generated are:
 
-oddb_substance.xml      
-oddb_limitation.xml     
-oddb_interaction.xml    
-oddb_code.xml           
-oddb_product.xml        
-oddb_article.xml
-oddb_fi.xml
-oddb_fi_product.xml
+* oddb_substance.xml      
+* oddb_limitation.xml     
+* oddb_interaction.xml    
+* oddb_code.xml           
+* oddb_product.xml        
+* oddb_article.xml
+* oddb_fi.xml
+* oddb_fi_product.xml
 
 ### article.xml
 
