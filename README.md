@@ -1,6 +1,24 @@
 # oddb2xml
 
-oddb2xml, creates xml files using swissINDEX, BAG-XML and Swissmedic.
+oddb2xml, creates xml 
+
+* oddb_substance.xml      
+* oddb_limitation.xml              
+* oddb_interaction.xml    
+* oddb_code.xml           
+* oddb_product.xml        
+* oddb_article.xml
+* oddb_fi.xml
+* oddb_fi_product.xml
+
+and 
+
+dat (IGM-11) 
+
+* oddb.dat
+* oddb_with_migel.dat
+
+files using swissINDEX, BAG-XML and Swissmedic.
 
 The following additional data is in the files:
 
@@ -60,6 +78,17 @@ If you need the XSD files, generate them yourself using the javabeans tool:
 this will generate you a valid XSD file that can be used to validate against the XML file.
 
 ## XML files
+
+xml files generated are:
+
+oddb_substance.xml      
+oddb_limitation.xml     
+oddb_interaction.xml    
+oddb_code.xml           
+oddb_product.xml        
+oddb_article.xml
+oddb_fi.xml
+oddb_fi_product.xml
 
 ### article.xml
 
