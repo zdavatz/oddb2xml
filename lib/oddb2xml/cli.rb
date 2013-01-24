@@ -174,7 +174,7 @@ module Oddb2xml
       end
     end
     def compress
-      compressor = Compressor.new(prefix, @options[:compress_ext])
+      compressor = Compressor.new(prefix, @options)
       files.values.each do |file|
         if File.exists?(file)
           compressor.contents << file
