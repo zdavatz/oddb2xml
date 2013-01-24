@@ -211,17 +211,17 @@ You can confirm wit `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`.
 
 ### Windows User: Making your SSL Certificate permanent via your PATH
 
-1. Download this [cacert.pem](http://curl.haxx.se/ca/cacert.pem) (cURL) into your HOME directory. \n
-or directly select cacert.pem from your oddb2xml-x.x.x gems directory. \n
-tools/cacert.pem is bundled with the oddb2xml gem.
-2. Then Choose Menu "Control Panel" > "System" > "Advanced system settings" \n
+1. Download this [cacert.pem](http://curl.haxx.se/ca/cacert.pem) (cURL) into your HOME directory.
+ * or directly select cacert.pem from your oddb2xml-x.x.x gems directory.
+ * tools/cacert.pem is bundled with the oddb2xml gem.
+2. Then Choose Menu "Control Panel" > "System" > "Advanced system settings"
 This opens the "System Properties" Window.
 3. Click "Advanced" Tab.
 4. Click "Environment Variables" button.
-5. Add set variable entry "SSL\_CERT\_FILE=%HOMEPATH%\cacert.pem" \n
-    Variable name: SSL\_CCERT\_FILE \n
-    Variable value: %HOMEPATH%\cacert.pem) \n
-   with "New..." button into upper are "User variables for xxx"
+5. Add set variable entry "SSL\_CERT\_FILE=%HOMEPATH%\cacert.pem"
+   * Variable name: SSL\_CCERT\_FILE
+   * Variable value: %HOMEPATH%\cacert.pem)
+with "New..." button into upper are "User variables for xxx"
 6. Do not remove this cacert.pem. All SSLv3 connections use this file.
 
 ### win_fetch_cacerts.rb
