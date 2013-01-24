@@ -27,14 +27,14 @@ the files are using [swissINDEX](http://www.refdata.ch/downloads/company/downloa
 
 The following additional data is in the files:
 
-* Wirkstoffe
-* Kühlkette (gemäss Swissmedic)
-* Orphan Drugs (gemäss Swissmedic)
-* FI (de und fr)
-* Limitation-Texte (gemäss BAG XML)
-* Interaktionen (EPha.ch)
-* Betäubungsmittel und psychotrope Stoffe (gemäss Swissmedic)
-* Non-Pharma from Refdata and Suppliers
+* Wirkstoffe (BAG XML)
+* Kühlkette (Swissmedic)
+* Orphan Drugs (Swissmedic)
+* FI: de, fr (Swissmedic)
+* Limitation-Texte (BAG XML)
+* Interaktionen [EPha.ch](http://epha.ch)
+* Betäubungsmittel und psychotrope Stoffe (Swissmedic)
+* Non-Pharma from Refdata and Suppliers (swissINDEX)
 
 ## usage
 
