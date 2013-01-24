@@ -38,6 +38,8 @@ option examples.
 $ oddb2xml                              # => oddb_article.xml, oddb_product.xml, oddb_substance.xml
 $ oddb2xml -t md                        # => md_article.xml, md_product.xml, md_substance.xml
 $ oddb2xml -a nonpharma -t md -c tar.gz # => md_xml_dd.mm.yyyy_hh.mm.tar.gz
+$ oddb2xml -f dat                       # => oddb.dat
+$ oddb2xml -f dat -a nonpharma          # => oddb_with_migel.dat
 ```
 
 output.
@@ -49,6 +51,13 @@ DE
 FR
         Pharma products: 14801
 ```
+
+## XSD files
+If you need the XSD files, generate them yourself using the javabeans tool:
+
+* http://xmlbeans.apache.org/docs/2.0.0/guide/tools.html#inst2xsd
+
+this will generate you a valid XSD file that can be used to validate against the XML file.
 
 ### article.xml
 
