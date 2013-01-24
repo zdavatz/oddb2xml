@@ -211,7 +211,7 @@ You can confirm wit `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`.
 
 ### Windows User: Making your SSL Certificate permanent via your PATH
 
-1. Download this [cacert.pem](http://curl.haxx.se/ca/cacert.pem) (cURL) into your HOME directory (or directly select cacert.pem from your oddb2xml-x.x.x gems directory). cacert.pem is bundled with the oddb2xml gem.
+1. Download this [cacert.pem](http://curl.haxx.se/ca/cacert.pem) (cURL) into your HOME directory (or directly select cacert.pem from your oddb2xml-x.x.x gems directory). tools/cacert.pem is bundled with the oddb2xml gem.
 2. Then Choose Menu "Control Panel" > "System" > "Advanced system settings" (This open "System Properties" Window.)
 3. Click "Advanced" Tab.
 4. Click "Environment Variables" button.
