@@ -1,6 +1,8 @@
 # oddb2xml
 
-oddb2xml, creates xml 
+* oddb2xml -a nonpharma -o fi
+
+creates the following xml files:
 
 * oddb_substance.xml      
 * oddb_limitation.xml              
@@ -11,14 +13,17 @@ oddb2xml, creates xml
 * oddb_fi.xml
 * oddb_fi_product.xml
 
-and 
+and
 
-dat ([IGM-11](http://dev.ywesee.com/uploads/att/IGM.pdf))
+* oddb2xml -f dat
+* oddb2xml -f dat -a nonpharma
+
+creates .dat files according to ([IGM-11](http://dev.ywesee.com/uploads/att/IGM.pdf))
 
 * oddb.dat
 * oddb_with_migel.dat
 
-files using swissINDEX, BAG-XML and Swissmedic.
+the files are using swissINDEX, BAG-XML and Swissmedic as sources.
 
 The following additional data is in the files:
 
