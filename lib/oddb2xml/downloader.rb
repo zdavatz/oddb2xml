@@ -33,7 +33,7 @@ module Oddb2xml
     def read_xml_form_zip(target, zipfile)
       xml = ''
       if RUBY_PLATFORM =~ /mswin|mingw|bccwin|cygwin/i
-        zip = ZipFile.open(zipfile) do |zipFile|
+        zip = Zip::ZipFile.open(zipfile) do |zipFile|
           zipFile.each do |entry|
             if entry.name =~ target
               io = entry.get_input_stream
