@@ -42,14 +42,16 @@ see `--help`.
 
 ```
 $ oddb2xml --help
-oddb2xml ver.1.0.7
+oddb2xml ver.1.2.2
 Usage:
   oddb2xml [option]
-    -c F, --compress=F   Compress format F. {tar.gz|zip}
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
+    -c F, --compress=F   Compress format F. {tar.gz|zip}
+    -f dat,              create dat files according to IGM-11 standard.
+    -h,   --help         Show this help message.
+    -o fi,               create fi xml files.
     -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9_]
                          If S is given, it is also used as prefix of filename.
-    -h,   --help         Show this help message.
 ```
 
 
