@@ -736,7 +736,6 @@ module Oddb2xml
         fr_pac = obj[:fr]
         # Oddb2tdat.parse
         if obj[:de][:status] =~ /A|I/
-          bg_pac = nil
           if obj[:seq]
             pac = obj[:seq][:packages][de_pac[:pharmacode]]
             row << "%#{DAT_LEN[:RECA]}s"  % '11'
@@ -763,7 +762,7 @@ module Oddb2xml
                                             end
             row << "%#{DAT_LEN[:ITHE]}s"  % format_date(@packs[pac[:swissmedic_number].intern].to_s)
             row << "%#{DAT_LEN[:CEAN]}s"  % de_pac[:ean].to_s
-            row << "%#{DAT_LEN[:CMWS]}s"  % '2'
+            row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
             rows << row
           end
         end
@@ -771,7 +770,35 @@ module Oddb2xml
       rows.join("\n")
     end
     def build_with_migel_dat
-      ''
+      prepare_articles
+      rows = []
+      @articles.each do |obj|
+        row = ''
+        de_pac = obj[:de]
+        # Oddb2tdat.parse_migel
+        row << "%#{DAT_LEN[:RECA]}s"  % '11'
+        row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = de_pac[:pharmacode] and phar.size > 3)
+                                          '1'
+                                        else
+                                          '3'
+                                        end
+        row << "%0#{DAT_LEN[:PHAR]}d" % de_pac[:pharmacode].to_i
+        row << "%-#{DAT_LEN[:ABEZ]}s" % (
+                                          de_pac[:desc].to_s.gsub(/"/, '') + " " +
+                                          de_pac[:additional_desc]
+                                        ).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
+        row << "%#{DAT_LEN[:PRMO]}s"  % '000000'
+        row << "%#{DAT_LEN[:PRPU]}s"  % '000000'
+        row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
+        row << "%#{DAT_LEN[:CLAG]}s"  % '0'
+        row << "%#{DAT_LEN[:CBGG]}s"  % '0'
+        row << "%#{DAT_LEN[:CIKS]}s"  % ' ' # no category
+        row << "%0#{DAT_LEN[:ITHE]}d" %  0
+        row << "%0#{DAT_LEN[:CEAN]}d" % (de_pac[:ean] ? de_pac[:ean].to_i : 0)
+        row << "%#{DAT_LEN[:CMWS]}s"  % '1' # nonpharma
+        rows << row
+      end
+      rows.join("\n")
     end
   end
 end
