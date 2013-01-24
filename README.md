@@ -23,7 +23,7 @@ creates .dat files according to ([IGM-11](http://dev.ywesee.com/uploads/att/IGM.
 * oddb.dat
 * oddb_with_migel.dat
 
-the files are using swissINDEX, BAG-XML and Swissmedic as sources.
+the files are using [swissINDEX](http://www.refdata.ch/downloads/company/download/swissindex_TechnischeBeschreibung.pdf), [BAG-XML](http://bag.e-mediat.net/SL2007.Web.External/Default.aspx?webgrab=ignore) and [Swissmedic](http://www.swissmedic.ch/daten/00080/00251/index.html?lang=de) as sources.
 
 The following additional data is in the files:
 
