@@ -59,6 +59,8 @@ If you need the XSD files, generate them yourself using the javabeans tool:
 
 this will generate you a valid XSD file that can be used to validate against the XML file.
 
+## XML files
+
 ### article.xml
 
 oddb2xml creates article.xml as oddb_article.xml by default.
@@ -170,20 +172,26 @@ product.xml has relation to substance as `<SUBNO>`.
 </SUBSTANCE>
 ```
 
-## About SSLv3 cert
+## SSLv3 cert for Windows Users
 
-Some websites need SSLv3 connection.  
+Some websites need SSLv3 connection.
 If you don't have these root CA files (x509), Please install these Certificates before running.  
-Please confirm wit `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`.
-
 see [cURL Website](http://curl.haxx.se/ca/)
 
+You can confirm wit `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`.
 
-### Windows User
+### Windows User: Making your SSL Certificate permanent via your PATH
 
-1. Download this [cacert.pem](http://curl.haxx.se/ca/cacert.pem) (cURL) into your HOME directory.
-1. Then Choose Menu "Control Panel" > "System" > "Advanced system settings" (This open "System Properties" Window.)
-2. Click "Advanced" Tab.
-3. Click "Environment Variables" button.
-4. Add set variable entry "SSL\_CERT\_FILE=%HOMEPATH%\cacert.pem" (Variable name: SSL\_CCERT\_FILE, Variable value: %HOMEPATH%\cacert.pem) with "New..." button into upper are "User variables for xxx"
-5. (Please do not remove this cacert.pem. All SSLv3 connections use this file.)
+1. Download this [cacert.pem](http://curl.haxx.se/ca/cacert.pem) (cURL) into your HOME directory (or directly select cacert.pem from your oddb2xml-x.x.x gems directory). cacert.pem is bundled with the oddb2xml gem.
+2. Then Choose Menu "Control Panel" > "System" > "Advanced system settings" (This open "System Properties" Window.)
+3. Click "Advanced" Tab.
+4. Click "Environment Variables" button.
+5. Add set variable entry "SSL\_CERT\_FILE=%HOMEPATH%\cacert.pem" (Variable name: SSL\_CCERT\_FILE, Variable value: %HOMEPATH%\cacert.pem) with "New..." button into upper are "User variables for xxx"
+6. (Please do not remove this cacert.pem. All SSLv3 connections use this file.)
+
+### win_fetch_cacerts.rb
+You can also run
+
+* tools/win_fetch_cacerts.rb
+
+for your currently open Terminal.
