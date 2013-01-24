@@ -733,38 +733,38 @@ module Oddb2xml
       @articles.each do |obj|
         row = ''
         de_pac = obj[:de]
-        fr_pac = obj[:fr]
         # Oddb2tdat.parse
         if obj[:de][:status] =~ /A|I/
+          pac = nil
           if obj[:seq]
             pac = obj[:seq][:packages][de_pac[:pharmacode]]
-            row << "%#{DAT_LEN[:RECA]}s"  % '11'
-            row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = pac[:pharmacode] and phar.size > 3) # does not check expiration_date
-                                              obj[:de][:status] == "I" ? '3' : '1'
-                                            else
-                                              '3'
-                                            end
-            row << "%0#{DAT_LEN[:PHAR]}d" % pac[:pharmacode].to_i
-            row << "%-#{DAT_LEN[:ABEZ]}s" % (
-                                              de_pac[:desc].to_s.gsub(/"/, '') + " " +
-                                              pac[:name_de].to_s +
-                                              de_pac[:additional_desc]
-                                            ).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
-            row << "%#{DAT_LEN[:PRMO]}s"  % format_price(pac[:prices][:exf_price][:price].to_s)
-            row << "%#{DAT_LEN[:PRPU]}s"  % format_price(pac[:prices][:pub_price][:price].to_s)
-            row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
-            row << "%#{DAT_LEN[:CLAG]}s"  % '0'
-            row << "%#{DAT_LEN[:CBGG]}s"  % (pac[:narcosis_flag] == 'Y' ? '1' : '0')
-            row << "%#{DAT_LEN[:CIKS]}s"  % if (pac[:swissmedic_category] =~ /^[ABCDE]$/)
-                                              pac[:swissmedic_category].gsub(/(\+|\s)/, '')
-                                            else
-                                              '0'
-                                            end
-            row << "%#{DAT_LEN[:ITHE]}s"  % format_date(@packs[pac[:swissmedic_number].intern].to_s)
-            row << "%#{DAT_LEN[:CEAN]}s"  % de_pac[:ean].to_s
-            row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
-            rows << row
           end
+          row << "%#{DAT_LEN[:RECA]}s"  % '11'
+          row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = de_pac[:pharmacode] and phar.size > 3) # does not check expiration_date
+                                            obj[:de][:status] == "I" ? '3' : '1'
+                                          else
+                                            '3'
+                                          end
+          row << "%0#{DAT_LEN[:PHAR]}d" % de_pac[:pharmacode].to_i
+          row << "%-#{DAT_LEN[:ABEZ]}s" % (
+                                            de_pac[:desc].to_s.gsub(/"/, '') + " " +
+                                            (pac ? pac[:name_de].to_s : '') +
+                                            de_pac[:additional_desc]
+                                          ).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
+          row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))
+          row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
+          row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
+          row << "%#{DAT_LEN[:CLAG]}s"  % '0'
+          row << "%#{DAT_LEN[:CBGG]}s"  % ((pac && pac[:narcosis_flag] == 'Y') ? '1' : '0')
+          row << "%#{DAT_LEN[:CIKS]}s"  % if (pac && pac[:swissmedic_category] =~ /^[ABCDE]$/)
+                                            pac[:swissmedic_category].gsub(/(\+|\s)/, '')
+                                          else
+                                            '0'
+                                          end
+          row << "%#{DAT_LEN[:ITHE]}s"  % (pac ? format_date(@packs[pac[:swissmedic_number].intern].to_s) : ('0' * DAT_LEN[:ITHE]))
+          row << "%#{DAT_LEN[:CEAN]}s"  % de_pac[:ean].to_s
+          row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
+          rows << row
         end
       end
       rows.join("\n")
