@@ -55,12 +55,9 @@ Usage:
 ```
 
 
-## example
-
-option examples.
+## Option examples
 
 ```
-$ oddb2xml                              # => oddb_article.xml, oddb_product.xml, oddb_substance.xml
 $ oddb2xml -t md                        # => md_article.xml, md_product.xml, md_substance.xml
 $ oddb2xml -a nonpharma -t md -c tar.gz # => md_xml_dd.mm.yyyy_hh.mm.tar.gz
 $ oddb2xml -f dat                       # => oddb.dat
