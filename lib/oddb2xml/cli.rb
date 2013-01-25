@@ -57,14 +57,6 @@ module Oddb2xml
             @actions = EphaExtractor.new(str).to_arry
           end
         end
-        # ywesee
-        threads << Thread.new do
-          downloader = YweseeBMDownloader.new
-          str = downloader.download
-          @mutex.synchronize do
-            @flags = YweseeBMExtractor.new(str).to_hash
-          end
-        end
       else # dat
         # swissmedic - package
         threads << Thread.new do
@@ -73,6 +65,14 @@ module Oddb2xml
           @mutex.synchronize do
             @packs = SwissmedicExtractor.new(bin, :packages).to_hash
           end
+        end
+      end
+      # ywesee
+      threads << Thread.new do
+        downloader = YweseeBMDownloader.new
+        str = downloader.download
+        @mutex.synchronize do
+          @flags = YweseeBMExtractor.new(str).to_hash
         end
       end
       # bag

@@ -761,10 +761,15 @@ module Oddb2xml
           row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
           row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
           row << "%#{DAT_LEN[:CLAG]}s"  % '0'
-          row << "%#{DAT_LEN[:CBGG]}s"  % ((pac && pac[:narcosis_flag] == 'Y') ? '1' : '0')
-          row << "%#{DAT_LEN[:CIKS]}s"  % if (pac && pac[:swissmedic_category] =~ /^[ABCDE]$/) # bagXML
+          row << "%#{DAT_LEN[:CBGG]}s"  % if ((pac && pac[:narcosis_flag] == 'Y') or           # BAGXml
+                                              (@flags[de_pac[:ean]]))                          # ywesee BM_update
+                                            '1'
+                                          else
+                                            '0'
+                                          end
+          row << "%#{DAT_LEN[:CIKS]}s"  % if (pac && pac[:swissmedic_category] =~ /^[ABCDE]$/) # BAGXml
                                             pac[:swissmedic_category]
-                                          elsif (@packs[num]) # Packungen.xls
+                                          elsif (@packs[num])                                  # Packungen.xls
                                             @packs[num][:swissmedic_category]
                                           else
                                             '0'
