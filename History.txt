@@ -1,3 +1,12 @@
+=== 1.2.3 / 25.01.2013
+
+* Change CBGG value as 3
+* Add CLAG value from @fridges
+* Change dat as only a file with `-a nonpharma`
+* Update CKZL value with sl_entry or not
+* Update to use also BM_update from ywesee
+* Update to use also category from Packungen.xls
+
 === 1.2.2 / 24.01.2013
 
 * Improve compressor for dat
