@@ -735,9 +735,15 @@ module Oddb2xml
         de_pac = obj[:de]
         # Oddb2tdat.parse
         if obj[:de][:status] =~ /A|I/
-          pac = nil
+          pac,num = nil, nil
           if obj[:seq]
             pac = obj[:seq][:packages][de_pac[:pharmacode]]
+          end
+          # :swissmedic_number
+          if de_pac[:ean].length == 13
+            num =  de_pac[:ean][4,8].intern
+          elsif pac
+            num = pac[:swissmedic_number].intern
           end
           row << "%#{DAT_LEN[:RECA]}s"  % '11'
           row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = de_pac[:pharmacode] and phar.size > 3) # does not check expiration_date
@@ -756,12 +762,18 @@ module Oddb2xml
           row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
           row << "%#{DAT_LEN[:CLAG]}s"  % '0'
           row << "%#{DAT_LEN[:CBGG]}s"  % ((pac && pac[:narcosis_flag] == 'Y') ? '1' : '0')
-          row << "%#{DAT_LEN[:CIKS]}s"  % if (pac && pac[:swissmedic_category] =~ /^[ABCDE]$/)
-                                            pac[:swissmedic_category].gsub(/(\+|\s)/, '')
+          row << "%#{DAT_LEN[:CIKS]}s"  % if (pac && pac[:swissmedic_category] =~ /^[ABCDE]$/) # bagXML
+                                            pac[:swissmedic_category]
+                                          elsif (@packs[num]) # Packungen.xls
+                                            @packs[num][:swissmedic_category]
                                           else
                                             '0'
-                                          end
-          row << "%0#{DAT_LEN[:ITHE]}d" % (pac ? format_date(@packs[pac[:swissmedic_number].intern].to_s) : ('0' * DAT_LEN[:ITHE])).to_i
+                                          end.gsub(/(\+|\s)/, '')
+          row << "%0#{DAT_LEN[:ITHE]}d" % if (pac && @packs[num])
+                                            format_date(@packs[num][:ith_swissmedic])
+                                          else
+                                            ('0' * DAT_LEN[:ITHE])
+                                          end.to_i
           row << "%0#{DAT_LEN[:CEAN]}d" % de_pac[:ean].to_i
           row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
           rows << row

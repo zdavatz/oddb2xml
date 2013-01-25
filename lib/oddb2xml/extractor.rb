@@ -166,11 +166,15 @@ module Oddb2xml
       case @type
       when :packages
         i_5,i_3 = 0,10 # :swissmedic_number
+        cat     = 13   # :swissmedic_category
         ith     = 4    # :ith_swissmedic (swissmedic-diff)
         @sheet.each do |row|
           no8 = extract_number(row, i_5).to_s + extract_number(row, i_3, /^\d{3}$/).to_s
           unless no8.empty?
-            data[no8.intern] = row[ith].to_s
+            data[no8.intern] = {
+              :ith_swissmedic      => row[ith].to_s,
+              :swissmedic_category => row[cat].to_s,
+            }
           end
         end
       end
