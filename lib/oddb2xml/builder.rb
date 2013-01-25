@@ -780,7 +780,7 @@ module Oddb2xml
                                           else
                                             '0'
                                           end.gsub(/(\+|\s)/, '')
-          row << "%0#{DAT_LEN[:ITHE]}d" % if (pac && @packs[num])
+          row << "%0#{DAT_LEN[:ITHE]}d" % if (@packs[num])
                                             format_date(@packs[num][:ith_swissmedic])
                                           else
                                             ('0' * DAT_LEN[:ITHE])
