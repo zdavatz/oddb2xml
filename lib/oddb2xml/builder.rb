@@ -769,7 +769,7 @@ module Oddb2xml
                                           end
           row << "%#{DAT_LEN[:CBGG]}s"  % if ((pac && pac[:narcosis_flag] == 'Y') or           # BAGXml
                                               (@flags[de_pac[:ean]]))                          # ywesee BM_update
-                                            '1'
+                                            '3'
                                           else
                                             '0'
                                           end
