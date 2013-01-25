@@ -759,7 +759,7 @@ module Oddb2xml
                                           ).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
           row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))
           row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
-          row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
+          row << "%#{DAT_LEN[:CKZL]}s"  % (pac ? '1' : '3') # sl_entry or not
           row << "%#{DAT_LEN[:CLAG]}s"  % '0'
           row << "%#{DAT_LEN[:CBGG]}s"  % if ((pac && pac[:narcosis_flag] == 'Y') or           # BAGXml
                                               (@flags[de_pac[:ean]]))                          # ywesee BM_update
