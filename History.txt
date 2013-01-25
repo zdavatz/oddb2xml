@@ -1,3 +1,7 @@
+=== 1.2.4 / 25.01.2013
+
+* Remove sl_entry check for IT-Number
+
 === 1.2.3 / 25.01.2013
 
 * Change CBGG value as 3
