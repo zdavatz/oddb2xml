@@ -761,7 +761,12 @@ module Oddb2xml
           row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))
           row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
           row << "%#{DAT_LEN[:CKZL]}s"  % (pac ? '1' : '3') # sl_entry or not
-          row << "%#{DAT_LEN[:CLAG]}s"  % '0'
+          row << "%#{DAT_LEN[:CLAG]}s"  % if ((num && num.to_s =~ /(\d{5})(\d{3})/) and
+                                              @fridges.include?($1.to_s))
+                                            '1'
+                                          else
+                                            '0'
+                                          end
           row << "%#{DAT_LEN[:CBGG]}s"  % if ((pac && pac[:narcosis_flag] == 'Y') or           # BAGXml
                                               (@flags[de_pac[:ean]]))                          # ywesee BM_update
                                             '1'
