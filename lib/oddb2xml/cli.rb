@@ -129,22 +129,18 @@ module Oddb2xml
       begin
         files.each_pair do |sbj, file|
           builder = Builder.new do |builder|
-            index = {}
-            LANGUAGES.each do |lang|
-              index[lang] = {} unless index[lang]
-              # TODO
-              #   to fix @index structure
-              if @options[:format] == :dat
-                type = (sbj == :dat ? :pharma : :nonpharma)
-                index[lang] = @index[lang][type]
-              else
+            if @options[:format] != :dat
+              index = {}
+              LANGUAGES.each do |lang|
+                index[lang] = {} unless index[lang]
                 types.each do |type|
                   index[lang].merge!(@index[lang][type]) if @index[lang][type]
                 end
               end
+              builder.index = index
+              builder.subject = sbj
             end
-            builder.subject = sbj
-            builder.index   = index
+            # common sources
             builder.items   = @items
             builder.flags   = @flags
             # additions
@@ -158,7 +154,17 @@ module Oddb2xml
           end
           output = ''
           if @options[:format] == :dat
-            output = builder.to_dat
+            types.each do |type|
+              index = {}
+              LANGUAGES.each do |lang|
+                index[lang] = @index[lang][type]
+              end
+              builder.index = index
+              _sbj = (type == :pharma ? :dat : :with_migel_dat)
+              builder.subject = _sbj
+              output << "\n" if _sbj == :nonpharma
+              output << builder.to_dat
+            end
           else
             output = builder.to_xml
           end
@@ -187,8 +193,8 @@ module Oddb2xml
         @_files = {}
         if @options[:format] == :dat
           @_files[:dat] = "#{prefix}.dat"
-          if @options[:nonpharma]
-            @_files[:with_migel_dat] = "#{prefix}_with_migel.dat"
+          if @options[:nonpharma] # into one file
+            @_files[:dat] = "#{prefix}_with_migel.dat"
           end
         else # xml
           ##

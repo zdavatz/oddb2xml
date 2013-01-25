@@ -52,7 +52,8 @@ module Oddb2xml
       end
     end
     private
-    def prepare_articles
+    def prepare_articles(reset=false)
+      @articles = nil if reset
       unless @articles
         @articles = [] # base is 'DE'
         @index['DE'].each_pair do |pharmacode, index|
@@ -787,7 +788,8 @@ module Oddb2xml
       rows.join("\n")
     end
     def build_with_migel_dat
-      prepare_articles
+      reset = true
+      prepare_articles(reset)
       rows = []
       @articles.each do |obj|
         row = ''
