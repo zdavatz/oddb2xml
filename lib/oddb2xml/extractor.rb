@@ -79,12 +79,13 @@ module Oddb2xml
             limitations.each do |lim|
               limitation = {
                 :it      => item[:it_code],
-                :code    => (lic = lim.at_xpath('.//LimitationCode'))  ? lic.text : '',
-                :type    => (lit = lim.at_xpath('.//LimitationType'))  ? lit.text : '',
-                :value   => (liv = lim.at_xpath('.//LimitationValue')) ? liv.text : '',
-                :desc_de => (dsc = lim.at_xpath('.//DescriptionDe'))   ? dsc.text : '',
-                :desc_fr => (dsc = lim.at_xpath('.//DescriptionFr'))   ? dsc.text : '',
-                :vdate   => (dat = lim.at_xpath('.//ValidFromDate'))   ? dat.text : '',
+                :code    => (lic = lim.at_xpath('.//LimitationCode'))   ? lic.text : '',
+                :type    => (lit = lim.at_xpath('.//LimitationType'))   ? lit.text : '',
+                :value   => (liv = lim.at_xpath('.//LimitationValue'))  ? liv.text : '',
+                :niv     => (niv = lim.at_xpath('.//LimitationNiveau')) ? niv.text : '',
+                :desc_de => (dsc = lim.at_xpath('.//DescriptionDe'))    ? dsc.text : '',
+                :desc_fr => (dsc = lim.at_xpath('.//DescriptionFr'))    ? dsc.text : '',
+                :vdate   => (dat = lim.at_xpath('.//ValidFromDate'))    ? dat.text : '',
               }
               deleted = false
               if upto = ((thr = lim.at_xpath('.//ValidThruDate')) ? thr.text : nil) and

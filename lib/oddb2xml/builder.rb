@@ -182,6 +182,7 @@ module Oddb2xml
               xml.IT     lim[:it]
               xml.LIMTYP lim[:type]
               xml.LIMVAL lim[:value]
+              xml.LIMNIV lim[:niv]
               xml.DSCRD  lim[:desc_de]
               xml.DSCRF  lim[:desc_fr]
               xml.VDAT   lim[:vdate]
