@@ -178,10 +178,11 @@ module Oddb2xml
         ) {
           @limitations.each do |lim|
             xml.LIM('DT' => '') {
-              xml.LIMCD  lim[:code]
+              xml.LIMCD  lim[:key] # swissmedic_number8 or swissmedic_number5
               xml.IT     lim[:it]
               xml.LIMTYP lim[:type]
               xml.LIMVAL lim[:value]
+              xml.LIMNAMEBAG lim[:code] # LIMCD
               xml.LIMNIV lim[:niv]
               xml.DSCRD  lim[:desc_de]
               xml.DSCRF  lim[:desc_fr]
@@ -352,7 +353,7 @@ module Oddb2xml
               #xml.DOSEU
               #xml.DRGFD
               #xml.DRGFF
-              seq[:packages].values.first[:swissmedic_number] =~ /(\d{5})(\d{3})/
+              seq[:packages].values.first[:swissmedic_number8] =~ /(\d{5})(\d{3})/
               xml.ORPH @orphans.include?($1.to_s) ? true : false
               #xml.BIOPHA
               #xml.BIOSIM
@@ -463,7 +464,7 @@ module Oddb2xml
               end
               if bg_pac
                 xml.SMCAT bg_pac[:swissmedic_category] unless bg_pac[:swissmedic_category].empty?
-                xml.SMNO  bg_pac[:swissmedic_number]   unless bg_pac[:swissmedic_number].empty?
+                xml.SMNO  bg_pac[:swissmedic_number8]  unless bg_pac[:swissmedic_number8].empty?
               end
               #xml.HOSPCD
               #xml.CLINCD
@@ -478,8 +479,8 @@ module Oddb2xml
               end
               #xml.GRDFR
               if bg_pac
-                if !bg_pac[:swissmedic_number].empty? and
-                   bg_pac[:swissmedic_number].to_s =~ /(\d{5})(\d{3})/
+                if !bg_pac[:swissmedic_number8].empty? and
+                   bg_pac[:swissmedic_number8].to_s =~ /(\d{5})(\d{3})/
                   xml.COOL 1 if @fridges.include?($1.to_s)
                 end
               end
@@ -664,7 +665,7 @@ module Oddb2xml
             # prod
             @products.each do |seq|
               seq[:packages].values.each do |pac|
-                if pac[:swissmedic_number] =~ /(\d{5})(\d{3})/
+                if pac[:swissmedic_number8] =~ /(\d{5})(\d{3})/
                   number = $1.to_s
                   if i = info_index[number]
                     length += 1
@@ -741,11 +742,11 @@ module Oddb2xml
           if obj[:seq]
             pac = obj[:seq][:packages][de_pac[:pharmacode]]
           end
-          # :swissmedic_number
+          # :swissmedic_numbers
           if de_pac[:ean].length == 13
-            num =  de_pac[:ean][4,8].intern
+            num =  de_pac[:ean][4,8].intern # :swissmedic_number5
           elsif pac
-            num = pac[:swissmedic_number].intern
+            num = pac[:swissmedic_number8].intern
           end
           row << "%#{DAT_LEN[:RECA]}s"  % '11'
           row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = de_pac[:pharmacode] and phar.size > 3) # does not check expiration_date

@@ -22,6 +22,7 @@ module Oddb2xml
         item[:desc_fr]      = (desc = seq.at_xpath('.//DescriptionFr')) ? desc.text : ''
         item[:name_de]      = (name = seq.at_xpath('.//NameDe'))        ? name.text : ''
         item[:name_fr]      = (name = seq.at_xpath('.//NameFr'))        ? name.text : ''
+        item[:swissmedic_number5] = (num5 = seq.at_xpath('.//SwissmedicNo5')) ? num5.text : ''
         item[:org_gen_code] = (orgc = seq.at_xpath('.//OrgGenCode'))    ? orgc.text : ''
         item[:deductible]   = (ddbl = seq.at_xpath('.//FlagSB20'))      ? ddbl.text : ''
         item[:atc_code]     = (atcc = seq.at_xpath('.//AtcCode'))       ? atcc.text : ''
@@ -54,7 +55,7 @@ module Oddb2xml
             item[:packages][phar] = {
               :pharmacode          => phar,
               :swissmedic_category => (cat = pac.at_xpath('.//SwissmedicCategory')) ? cat.text : '',
-              :swissmedic_number   => (num = pac.at_xpath('.//SwissmedicNo8'))      ? num.text : '',
+              :swissmedic_number8  => (num = pac.at_xpath('.//SwissmedicNo8'))      ? num.text : '',
               :narcosis_flag       => (flg = pac.at_xpath('.//FlagNarcosis'))       ? flg.text : '',
               :prices              => {
                 :exf_price => {
@@ -71,32 +72,36 @@ module Oddb2xml
             }
             # limitations
             item[:packages][phar][:limitations] = []
-            limitations = []
+            limitations = Hash.new{|h,k| h[k] = [] }
             # seq - level
-            limitations += (lims = seq.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
+            limitations[:seq] = (lims = seq.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
             # pac - level
-            limitations += (lims = pac.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
-            limitations.each do |lim|
-              limitation = {
-                :it      => item[:it_code],
-                :code    => (lic = lim.at_xpath('.//LimitationCode'))   ? lic.text : '',
-                :type    => (lit = lim.at_xpath('.//LimitationType'))   ? lit.text : '',
-                :value   => (liv = lim.at_xpath('.//LimitationValue'))  ? liv.text : '',
-                :niv     => (niv = lim.at_xpath('.//LimitationNiveau')) ? niv.text : '',
-                :desc_de => (dsc = lim.at_xpath('.//DescriptionDe'))    ? dsc.text : '',
-                :desc_fr => (dsc = lim.at_xpath('.//DescriptionFr'))    ? dsc.text : '',
-                :vdate   => (dat = lim.at_xpath('.//ValidFromDate'))    ? dat.text : '',
-              }
-              deleted = false
-              if upto = ((thr = lim.at_xpath('.//ValidThruDate')) ? thr.text : nil) and
-                 upto =~ /\d{2}\.\d{2}\.\d{2}/
-                begin
-                  deleted = true if Date.strptime(upto, '%d.%m.%y') >= Date.today
-                rescue ArgumentError
+            limitations[:pac] = (lims = pac.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
+            limitations.each_pair do |key, lims|
+              key = (key == :pac ? item[:packages][phar][:swissmedic_number8] : item[:swissmedic_number5])
+              lims.each do |lim|
+                limitation = {
+                  :it      => item[:it_code],
+                  :key     => key,
+                  :code    => (lic = lim.at_xpath('.//LimitationCode'))   ? lic.text : '',
+                  :type    => (lit = lim.at_xpath('.//LimitationType'))   ? lit.text : '',
+                  :value   => (liv = lim.at_xpath('.//LimitationValue'))  ? liv.text : '',
+                  :niv     => (niv = lim.at_xpath('.//LimitationNiveau')) ? niv.text : '',
+                  :desc_de => (dsc = lim.at_xpath('.//DescriptionDe'))    ? dsc.text : '',
+                  :desc_fr => (dsc = lim.at_xpath('.//DescriptionFr'))    ? dsc.text : '',
+                  :vdate   => (dat = lim.at_xpath('.//ValidFromDate'))    ? dat.text : '',
+                }
+                deleted = false
+                if upto = ((thr = lim.at_xpath('.//ValidThruDate')) ? thr.text : nil) and
+                   upto =~ /\d{2}\.\d{2}\.\d{2}/
+                  begin
+                    deleted = true if Date.strptime(upto, '%d.%m.%y') >= Date.today
+                  rescue ArgumentError
+                  end
                 end
+                limitation[:del] = deleted
+                item[:packages][phar][:limitations] << limitation
               end
-              limitation[:del] = deleted
-              item[:packages][phar][:limitations] << limitation
             end
             # limitation points
             pts = pac.at_xpath('.//PointLimitations/PointLimitation/Points') # only first points
@@ -171,7 +176,7 @@ module Oddb2xml
       data = {}
       case @type
       when :packages
-        i_5,i_3 = 0,10 # :swissmedic_number
+        i_5,i_3 = 0,10 # :swissmedic_numbers
         cat     = 13   # :swissmedic_category
         ith     = 4    # :ith_swissmedic (swissmedic-diff)
         @sheet.each do |row|
