@@ -1,3 +1,7 @@
+=== 1.2.5 / 27.01.2013
+
+* Add missing line break into dat
+
 === 1.2.4 / 25.01.2013
 
 * Remove sl_entry check for IT-Number
