@@ -20,7 +20,7 @@ module Oddb2xml
     attr_accessor :subject, :index, :items, :flags,
                   :actions,
                   :orphans, :fridges,
-                  :infos, :packs,
+                  :infos, :packs, :ean14,
                   :tag_suffix
     def initialize
       @subject    = nil
@@ -32,6 +32,7 @@ module Oddb2xml
       @actions    = []
       @orphans    = []
       @fridges    = []
+      @ean14      = true
       @tag_suffix = nil
       if block_given?
         yield self
@@ -801,6 +802,7 @@ module Oddb2xml
       @articles.each do |obj|
         row = ''
         de_pac = obj[:de]
+        next if (!ean14 && de_pac[:ean].to_s.length != 13)
         # Oddb2tdat.parse_migel
         row << "%#{DAT_LEN[:RECA]}s"  % '11'
         row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = de_pac[:pharmacode] and phar.size > 3)

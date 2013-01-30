@@ -18,7 +18,9 @@ Usage:
     -f F, --format=F     File format F, default is xml. {xml|dat}
                          If F is given, -o option is ignored.
     -o O, --optional=O   Optional output. O, only 'fi' is available.
-    -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9_]
+    -i I, --include=I    Include target option for 'dat' format. only 'ean14' is available.
+                         'xml' format includes always ean14 records.
+    -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9]
                          If S is given, it is also used as prefix of filename.
     -h,   --help         Show this help message.
 EOS
@@ -32,13 +34,15 @@ opts = {
   :fi           => false,
   :tag_suffix   => nil,
   :debug        => false,
+  :ean14        => false,
 }
 
-parser.on('-a v', '--append v',     /nonpharma/)     {|v| opts[:nonpharma] = true }
-parser.on('-c v', '--compress v',   /tar\.gz|zip/)   {|v| opts[:compress_ext] = v }
-parser.on('-f v', '--format v',     /dat/)           {|v| opts[:format] = :dat }
-parser.on('-o v', '--optional v',   /fi/)            {|v| opts[:fi] = true }
-parser.on('-t v', '--tag-suffix v', /^[A-z0-9_]*$/i) {|v| opts[:tag_suffix] = v.upcase }
+parser.on('-a v', '--append v',     /^nonpharma$/)  {|v| opts[:nonpharma] = true }
+parser.on('-c v', '--compress v',   /^tar\.gz|zip$/){|v| opts[:compress_ext] = v }
+parser.on('-f v', '--format v',     /^xml|dat$/)    {|v| opts[:format] = v.intern }
+parser.on('-o v', '--optional v',   /^fi$/)         {|v| opts[:fi] = true }
+parser.on('-i v', '--include v',    /^ean14$/)      {|v| opts[:ean14] = true }
+parser.on('-t v', '--tag-suffix v', /^[A-z0-9]*$/i) {|v| opts[:tag_suffix] = v.upcase }
 #parser.on('--debug') {|v| opts[:debug] = true }
 parser.on_tail('-h', '--help') { puts help; exit }
 
@@ -54,6 +58,9 @@ end
 
 ui = Oddb2xml::Cli.new(opts)
 begin
+  if opts[:format] == :xml
+    opts[:ean14] = true # force
+  end
   #puts opts if opts[:debug]
   ui.run
 rescue Interrupt

@@ -162,7 +162,10 @@ module Oddb2xml
               builder.index = index
               _sbj = (type == :pharma ? :dat : :with_migel_dat)
               builder.subject = _sbj
-              output << "\n" if type == :nonpharma
+              if type == :nonpharma
+                output << "\n"
+                builder.ean14 = @options[:ean14]
+              end
               output << builder.to_dat
             end
           else
