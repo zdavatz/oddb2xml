@@ -88,7 +88,7 @@ module Oddb2xml
             @limitations += pac[:limitations]
           end
         end
-        @limitations.uniq!
+        @limitations.uniq! {|lim| lim[:code] + lim[:type] }
         @limitations.sort_by!{|lim| lim[:code] }
       end
     end

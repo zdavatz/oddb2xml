@@ -69,9 +69,14 @@ module Oddb2xml
                 }
               }
             }
-            # limitation
+            # limitations
             item[:packages][phar][:limitations] = []
-            pac.xpath('.//Limitation').each do |lim|
+            limitations = []
+            # seq - level
+            limitations += (lims = seq.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
+            # pac - level
+            limitations += (lims = pac.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
+            limitations.each do |lim|
               limitation = {
                 :it      => item[:it_code],
                 :code    => (lic = lim.at_xpath('.//LimitationCode'))  ? lic.text : '',
