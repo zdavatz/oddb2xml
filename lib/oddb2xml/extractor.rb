@@ -78,7 +78,7 @@ module Oddb2xml
                 :type    => (lit = lim.at_xpath('.//LimitationType'))  ? lit.text : '',
                 :value   => (liv = lim.at_xpath('.//LimitationValue')) ? liv.text : '',
                 :desc_de => (dsc = lim.at_xpath('.//DescriptionDe'))   ? dsc.text : '',
-                :desc_fr => (dsc = lim.at_xpath('.//DescriptionDe'))   ? dsc.text : '',
+                :desc_fr => (dsc = lim.at_xpath('.//DescriptionFr'))   ? dsc.text : '',
                 :vdate   => (dat = lim.at_xpath('.//ValidFromDate'))   ? dat.text : '',
               }
               deleted = false
