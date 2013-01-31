@@ -1,3 +1,11 @@
+=== 1.2.6 / 30.01.2013
+
+* Update to exclude 14-EAN for oddb_with_migel.dat
+* Create LIMNAMEABAG for code into limitations.xml
+* Create LIMNIV in limitation.xml
+* Add lims at parent level into limitations.xml
+* Fix typo Fr as De
+
 === 1.2.5 / 27.01.2013
 
 * Add missing line break into dat
