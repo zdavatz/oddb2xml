@@ -19,6 +19,8 @@ spec/cli_spec.rb
 spec/compressor_spec.rb
 spec/data/XMLPublications.zip
 spec/data/epha_interactions.csv
+spec/data/oddb2xml_files_bm_update.txt
+spec/data/oddb2xml_files_lppv.txt
 spec/data/oddb_article.xml
 spec/data/oddb_fi.xml
 spec/data/oddb_fi_product.xml
@@ -38,7 +40,6 @@ spec/data/swissmedic_orphans.xls
 spec/data/wsdl.xml
 spec/data/wsdl_nonpharma.xml
 spec/data/wsdl_pharma.xml
-spec/data/ywesee_bm_update.txt
 spec/downloader_spec.rb
 spec/extractor_spec.rb
 spec/spec_helper.rb
