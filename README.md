@@ -81,6 +81,9 @@ If you need the XSD files, generate them yourself using the javabeans tool:
 
 this will generate you a valid XSD file that can be used to validate against the XML file.
 
+i.e.:
+* /home/zeno/.software/xmlbeans-2.6.0/bin/inst2xsd oddb_article.xml -outPrefix oddb_article
+
 ## XML files
 
 xml files generated are:
