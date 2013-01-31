@@ -88,7 +88,7 @@ module Oddb2xml
                     when :itc
                       phar
                     end
-              key = phar if key.empty?
+              key = phar if (key.empty? or key == '0')
               lims.each do |lim|
                 limitation = {
                   :it      => item[:it_code],
