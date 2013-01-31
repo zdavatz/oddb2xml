@@ -179,11 +179,11 @@ module Oddb2xml
         ) {
           @limitations.each do |lim|
             xml.LIM('DT' => '') {
-              xml.LIMCD  lim[:key] # swissmedic_number8 or swissmedic_number5
+              xml.LIMCD  lim[:key] # swissmedic_number8, swissmedic_number5 or pharmacode
               xml.IT     lim[:it]
               xml.LIMTYP lim[:type]
               xml.LIMVAL lim[:value]
-              xml.LIMNAMEBAG lim[:code] # LIMCD
+              xml.LIMNAMEBAG lim[:code] # original LIMCD
               xml.LIMNIV lim[:niv]
               xml.DSCRD  lim[:desc_de]
               xml.DSCRF  lim[:desc_fr]

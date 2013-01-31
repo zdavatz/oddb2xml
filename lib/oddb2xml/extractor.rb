@@ -70,15 +70,25 @@ module Oddb2xml
                 }
               }
             }
-            # limitations
+            # related all limitations
             item[:packages][phar][:limitations] = []
             limitations = Hash.new{|h,k| h[k] = [] }
-            # seq - level
+            # in seq
             limitations[:seq] = (lims = seq.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
-            # pac - level
+            # in it-codes
+            limitations[:itc] = (lims = seq.xpath('.//ItCodes/ItCode/Limitations/Limitation')) ? lims.to_a : nil
+            # in pac
             limitations[:pac] = (lims = pac.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
             limitations.each_pair do |key, lims|
-              key = (key == :pac ? item[:packages][phar][:swissmedic_number8] : item[:swissmedic_number5])
+              key = case key
+                    when :pac
+                      item[:packages][phar][:swissmedic_number8]
+                    when :seq
+                      item[:swissmedic_number5]
+                    when :itc
+                      phar
+                    end
+              key = phar if key.empty?
               lims.each do |lim|
                 limitation = {
                   :it      => item[:it_code],
