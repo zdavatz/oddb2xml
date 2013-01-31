@@ -254,14 +254,14 @@ XML
       end
     end
   end
-  class YweseeBMDownloader < Downloader
+  class BMUpdateDownloader < Downloader
     include TxtDownloadMethods
     def init
       super
-      @url ||= 'http://www.ywesee.com/uploads/Main/BM_Update.txt'
+      @url ||= 'https://raw.github.com/zdavatz/oddb2xml_files/master/BM_Update.txt'
     end
     def download
-      file = 'ywesee_bm_update.txt'
+      file = 'oddb2xml_files_bm_update.txt'
       download_as(file)
     end
   end

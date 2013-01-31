@@ -17,7 +17,7 @@ module Oddb2xml
       @mutex = Mutex.new
       @items = {} # Items from Preparations.xml in BAG
       @index = {} # Base index from swissINDEX
-      @flags = {} # narcotics flag from ywesee
+      @flags = {} # narcotics flag files repo.
       @lppvs = {} # lppv.txt from files repo.
       @infos = {} # [option] FI from SwissmedicInfo
       @packs = {} # [option] Packungen from Swissmedic for dat
@@ -68,15 +68,15 @@ module Oddb2xml
           end
         end
       end
-      # ywesee
+      # bm - files
       threads << Thread.new do
-        downloader = YweseeBMDownloader.new
+        downloader = BMUpdateDownloader.new
         str = downloader.download
         @mutex.synchronize do
-          @flags = YweseeBMExtractor.new(str).to_hash
+          @flags = BMUpdateExtractor.new(str).to_hash
         end
       end
-      # files
+      # lppv - files
       threads << Thread.new do
         downloader = LppvDownloader.new
         str = downloader.download

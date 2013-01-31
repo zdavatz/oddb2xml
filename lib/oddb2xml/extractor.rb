@@ -282,7 +282,7 @@ module Oddb2xml
       data
     end
   end
-  class YweseeBMExtractor < Extractor
+  class BMUpdateExtractor < Extractor
     include TxtMethods
   end
   class LppvExtractor < Extractor
