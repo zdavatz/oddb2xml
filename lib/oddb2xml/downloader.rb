@@ -42,7 +42,7 @@ module Oddb2xml
                 xml << bytes
                 bytes = nil
               end
-              io.close
+              io.close if io.respond_to?(:close)
             end
           end
         end
@@ -228,7 +228,7 @@ XML
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
-        io.close unless io.closed? # win
+        io.close if io and !io.closed? # win
         if File.exists?(file)
           File.unlink(file)
         end
@@ -247,7 +247,7 @@ XML
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
-        io.close unless io.closed? # win
+        io.close if io and !io.closed? # win
         if File.exists?(file)
           File.unlink(file)
         end

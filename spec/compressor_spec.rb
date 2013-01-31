@@ -35,7 +35,7 @@ describe Oddb2xml::Compressor do
     end
     context "when swiss prefix is given" do
       before(:each) do
-        @compressor = Oddb2xml::Compressor.new('swiss', 'tar.gz')
+        @compressor = Oddb2xml::Compressor.new('swiss', {:compress_ext => 'tar.gz'})
       end
       it 'should have formated filename with datetime' do
         @compressor.instance_variable_get(:@compress_file).
@@ -44,7 +44,7 @@ describe Oddb2xml::Compressor do
     end
     context "when tar.gz ext is given" do
       before(:each) do
-        @compressor = Oddb2xml::Compressor.new('oddb', 'tar.gz')
+        @compressor = Oddb2xml::Compressor.new('oddb', {:compress_ext => 'tar.gz'})
       end
       it 'should have formated filename with datetime' do
         @compressor.instance_variable_get(:@compress_file).
@@ -53,7 +53,7 @@ describe Oddb2xml::Compressor do
     end
     context "when zip ext is given" do
       before(:each) do
-        @compressor = Oddb2xml::Compressor.new('oddb', 'zip')
+        @compressor = Oddb2xml::Compressor.new('oddb', {:compress_ext => 'zip'})
       end
       it 'should have formated filename with datetime' do
         @compressor.instance_variable_get(:@compress_file).
@@ -83,7 +83,7 @@ describe Oddb2xml::Compressor do
       end
       context 'with zip' do
         before(:each) do
-          @compressor = Oddb2xml::Compressor.new('oddb', 'zip')
+          @compressor = Oddb2xml::Compressor.new('oddb', {:compress_ext => 'zip'})
         end
         it_behaves_like 'any compressor'
       end

@@ -49,7 +49,7 @@ describe Oddb2xml::SwissIndexDownloader do
   end
   context 'Pharma with DE' do
     before(:each) do
-      @downloader = Oddb2xml::SwissIndexDownloader.new(:pharma, 'DE')
+      @downloader = Oddb2xml::SwissIndexDownloader.new({}, :pharma, 'DE')
     end
     it_behaves_like 'any downloader'
     context 'when download_by is called with DE' do
@@ -67,7 +67,7 @@ describe Oddb2xml::SwissIndexDownloader do
   end
   context 'NonPharma with FR' do
     before(:each) do
-      @downloader = Oddb2xml::SwissIndexDownloader.new(:nonpharma, 'FR')
+      @downloader = Oddb2xml::SwissIndexDownloader.new({}, :nonpharma, 'FR')
     end
     it_behaves_like 'any downloader'
     context 'when download_by is called with FR' do
@@ -94,13 +94,13 @@ describe Oddb2xml::SwissmedicDownloader do
     end
     it_behaves_like 'any downloader'
     context 'download_by for orphans xls' do
-      let(:io) { @downloader.download }
-      it 'should return valid IO' do
-        io.should be_a IO
-        io.bytes.should_not nil
+      let(:bin) { @downloader.download }
+      it 'should return valid Binary-String' do
+        bin.should be_a String
+        bin.bytes.should_not nil
       end
       it 'should clean up current directory' do
-        io.should_not raise_error(Timeout::Error)
+        bin.should_not raise_error(Timeout::Error)
         File.exist?('oddb_orphans.xls').should be(false)
       end
     end
@@ -111,13 +111,13 @@ describe Oddb2xml::SwissmedicDownloader do
       @downloader = Oddb2xml::SwissmedicDownloader.new(:fridges)
     end
     context 'download_by for fridges xls' do
-      let(:io) { @downloader.download }
-      it 'should return valid IO' do
-        io.should be_a IO
-        io.bytes.should_not nil
+      let(:bin) { @downloader.download }
+      it 'should return valid Binary-String' do
+        bin.should be_a String
+        bin.bytes.should_not nil
       end
       it 'should clean up current directory' do
-        io.should_not raise_error(Timeout::Error)
+        bin.should_not raise_error(Timeout::Error)
         File.exist?('oddb_fridges.xls').should be(false)
       end
     end
@@ -133,7 +133,7 @@ describe Oddb2xml::SwissmedicInfoDownloader do
   it_behaves_like 'any downloader'
   context 'when download is called' do
     let(:xml) { @downloader.download }
-    it 'should parse zip to string' do
+    it 'should parse zip to String' do
       xml.should be_a String
       xml.length.should_not == 0
     end
@@ -157,34 +157,54 @@ describe Oddb2xml::EphaDownloader do
   end
   it_behaves_like 'any downloader'
   context 'when download is called' do
-    let(:io) { @downloader.download }
-    it 'should read csv to IO Object' do
-      io.should be_a IO
-      io.bytes.should_not nil
+    let(:csv) { @downloader.download }
+    it 'should read csv as String' do
+      csv.should be_a String
+      csv.bytes.should_not nil
     end
     it 'should clean up current directory' do
-      io.should_not raise_error(Timeout::Error)
+      csv.should_not raise_error(Timeout::Error)
       File.exist?('epha_interactions.csv').should be(false)
     end
   end
 end
 
-describe Oddb2xml::YweseeBMDownloader do
+describe Oddb2xml::BMUpdateDownloader do
   include ServerMockHelper
   before(:each) do
-    setup_ywesee_server_mock
-    @downloader = Oddb2xml::YweseeBMDownloader.new
+    setup_bm_update_server_mock
+    @downloader = Oddb2xml::BMUpdateDownloader.new
   end
   it_behaves_like 'any downloader'
   context 'when download is called' do
-    let(:io) { @downloader.download }
-    it 'should read txt to IO Object' do
-      io.should be_a IO
-      io.bytes.should_not nil
+    let(:txt) { @downloader.download }
+    it 'should read txt as String' do
+      txt.should be_a String
+      txt.bytes.should_not nil
     end
     it 'should clean up current directory' do
-      io.should_not raise_error(Timeout::Error)
-      File.exist?('ywesee_bm_update.txt').should be(false)
+      txt.should_not raise_error(Timeout::Error)
+      File.exist?('oddb2xml_files_bm_update.txt').should be(false)
+    end
+  end
+end
+
+describe Oddb2xml::LppvDownloader do
+  include ServerMockHelper
+  before(:each) do
+    setup_lppv_server_mock
+    @downloader = Oddb2xml::LppvDownloader.new
+  end
+  it_behaves_like 'any downloader'
+  context 'when download is called' do
+    let(:txt) { @downloader.download }
+    it 'should read txt as String' do
+      txt.should be_a String
+      txt.bytes.should_not nil
+    end
+    it 'should clean up current directory' do
+      txt.should_not raise_error(Timeout::Error)
+      File.exist?('oddb2xml_files_lppv.txt').should be(false)
     end
   end
 end
