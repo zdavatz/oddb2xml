@@ -235,13 +235,9 @@ XML
       end
     end
   end
-  class YweseeBMDownloader < Downloader
-    def init
-      super
-      @url ||= 'http://www.ywesee.com/uploads/Main/BM_Update.txt'
-    end
-    def download
-      file = 'ywesee_bm_update.txt'
+  # txt filse
+  module TxtDownloadMethods
+    def download_as(file)
       begin
         response = @agent.get(@url)
         response.save_as(file)
@@ -256,6 +252,28 @@ XML
           File.unlink(file)
         end
       end
+    end
+  end
+  class YweseeBMDownloader < Downloader
+    include TxtDownloadMethods
+    def init
+      super
+      @url ||= 'http://www.ywesee.com/uploads/Main/BM_Update.txt'
+    end
+    def download
+      file = 'ywesee_bm_update.txt'
+      download_as(file)
+    end
+  end
+  class LppvDownloader < Downloader
+    include TxtDownloadMethods
+    def init
+      super
+      @url ||= 'https://raw.github.com/zdavatz/oddb2xml_files/master/LPPV.txt'
+    end
+    def download
+      file = 'oddb2xml_files_lppv.txt'
+      download_as(file)
     end
   end
 end

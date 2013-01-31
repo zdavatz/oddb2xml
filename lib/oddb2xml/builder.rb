@@ -17,7 +17,7 @@ end
 
 module Oddb2xml
   class Builder
-    attr_accessor :subject, :index, :items, :flags,
+    attr_accessor :subject, :index, :items, :flags, :lppvs,
                   :actions,
                   :orphans, :fridges,
                   :infos, :packs, :ean14,
@@ -27,6 +27,7 @@ module Oddb2xml
       @index      = {}
       @items      = {}
       @flags      = {}
+      @lppvs      = {}
       @infos      = {}
       @packs      = {}
       @actions    = []
@@ -585,11 +586,13 @@ module Oddb2xml
                   }
                 end
               end
-              #xml.ARTINS {
-                #xml.VDAT
-                #xml.INCD
-                #xml.NINCD
-              #}
+              if @lppvs[de_pac[:ean]]
+                xml.ARTINS {
+                  #xml.VDAT
+                  #xml.INCD
+                  xml.NINCD 20
+                }
+              end
             }
           end
           xml.RESULT {
@@ -763,7 +766,13 @@ module Oddb2xml
                                           ).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
           row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))
           row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
-          row << "%#{DAT_LEN[:CKZL]}s"  % (pac ? '1' : '3') # sl_entry or not
+          row << "%#{DAT_LEN[:CKZL]}s"  % if (@lppvs[de_pac[:ean]])
+                                            '2'
+                                          elsif pac # sl_entry
+                                            '1'
+                                          else
+                                            '3'
+                                          end
           row << "%#{DAT_LEN[:CLAG]}s"  % if ((num && num.to_s =~ /(\d{5})(\d{3})/) and
                                               @fridges.include?($1.to_s))
                                             '1'

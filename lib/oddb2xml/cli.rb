@@ -18,6 +18,7 @@ module Oddb2xml
       @items = {} # Items from Preparations.xml in BAG
       @index = {} # Base index from swissINDEX
       @flags = {} # narcotics flag from ywesee
+      @lppvs = {} # lppv.txt from files repo.
       @infos = {} # [option] FI from SwissmedicInfo
       @packs = {} # [option] Packungen from Swissmedic for dat
       @actions = [] # [addition] interactions from epha
@@ -73,6 +74,14 @@ module Oddb2xml
         str = downloader.download
         @mutex.synchronize do
           @flags = YweseeBMExtractor.new(str).to_hash
+        end
+      end
+      # files
+      threads << Thread.new do
+        downloader = LppvDownloader.new
+        str = downloader.download
+        @mutex.synchronize do
+          @lppvs = LppvExtractor.new(str).to_hash
         end
       end
       # bag
@@ -141,8 +150,9 @@ module Oddb2xml
               builder.subject = sbj
             end
             # common sources
-            builder.items   = @items
-            builder.flags   = @flags
+            builder.items = @items
+            builder.flags = @flags
+            builder.lppvs = @lppvs
             # additions
             %w[actions orphans fridges].each do |addition|
               builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
