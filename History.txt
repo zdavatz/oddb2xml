@@ -1,3 +1,9 @@
+=== 1.2.8 / 01.02.2013
+
+* Update SMCAT to use Packungen.xls
+* Merge branch 'master' of ywesee.github.com:zdavatz/oddb2xml
+* Add additional Non-Pharma products
+
 === 1.2.7 / 31.01.2013
 
 * Update to use lppv for article.xml and oddb.dat
