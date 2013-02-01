@@ -31,9 +31,9 @@ module Oddb2xml
     end
     def run
       threads = []
-      # swissmedic-info
       if @options[:format] != :dat
         if @options[:fi]
+          # swissmedic-info
           threads << Thread.new do
             downloader = SwissmedicInfoDownloader.new
             xml = downloader.download
@@ -59,15 +59,6 @@ module Oddb2xml
             @actions = EphaExtractor.new(str).to_arry
           end
         end
-      else # dat
-        # swissmedic - package
-        threads << Thread.new do
-          downloader = SwissmedicDownloader.new(:packages)
-          bin = downloader.download
-          @mutex.synchronize do
-            @packs = SwissmedicExtractor.new(bin, :packages).to_hash
-          end
-        end
       end
       if @options[:nonpharma]
         # NonPharma.xls - files
@@ -75,6 +66,14 @@ module Oddb2xml
           downloader = MigelDownloader.new
           bin = downloader.download
           @migel = MigelExtractor.new(bin).to_hash
+        end
+      end
+      # swissmedic - package
+      threads << Thread.new do
+        downloader = SwissmedicDownloader.new(:packages)
+        bin = downloader.download
+        @mutex.synchronize do
+          @packs = SwissmedicExtractor.new(bin, :packages).to_hash
         end
       end
       # bm - files

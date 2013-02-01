@@ -489,6 +489,11 @@ module Oddb2xml
             if obj[:seq]
               bg_pac = obj[:seq][:packages][de_pac[:pharmacode]]
             end
+            if de_pac[:ean].length == 13
+              num =  de_pac[:ean][4,8].intern # :swissmedic_number5
+            elsif bg_pac
+              num = bg_pac[:swissmedic_number8].intern
+            end
             xml.ART('DT' => '') {
               xml.PHAR  de_pac[:pharmacode] unless de_pac[:pharmacode].empty?
               #xml.GRPCD
@@ -497,8 +502,12 @@ module Oddb2xml
               if obj[:seq]
                 xml.PRDNO obj[:seq][:product_key] unless obj[:seq][:product_key].empty?
               end
-              if bg_pac
+              if bg_pac # bag xml
                 xml.SMCAT bg_pac[:swissmedic_category] unless bg_pac[:swissmedic_category].empty?
+              elsif @packs[num] and @packs[num][:swissmedic_category] # Packungen.xls
+                xml.SMCAT @packs[num][:swissmedic_category]
+              end
+              if bg_pac
                 xml.SMNO  bg_pac[:swissmedic_number8]  unless bg_pac[:swissmedic_number8].empty?
               end
               #xml.HOSPCD
