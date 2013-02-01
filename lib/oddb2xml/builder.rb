@@ -613,13 +613,9 @@ module Oddb2xml
                 #xml.LINENO
                 #xml.CDVAL
               #}
-              if bg_pac
-                bg_pac[:limitations].each do |lim|
-                  xml.ARTLIM {
-                    xml.LIMCD lim[:code] unless lim[:code].empty?
-                  }
-                end
-              end
+              #xml.ARTLIM {
+              #  xml.LIMCD
+              #}
               if @lppvs[de_pac[:ean]]
                 xml.ARTINS {
                   #xml.VDAT
