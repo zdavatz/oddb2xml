@@ -1,3 +1,10 @@
+=== 1.2.9 / 01.02.2013
+
+* Remove ARTLIM and LIMCD
+* Update to use swissINDEX if duplicated nonpharma
+* Merge branch 'master' of ywesee.github.com:zdavatz/oddb2xml
+* Improve Cli#run crearly
+
 === 1.2.8 / 01.02.2013
 
 * Update SMCAT to use Packungen.xls
