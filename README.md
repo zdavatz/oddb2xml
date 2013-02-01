@@ -42,18 +42,21 @@ see `--help`.
 
 ```
 $ oddb2xml --help
-oddb2xml ver.1.2.2
+oddb2xml ver.1.2.7
 Usage:
   oddb2xml [option]
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
     -c F, --compress=F   Compress format F. {tar.gz|zip}
-    -f dat,              create dat files according to IGM-11 standard.
-    -h,   --help         Show this help message.
-    -o fi,               create fi xml files.
-    -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9_]
+    -f F, --format=F     File format F, default is xml. {xml|dat}
+                         If F is given, -o option is ignored.
+    -o O, --optional=O   Optional output. O, only 'fi' is available.
+    -i I, --include=I    Include target option for 'dat' format. only 'ean14' is available.
+                         'xml' format includes always ean14 records.
+    -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9]
                          If S is given, it is also used as prefix of filename.
-```
+    -h,   --help         Show this help message.
 
+```
 
 ## Option examples
 
@@ -80,6 +83,9 @@ If you need the XSD files, generate them yourself using the javabeans tool:
 * http://xmlbeans.apache.org/docs/2.0.0/guide/tools.html#inst2xsd
 
 this will generate you a valid XSD file that can be used to validate against the XML file.
+
+i.e.:
+* /home/zeno/.software/xmlbeans-2.6.0/bin/inst2xsd oddb_article.xml -outPrefix oddb_article
 
 ## XML files
 
