@@ -18,10 +18,9 @@ end
 module Oddb2xml
   class Builder
     attr_accessor :subject, :index, :items, :flags, :lppvs,
-                  :actions,
-                  :orphans, :fridges,
-                  :infos, :packs, :ean14,
-                  :tag_suffix
+                  :actions, :migel, :orphans, :fridges,
+                  :infos, :packs,
+                  :ean14, :tag_suffix
     def initialize
       @subject    = nil
       @index      = {}
@@ -30,6 +29,7 @@ module Oddb2xml
       @lppvs      = {}
       @infos      = {}
       @packs      = {}
+      @migel      = {}
       @actions    = []
       @orphans    = []
       @fridges    = []
@@ -60,11 +60,44 @@ module Oddb2xml
         @articles = [] # base is 'DE'
         @index['DE'].each_pair do |pharmacode, index|
           object = {
-            :de => index,
-            :fr => @index['FR'][pharmacode],
+            :de    => index,
+            :fr    => @index['FR'][pharmacode],
           }
+          # overwrite
+          if migel = @migel[pharmacode]
+            %w[de fr].each do |lang|
+               l = lang.intern
+               object[l][:ean]             = migel[:ean]
+               object[l][:desc]            = migel["desc_#{lang}".intern]
+               object[l][:additional_desc] = migel[:additional_desc]
+               object[l][:company_name]    = migel[:company_name]
+               object[l][:company_ean]     = migel[:company_ean]
+            end
+            @migel[pharmacode] = nil
+          end
           if seq = @items[pharmacode]
             object[:seq] = seq
+          end
+          @articles << object
+        end
+        # add
+        @migel.values.compact.each do |migel|
+          next if migel[:pharmacode].empty?
+          object = {}
+          %w[de fr].each do |lang|
+            pac = {
+              :ean             => migel[:ean],
+              :pharmacode      => migel[:pharmacode],
+              :status          => 'I',
+              :stat_date       => '',
+              :lang            => lang.capitalize,
+              :desc            => migel["desc_#{lang}".intern],
+              :atc_code        => '',
+              :additional_desc => migel[:additional_desc],
+              :company_ean     => migel[:company_ean],
+              :company_name    => migel[:company_name],
+            }
+            object[lang.intern] = pac
           end
           @articles << object
         end

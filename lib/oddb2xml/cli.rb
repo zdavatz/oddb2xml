@@ -17,10 +17,11 @@ module Oddb2xml
       @mutex = Mutex.new
       @items = {} # Items from Preparations.xml in BAG
       @index = {} # Base index from swissINDEX
-      @flags = {} # narcotics flag files repo.
-      @lppvs = {} # lppv.txt from files repo.
+      @flags = {} # narcotics flag files repo
+      @lppvs = {} # lppv.txt from files repo
       @infos = {} # [option] FI from SwissmedicInfo
       @packs = {} # [option] Packungen from Swissmedic for dat
+      @migel   = {} # [addition] additional Non Pharma products from files repo
       @actions = [] # [addition] interactions from epha
       @orphans = [] # [addition] Orphaned drugs from Swissmedic xls
       @fridges = [] # [addition] ReFridge drugs from Swissmedic xls
@@ -66,6 +67,14 @@ module Oddb2xml
           @mutex.synchronize do
             @packs = SwissmedicExtractor.new(bin, :packages).to_hash
           end
+        end
+      end
+      if @options[:nonpharma]
+        # NonPharma.xls - files
+        threads << Thread.new do
+          downloader = MigelDownloader.new
+          bin = downloader.download
+          @migel = MigelExtractor.new(bin).to_hash
         end
       end
       # bm - files
@@ -153,13 +162,13 @@ module Oddb2xml
             builder.items = @items
             builder.flags = @flags
             builder.lppvs = @lppvs
-            # additions
-            %w[actions orphans fridges].each do |addition|
-              builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
-            end
-            # optionals
+            # optional sources
             builder.infos = @infos
             builder.packs = @packs
+            # additional sources
+            %w[actions orphans fridges migel].each do |addition|
+              builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
+            end
             builder.tag_suffix = @options[:tag_suffix]
           end
           output = ''

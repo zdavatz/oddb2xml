@@ -162,7 +162,30 @@ XML
       rescue Timeout::Error
         retrievable? ? retry : raise
       ensure
-        io.close unless io.closed?
+        io.close if io and !io.closed?
+        if File.exists?(file)
+          File.unlink(file)
+        end
+      end
+    end
+  end
+  class MigelDownloader < Downloader
+    def init
+      super
+      @url ||= 'https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls'
+    end
+    def download
+      file = "oddb2xml_files_nonpharma.xls"
+      begin
+        response = @agent.get(@url)
+        response.save_as(file)
+        response = nil # win
+        io = File.open(file, 'rb')
+        return io.read
+      rescue Timeout::Error
+        retrievable? ? retry : raise
+      ensure
+        io.close if io and !io.closed? # win
         if File.exists?(file)
           File.unlink(file)
         end

@@ -214,6 +214,30 @@ module Oddb2xml
       end
     end
   end
+  class MigelExtractor < Extractor
+    def initialize(bin)
+      io = StringIO.new(bin)
+      book = Spreadsheet.open(io)
+      @sheet = book.worksheet(0)
+    end
+    def to_hash
+      data = {}
+      @sheet.each_with_index do |row, i|
+        next if i == 0
+        phar = row[1].to_s
+        data[phar] = {
+          :ean             => row[0].to_i.to_s,
+          :pharmacode      => phar,
+          :desc_de         => row[3],
+          :desc_fr         => row[4],
+          :additional_desc => row[5], # quantity
+          :company_name    => row[6],
+          :company_ean     => row[7].to_i.to_s,
+        }
+      end
+      data
+    end
+  end
   class SwissmedicInfoExtractor < Extractor
     def to_hash
       data = Hash.new{|h,k| h[k] = [] }

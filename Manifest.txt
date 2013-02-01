@@ -25,6 +25,9 @@ spec/data/oddb_fi_product.xml
 spec/data/oddb_limitation.xml
 spec/data/oddb_product.xml
 spec/data/oddb_substance.xml
+spec/data/oddb2xml_files_nonpharma.xls
+spec/data/oddb2xml_files_lppv.txt
+spec/data/oddb2xml_files_bm_update.txt
 spec/data/swissindex.xml
 spec/data/swissindex_nonpharma.xml
 spec/data/swissindex_pharma.xml
@@ -38,7 +41,6 @@ spec/data/swissmedic_orphans.xls
 spec/data/wsdl.xml
 spec/data/wsdl_nonpharma.xml
 spec/data/wsdl_pharma.xml
-spec/data/ywesee_bm_update.txt
 spec/downloader_spec.rb
 spec/extractor_spec.rb
 spec/spec_helper.rb

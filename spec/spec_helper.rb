@@ -24,6 +24,7 @@ module ServerMockHelper
     setup_epha_server_mock
     setup_bm_update_server_mock
     setup_lppv_server_mock
+    setup_migel_server_mock
   end
   def setup_bag_xml_server_mock
     # zip
@@ -181,6 +182,20 @@ module ServerMockHelper
       to_return(
         :status  => 200,
         :headers => {'Content-Type' => 'text/plain; charset=utf-8'},
+        :body    => stub_response)
+  end
+  def setup_migel_server_mock
+    # xls
+    stub_xls_url = 'https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls'
+    stub_response = File.read(File.expand_path('../data/oddb2xml_files_nonpharma.xls', __FILE__))
+    stub_request(:get, stub_xls_url).
+      with(:headers => {
+        'Accept' => '*/*',
+        'Host'   => 'github.com',
+      }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'application/octet-stream; charset=utf-8'},
         :body    => stub_response)
   end
 end
