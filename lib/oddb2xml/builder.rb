@@ -63,16 +63,8 @@ module Oddb2xml
             :de    => index,
             :fr    => @index['FR'][pharmacode],
           }
-          # overwrite
           if migel = @migel[pharmacode]
-            %w[de fr].each do |lang|
-               l = lang.intern
-               object[l][:ean]             = migel[:ean]
-               object[l][:desc]            = migel["desc_#{lang}".intern]
-               object[l][:additional_desc] = migel[:additional_desc]
-               object[l][:company_name]    = migel[:company_name]
-               object[l][:company_ean]     = migel[:company_ean]
-            end
+            # delete duplicates
             @migel[pharmacode] = nil
           end
           if seq = @items[pharmacode]
