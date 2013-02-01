@@ -28,100 +28,29 @@ module Oddb2xml
       LANGUAGES.each do |lang|
         @index[lang] = {}
       end
+      @_message = false
     end
     def run
       threads = []
       if @options[:format] != :dat
         if @options[:fi]
-          # swissmedic-info
-          threads << Thread.new do
-            downloader = SwissmedicInfoDownloader.new
-            xml = downloader.download
-            @mutex.synchronize do
-              hsh = SwissmedicInfoExtractor.new(xml).to_hash
-              @infos = hsh
-            end
-          end
+          threads << download(:fachinfo) # swissmedic-info
         end
-        # swissmedic - orphan, fridge
-        [:orphans, :fridges].each do |type|
-          threads << Thread.new do
-            downloader = SwissmedicDownloader.new(type)
-            bin = downloader.download
-            self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(bin, type).to_arry)
-          end
+        [:orphan, :fridge].each do |type|
+          threads << download(type) # swissmedic
         end
-        # epha
-        threads << Thread.new do
-          downloader = EphaDownloader.new
-          str = downloader.download
-          @mutex.synchronize do
-            @actions = EphaExtractor.new(str).to_arry
-          end
-        end
+        threads << download(:interaction) # epha
       end
       if @options[:nonpharma]
-        # NonPharma.xls - files
-        threads << Thread.new do
-          downloader = MigelDownloader.new
-          bin = downloader.download
-          @migel = MigelExtractor.new(bin).to_hash
-        end
+        threads << download(:migel) # oddb2xml_files
       end
-      # swissmedic - package
-      threads << Thread.new do
-        downloader = SwissmedicDownloader.new(:packages)
-        bin = downloader.download
-        @mutex.synchronize do
-          @packs = SwissmedicExtractor.new(bin, :packages).to_hash
-        end
-      end
-      # bm - files
-      threads << Thread.new do
-        downloader = BMUpdateDownloader.new
-        str = downloader.download
-        @mutex.synchronize do
-          @flags = BMUpdateExtractor.new(str).to_hash
-        end
-      end
-      # lppv - files
-      threads << Thread.new do
-        downloader = LppvDownloader.new
-        str = downloader.download
-        @mutex.synchronize do
-          @lppvs = LppvExtractor.new(str).to_hash
-        end
-      end
-      # bag
-      threads << Thread.new do
-        downloader = BagXmlDownloader.new(@options)
-        xml = downloader.download
-        @mutex.synchronize do
-          hsh = BagXmlExtractor.new(xml).to_hash
-          @items = hsh
-        end
-      end
-      @_message = false
+      threads << download(:package) # swissmedic
+      threads << download(:bm_update) # oddb2xml_files
+      threads << download(:lppv) # oddb2xml_files
+      threads << download(:bag) # bag.e-mediat
       LANGUAGES.each do |lang|
-        # swissindex
         types.each do |type|
-          threads << Thread.new do
-            downloader = SwissIndexDownloader.new(@options, type, lang)
-            begin
-              xml = downloader.download
-            rescue SystemExit
-              @mutex.synchronize do
-                unless @_message # hook only one exit
-                  @_message = true
-                  exit
-                end
-              end
-            end
-            @mutex.synchronize do
-              hsh = SwissIndexExtractor.new(xml, type).to_hash
-              @index[lang][type] = hsh
-            end
-          end
+          threads << download(:index, type, lang) # swissindex
         end
       end
       begin
@@ -198,6 +127,93 @@ module Oddb2xml
           end
         end
         raise Interrupt
+      end
+    end
+    def download(what, type=nil, lang=nil)
+      case what
+      when :fachinfo
+        Thread.new do
+          downloader = SwissmedicInfoDownloader.new
+          xml = downloader.download
+          @mutex.synchronize do
+            hsh = SwissmedicInfoExtractor.new(xml).to_hash
+            @infos = hsh
+          end
+        end
+      when :orphan, :fridge
+        type = (what.to_s + "s").intern
+        Thread.new do
+          downloader = SwissmedicDownloader.new(type)
+          bin = downloader.download
+          self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(bin, type).to_arry)
+        end
+      when :interaction
+        Thread.new do
+          downloader = EphaDownloader.new
+          str = downloader.download
+          @mutex.synchronize do
+            @actions = EphaExtractor.new(str).to_arry
+          end
+        end
+      when :migel
+        Thread.new do
+          downloader = MigelDownloader.new
+          bin = downloader.download
+          @mutex.synchronize do
+            @migel = MigelExtractor.new(bin).to_hash
+          end
+        end
+      when :package
+        Thread.new do
+          downloader = SwissmedicDownloader.new(:packages)
+          bin = downloader.download
+          @mutex.synchronize do
+            @packs = SwissmedicExtractor.new(bin, :packages).to_hash
+          end
+        end
+      when :bm_update
+        Thread.new do
+          downloader = BMUpdateDownloader.new
+          str = downloader.download
+          @mutex.synchronize do
+            @flags = BMUpdateExtractor.new(str).to_hash
+          end
+        end
+      when :lppv
+        Thread.new do
+          downloader = LppvDownloader.new
+          str = downloader.download
+          @mutex.synchronize do
+            @lppvs = LppvExtractor.new(str).to_hash
+          end
+        end
+      when :bag
+        Thread.new do
+          downloader = BagXmlDownloader.new(@options)
+          xml = downloader.download
+          @mutex.synchronize do
+            hsh = BagXmlExtractor.new(xml).to_hash
+            @items = hsh
+          end
+        end
+      when :index
+        Thread.new do
+          downloader = SwissIndexDownloader.new(@options, type, lang)
+          begin
+            xml = downloader.download
+          rescue SystemExit
+            @mutex.synchronize do
+              unless @_message # hook only one exit
+                @_message = true
+                exit
+              end
+            end
+          end
+          @mutex.synchronize do
+            hsh = SwissIndexExtractor.new(xml, type).to_hash
+            @index[lang][type] = hsh
+          end
+        end
       end
     end
     def compress
