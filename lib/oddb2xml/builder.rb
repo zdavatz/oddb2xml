@@ -704,7 +704,7 @@ module Oddb2xml
                     length += 1
                     xml.KP('DT' => '') {
                       xml.MONID @infos[lang][i][:monid]
-                      xml.PRDNO seq[:product_key] unless seq[:product_key].empty?
+                      xml.GTIN  seq[:ean] if seq[:ean] and seq[:ean][0..3] == '7680'
                       # as orphans ?
                       xml.DEL   @orphans.include?(number) ? true : false
                     }
