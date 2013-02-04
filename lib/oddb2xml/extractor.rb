@@ -188,7 +188,7 @@ module Oddb2xml
       when :packages
         i_5,i_3 = 0,10 # :swissmedic_numbers
         cat     = 13   # :swissmedic_category
-        ith     = 4    # :ith_swissmedic (swissmedic-diff)
+        ith     = 4    # :ith_swissmedic IT-Code (swissmedic-diff)
         @sheet.each do |row|
           no8 = extract_number(row, i_5).to_s + extract_number(row, i_3, /^\d{3}$/).to_s
           unless no8.empty?
@@ -254,8 +254,8 @@ module Oddb2xml
           item[:paragraph] =  "<title><p>#{item[:name]}</p></title>" +
              ((paragraph = html.xpath("///div[@class='paragraph']")) ? paragraph.to_s : '')
           if text = html.xpath("///div[@id='Section7750']/p").text
-            if text =~ /(\d{5})[,\s]*(\d{5})?/
-              [$1, $2].compact.each do |n|
+            if text =~ /(\d{5})[,\s]*(\d{5})?[,\s]*(\d{5})?/ or # max 3 numbers
+              [$1, $2, $3].compact.each do |n|
                 item[:monid] = n
                 data[lang] << item
               end

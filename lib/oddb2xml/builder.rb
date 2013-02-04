@@ -141,17 +141,33 @@ module Oddb2xml
     end
     def prepare_products
       unless @products
-        # merge company info from swissINDEX
         @products = []
         @products = @items.values.uniq.map do |seq|
           %w[de fr].each do |lang|
+            # Values come from swissINDEX and Packungen.xls
+            #   * company_name
+            #   * atc_code
+            #   * it_code
+            it_code = ''
+            if ppac = @packs[seq[:swissmedic_number5]]
+              ht_code = ppac[:ith_swissmedic]
+            end
             name_key = "company_name_#{lang}".intern
-            seq[name_key] = ''
-            if pharmacode = seq[:pharmacodes].first
-              indices = @index[lang.upcase]
-              if index = indices[pharmacode]
-                seq[:ean]     = index[:ean]
-                seq[name_key] = index[:company_name]
+            seq[name_key]  = ''
+            indices = @index[lang.upcase]
+            seq[:packages].each_pair do |phar, pac|
+              if index = indices[phar]
+                if seq[name_key].empty?
+                  seq[name_key] = index[:company_name]
+                end
+                if it_code.empty? and
+                   num = pac[:swissmedic_number8] and
+                   ppac =  @packs[num]
+                  it_code = ppac[:ith_swissmedic]
+                end
+                seq[:atc_code] = index[:atc_code]
+                seq[:it_code]  = it_code
+                seq[:packages][phar][:ean] = index[:ean]
               end
             end
           end
@@ -344,116 +360,121 @@ module Oddb2xml
           'PROD_DATE'         => datetime,
           'VALID_DATE'        => datetime,
         ) {
+          length = 0
           @products.each do |seq|
-            xml.PRD('DT' => '') {
-              xml.GTIN seq[:ean] if seq[:ean] and !seq[:ean].empty?
-              %w[de fr].each do |l|
-                name = "name_#{l}".intern
-                desc = "desc_#{l}".intern
-                elem = "DSCR" + l[0].upcase
-                if !seq[name].empty? and !seq[desc].empty?
-                  xml.send(elem, seq[name] + ' ' + seq[desc])
-                elsif !seq[desc].empty?
-                  xml.send(elem, seq[desc])
-                end
-              end
-              #xml.BNAMD
-              #xml.BNAMF
-              #xml.ADNAMD
-              #xml.ADNAMF
-              #xml.SIZE
-              xml.ADINFD seq[:comment_de]   unless seq[:comment_de].empty?
-              xml.ADINFF seq[:comment_fr]   unless seq[:comment_fr].empty?
-              xml.GENCD  seq[:org_gen_code] unless seq[:org_gen_code].empty?
-              #xml.GENGRP
-              xml.ATC    seq[:atc_code]     unless seq[:atc_code].empty?
-              xml.IT     seq[:it_code]      unless seq[:it_code].empty?
-              #xml.ITBAG
-              #xml.KONO
-              #xml.TRADE
-              #xml.PRTNO
-              #xml.MONO
-              #xml.CDGALD
-              #xml.CDGALF
-              #xml.FORMD
-              #xml.FORMF
-              #xml.DOSE
-              #xml.DOSEU
-              #xml.DRGFD
-              #xml.DRGFF
-              seq[:packages].values.first[:swissmedic_number8] =~ /(\d{5})(\d{3})/
-              xml.ORPH @orphans.include?($1.to_s) ? true : false
-              #xml.BIOPHA
-              #xml.BIOSIM
-              #xml.BFS
-              #xml.BLOOD
-              #xml.MSCD # always empty
-              #xml.DEL
-              xml.CPT {
-                #xml.CPTLNO
-                #xml.CNAMED
-                #xml.CNAMEF
-                #xml.IDXIND
-                #xml.DDDD
-                #xml.DDDU
-                #xml.DDDA
-                #xml.IDXIA
-                #xml.IXREL
-                #xml.GALF
-                #xml.DRGGRPCD
-                #xml.PRBSUIT
-                #xml.CSOLV
-                #xml.CSOLVQ
-                #xml.CSOLVQU
-                #xml.PHVAL
-                #xml.LSPNSOL
-                #xml.APDURSOL
-                #xml.EXCIP
-                #xml.EXCIPQ
-                #xml.EXCIPCD
-                #xml.EXCIPCF
-                #xml.PQTY
-                #xml.PQTYU
-                #xml.SIZEMM
-                #xml.WEIGHT
-                #xml.LOOKD
-                #xml.LOOKF
-                #xml.IMG2
-                seq[:substances].each do |sub|
-                  xml.CPTCMP {
-                    xml.LINE  sub[:index]    unless sub[:index].empty?
-                    xml.SUBNO @substances.index(sub[:name]) + 1 if @substances.include?(sub[:name])
-                    xml.QTY   sub[:quantity] unless sub[:quantity].empty?
-                    xml.QTYU  sub[:unit]     unless sub[:unit].empty?
-                    #xml.WHK
-                  }
-                end
-                @interactions.each do |ix|
-                  if [ix[:act1], ix[:act2]].include?(seq[:atc_code])
-                    xml.CPTIX {
-                      xml.IXNO ix[:ixno]
-                      #xml.GRP
-                      xml.RLV  @codes[ix[:grad]]
-                    }
+            seq[:packages].each_value do |pac|
+              next if !pac[:ean] or pac[:ean].empty?
+              length += 1
+              xml.PRD('DT' => '') {
+                xml.GTIN pac[:ean]
+                %w[de fr].each do |l|
+                  name = "name_#{l}".intern
+                  desc = "desc_#{l}".intern
+                  elem = "DSCR" + l[0].upcase
+                  if !seq[name].empty? and !seq[desc].empty?
+                    xml.send(elem, seq[name] + ' ' + seq[desc])
+                  elsif !seq[desc].empty?
+                    xml.send(elem, seq[desc])
                   end
                 end
-                #xml.CPTROA {
-                  #xml.SYSLOC
-                  #xml.ROA
+                #xml.BNAMD
+                #xml.BNAMF
+                #xml.ADNAMD
+                #xml.ADNAMF
+                #xml.SIZE
+                xml.ADINFD seq[:comment_de]   unless seq[:comment_de].empty?
+                xml.ADINFF seq[:comment_fr]   unless seq[:comment_fr].empty?
+                xml.GENCD  seq[:org_gen_code] unless seq[:org_gen_code].empty?
+                #xml.GENGRP
+                xml.ATC    seq[:atc_code]     unless seq[:atc_code].empty?
+                xml.IT     seq[:it_code]      unless seq[:it_code].empty?
+                #xml.ITBAG
+                #xml.KONO
+                #xml.TRADE
+                #xml.PRTNO
+                #xml.MONO
+                #xml.CDGALD
+                #xml.CDGALF
+                #xml.FORMD
+                #xml.FORMF
+                #xml.DOSE
+                #xml.DOSEU
+                #xml.DRGFD
+                #xml.DRGFF
+                pac[:swissmedic_number8] =~ /(\d{5})(\d{3})/
+                xml.ORPH @orphans.include?($1.to_s) ? true : false
+                #xml.BIOPHA
+                #xml.BIOSIM
+                #xml.BFS
+                #xml.BLOOD
+                #xml.MSCD # always empty
+                #xml.DEL
+                xml.CPT {
+                  #xml.CPTLNO
+                  #xml.CNAMED
+                  #xml.CNAMEF
+                  #xml.IDXIND
+                  #xml.DDDD
+                  #xml.DDDU
+                  #xml.DDDA
+                  #xml.IDXIA
+                  #xml.IXREL
+                  #xml.GALF
+                  #xml.DRGGRPCD
+                  #xml.PRBSUIT
+                  #xml.CSOLV
+                  #xml.CSOLVQ
+                  #xml.CSOLVQU
+                  #xml.PHVAL
+                  #xml.LSPNSOL
+                  #xml.APDURSOL
+                  #xml.EXCIP
+                  #xml.EXCIPQ
+                  #xml.EXCIPCD
+                  #xml.EXCIPCF
+                  #xml.PQTY
+                  #xml.PQTYU
+                  #xml.SIZEMM
+                  #xml.WEIGHT
+                  #xml.LOOKD
+                  #xml.LOOKF
+                  #xml.IMG2
+                  seq[:substances].each do |sub|
+                    xml.CPTCMP {
+                      xml.LINE  sub[:index]    unless sub[:index].empty?
+                      xml.SUBNO @substances.index(sub[:name]) + 1 if @substances.include?(sub[:name])
+                      xml.QTY   sub[:quantity] unless sub[:quantity].empty?
+                      xml.QTYU  sub[:unit]     unless sub[:unit].empty?
+                      #xml.WHK
+                    }
+                  end
+                  @interactions.each do |ix|
+                    if [ix[:act1], ix[:act2]].include?(seq[:atc_code])
+                      xml.CPTIX {
+                        xml.IXNO ix[:ixno]
+                        #xml.GRP
+                        xml.RLV  @codes[ix[:grad]]
+                      }
+                    end
+                  end
+                  #xml.CPTROA {
+                    #xml.SYSLOC
+                    #xml.ROA
+                  #}
+                }
+                #xml.PRDICD { # currently empty
+                  #xml.ICD
+                  #xml.RTYP
+                  #xml.RSIG
+                  #xml.REMD
+                  #xml.REMF
                 #}
               }
-              #xml.PRDICD { # currently empty
-                #xml.ICD
-                #xml.RTYP
-                #xml.RSIG
-                #xml.REMD
-                #xml.REMF
-              #}
-            }
+            end
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @products.length.to_s
+            xml.NBR_RECORD length.to_s
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -700,11 +721,13 @@ module Oddb2xml
               seq[:packages].values.each do |pac|
                 if pac[:swissmedic_number8] =~ /(\d{5})(\d{3})/
                   number = $1.to_s
-                  if i = info_index[number]
+                  if ((i = info_index[number]) and
+                      (pac[:ean] and pac[:ean][0..3] == '7680'))
                     length += 1
                     xml.KP('DT' => '') {
                       xml.MONID @infos[lang][i][:monid]
-                      xml.GTIN  seq[:ean] if seq[:ean] and seq[:ean][0..3] == '7680'
+                      xml.GTIN  pac[:ean]
+                      xml.LANG  lang
                       # as orphans ?
                       xml.DEL   @orphans.include?(number) ? true : false
                     }
