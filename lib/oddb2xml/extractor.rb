@@ -254,7 +254,8 @@ module Oddb2xml
           item[:paragraph] =  "<title><p>#{item[:name]}</p></title>" +
              ((paragraph = html.xpath("///div[@class='paragraph']")) ? paragraph.to_s : '')
           if text = html.xpath("///div[@id='Section7750']/p").text
-            if text =~ /(\d{5})[,\s]*(\d{5})?[,\s]*(\d{5})?/ or # max 3 numbers
+            # 1 ~ 3 swissmedic number
+            if text =~ /(\d{5})[,\s]*(\d{5})?|(\d{5})[,\s]*(\d{5})?[,\s]*(\d{5})?/
               [$1, $2, $3].compact.each do |n|
                 item[:monid] = n
                 data[lang] << item
