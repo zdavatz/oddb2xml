@@ -491,9 +491,7 @@ module Oddb2xml
               #xml.GRPCD
               #xml.CDS01
               #xml.CDS02
-              if obj[:seq]
-                xml.PRDNO obj[:seq][:product_key] unless obj[:seq][:product_key].empty?
-              end
+              #xml.PRDNO
               if bg_pac # bag xml
                 xml.SMCAT bg_pac[:swissmedic_category] unless bg_pac[:swissmedic_category].empty?
               elsif @packs[num] and @packs[num][:swissmedic_category] # Packungen.xls
