@@ -150,6 +150,7 @@ module Oddb2xml
             if pharmacode = seq[:pharmacodes].first
               indices = @index[lang.upcase]
               if index = indices[pharmacode]
+                seq[:ean]     = index[:ean]
                 seq[name_key] = index[:company_name]
               end
             end
@@ -345,7 +346,7 @@ module Oddb2xml
         ) {
           @products.each do |seq|
             xml.PRD('DT' => '') {
-              xml.PRDNO seq[:product_key] unless seq[:product_key].empty?
+              xml.GTIN seq[:ean] if seq[:ean] and !seq[:ean].empty?
               %w[de fr].each do |l|
                 name = "name_#{l}".intern
                 desc = "desc_#{l}".intern
