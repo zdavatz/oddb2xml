@@ -670,7 +670,7 @@ module Oddb2xml
           length = 0
           %w[de fr].each do |lang|
             length += @infos[lang].length
-            @infos[lang].each_with_index do |info, i|
+            @infos[lang].each do |info|
               xml.KMP(
                 'MONTYPE' => 'fi', # only
                 'LANG'    => lang.upcase,
@@ -711,29 +711,28 @@ module Oddb2xml
           'VALID_DATE'        => datetime,
         ) {
           length = 0
+          info_index = {}
           %w[de fr].each do |lang|
-            info_index = {}
             @infos[lang].each_with_index do |info, i|
               info_index[info[:monid]] = i
             end
-            # prod
-            @products.each do |seq|
-              seq[:packages].values.each do |pac|
-                if pac[:swissmedic_number8] =~ /(\d{5})(\d{3})/
-                  number = $1.to_s
-                  if ((i = info_index[number]) and
-                      (pac[:ean] and pac[:ean][0..3] == '7680'))
-                    length += 1
-                    xml.KP('DT' => '') {
-                      xml.MONID @infos[lang][i][:monid]
-                      xml.GTIN  pac[:ean]
-                      xml.LANG  lang
-                      # as orphans ?
-                      xml.DEL   @orphans.include?(number) ? true : false
-                    }
+          end
+          @products.group_by{|seq| seq[:swissmedic_number5] }.
+            each_pair do |monid, products|
+            if info_index[monid]
+              xml.KP('DT' => '') {
+                xml.MONID monid
+                products.each do |seq|
+                  seq[:packages].values.each do |pac|
+                    if (pac[:ean] and pac[:ean][0..3] == '7680')
+                      length += 1
+                      xml.GTIN pac[:ean]
+                    end
                   end
                 end
-              end
+                # as orphans ?
+                xml.DEL @orphans.include?(monid) ? true : false
+              }
             end
           end
           xml.RESULT {
