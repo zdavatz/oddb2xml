@@ -122,6 +122,23 @@ describe Oddb2xml::SwissmedicDownloader do
       end
     end
   end
+  context 'packages' do
+    before(:each) do
+      setup_swissmedic_server_mock
+      @downloader = Oddb2xml::SwissmedicDownloader.new(:packages)
+    end
+    context 'download_by for packages xls' do
+      let(:bin) { @downloader.download }
+      it 'should return valid Binary-String' do
+        bin.should be_a String
+        bin.bytes.should_not nil
+      end
+      it 'should clean up current directory' do
+        bin.should_not raise_error(Timeout::Error)
+        File.exist?('oddb_packages.xls').should be(false)
+      end
+    end
+  end
 end
 
 describe Oddb2xml::SwissmedicInfoDownloader do

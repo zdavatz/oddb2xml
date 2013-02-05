@@ -70,8 +70,9 @@ module ServerMockHelper
   def setup_swissmedic_server_mock
     host = 'www.swissmedic.ch'
     {
-      :orphans => {:html => '/daten/00081/index.html?lang=de',       :xls => '/download'},
-      :fridges => {:html => '/daten/00080/00254/index.html?lang=de', :xls => '/download'}
+      :orphans  => {:html => '/daten/00081/index.html?lang=de',       :xls => '/download'},
+      :fridges  => {:html => '/daten/00080/00254/index.html?lang=de', :xls => '/download'},
+      :packages => {:html => '/daten/00080/00251/index.html?lang=de', :xls => '/download'},
     }.each_pair do |type, urls|
       # html (dummy)
       stub_html_url = "http://#{host}" + urls[:html]
