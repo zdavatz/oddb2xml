@@ -79,20 +79,29 @@ module Oddb2xml
             limitations[:itc] = (lims = seq.xpath('.//ItCodes/ItCode/Limitations/Limitation')) ? lims.to_a : nil
             # in pac
             limitations[:pac] = (lims = pac.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
-            limitations.each_pair do |key, lims|
-              key = case key
-                    when :pac
-                      item[:packages][phar][:swissmedic_number8]
-                    when :seq
-                      item[:swissmedic_number5]
-                    when :itc
-                      phar
-                    end
-              key = phar if (key.empty? or key == '0')
+            limitations.each_pair do |lim_key, lims|
+              key = ''
+              id  = ''
+              case lim_key
+              when :pac
+                key = :swissmedic_number8
+                id  = item[:packages][phar][key].to_s
+              when :seq
+                key = :swissmedic_number5
+                id  = item[key].to_s
+              when :itc
+                key = :pharmacode
+                id  = phar
+              end
+              if id.empty? or id == '0'
+                key = :pharmacode
+                id  = phar .to_s
+              end
               lims.each do |lim|
                 limitation = {
                   :it      => item[:it_code],
                   :key     => key,
+                  :id      => id,
                   :code    => (lic = lim.at_xpath('.//LimitationCode'))   ? lic.text : '',
                   :type    => (lit = lim.at_xpath('.//LimitationType'))   ? lit.text : '',
                   :value   => (liv = lim.at_xpath('.//LimitationValue'))  ? liv.text : '',

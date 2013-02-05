@@ -115,7 +115,9 @@ module Oddb2xml
             @limitations += pac[:limitations]
           end
         end
-        @limitations.uniq! {|lim| lim[:code] + lim[:type] }
+        # ID is no longer fixed TAG (swissmedicNo8, swissmedicNo5, pharmacode)
+        # limitation.xml needs all duplicate entries for this keys.
+        #@limitations.uniq! {|lim| lim[:] lim[:code] + lim[:type] }
         @limitations.sort_by!{|lim| lim[:code] }
       end
     end
@@ -222,15 +224,22 @@ module Oddb2xml
         ) {
           @limitations.each do |lim|
             xml.LIM('DT' => '') {
-              xml.LIMCD  lim[:key] # swissmedic_number8, swissmedic_number5 or pharmacode
-              xml.IT     lim[:it]
-              xml.LIMTYP lim[:type]
-              xml.LIMVAL lim[:value]
+              case lim[:key]
+              when :swissmedic_number8
+                xml.SwissmedicNo8 lim[:id]
+              when :swissmedic_number5
+                xml.SwissmedicNo5 lim[:id]
+              when :pharmacode
+                xml.Pharmacode lim[:id]
+              end
+              xml.IT         lim[:it]
+              xml.LIMTYP     lim[:type]
+              xml.LIMVAL     lim[:value]
               xml.LIMNAMEBAG lim[:code] # original LIMCD
-              xml.LIMNIV lim[:niv]
-              xml.DSCRD  lim[:desc_de]
-              xml.DSCRF  lim[:desc_fr]
-              xml.VDAT   lim[:vdate]
+              xml.LIMNIV     lim[:niv]
+              xml.DSCRD      lim[:desc_de]
+              xml.DSCRF      lim[:desc_fr]
+              xml.VDAT       lim[:vdate]
               if lim[:del]
                 xml.DEL 3
               end
