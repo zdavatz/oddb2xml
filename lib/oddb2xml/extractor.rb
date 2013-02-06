@@ -83,19 +83,16 @@ module Oddb2xml
               key = ''
               id  = ''
               case lim_key
+              when :seq, :itc
+                key = :swissmedic_number5
+                id  = item[key].to_s
               when :pac
                 key = :swissmedic_number8
                 id  = item[:packages][phar][key].to_s
-              when :seq
-                key = :swissmedic_number5
-                id  = item[key].to_s
-              when :itc
-                key = :pharmacode
-                id  = phar
               end
               if id.empty? or id == '0'
                 key = :pharmacode
-                id  = phar .to_s
+                id  = phar.to_s
               end
               lims.each do |lim|
                 limitation = {
