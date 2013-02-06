@@ -411,7 +411,9 @@ module Oddb2xml
                 #xml.DRGFD
                 #xml.DRGFF
                 pac[:swissmedic_number8] =~ /(\d{5})(\d{3})/
-                xml.ORPH @orphans.include?($1.to_s) ? true : false
+                if @orphans.include?($1.to_s)
+                  xml.ORPH true
+                end
                 #xml.BIOPHA
                 #xml.BIOSIM
                 #xml.BFS
