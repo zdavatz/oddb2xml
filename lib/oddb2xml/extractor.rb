@@ -175,14 +175,14 @@ module Oddb2xml
         i = 1
         @sheet.each do |row|
           if number = extract_number(row, i)
-            data << number
+            data << number.to_s
           end
         end
       when :fridges
         i,c = 1,7
         @sheet.each do |row|
           if number = extract_number(row, i) and row[c] and row[c].to_s == 'x'
-            data << row[i].to_i.to_s
+            data << row[i].to_s
           end
         end
       end
@@ -210,7 +210,10 @@ module Oddb2xml
     private
     def extract_number(row, i, ptrn=/^\d{5}$/)
       begin
-        if (row[i] and number = row[i].to_s.gsub(/[^0-9]/,'') and number =~ ptrn)
+        return nil unless row[i]
+        number = row[i].to_i.to_s.gsub(/[^0-9]/, '')
+        number = number.rjust(5, '0') if ptrn == /^\d{5}$/
+        if number =~ ptrn
           return number
         else
           nil

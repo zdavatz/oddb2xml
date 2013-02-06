@@ -145,7 +145,10 @@ module Oddb2xml
         Thread.new do
           downloader = SwissmedicDownloader.new(type)
           bin = downloader.download
-          self.instance_variable_set("@#{type.to_s}", SwissmedicExtractor.new(bin, type).to_arry)
+          self.instance_variable_set(
+            "@#{type.to_s}".intern,
+            SwissmedicExtractor.new(bin, type).to_arry
+          )
         end
       when :interaction
         Thread.new do
