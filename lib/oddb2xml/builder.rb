@@ -116,8 +116,8 @@ module Oddb2xml
           end
         end
         # ID is no longer fixed TAG (swissmedicNo8, swissmedicNo5, pharmacode)
-        # limitation.xml needs all duplicate entries for this keys.
-        #@limitations.uniq! {|lim| lim[:] lim[:code] + lim[:type] }
+        # limitation.xml needs all duplicate entries by this keys.
+        @limitations.uniq! {|lim| lim[:id] + lim[:type] }
         @limitations.sort_by!{|lim| lim[:code] }
       end
     end
