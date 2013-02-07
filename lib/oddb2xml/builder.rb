@@ -146,28 +146,36 @@ module Oddb2xml
         @products = []
         @products = @items.values.uniq.map do |seq|
           %w[de fr].each do |lang|
-            # Values come from swissINDEX and Packungen.xls
+            # Merge values from swissINDEX and Packungen.xls
             #   * company_name
             #   * atc_code
             #   * it_code
             it_code = ''
-            if ppac = @packs[seq[:swissmedic_number5]]
-              ht_code = ppac[:ith_swissmedic]
+            # Swissmedic-No5
+            if ppac = @packs[seq[:swissmedic_number5].intern]
+              it_code = ppac[:ith_swissmedic]
             end
             name_key = "company_name_#{lang}".intern
             seq[name_key]  = ''
             indices = @index[lang.upcase]
             seq[:packages].each_pair do |phar, pac|
               if index = indices[phar]
+                # siwssINDEX
                 if seq[name_key].empty?
                   seq[name_key] = index[:company_name]
                 end
-                if it_code.empty? and
-                   num = pac[:swissmedic_number8] and
-                   ppac =  @packs[num]
-                  it_code = ppac[:ith_swissmedic]
+                atc_code = index[:atc_code]
+                # Packungen
+                if num = pac[:swissmedic_number8] and
+                   ppac = @packs[num.intern]
+                  if it_code.empty?
+                    it_code = ppac[:ith_swissmedic]
+                  end
+                  if atc_code.empty?
+                    atc_code = ppac[:atc_code]
+                  end
                 end
-                seq[:atc_code] = index[:atc_code]
+                seq[:atc_code] = atc_code
                 seq[:it_code]  = it_code
                 seq[:packages][phar][:ean] = index[:ean]
               end

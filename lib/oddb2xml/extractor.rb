@@ -188,19 +188,23 @@ module Oddb2xml
       end
       data.uniq
     end
-    def to_hash
+    def to_hash # Packungen.xls
       data = {}
       case @type
       when :packages
         i_5,i_3 = 0,10 # :swissmedic_numbers
         cat     = 13   # :swissmedic_category
         ith     = 4    # :ith_swissmedic IT-Code (swissmedic-diff)
+        atc     = 5    # :atc_code
+        typ     = 6    # Heilmittelcode
         @sheet.each do |row|
+          next if row[typ] == 'Tierarzneimittel'
           no8 = extract_number(row, i_5).to_s + extract_number(row, i_3, /^\d{3}$/).to_s
           unless no8.empty?
             data[no8.intern] = {
               :ith_swissmedic      => row[ith].to_s,
               :swissmedic_category => row[cat].to_s,
+              :atc_code            => row[atc].to_s,
             }
           end
         end
