@@ -148,28 +148,36 @@ module Oddb2xml
           indices.each_with_index do |index, i|
             obj = {}
             obj = {
-              :ean => index[:ean],
-              :atc => index[:atc_code],
-              # additional tags
-              :ith => '',
               :seq => @items[phar],
               :pac => nil,
               :no8 => nil,
               :de  => index,
               :fr  => @index['FR'][phar][i],
               :st  => index[:status],
+              # swissINDEX and Packungen.xls(if swissINDEX does not have EAN)
+              :ean => index[:ean],
+              :atc => index[:atc_code],
+              :ith => '',
+              # from Packungen.xls
+              :siz => '',
+              :eht => '',
+              :sub => '',
             }
             if obj[:seq] and obj[:pac] = obj[:seq][:packages][phar]
               obj[:no8] = obj[:pac][:swissmedic_number8].to_s
               obj[:atc] = obj[:pac][:atc_code].to_s
-              obj[:ith] = obj[:pac][:it_code].to_s # first one
-              unless obj[:ean]
-                if obj[:no8] and ppac = @packs[obj[:no8].intern] # Packungen.xls
+              if obj[:no8] and ppac = @packs[obj[:no8].intern] # Packungen.xls
+                unless obj[:ean]
                   obj[:ean] = ppac[:ean].to_s
-                  obj[:atc] = ppac[:atc_code].to_s
-                  obj[:ith] = ppac[:ith_swissmedic].to_s
-                  obj[:st]  = 'I'
                 end
+                # sync ATC-code via EAN
+                if obj[:ean] == ppac[:ean].to_s
+                  obj[:atc] = ppac[:atc_code].to_s
+                end
+                obj[:ith] = ppac[:ith_swissmedic]
+                obj[:siz] = ppac[:package_size]
+                obj[:eht] = ppac[:einheit_swissmedic]
+                obj[:sub] = ppac[:substance_swissmedic]
               end
             end
             if obj[:ean][0..3] == '7680'
@@ -490,6 +498,9 @@ module Oddb2xml
                 #xml.REMD
                 #xml.REMF
               #}
+              xml.PackGrSwissmedic    obj[:siz] unless obj[:siz].empty?
+              xml.EinheitSwissmedic   obj[:eht] unless obj[:eht].empty?
+              xml.SubstanceSwissmedic obj[:sub] unless obj[:sub].empty?
             }
           end
           xml.RESULT {
