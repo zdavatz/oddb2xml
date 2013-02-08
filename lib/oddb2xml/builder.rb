@@ -534,12 +534,8 @@ module Oddb2xml
                 #xml.CDS01
                 #xml.CDS02
                 #xml.PRDNO
-                if pac
-                  if !pac[:swissmedic_category].empty?
-                    xml.SMCAT pac[:swissmedic_category]
-                  elsif ppac && ppac[:swissmedic_category]
-                    xml.SMCAT ppac[:swissmedic_category]
-                  end
+                if pac && ppac && ppac[:swissmedic_category]
+                  xml.SMCAT ppac[:swissmedic_category]
                 end
                 if pac
                   xml.SMNO no8.to_s unless no8.to_s.empty?
@@ -853,9 +849,7 @@ module Oddb2xml
                                             else
                                               '0'
                                             end
-            row << "%#{DAT_LEN[:CIKS]}s"  % if (pac && pac[:swissmedic_category] =~ /^[ABCDE]$/) # BAGXml
-                                              pac[:swissmedic_category]
-                                            elsif (no8 && @packs[no8])                           # Packungen.xls
+            row << "%#{DAT_LEN[:CIKS]}s"  % if (no8 && @packs[no8]) # Packungen.xls
                                               @packs[no8][:swissmedic_category]
                                             else
                                               '0'
