@@ -22,7 +22,7 @@ module Oddb2xml
         item[:desc_fr]      = (desc = seq.at_xpath('.//DescriptionFr')) ? desc.text : ''
         item[:name_de]      = (name = seq.at_xpath('.//NameDe'))        ? name.text : ''
         item[:name_fr]      = (name = seq.at_xpath('.//NameFr'))        ? name.text : ''
-        item[:swissmedic_number5] = (num5 = seq.at_xpath('.//SwissmedicNo5')) ? num5.text : ''
+        item[:swissmedic_number5] = (num5 = seq.at_xpath('.//SwissmedicNo5')) ? (num5.text.rjust(5,'0')) : ''
         item[:org_gen_code] = (orgc = seq.at_xpath('.//OrgGenCode'))    ? orgc.text : ''
         item[:deductible]   = (ddbl = seq.at_xpath('.//FlagSB20'))      ? ddbl.text : ''
         item[:atc_code]     = (atcc = seq.at_xpath('.//AtcCode'))       ? atcc.text : ''
@@ -55,7 +55,7 @@ module Oddb2xml
             item[:packages][phar] = {
               :pharmacode          => phar,
               :swissmedic_category => (cat = pac.at_xpath('.//SwissmedicCategory')) ? cat.text : '',
-              :swissmedic_number8  => (num = pac.at_xpath('.//SwissmedicNo8'))      ? num.text : '',
+              :swissmedic_number8  => (num = pac.at_xpath('.//SwissmedicNo8'))      ? num.text.rjust(8, '0') : '',
               :narcosis_flag       => (flg = pac.at_xpath('.//FlagNarcosis'))       ? flg.text : '',
               :prices              => {
                 :exf_price => {
@@ -147,7 +147,7 @@ module Oddb2xml
         item[:stat_date]       = (date = pac.at_xpath('.//SDATE'))  ? date.text : ''
         item[:lang]            = (lang = pac.at_xpath('.//LANG'))   ? lang.text : ''
         item[:desc]            = (dscr = pac.at_xpath('.//DSCR'))   ? dscr.text : ''
-        item[:atc_code]        = (code = pac.at_xpath('.//ATC'))    ? code.text : ''
+        item[:atc_code]        = (code = pac.at_xpath('.//ATC'))    ? code.text.to_s : ''
         # as quantity text
         item[:additional_desc] = (dscr = pac.at_xpath('.//ADDSCR')) ? dscr.text : ''
         if comp = pac.xpath('.//COMP')
@@ -155,7 +155,10 @@ module Oddb2xml
           item[:company_ean]  = (gln = comp.at_xpath('.//GLN'))  ? gln.text : ''
         end
         unless item[:pharmacode].empty?
-          data[item[:pharmacode]] = item
+          unless data[item[:pharmacode]] # pharmacode => GTINs
+            data[item[:pharmacode]] = []
+          end
+          data[item[:pharmacode]] << item
         end
       end
       data
@@ -197,11 +200,13 @@ module Oddb2xml
         ith     = 4    # :ith_swissmedic IT-Code (swissmedic-diff)
         atc     = 5    # :atc_code
         typ     = 6    # Heilmittelcode
-        @sheet.each do |row|
-          next if row[typ] == 'Tierarzneimittel'
+        @sheet.each_with_index do |row, i|
+          next if (i== 0 or row[typ] == 'Tierarzneimittel')
           no8 = extract_number(row, i_5).to_s + extract_number(row, i_3, /^\d{3}$/).to_s
           unless no8.empty?
+            ean_base12 = "7680#{no8}"
             data[no8.intern] = {
+              :ean                 => (ean_base12.ljust(12, '0') + calc_checksum(ean_base12)),
               :ith_swissmedic      => row[ith].to_s,
               :swissmedic_category => row[cat].to_s,
               :atc_code            => row[atc].to_s,
@@ -215,7 +220,8 @@ module Oddb2xml
     def extract_number(row, i, ptrn=/^\d{5}$/)
       begin
         return nil unless row[i]
-        number = row[i].to_i.to_s.gsub(/[^0-9]/, '')
+        row[i] = row[i].to_i if row[i].is_a? Float
+        number = row[i].to_s.gsub(/[^0-9]/, '')
         number = number.rjust(5, '0') if ptrn == /^\d{5}$/
         if number =~ ptrn
           return number
@@ -225,6 +231,16 @@ module Oddb2xml
       rescue NoMethodError
         nil
       end
+    end
+    def calc_checksum(str)
+      str = str.strip
+      sum = 0
+      val =   str.split(//u)
+      12.times do |idx|
+        fct = ((idx%2)*2)+1
+        sum += fct*val[idx].to_i
+      end
+      ((10-(sum%10))%10).to_s
     end
   end
   class MigelExtractor < Extractor
