@@ -146,7 +146,6 @@ module Oddb2xml
         @products = []
         @index['DE'].each_pair do |phar, indices|
           indices.each_with_index do |index, i|
-            obj = {}
             obj = {
               :seq => @items[phar],
               :pac => nil,
@@ -158,27 +157,27 @@ module Oddb2xml
               :ean => index[:ean],
               :atc => index[:atc_code],
               :ith => '',
-              # from Packungen.xls
               :siz => '',
               :eht => '',
               :sub => '',
             }
-            if obj[:seq] and obj[:pac] = obj[:seq][:packages][phar]
-              obj[:no8] = obj[:pac][:swissmedic_number8].to_s
-              obj[:atc] = obj[:pac][:atc_code].to_s
-              if obj[:no8] and ppac = @packs[obj[:no8].intern] # Packungen.xls
-                unless obj[:ean]
-                  obj[:ean] = ppac[:ean].to_s
-                end
-                # sync ATC-code via EAN
-                if obj[:ean] == ppac[:ean].to_s
-                  obj[:atc] = ppac[:atc_code].to_s
-                end
-                obj[:ith] = ppac[:ith_swissmedic]
-                obj[:siz] = ppac[:package_size]
-                obj[:eht] = ppac[:einheit_swissmedic]
-                obj[:sub] = ppac[:substance_swissmedic]
+            if obj[:ean] # via EAN-Code
+              obj[:no8] = obj[:ean][4..11]
+            end
+            if obj[:no8] and ppac = @packs[obj[:no8].intern] and # Packungen.xls
+               !ppac[:is_tier]
+              # If swissINDEX does not have EAN
+              if obj[:ean].nil? or obj[:ean].empty?
+                obj[:ean] = ppac[:ean].to_s
               end
+              # If swissINDEX dose not have ATC-Code
+              if obj[:atc].nil? or obj[:atc].empty?
+                obj[:atc] = ppac[:atc_code].to_s
+              end
+              obj[:ith] = ppac[:ith_swissmedic]
+              obj[:siz] = ppac[:package_size]
+              obj[:eht] = ppac[:einheit_swissmedic]
+              obj[:sub] = ppac[:substance_swissmedic]
             end
             if obj[:ean][0..3] == '7680'
               @products << obj
@@ -384,7 +383,6 @@ module Oddb2xml
           length = 0
           @products.each do |obj|
             seq = obj[:seq]
-            next unless seq # option
             length += 1
             xml.PRD('DT' => '') {
               xml.GTIN obj[:ean].to_s
@@ -529,15 +527,14 @@ module Oddb2xml
         ) {
           @articles.each do |obj|
             obj[:de].each_with_index do |de_idx, i|
-              fr_idx = obj[:fr][i] # swiss index FR
-              pac,no8 = nil,nil    # BAG XML (additional data)
-              ppac = nil           # Packungen
+              fr_idx = obj[:fr][i]              # swiss index FR
+              pac,no8 = nil,de_idx[:ean][4..11] # BAG XML (additional data)
+              ppac = nil                        # Packungen
               if obj[:seq]
                 pac = obj[:seq][:packages][de_idx[:pharmacode]]
-                if pac
-                  no8  = pac[:swissmedic_number8].intern
-                  ppac = @packs[no8]
-                end
+              end
+              if no8
+                ppac = ((_ppac = @packs[no8.intern] and !_ppac[:is_tier]) ? _ppac : nil)
               end
               xml.ART('DT' => '') {
                 xml.PHAR  de_idx[:pharmacode] unless de_idx[:pharmacode].empty?
@@ -545,10 +542,10 @@ module Oddb2xml
                 #xml.CDS01
                 #xml.CDS02
                 #xml.PRDNO
-                if pac && ppac && ppac[:swissmedic_category]
+                if ppac && ppac[:swissmedic_category]
                   xml.SMCAT ppac[:swissmedic_category]
                 end
-                if pac
+                if no8
                   xml.SMNO no8.to_s unless no8.to_s.empty?
                 end
                 #xml.HOSPCD
@@ -563,11 +560,9 @@ module Oddb2xml
                   xml.LIMPTS pac[:limitation_points] unless pac[:limitation_points].empty?
                 end
                 #xml.GRDFR
-                if pac
-                  if no8.empty? and
-                     no8.to_s =~ /(\d{5})(\d{3})/
-                    xml.COOL 1 if @fridges.include?($1.to_s)
-                  end
+                if no8 and !no8.empty? and
+                   no8.to_s =~ /(\d{5})(\d{3})/
+                  xml.COOL 1 if @fridges.include?($1.to_s)
                 end
                 #xml.TEMP
                 unless de_idx[:ean].empty?
@@ -860,12 +855,12 @@ module Oddb2xml
                                             else
                                               '0'
                                             end
-            row << "%#{DAT_LEN[:CIKS]}s"  % if (no8 && @packs[no8]) # Packungen.xls
+            row << "%#{DAT_LEN[:CIKS]}s"  % if (no8 && @packs[no8] && !@packs[no8][:is_tier]) # Packungen.xls
                                               @packs[no8][:swissmedic_category]
                                             else
                                               '0'
                                             end.gsub(/(\+|\s)/, '')
-            row << "%0#{DAT_LEN[:ITHE]}d" % if (no8 && @packs[no8])
+            row << "%0#{DAT_LEN[:ITHE]}d" % if (no8 && @packs[no8] && !@packs[no8][:is_tier])
                                               format_date(@packs[no8][:ith_swissmedic])
                                             else
                                               ('0' * DAT_LEN[:ITHE])

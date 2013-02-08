@@ -204,7 +204,7 @@ module Oddb2xml
         eht     = 12   # :einheit_swissmedic
         sub     = 14   # :substance_swissmedic
         @sheet.each_with_index do |row, i|
-          next if (i== 0 or row[typ] == 'Tierarzneimittel')
+          next if (i== 0)
           no8 = extract_number(row, i_5).to_s + extract_number(row, i_3, /^\d{3}$/).to_s
           unless no8.empty?
             ean_base12 = "7680#{no8}"
@@ -216,6 +216,7 @@ module Oddb2xml
               :package_size         => row[siz].to_s,
               :einheit_swissmedic   => row[eht].to_s,
               :substance_swissmedic => row[sub].to_s,
+              :is_tier              => (row[typ] == 'Tierarzneimittel' ? true : false),
             }
           end
         end
