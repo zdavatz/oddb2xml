@@ -1,3 +1,7 @@
+=== 1.3.8 / 09.02.2013
+
+* Add valid INDEX entries to product.xml
+
 === 1.3.7 / 08.02.2013
 
 * Add more Tags to product.xml from Packungen.xls
