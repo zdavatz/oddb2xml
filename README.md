@@ -229,7 +229,7 @@ You can confirm wit `ruby -ropenssl -e 'p OpenSSL::X509::DEFAULT_CERT_FILE'`.
 3. Click "Advanced" Tab.
 4. Click "Environment Variables" button.
 5. Add set variable entry "SSL\_CERT\_FILE=%HOMEPATH%\cacert.pem"
-  * Variable name: SSL\_CCERT\_FILE
+  * Variable name: SSL\_CERT\_FILE
   * Variable value: %HOMEPATH%\cacert.pem
   * with "New..." button into upper are "User variables for xxx"
 6. Do not remove this cacert.pem. All SSLv3 connections use this file.
