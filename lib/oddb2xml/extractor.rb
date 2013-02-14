@@ -5,11 +5,31 @@ require 'spreadsheet'
 require 'stringio'
 
 module Oddb2xml
+  module TxtExtractorMethods
+    def initialize(str)
+      @io = StringIO.new(str)
+    end
+    def to_hash
+      data = {}
+      while line = @io.gets
+        next unless line =~ /\d{13}/
+        ean = line.chomp.gsub("\"", '')
+        data[ean] = true
+      end
+      data
+    end
+  end
   class Extractor
     attr_accessor :xml
     def initialize(xml)
       @xml = xml
     end
+  end
+  class BMUpdateExtractor < Extractor
+    include TxtExtractorMethods
+  end
+  class LppvExtractor < Extractor
+    include TxtExtractorMethods
   end
   class BagXmlExtractor < Extractor
     def to_hash
@@ -167,21 +187,21 @@ module Oddb2xml
   class SwissmedicExtractor < Extractor
     def initialize(bin, type)
       io = StringIO.new(bin)
-      book = Spreadsheet.open(io)
+      book = Spreadsheet.open(io, 'rb')
       @sheet = book.worksheet(0)
       @type  = type
     end
     def to_arry
       data = []
       case @type
-      when :orphans
+      when :orphan
         i = 1
         @sheet.each do |row|
           if number = extract_number(row, i)
             data << number.to_s
           end
         end
-      when :fridges
+      when :fridge
         i,c = 1,7
         @sheet.each do |row|
           if number = extract_number(row, i) and row[c] and row[c].to_s == 'x'
@@ -194,7 +214,7 @@ module Oddb2xml
     def to_hash # Packungen.xls
       data = {}
       case @type
-      when :packages
+      when :package
         typ = 6 # Heilmittelcode
         i_5,i_3 = 0,10 # :swissmedic_numbers
         cat     = 13   # :swissmedic_category
@@ -253,13 +273,13 @@ module Oddb2xml
   class MigelExtractor < Extractor
     def initialize(bin)
       io = StringIO.new(bin)
-      book = Spreadsheet.open(io)
+      book = Spreadsheet.open(io, 'rb')
       @sheet = book.worksheet(0)
     end
     def to_hash
       data = {}
       @sheet.each_with_index do |row, i|
-        next if i == 0
+        next if i.zero?
         phar = row[1].to_s
         data[phar] = {
           :ean             => row[0].to_i.to_s,
@@ -328,25 +348,53 @@ module Oddb2xml
       data
     end
   end
-  # txt files
-  module TxtMethods
-    def initialize(str)
-      @io = StringIO.new(str)
+  class MedregbmExtractor < Extractor
+    def initialize(str, type)
+      @io   = StringIO.new(str)
+      @type = type
     end
     def to_hash
       data = {}
-      while line = @io.gets
-        next unless line =~ /\d{13}/
-        ean = line.chomp.gsub("\"", '')
-        data[ean] = true
+      case @type
+      when :company
+        while line = @io.gets
+          row = line.chomp.split("\t")
+          next if row[0] =~ /^GLN/
+          gln = row[0].to_s
+          data[gln] = {
+            :gln     => gln,          #=> GLN Betrieb
+            :name_1  => row[1].to_s,  #=> Betriebsname 1
+            :name_2  => row[2].to_s,  #=> Betriebsname 2
+            :address => row[3].to_s,  #=> Strasse
+            :number  => row[4].to_s,  #=> Nummer
+            :post    => row[5].to_s,  #=> PLZ
+            :place   => row[6].to_s,  #=> Ort
+            :region  => row[7].to_s,  #=> Bewilligungskanton
+            :country => row[8].to_s,  #=> Land
+            :type    => row[9].to_s,  #=> Betriebstyp
+            :authorization => row[10].to_s, #=> BTM Berechtigung
+          }
+        end
+      when :person
+        while line = @io.gets
+          row = line.chomp.split("\t")
+          next if row[0] =~ /^GLN/
+          gln = row[0].to_s
+          data[gln] = {
+            :gln           => gln,         #=> GLN Person
+            :last_name     => row[1].to_s, #=> Name
+            :first_name    => row[2].to_s, #=> Vorname
+            :post          => row[3].to_s, #=> PLZ
+            :place         => row[4].to_s, #=> Ort
+            :region        => row[5].to_s, #=> Bewilligungskanton
+            :country       => row[6].to_s, #=> Land
+            :license       => row[7].to_s, #=> Bewilligung Selbstdispensation
+            :certificate   => row[8].to_s, #=> Diplom
+            :authorization => row[9].to_s, #=> BTM Berechtigung
+          }
+        end
       end
       data
     end
-  end
-  class BMUpdateExtractor < Extractor
-    include TxtMethods
-  end
-  class LppvExtractor < Extractor
-    include TxtMethods
   end
 end

@@ -5,6 +5,25 @@ require 'zip/zip'
 require 'savon'
 
 module Oddb2xml
+  module DownloadMethod
+    private
+    def download_as(file, option='r')
+      begin
+        response = @agent.get(@url)
+        response.save_as(file)
+        response = nil # win
+        io = File.open(file, option)
+        return io.read
+      rescue Timeout::Error
+        retrievable? ? retry : raise
+      ensure
+        io.close if io and !io.closed? # win
+        if File.exists?(file)
+          File.unlink(file)
+        end
+      end
+    end
+  end
   class Downloader
     def initialize(options={}, url=nil)
       @options     = options
@@ -54,6 +73,53 @@ module Oddb2xml
         end
       end
       xml
+    end
+  end
+  class MigelDownloader < Downloader
+    include DownloadMethod
+    def download
+      @url ||= 'https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls'
+      download_as('oddb2xml_files_nonpharma.xls', 'rb')
+    end
+  end
+  class EphaDownloader < Downloader
+    include DownloadMethod
+    def download
+      @url ||= 'http://community.epha.ch/interactions_de_utf8.csv'
+      download_as('epha_interactions.csv', 'r')
+    end
+  end
+  class BMUpdateDownloader < Downloader
+    include DownloadMethod
+    def download
+      @url ||= 'https://raw.github.com/zdavatz/oddb2xml_files/master/BM_Update.txt'
+      download_as('oddb2xml_files_bm_update.txt', 'r')
+    end
+  end
+  class LppvDownloader < Downloader
+    include DownloadMethod
+    def download
+      @url ||= 'https://raw.github.com/zdavatz/oddb2xml_files/master/LPPV.txt'
+      download_as('oddb2xml_files_lppv.txt', 'r')
+    end
+  end
+  class MedregbmDownloader < Downloader
+    include DownloadMethod
+    def initialize(type=:company)
+      @type = type
+      case @type
+      when :company # betrieb
+        action = 'CreateExcelListBetriebs'
+      when :person  # medizinalperson
+        action = 'CreateExcelListMedizinalPersons'
+      else
+        action = ''
+      end
+      url = "https://www.medregbm.admin.ch/Publikation/#{action}"
+      super({}, url)
+    end
+    def download
+      download_as("medregbm_#{@type.to_s}.txt", 'r:iso-8859-1:utf-8')
     end
   end
   class BagXmlDownloader < Downloader
@@ -131,16 +197,16 @@ XML
     end
   end
   class SwissmedicDownloader < Downloader
-    def initialize(type=:orphans)
+    def initialize(type=:orphan)
       @type = type
       case @type
-      when :orphans
+      when :orphan
         action = "daten/00081/index.html?lang=de"
         @xpath = "//div[@id='sprungmarke0_4']//a[@title='Humanarzneimittel']"
-      when :fridges
+      when :fridge
         action = "daten/00080/00254/index.html?lang=de"
         @xpath = "//table[@class='swmTableFlex']//a[@title='B3.1.35-d.xls']"
-      when :packages
+      when :package
         action = "daten/00080/00251/index.html?lang=de"
         @xpath = "//div[@id='sprungmarke0_7']//a[@title='Excel-Version Zugelassene Verpackungen*']"
       end
@@ -163,29 +229,6 @@ XML
         retrievable? ? retry : raise
       ensure
         io.close if io and !io.closed?
-        if File.exists?(file)
-          File.unlink(file)
-        end
-      end
-    end
-  end
-  class MigelDownloader < Downloader
-    def init
-      super
-      @url ||= 'https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls'
-    end
-    def download
-      file = "oddb2xml_files_nonpharma.xls"
-      begin
-        response = @agent.get(@url)
-        response.save_as(file)
-        response = nil # win
-        io = File.open(file, 'rb')
-        return io.read
-      rescue Timeout::Error
-        retrievable? ? retry : raise
-      ensure
-        io.close if io and !io.closed? # win
         if File.exists?(file)
           File.unlink(file)
         end
@@ -233,70 +276,6 @@ XML
           end
         end
       end
-    end
-  end
-  class EphaDownloader < Downloader
-    def init
-      super
-      @url ||= 'http://community.epha.ch/interactions_de_utf8.csv'
-    end
-    def download
-      file = "epha_interactions.csv"
-      begin
-        response = @agent.get(@url)
-        response.save_as(file)
-        response = nil # win
-        io = File.open(file, 'r')
-        return io.read
-      rescue Timeout::Error
-        retrievable? ? retry : raise
-      ensure
-        io.close if io and !io.closed? # win
-        if File.exists?(file)
-          File.unlink(file)
-        end
-      end
-    end
-  end
-  # txt filse
-  module TxtDownloadMethods
-    def download_as(file)
-      begin
-        response = @agent.get(@url)
-        response.save_as(file)
-        response = nil # win
-        io = File.open(file, 'r')
-        return io.read
-      rescue Timeout::Error
-        retrievable? ? retry : raise
-      ensure
-        io.close if io and !io.closed? # win
-        if File.exists?(file)
-          File.unlink(file)
-        end
-      end
-    end
-  end
-  class BMUpdateDownloader < Downloader
-    include TxtDownloadMethods
-    def init
-      super
-      @url ||= 'https://raw.github.com/zdavatz/oddb2xml_files/master/BM_Update.txt'
-    end
-    def download
-      file = 'oddb2xml_files_bm_update.txt'
-      download_as(file)
-    end
-  end
-  class LppvDownloader < Downloader
-    include TxtDownloadMethods
-    def init
-      super
-      @url ||= 'https://raw.github.com/zdavatz/oddb2xml_files/master/LPPV.txt'
-    end
-    def download
-      file = 'oddb2xml_files_lppv.txt'
-      download_as(file)
     end
   end
 end

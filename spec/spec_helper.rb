@@ -25,6 +25,7 @@ module ServerMockHelper
     setup_bm_update_server_mock
     setup_lppv_server_mock
     setup_migel_server_mock
+    setup_medregbm_server_mock
   end
   def setup_bag_xml_server_mock
     # zip
@@ -197,6 +198,32 @@ module ServerMockHelper
       to_return(
         :status  => 200,
         :headers => {'Content-Type' => 'application/octet-stream; charset=utf-8'},
+        :body    => stub_response)
+  end
+  def setup_medregbm_server_mock
+    # txt betrieb
+    stub_txt_url = 'https://www.medregbm.admin.ch/Publikation/CreateExcelListBetriebs'
+    stub_response = File.read(File.expand_path('../data/medregbm_betrieb.txt', __FILE__))
+    stub_request(:get, stub_txt_url).
+      with(:headers => {
+        'Accept' => '*/*',
+        'Host'   => 'www.medregbm.admin.ch',
+      }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'text/plain; charset=utf-8'},
+        :body    => stub_response)
+    stub_txt_url = 'https://www.medregbm.admin.ch/Publikation/CreateExcelListMedizinalPersons'
+    # txt person
+    stub_response = File.read(File.expand_path('../data/medregbm_person.txt', __FILE__))
+    stub_request(:get, stub_txt_url).
+      with(:headers => {
+        'Accept' => '*/*',
+        'Host'   => 'www.medregbm.admin.ch',
+      }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'text/plain; charset=utf-8'},
         :body    => stub_response)
   end
 end

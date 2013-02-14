@@ -15,6 +15,7 @@ module Oddb2xml
     def initialize(args)
       @options = args
       @mutex = Mutex.new
+      # product
       @items = {} # Items from Preparations.xml in BAG
       @index = {} # Base index from swissINDEX
       @flags = {} # narcotics flag files repo
@@ -25,6 +26,9 @@ module Oddb2xml
       @actions = [] # [addition] interactions from epha
       @orphans = [] # [addition] Orphaned drugs from Swissmedic xls
       @fridges = [] # [addition] ReFridge drugs from Swissmedic xls
+      # addres
+      @companies = {} # betrieb
+      @people    = {} # medizinalperson
       LANGUAGES.each do |lang|
         @index[lang] = {}
       end
@@ -32,25 +36,31 @@ module Oddb2xml
     end
     def run
       threads = []
-      if @options[:format] != :dat
-        if @options[:fi]
-          threads << download(:fachinfo) # swissmedic-info
+      if @options[:address]
+        [:company, :person].each do |type|
+          threads << download(type) # medregbm.admin
         end
-        [:orphan, :fridge].each do |type|
-          threads << download(type) # swissmedic
+      else
+        if @options[:format] != :dat
+          if @options[:fi]
+            threads << download(:fachinfo) # swissmedic-info
+          end
+          [:orphan, :fridge].each do |type|
+            threads << download(type) # swissmedic
+          end
+          threads << download(:interaction) # epha
         end
-        threads << download(:interaction) # epha
-      end
-      if @options[:nonpharma]
-        threads << download(:migel) # oddb2xml_files
-      end
-      threads << download(:package) # swissmedic
-      threads << download(:bm_update) # oddb2xml_files
-      threads << download(:lppv) # oddb2xml_files
-      threads << download(:bag) # bag.e-mediat
-      LANGUAGES.each do |lang|
-        types.each do |type|
-          threads << download(:index, type, lang) # swissindex
+        if @options[:nonpharma]
+          threads << download(:migel) # oddb2xml_files
+        end
+        threads << download(:package) # swissmedic
+        threads << download(:bm_update) # oddb2xml_files
+        threads << download(:lppv) # oddb2xml_files
+        threads << download(:bag) # bag.e-mediat
+        LANGUAGES.each do |lang|
+          types.each do |type|
+            threads << download(:index, type, lang) # swissindex
+          end
         end
       end
       begin
@@ -75,32 +85,38 @@ module Oddb2xml
       begin
         files.each_pair do |sbj, file|
           builder = Builder.new do |builder|
-            if @options[:format] != :dat
-              index = {}
-              LANGUAGES.each do |lang|
-                index[lang] = {} unless index[lang]
-                types.each do |type|
-                  index[lang].merge!(@index[lang][type]) if @index[lang][type]
+            if @options[:address]
+              builder.subject   = sbj
+              builder.companies = @companies
+              builder.people    = @people
+            else # product
+              if @options[:format] != :dat
+                index = {}
+                LANGUAGES.each do |lang|
+                  index[lang] = {} unless index[lang]
+                  types.each do |type|
+                    index[lang].merge!(@index[lang][type]) if @index[lang][type]
+                  end
                 end
+                builder.index = index
+                builder.subject = sbj
               end
-              builder.index = index
-              builder.subject = sbj
-            end
-            # common sources
-            builder.items = @items
-            builder.flags = @flags
-            builder.lppvs = @lppvs
-            # optional sources
-            builder.infos = @infos
-            builder.packs = @packs
-            # additional sources
-            %w[actions orphans fridges migel].each do |addition|
-              builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
+              # common sources
+              builder.items = @items
+              builder.flags = @flags
+              builder.lppvs = @lppvs
+              # optional sources
+              builder.infos = @infos
+              builder.packs = @packs
+              # additional sources
+              %w[actions orphans fridges migel].each do |addition|
+                builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
+              end
             end
             builder.tag_suffix = @options[:tag_suffix]
           end
           output = ''
-          if @options[:format] == :dat
+          if !@options[:address] and (@options[:format] == :dat)
             types.each do |type|
               index = {}
               LANGUAGES.each do |lang|
@@ -131,6 +147,16 @@ module Oddb2xml
     end
     def download(what, type=nil, lang=nil)
       case what
+      when :company, :person
+        var = (what == :company ? 'companies' : 'people')
+        Thread.new do
+          downloader = MedregbmDownloader.new(what)
+          str = downloader.download
+          self.instance_variable_set(
+            "@#{var}".intern,
+            MedregbmExtractor.new(str, what).to_hash
+          )
+        end
       when :fachinfo
         Thread.new do
           downloader = SwissmedicInfoDownloader.new
@@ -141,13 +167,13 @@ module Oddb2xml
           end
         end
       when :orphan, :fridge
-        type = (what.to_s + "s").intern
+        var = what.to_s + 's'
         Thread.new do
-          downloader = SwissmedicDownloader.new(type)
+          downloader = SwissmedicDownloader.new(what)
           bin = downloader.download
           self.instance_variable_set(
-            "@#{type.to_s}".intern,
-            SwissmedicExtractor.new(bin, type).to_arry
+            "@#{var}".intern,
+            SwissmedicExtractor.new(bin, what).to_arry
           )
         end
       when :interaction
@@ -168,10 +194,10 @@ module Oddb2xml
         end
       when :package
         Thread.new do
-          downloader = SwissmedicDownloader.new(:packages)
+          downloader = SwissmedicDownloader.new(:package)
           bin = downloader.download
           @mutex.synchronize do
-            @packs = SwissmedicExtractor.new(bin, :packages).to_hash
+            @packs = SwissmedicExtractor.new(bin, :package).to_hash
           end
         end
       when :bm_update
@@ -231,7 +257,10 @@ module Oddb2xml
     def files
       unless @_files
         @_files = {}
-        if @options[:format] == :dat
+        if @options[:address]
+          @_files[:company] = "#{prefix}_betrieb.xml"
+          @_files[:person]  = "#{prefix}_medizinalperson.xml"
+        elsif @options[:format] == :dat
           @_files[:dat] = "#{prefix}.dat"
           if @options[:nonpharma] # into one file
             @_files[:dat] = "#{prefix}_with_migel.dat"
@@ -255,18 +284,20 @@ module Oddb2xml
       @_prefix ||= (@options[:tag_suffix] || 'oddb').gsub(/^_|_$/, '').downcase
     end
     def report
-      lines = []
-      LANGUAGES.each do |lang|
-        lines << lang
-        types.each do |type|
-          key = (type == :nonpharma ? 'NonPharma' : 'Pharma')
-          if @index[lang][type]
-            lines << sprintf(
-              "\t#{key} products: %i", @index[lang][type].values.length)
+      unless @options[:address]
+        lines = []
+        LANGUAGES.each do |lang|
+          lines << lang
+          types.each do |type|
+            key = (type == :nonpharma ? 'NonPharma' : 'Pharma')
+            if @index[lang][type]
+              lines << sprintf(
+                "\t#{key} products: %i", @index[lang][type].values.length)
+            end
           end
         end
+        puts lines.join("\n")
       end
-      puts lines.join("\n")
     end
     def types # swissindex
       @_types ||=

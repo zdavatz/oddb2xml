@@ -17,21 +17,23 @@ Usage:
     -c F, --compress=F   Compress format F. {tar.gz|zip}
     -f F, --format=F     File format F, default is xml. {xml|dat}
                          If F is given, -o option is ignored.
-    -o O, --optional=O   Optional output. O, only 'fi' is available.
+    -o O, --option=O     Optional output. O, only 'fi' is available.
     -i I, --include=I    Include target option for 'dat' format. only 'ean14' is available.
                          'xml' format includes always ean14 records.
     -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9]
                          If S is given, it is also used as prefix of filename.
+    -x X, --context      context for address (betrieb and person).
     -h,   --help         Show this help message.
 EOS
 end
 
 parser = OptionParser.new
 opts = {
+  :fi           => false,
+  :adr          => false,
   :nonpharma    => false,
   :compress_ext => nil,
   :format       => :xml,
-  :fi           => false,
   :tag_suffix   => nil,
   :debug        => false,
   :ean14        => false,
@@ -40,9 +42,10 @@ opts = {
 parser.on('-a v', '--append v',     /^nonpharma$/)  {|v| opts[:nonpharma] = true }
 parser.on('-c v', '--compress v',   /^tar\.gz|zip$/){|v| opts[:compress_ext] = v }
 parser.on('-f v', '--format v',     /^xml|dat$/)    {|v| opts[:format] = v.intern }
-parser.on('-o v', '--optional v',   /^fi$/)         {|v| opts[:fi] = true }
+parser.on('-o v', '--option v',     /^fi$/)         {|v| opts[:fi] = true }
 parser.on('-i v', '--include v',    /^ean14$/)      {|v| opts[:ean14] = true }
 parser.on('-t v', '--tag-suffix v', /^[A-z0-9]*$/i) {|v| opts[:tag_suffix] = v.upcase }
+parser.on('-x v', '--context v',    /^addr(ess)*$/i){|v| opts[:address] = true }
 #parser.on('--debug') {|v| opts[:debug] = true }
 parser.on_tail('-h', '--help') { puts help; exit }
 

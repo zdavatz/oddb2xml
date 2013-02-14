@@ -20,7 +20,8 @@ module Oddb2xml
     attr_accessor :subject, :index, :items, :flags, :lppvs,
                   :actions, :migel, :orphans, :fridges,
                   :infos, :packs,
-                  :ean14, :tag_suffix
+                  :ean14, :tag_suffix,
+                  :companies, :people
     def initialize
       @subject    = nil
       @index      = {}
@@ -34,6 +35,8 @@ module Oddb2xml
       @orphans    = []
       @fridges    = []
       @ean14      = true
+      @companies  = {}
+      @people     = {}
       @tag_suffix = nil
       if block_given?
         yield self
@@ -759,6 +762,77 @@ module Oddb2xml
           xml.RESULT {
             xml.OK_ERROR   'OK'
             xml.NBR_RECORD length
+            xml.ERROR_CODE ''
+            xml.MESSAGE    ''
+          }
+        }
+      end
+      _builder.to_xml
+    end
+    def build_company
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T.%7N%z')
+        xml.Betriebe(
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'VALID_DATE'        => datetime,
+        ) {
+          @companies.each_pair do |ean, c|
+            xml.Betrieb('DT' => '') {
+              xml.GLN_Betrieb        ean unless ean.empty?
+              xml.Betriebsname_1     c[:name_1]  unless c[:name_1].empty?
+              xml.Betriebsname_2     c[:name_2]  unless c[:name_2].empty?
+              xml.Strasse            c[:address] unless c[:address].empty?
+              xml.Nummer             c[:number]  unless c[:number].empty?
+              xml.PLZ                c[:post]    unless c[:post].empty?
+              xml.Ort                c[:place]   unless c[:place].empty?
+              xml.Bewilligungskanton c[:region]  unless c[:region].empty?
+              xml.Land               c[:country] unless c[:country].empty?
+              xml.Betriebstyp        c[:type]    unless c[:type].empty?
+              xml.BTM_Berechtigung   c[:authorization] unless c[:authorization].empty?
+            }
+          end
+          xml.RESULT {
+            xml.OK_ERROR   'OK'
+            xml.NBR_RECORD @companies.values.length
+            xml.ERROR_CODE ''
+            xml.MESSAGE    ''
+          }
+        }
+      end
+      _builder.to_xml
+    end
+    def build_person
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T.%7N%z')
+        xml.Personen(
+          'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
+          'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
+          'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
+          'CREATION_DATETIME' => datetime,
+          'VALID_DATE'        => datetime,
+        ) {
+          @people.each_pair do |ean, p|
+            xml.Person('DT' => '') {
+              xml.GLN_Person         ean unless ean.empty?
+              xml.Name               p[:last_name]     unless p[:last_name].empty?
+              xml.Vorname            p[:first_name]    unless p[:first_name].empty?
+              xml.PLZ                p[:post]          unless p[:post].empty?
+              xml.Ort                p[:place]         unless p[:place].empty?
+              xml.Bewilligungskanton p[:region]        unless p[:region].empty?
+              xml.Land               p[:country]       unless p[:country].empty?
+              xml.Bewilligung_Selbstdispensation p[:lincense] unless p[:license].empty?
+              xml.Diplom             p[:certificate]   unless p[:certificate].empty?
+              xml.BTM_Berechtigung   p[:authorization] unless p[:authorization].empty?
+            }
+          end
+          xml.RESULT {
+            xml.OK_ERROR   'OK'
+            xml.NBR_RECORD @people.values.length
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }

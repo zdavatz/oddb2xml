@@ -87,13 +87,13 @@ end
 
 describe Oddb2xml::SwissmedicDownloader do
   include ServerMockHelper
-  context 'orphans' do
+  context 'orphan' do
     before(:each) do
       setup_swissmedic_server_mock
-      @downloader = Oddb2xml::SwissmedicDownloader.new(:orphans)
+      @downloader = Oddb2xml::SwissmedicDownloader.new(:orphan)
     end
     it_behaves_like 'any downloader'
-    context 'download_by for orphans xls' do
+    context 'download_by for orphan xls' do
       let(:bin) { @downloader.download }
       it 'should return valid Binary-String' do
         bin.should be_a String
@@ -101,16 +101,16 @@ describe Oddb2xml::SwissmedicDownloader do
       end
       it 'should clean up current directory' do
         bin.should_not raise_error(Timeout::Error)
-        File.exist?('oddb_orphans.xls').should be(false)
+        File.exist?('oddb_orphan.xls').should be(false)
       end
     end
   end
-  context 'fridges' do
+  context 'fridge' do
     before(:each) do
       setup_swissmedic_server_mock
-      @downloader = Oddb2xml::SwissmedicDownloader.new(:fridges)
+      @downloader = Oddb2xml::SwissmedicDownloader.new(:fridge)
     end
-    context 'download_by for fridges xls' do
+    context 'download_by for fridge xls' do
       let(:bin) { @downloader.download }
       it 'should return valid Binary-String' do
         bin.should be_a String
@@ -118,16 +118,16 @@ describe Oddb2xml::SwissmedicDownloader do
       end
       it 'should clean up current directory' do
         bin.should_not raise_error(Timeout::Error)
-        File.exist?('oddb_fridges.xls').should be(false)
+        File.exist?('oddb_fridge.xls').should be(false)
       end
     end
   end
-  context 'packages' do
+  context 'package' do
     before(:each) do
       setup_swissmedic_server_mock
-      @downloader = Oddb2xml::SwissmedicDownloader.new(:packages)
+      @downloader = Oddb2xml::SwissmedicDownloader.new(:package)
     end
-    context 'download_by for packages xls' do
+    context 'download_by for package xls' do
       let(:bin) { @downloader.download }
       it 'should return valid Binary-String' do
         bin.should be_a String
@@ -135,7 +135,7 @@ describe Oddb2xml::SwissmedicDownloader do
       end
       it 'should clean up current directory' do
         bin.should_not raise_error(Timeout::Error)
-        File.exist?('oddb_packages.xls').should be(false)
+        File.exist?('oddb_package.xls').should be(false)
       end
     end
   end
@@ -242,6 +242,45 @@ describe Oddb2xml::MigelDownloader do
     it 'should clean up current directory' do
       bin.should_not raise_error(Timeout::Error)
       File.exist?('oddb2xml_files_nonpharma.txt').should be(false)
+    end
+  end
+end
+
+describe Oddb2xml::MedregbmDownloader do
+  include ServerMockHelper
+  context 'betrieb' do
+    before(:each) do
+      setup_medregbm_server_mock
+      @downloader = Oddb2xml::MedregbmDownloader.new(:company)
+    end
+    it_behaves_like 'any downloader'
+    context 'download betrieb txt' do
+      let(:txt) { @downloader.download }
+      it 'should return valid String' do
+        txt.should be_a String
+        txt.bytes.should_not nil
+      end
+      it 'should clean up current directory' do
+        txt.should_not raise_error(Timeout::Error)
+        File.exist?('oddb_company.xls').should be(false)
+      end
+    end
+  end
+  context 'person' do
+    before(:each) do
+      setup_medregbm_server_mock
+      @downloader = Oddb2xml::MedregbmDownloader.new(:person)
+    end
+    context 'download person txt' do
+      let(:txt) { @downloader.download }
+      it 'should return valid String' do
+        txt.should be_a String
+        txt.bytes.should_not nil
+      end
+      it 'should clean up current directory' do
+        txt.should_not raise_error(Timeout::Error)
+        File.exist?('oddb_person.xls').should be(false)
+      end
     end
   end
 end
