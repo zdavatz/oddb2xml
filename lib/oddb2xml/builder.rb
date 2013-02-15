@@ -825,7 +825,7 @@ module Oddb2xml
               xml.Ort                p[:place]         unless p[:place].empty?
               xml.Bewilligungskanton p[:region]        unless p[:region].empty?
               xml.Land               p[:country]       unless p[:country].empty?
-              xml.Bewilligung_Selbstdispensation p[:lincense] unless p[:license].empty?
+              xml.Bewilligung_Selbstdispensation p[:license] unless p[:license].empty?
               xml.Diplom             p[:certificate]   unless p[:certificate].empty?
               xml.BTM_Berechtigung   p[:authorization] unless p[:authorization].empty?
             }
