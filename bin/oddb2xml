@@ -22,7 +22,7 @@ Usage:
                          'xml' format includes always ean14 records.
     -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9]
                          If S is given, it is also used as prefix of filename.
-    -x X, --context      context for address (betrieb and person).
+    -x N, --context=N    context N {product|address}. product is default.
     -h,   --help         Show this help message.
 EOS
 end
