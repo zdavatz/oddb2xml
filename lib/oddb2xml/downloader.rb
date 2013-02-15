@@ -38,6 +38,12 @@ module Oddb2xml
       @agent.redirect_ok         = true
       @agent.redirection_limit   = 5
       @agent.follow_meta_refresh = true
+      if RUBY_PLATFORM =~ /mswin|mingw|bccwin|cygwin/i and
+         ENV['SSL_CERT_FILE'].nil?
+        cert_store = OpenSSL::X509::Store.new
+        cert_store.add_file(File.expand_path('../../../tools/cacert.pem', __FILE__))
+        @agent.cert_store = cert_store
+      end
     end
     protected
     def retrievable?

@@ -29,7 +29,6 @@ Hoe.spec 'oddb2xml' do
   # gem.add_development_dependency
   self.extra_dev_deps << ['rspec']
   self.extra_dev_deps << ['webmock']
-  self.extra_dev_deps << ['ZenTest']
 
   self.extra_dev_deps << ['hoe', '>= 3.4']
   self.extra_dev_deps << ['rdoc']

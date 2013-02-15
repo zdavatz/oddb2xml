@@ -10,7 +10,6 @@ gem 'spreadsheet'
 group :development do
   gem 'rspec'
   gem 'webmock'
-  gem 'ZenTest'
 
   gem 'hoe', '>= 3.4'
   gem 'rdoc'

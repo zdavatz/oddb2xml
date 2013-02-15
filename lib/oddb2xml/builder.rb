@@ -112,16 +112,16 @@ module Oddb2xml
     end
     def prepare_limitations
       unless @limitations
-        @limitations = []
+        limitations = []
         @items.values.uniq.each do |seq|
           seq[:packages].each_value do |pac|
-            @limitations += pac[:limitations]
+            limitations += pac[:limitations]
           end
         end
         # ID is no longer fixed TAG (swissmedicNo8, swissmedicNo5, pharmacode)
         # limitation.xml needs all duplicate entries by this keys.
-        @limitations.uniq! {|lim| lim[:id] + lim[:code] + lim[:type] }
-        @limitations.sort_by!{|lim| lim[:code] }
+        limitations.uniq! {|lim| lim[:id] + lim[:code] + lim[:type] }
+        @limitations = limitations.sort_by {|lim| lim[:code] }
       end
     end
     def prepare_interactions
@@ -194,18 +194,18 @@ module Oddb2xml
       prepare_substances
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.SUBSTANCE(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
           'PROD_DATE'         => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           @substances.each_with_index do |sub_name, i|
             xml.SB('DT' => '') {
-              xml.SUBNO (i + 1).to_i
+              xml.SUBNO((i + 1).to_i)
               #xml.NAMD
               #xml.ANAMD
               #xml.NAMF
@@ -226,14 +226,14 @@ module Oddb2xml
       prepare_limitations
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.LIMITATION(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
           'PROD_DATE'         => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           @limitations.each do |lim|
             xml.LIM('DT' => '') {
@@ -243,7 +243,7 @@ module Oddb2xml
               when :swissmedic_number5
                 xml.SwissmedicNo5 lim[:id]
               when :pharmacode
-                xml.Pharmacode lim[:id]
+                xml.Pharmacode    lim[:id]
               end
               xml.IT         lim[:it]
               xml.LIMTYP     lim[:type]
@@ -273,14 +273,14 @@ module Oddb2xml
       prepare_codes
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.INTERACTION(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
           'PROD_DATE'         => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           @interactions.sort_by{|ix| ix[:ixno] }.each do |ix|
             xml.IX('DT' => '') {
@@ -334,14 +334,14 @@ module Oddb2xml
       prepare_codes
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.CODE(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
           'PROD_DATE'         => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           @codes.each_pair do |val, definition|
             xml.CD('DT' => '') {
@@ -353,7 +353,7 @@ module Oddb2xml
               #xml.DSCRMF
               #xml.DSCRD
               #xml.DSCRF
-              xml.DEL false
+              xml.DEL     false
             }
           end
           xml.RESULT {
@@ -373,14 +373,14 @@ module Oddb2xml
       prepare_codes
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.PRODUCT(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
           'PROD_DATE'         => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           list = []
           length = 0
@@ -393,7 +393,7 @@ module Oddb2xml
                 %w[de fr].each do |l|
                   name = "name_#{l}".intern
                   desc = "desc_#{l}".intern
-                  elem = "DSCR" + l[0].upcase
+                  elem = "DSCR" + l[0].chr.upcase
                   if !seq[name].empty? and !seq[desc].empty?
                     xml.send(elem, seq[name] + ' ' + seq[desc])
                   elsif !seq[desc].empty?
@@ -471,7 +471,7 @@ module Oddb2xml
                   seq[:substances].each do |sub|
                     xml.CPTCMP {
                       xml.LINE  sub[:index]    unless sub[:index].empty?
-                      xml.SUBNO @substances.index(sub[:name]) + 1 if @substances.include?(sub[:name])
+                      xml.SUBNO(@substances.index(sub[:name]) + 1) if @substances.include?(sub[:name])
                       xml.QTY   sub[:quantity] unless sub[:quantity].empty?
                       xml.QTYU  sub[:unit]     unless sub[:unit].empty?
                       #xml.WHK
@@ -519,14 +519,14 @@ module Oddb2xml
       prepare_articles
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.ARTICLE(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
           'PROD_DATE'         => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           @articles.each do |obj|
             obj[:de].each_with_index do |de_idx, i|
@@ -556,7 +556,7 @@ module Oddb2xml
                 #xml.ARTTYP
                 #xml.VAT
                 if de_idx
-                  xml.SALECD de_idx[:status].empty? ? 'N' : de_idx[:status]
+                  xml.SALECD(de_idx[:status].empty? ? 'N' : de_idx[:status])
                 end
                 if pac
                   #xml.INSLIM
@@ -571,8 +571,8 @@ module Oddb2xml
                 unless de_idx[:ean].empty?
                   flag = @flags[de_idx[:ean]]
                   # as same flag
-                  xml.CDBG (flag ? 'Y' : 'N')
-                  xml.BG   (flag ? 'Y' : 'N')
+                  xml.CDBG(flag ? 'Y' : 'N')
+                  xml.BG(flag ? 'Y' : 'N')
                 end
                 #xml.EXP
                 xml.QTY   de_idx[:additional_desc] unless de_idx[:additional_desc].empty?
@@ -686,14 +686,14 @@ module Oddb2xml
     def build_fi
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.KOMPENDIUM(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
           'PROD_DATE'         => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           length = 0
           %w[de fr].each do |lang|
@@ -702,16 +702,16 @@ module Oddb2xml
               xml.KMP(
                 'MONTYPE' => 'fi', # only
                 'LANG'    => lang.upcase,
-                'DT'      => '',
+                'DT'      => ''
               ) {
                 unless info[:name].empty?
-                  xml.name { xml.p info[:name] }
+                  xml.name  { xml.p(info[:name]) }
                 end
                 unless info[:owner].empty?
-                  xml.owner { xml.p info[:owner] }
+                  xml.owner { xml.p(info[:owner]) }
                 end
-                xml.monid info[:monid] unless info[:monid].empty?
-                xml.paragraph { xml.cdata info[:paragraph] unless info[:paragraph].empty? }
+                xml.monid     info[:monid]                    unless info[:monid].empty?
+                xml.paragraph { xml.cdata(info[:paragraph]) } unless info[:paragraph].empty?
               }
             end
           end
@@ -729,14 +729,14 @@ module Oddb2xml
       prepare_products
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.KOMPENDIUM_PRODUCT(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
           'PROD_DATE'         => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           length = 0
           info_index = {}
@@ -755,7 +755,7 @@ module Oddb2xml
                   length += 1
                 end
                 # as orphans ?
-                xml.DEL @orphans.include?(monid) ? true : false
+                xml.DEL(@orphans.include?(monid) ? true : false)
               }
             end
           end
@@ -772,13 +772,13 @@ module Oddb2xml
     def build_company
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.Betriebe(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           @companies.each do |c|
             xml.Betrieb('DT' => '') {
@@ -808,23 +808,23 @@ module Oddb2xml
     def build_person
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
-        datetime = Time.new.strftime('%FT%T.%7N%z')
+        datetime = Time.new.strftime('%FT%T%z')
         xml.Personen(
           'xmlns:xsd'         => 'http://www.w3.org/2001/XMLSchema',
           'xmlns:xsi'         => 'http://www.w3.org/2001/XMLSchema-instance',
           'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
           'CREATION_DATETIME' => datetime,
-          'VALID_DATE'        => datetime,
+          'VALID_DATE'        => datetime
         ) {
           @people.each do |p|
             xml.Person('DT' => '') {
-              xml.GLN_Person         p[:gln]           unless p[:gln].empty?
-              xml.Name               p[:last_name]     unless p[:last_name].empty?
-              xml.Vorname            p[:first_name]    unless p[:first_name].empty?
-              xml.PLZ                p[:post]          unless p[:post].empty?
-              xml.Ort                p[:place]         unless p[:place].empty?
-              xml.Bewilligungskanton p[:region]        unless p[:region].empty?
-              xml.Land               p[:country]       unless p[:country].empty?
+              xml.GLN_Person         p[:gln]         unless p[:gln].empty?
+              xml.Name               p[:last_name]   unless p[:last_name].empty?
+              xml.Vorname            p[:first_name]  unless p[:first_name].empty?
+              xml.PLZ                p[:post]        unless p[:post].empty?
+              xml.Ort                p[:place]       unless p[:place].empty?
+              xml.Bewilligungskanton p[:region]      unless p[:region].empty?
+              xml.Land               p[:country]     unless p[:country].empty?
               xml.Bewilligung_Selbstdispensation p[:license] unless p[:license].empty?
               xml.Diplom             p[:certificate]   unless p[:certificate].empty?
               xml.BTM_Berechtigung   p[:authorization] unless p[:authorization].empty?
@@ -846,12 +846,12 @@ module Oddb2xml
       price = price_str.split('.')
       pre = ''
       las = ''
-      pre = "%0#{int_len}d" % (price[0] ? price[0] : '0')
+      pre = "%0#{int_len}d" % (price[0] ? price[0].chr : '0')
       las = if price[1]
-              if price[1].size < frac_len
-                price[1] + "0"*(frac_len-price[2].to_s.size)
+              if price[1].chr.size < frac_len
+                price[1].chr + "0"*(frac_len-price[2].to_s.size)
               else
-                price[1][0,frac_len]
+                price[1].chr[0,frac_len]
               end
             else
               '0'*frac_len
