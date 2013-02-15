@@ -353,44 +353,42 @@ module Oddb2xml
       @io   = StringIO.new(str)
       @type = type
     end
-    def to_hash
-      data = {}
+    def to_arry
+      data = []
       case @type
       when :company
         while line = @io.gets
           row = line.chomp.split("\t")
           next if row[0] =~ /^GLN/
-          gln = row[0].to_s
-          data[gln] = {
-            :gln     => gln,          #=> GLN Betrieb
-            :name_1  => row[1].to_s,  #=> Betriebsname 1
-            :name_2  => row[2].to_s,  #=> Betriebsname 2
-            :address => row[3].to_s,  #=> Strasse
-            :number  => row[4].to_s,  #=> Nummer
-            :post    => row[5].to_s,  #=> PLZ
-            :place   => row[6].to_s,  #=> Ort
-            :region  => row[7].to_s,  #=> Bewilligungskanton
-            :country => row[8].to_s,  #=> Land
-            :type    => row[9].to_s,  #=> Betriebstyp
-            :authorization => row[10].to_s, #=> BTM Berechtigung
+          data << {
+            :gln           => row[0].to_s.gsub(/[^0-9]/, ''), #=> GLN Betrieb
+            :name_1        => row[1].to_s,                    #=> Betriebsname 1
+            :name_2        => row[2].to_s,                    #=> Betriebsname 2
+            :address       => row[3].to_s,                    #=> Strasse
+            :number        => row[4].to_s,                    #=> Nummer
+            :post          => row[5].to_s,                    #=> PLZ
+            :place         => row[6].to_s,                    #=> Ort
+            :region        => row[7].to_s,                    #=> Bewilligungskanton
+            :country       => row[8].to_s,                    #=> Land
+            :type          => row[9].to_s,                    #=> Betriebstyp
+            :authorization => row[10].to_s,                   #=> BTM Berechtigung
           }
         end
       when :person
         while line = @io.gets
           row = line.chomp.split("\t")
           next if row[0] =~ /^GLN/
-          gln = row[0].to_s
-          data[gln] = {
-            :gln           => gln,         #=> GLN Person
-            :last_name     => row[1].to_s, #=> Name
-            :first_name    => row[2].to_s, #=> Vorname
-            :post          => row[3].to_s, #=> PLZ
-            :place         => row[4].to_s, #=> Ort
-            :region        => row[5].to_s, #=> Bewilligungskanton
-            :country       => row[6].to_s, #=> Land
-            :license       => row[7].to_s, #=> Bewilligung Selbstdispensation
-            :certificate   => row[8].to_s, #=> Diplom
-            :authorization => row[9].to_s, #=> BTM Berechtigung
+          data << {
+            :gln           => row[0].to_s.gsub(/[^0-9]/, ''), #=> GLN Person
+            :last_name     => row[1].to_s,                    #=> Name
+            :first_name    => row[2].to_s,                    #=> Vorname
+            :post          => row[3].to_s,                    #=> PLZ
+            :place         => row[4].to_s,                    #=> Ort
+            :region        => row[5].to_s,                    #=> Bewilligungskanton
+            :country       => row[6].to_s,                    #=> Land
+            :license       => row[7].to_s,                    #=> Bewilligung Selbstdispensation
+            :certificate   => row[8].to_s,                    #=> Diplom
+            :authorization => row[9].to_s,                    #=> BTM Berechtigung
           }
         end
       end

@@ -27,8 +27,8 @@ module Oddb2xml
       @orphans = [] # [addition] Orphaned drugs from Swissmedic xls
       @fridges = [] # [addition] ReFridge drugs from Swissmedic xls
       # addres
-      @companies = {} # betrieb
-      @people    = {} # medizinalperson
+      @companies = [] # betrieb
+      @people    = [] # medizinalperson
       LANGUAGES.each do |lang|
         @index[lang] = {}
       end
@@ -154,7 +154,7 @@ module Oddb2xml
           str = downloader.download
           self.instance_variable_set(
             "@#{var}".intern,
-            MedregbmExtractor.new(str, what).to_hash
+            MedregbmExtractor.new(str, what).to_arry
           )
         end
       when :fachinfo

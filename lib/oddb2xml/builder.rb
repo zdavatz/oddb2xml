@@ -35,8 +35,8 @@ module Oddb2xml
       @orphans    = []
       @fridges    = []
       @ean14      = true
-      @companies  = {}
-      @people     = {}
+      @companies  = []
+      @people     = []
       @tag_suffix = nil
       if block_given?
         yield self
@@ -780,24 +780,24 @@ module Oddb2xml
           'CREATION_DATETIME' => datetime,
           'VALID_DATE'        => datetime,
         ) {
-          @companies.each_pair do |ean, c|
+          @companies.each do |c|
             xml.Betrieb('DT' => '') {
-              xml.GLN_Betrieb        ean unless ean.empty?
-              xml.Betriebsname_1     c[:name_1]  unless c[:name_1].empty?
-              xml.Betriebsname_2     c[:name_2]  unless c[:name_2].empty?
-              xml.Strasse            c[:address] unless c[:address].empty?
-              xml.Nummer             c[:number]  unless c[:number].empty?
-              xml.PLZ                c[:post]    unless c[:post].empty?
-              xml.Ort                c[:place]   unless c[:place].empty?
-              xml.Bewilligungskanton c[:region]  unless c[:region].empty?
-              xml.Land               c[:country] unless c[:country].empty?
-              xml.Betriebstyp        c[:type]    unless c[:type].empty?
+              xml.GLN_Betrieb        c[:gln]           unless c[:gln].empty?
+              xml.Betriebsname_1     c[:name_1]        unless c[:name_1].empty?
+              xml.Betriebsname_2     c[:name_2]        unless c[:name_2].empty?
+              xml.Strasse            c[:address]       unless c[:address].empty?
+              xml.Nummer             c[:number]        unless c[:number].empty?
+              xml.PLZ                c[:post]          unless c[:post].empty?
+              xml.Ort                c[:place]         unless c[:place].empty?
+              xml.Bewilligungskanton c[:region]        unless c[:region].empty?
+              xml.Land               c[:country]       unless c[:country].empty?
+              xml.Betriebstyp        c[:type]          unless c[:type].empty?
               xml.BTM_Berechtigung   c[:authorization] unless c[:authorization].empty?
             }
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @companies.values.length
+            xml.NBR_RECORD @companies.length
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -816,9 +816,9 @@ module Oddb2xml
           'CREATION_DATETIME' => datetime,
           'VALID_DATE'        => datetime,
         ) {
-          @people.each_pair do |ean, p|
+          @people.each do |p|
             xml.Person('DT' => '') {
-              xml.GLN_Person         ean unless ean.empty?
+              xml.GLN_Person         p[:gln]           unless p[:gln].empty?
               xml.Name               p[:last_name]     unless p[:last_name].empty?
               xml.Vorname            p[:first_name]    unless p[:first_name].empty?
               xml.PLZ                p[:post]          unless p[:post].empty?
@@ -832,7 +832,7 @@ module Oddb2xml
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @people.values.length
+            xml.NBR_RECORD @people.length
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
