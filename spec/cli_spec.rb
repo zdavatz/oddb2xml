@@ -25,7 +25,7 @@ end
 shared_examples_for 'any interface for address' do
   it { cli.should respond_to(:run)  }
   it 'should run successfully' do
-    $stdout.should_not_receive(:puts) # no output
+    $stdout.should_receive(:puts).with(/addresses/)
     cli.run
   end
 end
@@ -247,11 +247,13 @@ describe Oddb2xml::Cli do
       cli.should have_option(:address=> true)
     end
     it 'should not create any compressed file' do
+      $stdout.should_receive(:puts).with(/addresses/)
       cli.run
       Dir.glob('oddb_*.tar.gz').first.should be_nil
       Dir.glob('oddb_*.zip').first.should be_nil
     end
     it 'should create xml files' do
+      $stdout.should_receive(:puts).with(/addresses/)
       cli.run
       expected = [
         'oddb_betrieb.xml',
