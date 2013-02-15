@@ -284,8 +284,8 @@ module Oddb2xml
       @_prefix ||= (@options[:tag_suffix] || 'oddb').gsub(/^_|_$/, '').downcase
     end
     def report
+      lines = []
       unless @options[:address]
-        lines = []
         LANGUAGES.each do |lang|
           lines << lang
           types.each do |type|
@@ -296,8 +296,16 @@ module Oddb2xml
             end
           end
         end
-        puts lines.join("\n")
+      else
+        {
+          'Betrieb' => :@companies,
+          'Person'  => :@people
+        }.each do |type, var|
+          lines << sprintf(
+            "#{type} addresses: %i", self.instance_variable_get(var).length)
+        end
       end
+      puts lines.join("\n")
     end
     def types # swissindex
       @_types ||=
