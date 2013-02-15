@@ -65,6 +65,13 @@ begin
     opts[:ean14] = true # force
   end
   #puts opts if opts[:debug]
+  if RUBY_VERSION.to_f < 1.9
+    message = <<-MES
+Once you find some time, please upgrade your Ruby to 1.9.3 ;)
+then you will not see anymore warnings
+    MES
+    warn message
+  end
   ui.run
 rescue Interrupt
   puts
