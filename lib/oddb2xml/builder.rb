@@ -846,12 +846,12 @@ module Oddb2xml
       price = price_str.split('.')
       pre = ''
       las = ''
-      pre = "%0#{int_len}d" % (price[0] ? price[0].chr : '0')
+      pre = "%0#{int_len}d" % (price[0] ? price[0] : '0')
       las = if price[1]
-              if price[1].chr.size < frac_len
-                price[1].chr + "0"*(frac_len-price[2].to_s.size)
+              if price[1].size < frac_len
+                price[1] + "0"*(frac_len-price[2].to_s.size)
               else
-                price[1].chr[0,frac_len]
+                price[1][0,frac_len]
               end
             else
               '0'*frac_len
