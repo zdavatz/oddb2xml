@@ -21,7 +21,7 @@ Hoe.spec 'oddb2xml' do
   # gem.add_runtime_dependency
   self.extra_deps << ['rubyzip']
   self.extra_deps << ['archive-tar-minitar']
-  self.extra_deps << ['mechanize']
+  self.extra_deps << ['mechanize', '~> 2.5.1']
   self.extra_deps << ['nokogiri']
   self.extra_deps << ['savon', '>= 2.0']
   self.extra_deps << ['spreadsheet']

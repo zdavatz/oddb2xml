@@ -2,7 +2,7 @@ source :rubygems
 
 gem 'rubyzip'
 gem 'archive-tar-minitar'
-gem 'mechanize'
+gem 'mechanize', '~> 2.5.1'
 gem 'nokogiri'
 gem 'savon', '>= 2.0'
 gem 'spreadsheet'
