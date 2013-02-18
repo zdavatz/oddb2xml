@@ -1,3 +1,9 @@
+=== 1.4.3 / 18.02.2013
+
+* Remove slicing bug for ruby 1.8.7 (This is Array)
+* Fix spec for ruby 1.8.7
+* Update to use Mechanize 2.5.1
+
 === 1.4.2 / 15.02.2013
 
 * Add warning for ruby-1.8.7 user
