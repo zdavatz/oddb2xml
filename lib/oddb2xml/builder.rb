@@ -842,6 +842,21 @@ module Oddb2xml
     end
 
     ### --- see oddb2tdat
+    DAT_LEN = {
+      :RECA =>  2,
+      :CMUT =>  1,
+      :PHAR =>  7,
+      :ABEZ => 50,
+      :PRMO =>  6,
+      :PRPU =>  6,
+      :CKZL =>  1,
+      :CLAG =>  1,
+      :CBGG =>  1,
+      :CIKS =>  1,
+      :ITHE =>  7,
+      :CEAN => 13,
+      :CMWS =>  1,
+    }
     def format_price(price_str, len=6, int_len=4, frac_len=2)
       price = price_str.split('.')
       pre = ''
@@ -865,21 +880,20 @@ module Oddb2xml
       end
       date[0,len]
     end
-    DAT_LEN = {
-      :RECA =>  2,
-      :CMUT =>  1,
-      :PHAR =>  7,
-      :ABEZ => 50,
-      :PRMO =>  6,
-      :PRPU =>  6,
-      :CKZL =>  1,
-      :CLAG =>  1,
-      :CBGG =>  1,
-      :CIKS =>  1,
-      :ITHE =>  7,
-      :CEAN => 13,
-      :CMWS =>  1,
-    }
+    def format_name(name)
+      if RUBY_VERSION.to_f < 1.9 # for multibyte chars length support
+        chars = name.scan(/./mu).to_a
+        diff  = DAT_LEN[:ABEZ] - chars.length
+        if diff > 0
+          chars += Array.new(diff, ' ')
+        elsif diff < 0
+          chars = chars [0,DAT_LEN[:ABEZ]]
+        end
+        chars.to_s
+      else
+        "%-#{DAT_LEN[:ABEZ]}s" % name
+      end
+    end
     def build_dat
       prepare_articles
       rows = []
@@ -903,11 +917,12 @@ module Oddb2xml
                                               '3'
                                             end
             row << "%0#{DAT_LEN[:PHAR]}d" % idx[:pharmacode].to_i
-            row << "%-#{DAT_LEN[:ABEZ]}s" % (
-                                              idx[:desc].to_s.gsub(/"/, '') + " " +
-                                              (pac ? pac[:name_de].to_s : '') +
-                                              idx[:additional_desc]
-                                            ).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
+            abez = ( # de name
+              idx[:desc].to_s + " " +
+              (pac ? pac[:name_de].to_s : '') +
+              idx[:additional_desc]
+            ).gsub(/"/, '')
+            row << format_name(abez)
             row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))
             row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
             row << "%#{DAT_LEN[:CKZL]}s"  % if (@lppvs[idx[:ean]])
@@ -963,10 +978,11 @@ module Oddb2xml
                                             '3'
                                           end
           row << "%0#{DAT_LEN[:PHAR]}d" % idx[:pharmacode].to_i
-          row << "%-#{DAT_LEN[:ABEZ]}s" % (
-                                            idx[:desc].to_s.gsub(/"/, '') + " " +
-                                            idx[:additional_desc]
-                                          ).to_s[0, DAT_LEN[:ABEZ]].gsub(/"/, '')
+          abez = ( # de name
+            idx[:desc].to_s + " " +
+            idx[:additional_desc]
+          ).gsub(/"/, '')
+          row << format_name(abez)
           row << "%#{DAT_LEN[:PRMO]}s"  % ('0' * DAT_LEN[:PRMO])
           row << "%#{DAT_LEN[:PRPU]}s"  % ('0' * DAT_LEN[:PRPU])
           row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
