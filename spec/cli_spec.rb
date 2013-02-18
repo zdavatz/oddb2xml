@@ -2,6 +2,22 @@
 
 require 'spec_helper'
 
+# for stdout/stderr on ruby 1.8.7
+# $stdout.should_receive(:puts).with() does not work
+module Kernel
+  def capture(stream)
+    begin
+      stream = stream.to_s
+      eval "$#{stream} = StringIO.new"
+      yield
+      result = eval("$#{stream}").string
+    ensure
+      eval "$#{stream} = #{stream.upcase}"
+    end
+    result
+  end
+end
+
 RSpec::Matchers.define :have_option do |option|
   match do |interface|
     key = option.keys.first
@@ -15,18 +31,16 @@ RSpec::Matchers.define :have_option do |option|
 end
 
 shared_examples_for 'any interface for product' do
-  it { cli.should respond_to(:run)  }
+  it { capture(:stdout) { cli.should respond_to(:run) } }
   it 'should run successfully' do
-    $stdout.should_receive(:puts).with(/products/)
-    cli.run
+    capture(:stdout){ cli.run }.should match(/products/)
   end
 end
 
 shared_examples_for 'any interface for address' do
-  it { cli.should respond_to(:run)  }
+  it { capture(:stdout) { cli.should respond_to(:run) } }
   it 'should run successfully' do
-    $stdout.should_receive(:puts).with(/addresses/)
-    cli.run
+    capture(:stdout){ cli.run }.should match(/addresses/)
   end
 end
 
@@ -51,14 +65,12 @@ describe Oddb2xml::Cli do
       cli.should have_option(:compress_ext => 'tar.gz')
     end
     it 'should create tar.gz file' do
-      $stdout.should_receive(:puts).with(/Pharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/Pharma/)
       file = Dir.glob('oddb_*.tar.gz').first
       File.exists?(file).should be_true
     end
     it 'should not create any xml file' do
-      $stdout.should_receive(:puts).with(/Pharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/Pharma/)
       Dir.glob('oddb_*.xml').each do |file|
         File.exists?(file).should be_nil
       end
@@ -85,14 +97,12 @@ describe Oddb2xml::Cli do
       cli.should have_option(:compress_ext => 'zip')
     end
     it 'should create zip file' do
-      $stdout.should_receive(:puts).with(/Pharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/Pharma/)
       file = Dir.glob('oddb_*.zip').first
       File.exists?(file).should be_true
     end
     it 'should not create any xml file' do
-      $stdout.should_receive(:puts).with(/Pharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/Pharma/)
       Dir.glob('oddb_*.xml').each do |file|
         File.exists?(file).should be_nil
       end
@@ -119,14 +129,12 @@ describe Oddb2xml::Cli do
       cli.should have_option(:nonpharma => true)
     end
     it 'should not create any compressed file' do
-      $stdout.should_receive(:puts).with(/NonPharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/NonPharma/)
       Dir.glob('oddb_*.tar.gz').first.should be_nil
       Dir.glob('oddb_*.zip').first.should be_nil
     end
     it 'should create xml files' do
-      $stdout.should_receive(:puts).with(/NonPharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/NonPharma/)
       expected = [
         'oddb_product.xml',
         'oddb_article.xml',
@@ -161,14 +169,12 @@ describe Oddb2xml::Cli do
       cli.should have_option(:tag_suffix=> '_SWISS')
     end
     it 'should not create any compressed file' do
-      $stdout.should_receive(:puts).with(/Pharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/Pharma/)
       Dir.glob('oddb_*.tar.gz').first.should be_nil
       Dir.glob('oddb_*.zip').first.should be_nil
     end
     it 'should create xml files with prefix swiss_' do
-      $stdout.should_receive(:puts).with(/Pharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/Pharma/)
       expected = [
         'swiss_product.xml',
         'swiss_article.xml',
@@ -203,14 +209,12 @@ describe Oddb2xml::Cli do
       cli.should have_option(:fi => true)
     end
     it 'should not create any compressed file' do
-      $stdout.should_receive(:puts).with(/Pharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/Pharma/)
       Dir.glob('oddb_*.tar.gz').first.should be_nil
       Dir.glob('oddb_*.zip').first.should be_nil
     end
     it 'should create xml files' do
-      $stdout.should_receive(:puts).with(/Pharma/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/Pharma/)
       expected = [
         'oddb_fi.xml',
         'oddb_fi_product.xml',
@@ -247,14 +251,12 @@ describe Oddb2xml::Cli do
       cli.should have_option(:address=> true)
     end
     it 'should not create any compressed file' do
-      $stdout.should_receive(:puts).with(/addresses/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/addresses/)
       Dir.glob('oddb_*.tar.gz').first.should be_nil
       Dir.glob('oddb_*.zip').first.should be_nil
     end
     it 'should create xml files' do
-      $stdout.should_receive(:puts).with(/addresses/)
-      cli.run
+      capture(:stdout) { cli.run }.should match(/addresses/)
       expected = [
         'oddb_betrieb.xml',
         'oddb_medizinalperson.xml',

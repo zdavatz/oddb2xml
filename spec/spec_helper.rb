@@ -49,8 +49,9 @@ module ServerMockHelper
       stub_response = File.read(File.expand_path("../data/wsdl_#{type.downcase}.xml", __FILE__))
       stub_request(:get, stub_wsdl_url).
         with(:headers => {
-          'Accept'     => '*/*',
-          'User-Agent' => 'Ruby'}).
+          'Accept' => '*/*',
+          #'Host'   => 'ws.e-mediat.net'
+        }).
         to_return(
           :status  => 200,
           :headers => {'Content-Type' => 'text/xml; charset=utf-8'},
@@ -60,8 +61,9 @@ module ServerMockHelper
       stub_response = File.read(File.expand_path("../data/swissindex_#{type.downcase}.xml", __FILE__))
       stub_request(:post, stub_soap_url).
         with(:headers => {
-          'Accept'     => '*/*',
-          'User-Agent' => 'Ruby'}).
+          'Accept' => '*/*',
+          #'Host'   => 'example.com'
+        }).
         to_return(
           :status  => 200,
           :headers => {'Content-Type' => 'text/xml; chaprset=utf-8'},
