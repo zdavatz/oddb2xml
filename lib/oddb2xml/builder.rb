@@ -887,10 +887,11 @@ module Oddb2xml
         if diff > 0
           chars += Array.new(diff, ' ')
         elsif diff < 0
-          chars = chars [0,DAT_LEN[:ABEZ]]
+          chars = chars[0,DAT_LEN[:ABEZ]]
         end
         chars.to_s
       else
+        name = name[0,DAT_LEN[:ABEZ]] if name.length > DAT_LEN[:ABEZ]
         "%-#{DAT_LEN[:ABEZ]}s" % name
       end
     end
@@ -899,6 +900,7 @@ module Oddb2xml
       rows = []
       @articles.each do |obj|
         obj[:de].each_with_index do |idx, i|
+          next if (!ean14 && idx[:ean].to_s.length != 13)
           row = ''
           # Oddb2tdat.parse
           if idx[:status] =~ /A|I/
