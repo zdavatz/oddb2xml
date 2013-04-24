@@ -1,3 +1,7 @@
+=== 1.4.6 / 24.04.2013
+
+* Update to skip ean14 as default in also oddb.dat
+
 === 1.4.5 / 19.02.2013
 
 * Add name slicing for dat output
