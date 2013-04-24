@@ -122,12 +122,12 @@ module Oddb2xml
               LANGUAGES.each do |lang|
                 index[lang] = @index[lang][type]
               end
-              builder.index = index
               _sbj = (type == :pharma ? :dat : :with_migel_dat)
+              builder.index   = index
               builder.subject = _sbj
+              builder.ean14   = @options[:ean14]
               if type == :nonpharma
                 output << "\n"
-                builder.ean14 = @options[:ean14]
               end
               output << builder.to_dat
             end

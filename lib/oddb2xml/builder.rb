@@ -34,7 +34,7 @@ module Oddb2xml
       @actions    = []
       @orphans    = []
       @fridges    = []
-      @ean14      = true
+      @ean14      = false
       @companies  = []
       @people     = []
       @tag_suffix = nil
@@ -900,7 +900,7 @@ module Oddb2xml
       rows = []
       @articles.each do |obj|
         obj[:de].each_with_index do |idx, i|
-          next if (!ean14 && idx[:ean].to_s.length != 13)
+          next if ((idx[:ean].to_s.length != 13) and !ean14)
           row = ''
           # Oddb2tdat.parse
           if idx[:status] =~ /A|I/
@@ -971,7 +971,7 @@ module Oddb2xml
       @articles.each do |obj|
         obj[:de].each_with_index do |idx, i|
           row = ''
-          next if (!ean14 && idx[:ean].to_s.length != 13)
+          next if ((idx[:ean].to_s.length != 13) and !ean14)
           # Oddb2tdat.parse_migel
           row << "%#{DAT_LEN[:RECA]}s"  % '11'
           row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = idx[:pharmacode] and phar.size > 3)
