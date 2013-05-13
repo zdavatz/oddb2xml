@@ -4,11 +4,11 @@
 
 creates the following xml files:
 
-* oddb_substance.xml      
-* oddb_limitation.xml              
-* oddb_interaction.xml    
-* oddb_code.xml           
-* oddb_product.xml        
+* oddb_substance.xml
+* oddb_limitation.xml
+* oddb_interaction.xml
+* oddb_code.xml
+* oddb_product.xml
 * oddb_article.xml
 * oddb_fi.xml
 * oddb_fi_product.xml
@@ -91,11 +91,11 @@ i.e.:
 
 xml files generated are:
 
-* oddb_substance.xml      
-* oddb_limitation.xml     
-* oddb_interaction.xml    
-* oddb_code.xml           
-* oddb_product.xml        
+* oddb_substance.xml
+* oddb_limitation.xml
+* oddb_interaction.xml
+* oddb_code.xml
+* oddb_product.xml
 * oddb_article.xml
 * oddb_fi.xml
 * oddb_fi_product.xml
@@ -156,30 +156,34 @@ For example, if `-t _swiss` is given then oddb2xml creates product.xml as swiss_
 <?xml version="1.0" encoding="utf-8"?>
 <PRODUCT_SWISS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration" CREATION_DATETIME="2012-11-21T13:01:29.5903756+0900" PROD_DATE="2012-11-21T13:01:29.5903756+0900" VALID_DATE="2012-11-21T13:01:29.5903756+0900">
   <PRD_SWISS DT="">
-    <PRDNO_SWISS>1167149</PRDNO_SWISS>
-    <DSCRD_SWISS>Allergovit Artemisia Inj Susp Kombi</DSCRD_SWISS>
-    <DSCRF_SWISS>Allergovit Artemisia susp inj combi </DSCRF_SWISS>
-    <ATC_SWISS>V01AA10</ATC_SWISS>
-    <IT_SWISS>07.13.30.</IT_SWISS>
+    <GTIN_SWISS>7680353660163</GTIN_SWISS>
+    <PRODNO_SWISS>353661</PRODNO_SWISS>
+    <DSCRD_SWISS>Kendural Depottabl </DSCRD_SWISS>
+    <DSCRF_SWISS>Kendural cpr dépôt </DSCRF_SWISS>
+    <ATC_SWISS>B03AE10</ATC_SWISS>
+    <IT_SWISS>06.07.1.</IT_SWISS>
     <CPT_SWISS>
       <CPTCMP_SWISS>
         <LINE_SWISS>0</LINE_SWISS>
-        <SUBNO_SWISS>100</SUBNO_SWISS>
-        <QTY_SWISS>1000</QTY_SWISS>
-        <QTYU_SWISS>U.</QTYU_SWISS>
+        <SUBNO_SWISS>507</SUBNO_SWISS>
+        <QTY_SWISS>105</QTY_SWISS>
+        <QTYU_SWISS>mg</QTYU_SWISS>
       </CPTCMP_SWISS>
       <CPTCMP_SWISS>
         <LINE_SWISS>1</LINE_SWISS>
-        <SUBNO_SWISS>105</SUBNO_SWISS>
-        <QTY_SWISS>10000</QTY_SWISS>
-        <QTYU_SWISS>U.</QTYU_SWISS>
+        <SUBNO_SWISS>23</SUBNO_SWISS>
+        <QTY_SWISS>500</QTY_SWISS>
+        <QTYU_SWISS>mg</QTYU_SWISS>
       </CPTCMP_SWISS>
     </CPT_SWISS>
+    <PackGrSwissmedic_SWISS>30</PackGrSwissmedic_SWISS>
+    <EinheitSwissmedic_SWISS>Tablette(n)</EinheitSwissmedic_SWISS>
+    <SubstanceSwissmedic_SWISS>ferrum(II), acidum ascorbicum</SubstanceSwissmedic_SWISS>
   </PRD_SWISS>
   ...
   <RESULT_SWISS>
     <OK_ERROR_SWISS>OK</OK_ERROR_SWISS>
-    <NBR_RECORD_SWISS>5850</NBR_RECORD_SWISS>
+    <NBR_RECORD_SWISS>14336</NBR_RECORD_SWISS>
     <ERROR_CODE_SWISS/>
     <MESSAGE_SWISS/>
   </RESULT_SWISS>

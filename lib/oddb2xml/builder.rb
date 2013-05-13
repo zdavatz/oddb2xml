@@ -389,6 +389,8 @@ module Oddb2xml
             length += 1
             xml.PRD('DT' => '') {
               xml.GTIN obj[:ean].to_s
+              ppac = ((_ppac = @packs[obj[:ean].to_s[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
+              xml.PRODNO ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
               if seq
                 %w[de fr].each do |l|
                   name = "name_#{l}".intern
@@ -544,9 +546,8 @@ module Oddb2xml
                 #xml.GRPCD
                 #xml.CDS01
                 #xml.CDS02
-                #xml.PRDNO
-                if ppac && ppac[:swissmedic_category]
-                  xml.SMCAT ppac[:swissmedic_category]
+                if ppac
+                  xml.SMCAT ppac[:swissmedic_category] unless ppac[:swissmedic_category].empty?
                 end
                 if no8
                   xml.SMNO no8.to_s unless no8.to_s.empty?

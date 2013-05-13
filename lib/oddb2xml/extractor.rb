@@ -216,13 +216,14 @@ module Oddb2xml
       case @type
       when :package
         typ = 6 # Heilmittelcode
-        i_5,i_3 = 0,10 # :swissmedic_numbers
-        cat     = 13   # :swissmedic_category
-        ith     = 4    # :ith_swissmedic IT-Code (swissmedic-diff)
-        atc     = 5    # :atc_code
-        siz     = 11   # :package_size
-        eht     = 12   # :einheit_swissmedic
-        sub     = 14   # :substance_swissmedic
+        i_5,i_3   = 0,10 # :swissmedic_numbers
+        p_5,p_1_2 = 0,1  # :prodno
+        cat       = 13   # :swissmedic_category
+        ith       = 4    # :ith_swissmedic IT-Code (swissmedic-diff)
+        atc       = 5    # :atc_code
+        siz       = 11   # :package_size
+        eht       = 12   # :einheit_swissmedic
+        sub       = 14   # :substance_swissmedic
         @sheet.each_with_index do |row, i|
           next if (i== 0)
           no8 = extract_number(row, i_5).to_s + extract_number(row, i_3, /^\d{3}$/).to_s
@@ -230,6 +231,7 @@ module Oddb2xml
             ean_base12 = "7680#{no8}"
             data[no8.intern] = {
               :ean                  => (ean_base12.ljust(12, '0') + calc_checksum(ean_base12)),
+              :prodno               => row[p_5].to_s + row[p_1_2].to_i.to_s,
               :ith_swissmedic       => row[ith].to_s,
               :swissmedic_category  => row[cat].to_s,
               :atc_code             => row[atc].to_s,
