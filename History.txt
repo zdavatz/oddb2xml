@@ -1,3 +1,7 @@
+=== 1.4.7 / 13.05.2013
+
+* Add prodno to oddb_product.xml
+
 === 1.4.6 / 24.04.2013
 
 * Update to skip ean14 as default in also oddb.dat
