@@ -1,3 +1,7 @@
+=== 1.4.8 / 13.05.2013
+
+* Applied Patch by N.Giger to Gemfile
+
 === 1.4.7 / 13.05.2013
 
 * Add prodno to oddb_product.xml

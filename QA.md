@@ -21,3 +21,6 @@ aber grundsätzlich selbsterklärend.
 
 Der Mwst.-Code ist bei allen Produkten bei denen der GTIN mit 7680 (Medi in der SL) beginnt bei 8%.
 
+####Was für eine Nummer findet man im Feld PRODNO?
+* Mit dem Release 1.4.8 finden Sie auch die PRODNO im XML. Die PRODNO setzen wir zusammen aus der 5-stelligen Swissmedic-Nummer und der Swissmedic Sequenz Nummer. Die Squenznummer unterscheidet nicht nach Packungsgrösse. Produkte mit der gleichen Dosierung und der gleichen galenischen Form aber einer unterschiedlicher Packungsgrösse, haben die gleiche PRODNO.
+
