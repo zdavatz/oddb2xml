@@ -19,7 +19,7 @@ aber grundsätzlich selbsterklärend.
 * im article.xml verwenden wird die Bezeichnungen von Refdata.ch
 * im product.xml verwenden wir die Bezeichnungen vom BAG-XML. Produkte die nicht in der SL sind haben dann im product.xml auch keine Bezeichnung.
 
-####Wo finde ich die Mehrwertsteuer
+####Wo finde ich die Mehrwertsteuer?
 * Der Mwst.-Code ist bei allen Produkten bei denen der GTIN mit 7680 (Medi in der SL) beginnt bei 2.5% (reduzierter Satz, Art. 49 MWSTV). 
 * Siehe auch: http://www.estv.admin.ch/mwst/themen/00155/#sprungmarke0_4
 
