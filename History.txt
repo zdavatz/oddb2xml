@@ -1,3 +1,7 @@
+=== 1.5.0 / 08.06.2013
+
+* Fix NINCD and NonPharma products report
+
 === 1.4.9 / 07.06.2013
 
 * Update NINCD for oddb_article.xml
