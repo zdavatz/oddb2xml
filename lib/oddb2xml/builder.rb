@@ -91,6 +91,7 @@ module Oddb2xml
               :additional_desc => migel[:additional_desc],
               :company_ean     => migel[:company_ean],
               :company_name    => migel[:company_name],
+              :migel           => true,
             }
             obj[lang.intern] = [entry]
           end
@@ -532,8 +533,8 @@ module Oddb2xml
         ) {
           @articles.each do |obj|
             obj[:de].each_with_index do |de_idx, i|
-              fr_idx = obj[:fr][i]              # swiss index FR
-              pac,no8 = nil,de_idx[:ean][4..11] # BAG XML (additional data)
+              fr_idx = obj[:fr][i]              # swissindex FR
+              pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
               ppac = nil                        # Packungen
               if obj[:seq]
                 pac = obj[:seq][:packages][de_idx[:pharmacode]]
@@ -664,11 +665,20 @@ module Oddb2xml
                 #xml.ARTLIM {
                 #  xml.LIMCD
                 #}
-                if @lppvs[de_idx[:ean]]
+                nincd = if @lppvs[de_idx[:ean]] # LPPV
+                  20
+                elsif de_idx[:migel] # MiGel
+                  13
+                elsif no8 # BAG-XML (SL/LS)
+                  10
+                else
+                  nil
+                end
+                if nincd
                   xml.ARTINS {
                     #xml.VDAT
                     #xml.INCD
-                    xml.NINCD 20
+                    xml.NINCD nincd
                   }
                 end
               }
