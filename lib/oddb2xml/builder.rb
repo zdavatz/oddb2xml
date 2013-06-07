@@ -665,12 +665,14 @@ module Oddb2xml
                 #xml.ARTLIM {
                 #  xml.LIMCD
                 #}
+                seq = @items[de_idx[:pharmacode]]
                 nincd = if @lppvs[de_idx[:ean]] # LPPV
                   20
-                elsif de_idx[:migel] # MiGel
-                  13
-                elsif no8 # BAG-XML (SL/LS)
+                elsif seq # BAG-XML (SL/LS)
                   10
+                elsif (de_idx[:migel] or # MiGel (xls)
+                       de_idx[:_type] == :nonpharma) # MiGel (swissindex)
+                  13
                 else
                   nil
                 end

@@ -289,10 +289,16 @@ module Oddb2xml
         LANGUAGES.each do |lang|
           lines << lang
           types.each do |type|
-            key = (type == :nonpharma ? 'NonPharma' : 'Pharma')
             if @index[lang][type]
-              lines << sprintf(
-                "\t#{key} products: %i", @index[lang][type].values.length)
+              indices = @index[lang][type].values.flatten.length
+              if type == :nonpharma
+                migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode].empty? }.map{|m| m[:pharmacode] }
+                nonpharmas = @index[lang][type].keys
+                indices += (migel_xls - nonpharmas).length # ignore duplicates, null
+                lines << sprintf("\tNonPharma products: %i", indices)
+              else
+                lines << sprintf("\tPharma products: %i", indices)
+              end
             end
           end
         end

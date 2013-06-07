@@ -161,6 +161,7 @@ module Oddb2xml
       doc.remove_namespaces!
       doc.xpath("//Envelope/Body/#{@type}/ITEM").each do |pac|
         item = {}
+        item[:_type]           = @type.downcase.intern
         item[:ean]             = (gtin = pac.at_xpath('.//GTIN'))   ? gtin.text : ''
         item[:pharmacode]      = (phar = pac.at_xpath('.//PHAR'))   ? phar.text : ''
         item[:status]          = (stat = pac.at_xpath('.//STATUS')) ? stat.text : ''
