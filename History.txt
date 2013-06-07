@@ -1,3 +1,7 @@
+=== 1.4.9 / 07.06.2013
+
+* Update NINCD for oddb_article.xml
+
 === 1.4.8 / 13.05.2013
 
 * Applied Patch by N.Giger to Gemfile
