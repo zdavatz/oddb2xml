@@ -550,8 +550,10 @@ module Oddb2xml
                 if ppac
                   xml.SMCAT ppac[:swissmedic_category] unless ppac[:swissmedic_category].empty?
                 end
-                if no8
-                  xml.SMNO no8.to_s unless no8.to_s.empty?
+                if no8 and !no8.to_s.empty?
+                  if de_idx[:ean][0..3] == "7680"
+                    xml.SMNO no8.to_s
+                  end
                 end
                 #xml.HOSPCD
                 #xml.CLINCD
