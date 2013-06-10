@@ -176,6 +176,9 @@ module Oddb2xml
           item[:company_ean]  = (gln = comp.at_xpath('.//GLN'))  ? gln.text : ''
         end
         unless item[:pharmacode].empty?
+          if item[:pharmacode].length != 7 # restore zero at the beginnig
+            item[:pharmacode] = ("%07i" % item[:pharmacode])
+          end
           unless data[item[:pharmacode]] # pharmacode => GTINs
             data[item[:pharmacode]] = []
           end
