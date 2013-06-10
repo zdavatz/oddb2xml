@@ -1,3 +1,8 @@
+=== 1.5.1 / 10.06.2013
+
+* Update oddb2xml to handle pharmacode that is started with "0"
+* Delete SMNO if article does not have correct GTIN (GTIN must begin with "7680")
+
 === 1.5.0 / 08.06.2013
 
 * Fix NINCD and NonPharma products report
