@@ -14,7 +14,7 @@ module Oddb2xml
         response = nil # win
         io = File.open(file, option)
         return io.read
-      rescue Timeout::Error
+      rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
         io.close if io and !io.closed? # win
@@ -144,7 +144,7 @@ module Oddb2xml
           response = nil # win
         end
         return read_xml_form_zip(/^Preparation/iu, file)
-      rescue Timeout::Error
+      rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
         if File.exists?(file)
@@ -197,7 +197,7 @@ XML
         end
       rescue HTTPI::SSLError
         exit # catch me in Cli class
-      rescue Timeout::Error
+      rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       end
     end
@@ -231,7 +231,7 @@ XML
         end
         io = File.open(file, 'rb')
         return io.read
-      rescue Timeout::Error
+      rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
         io.close if io and !io.closed?
@@ -265,7 +265,7 @@ XML
           response = nil # win
         end
         return read_xml_form_zip(/^AipsDownload_/iu, file)
-      rescue Timeout::Error
+      rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       rescue NoMethodError
         # pass

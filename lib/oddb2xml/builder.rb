@@ -667,18 +667,7 @@ module Oddb2xml
                 #xml.ARTLIM {
                 #  xml.LIMCD
                 #}
-                seq = @items[de_idx[:pharmacode]]
-                nincd = if @lppvs[de_idx[:ean]] # LPPV
-                  20
-                elsif seq # BAG-XML (SL/LS)
-                  10
-                elsif (de_idx[:migel] or # MiGel (xls)
-                       de_idx[:_type] == :nonpharma) # MiGel (swissindex)
-                  13
-                else
-                  nil
-                end
-                if nincd
+                if nincd = detect_nincd(de_idx)
                   xml.ARTINS {
                     #xml.VDAT
                     #xml.INCD
@@ -854,6 +843,26 @@ module Oddb2xml
         }
       end
       _builder.to_xml
+    end
+    def detect_nincd(de_idx)
+      if @lppvs[de_idx[:ean]] # LPPV
+        20
+      elsif @items[de_idx[:pharmacode]] # BAG-XML (SL/LS)
+        10
+      elsif (de_idx[:migel] or # MiGel (xls)
+             de_idx[:_type] == :nonpharma) # MiGel (swissindex)
+        13
+      else
+        # fallback via EAN
+        bag_entry_via_ean = @items.values.select do |i|
+          i[:packages].values.select {|_pac| _pac[:ean] == de_idx[:ean] }.length != 0
+        end.length
+        if bag_entry_via_ean > 0
+          10
+        else
+          nil
+        end
+      end
     end
 
     ### --- see oddb2tdat

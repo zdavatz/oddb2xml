@@ -24,6 +24,13 @@ module Oddb2xml
     def initialize(xml)
       @xml = xml
     end
+    def correct_code(pharmacode, length=7)
+      if pharmacode.length != length # restore zero at the beginnig
+        ("%0#{length}i" % pharmacode.to_i)
+      else
+        pharmacode
+      end
+    end
   end
   class BMUpdateExtractor < Extractor
     include TxtExtractorMethods
@@ -68,12 +75,13 @@ module Oddb2xml
         item[:packages]    = {} # pharmacode => package
         seq.xpath('.//Pack').each do |pac|
           if phar = pac.attr('Pharmacode')
-            phar = phar.to_s
+            phar = correct_code(phar.to_s, 7)
             # as common key with swissINDEX
             item[:pharmacodes] << phar
             # packages
             item[:packages][phar] = {
               :pharmacode          => phar,
+              :ean                 => (ean = pac.at_xpath('.//GTIN')) ? ean.text : '',
               :swissmedic_category => (cat = pac.at_xpath('.//SwissmedicCategory')) ? cat.text : '',
               :swissmedic_number8  => (num = pac.at_xpath('.//SwissmedicNo8'))      ? num.text.rjust(8, '0') : '',
               :narcosis_flag       => (flg = pac.at_xpath('.//FlagNarcosis'))       ? flg.text : '',
@@ -176,9 +184,7 @@ module Oddb2xml
           item[:company_ean]  = (gln = comp.at_xpath('.//GLN'))  ? gln.text : ''
         end
         unless item[:pharmacode].empty?
-          if item[:pharmacode].length != 7 # restore zero at the beginnig
-            item[:pharmacode] = ("%07i" % item[:pharmacode])
-          end
+          item[:pharmacode] = correct_code(item[:pharmacode].to_s, 7)
           unless data[item[:pharmacode]] # pharmacode => GTINs
             data[item[:pharmacode]] = []
           end
@@ -286,7 +292,7 @@ module Oddb2xml
       data = {}
       @sheet.each_with_index do |row, i|
         next if i.zero?
-        phar = row[1].to_s
+        phar = correct_code(row[1].to_s.gsub(/[^0-9]/, ''), 7)
         data[phar] = {
           :ean             => row[0].to_i.to_s,
           :pharmacode      => phar,
