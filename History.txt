@@ -1,3 +1,9 @@
+=== 1.5.2 / 12.06.2013
+
+* Improve NINCD detection
+  - Update timeout handling
+  - Improve pharmacode detection                
+
 === 1.5.1 / 10.06.2013
 
 * Update oddb2xml to handle pharmacode that is started with "0"
