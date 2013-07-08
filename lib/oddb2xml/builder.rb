@@ -543,6 +543,10 @@ module Oddb2xml
               if no8
                 ppac = ((_ppac = @packs[no8.intern] and !_ppac[:is_tier]) ? _ppac : nil)
               end
+              price = nil
+              if !@prices.empty? && de_idx[:ean] && @prices[de_idx[:ean]]
+                price = @prices[de_idx[:ean]] # zurrose
+              end
               xml.ART('DT' => '') {
                 xml.PHAR  de_idx[:pharmacode] unless de_idx[:pharmacode].empty?
                 #xml.GRPCD
@@ -559,7 +563,10 @@ module Oddb2xml
                 #xml.HOSPCD
                 #xml.CLINCD
                 #xml.ARTTYP
-                #xml.VAT
+                if price
+                  xml.VAT price[:vat]
+                end
+
                 if de_idx
                   xml.SALECD(de_idx[:status].empty? ? 'N' : de_idx[:status])
                 end
@@ -646,12 +653,11 @@ module Oddb2xml
                   #xml.LINENO
                   #xml.NOUNITS
                 #}
-                if !@prices.empty? && de_idx[:ean] && \
-                  price = @prices[de_idx[:ean]] # zurrose
+                if price # zurrose
                   xml.ARTPRI {
                    xml.VDAT  datetime
                    xml.PTYP  "ZURROSE"
-                   xml.PRICE price
+                   xml.PRICE price[:price]
                   }
                 elsif pac
                   pac[:prices].each_pair do |key, price|

@@ -114,7 +114,7 @@ module Oddb2xml
   class ZurroseDownloader < Downloader
     include DownloadMethod
     def download
-      @url ||= 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/DOS/IGM01_ohne_MwSt/Vollstamm/transfer.dat'
+      @url ||= 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat'
       download_as('oddb2xml_zurrose_transfer.dat', 'r:iso-8859-1:utf-8')
     end
   end
