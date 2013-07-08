@@ -284,3 +284,23 @@ describe Oddb2xml::MedregbmDownloader do
     end
   end
 end
+
+describe Oddb2xml::ZurroseDownloader do
+  include ServerMockHelper
+  before(:each) do
+    setup_zurrose_server_mock
+    @downloader = Oddb2xml::ZurroseDownloader.new
+  end
+  it_behaves_like 'any downloader'
+  context 'when download is called' do
+    let(:dat) { @downloader.download }
+    it 'should read dat as String' do
+      dat.should be_a String
+      dat.bytes.should_not nil
+    end
+    it 'should clean up current directory' do
+      dat.should_not raise_error(Timeout::Error)
+      File.exist?('oddb2xml_zurrose_transfer.dat').should be(false)
+    end
+  end
+end

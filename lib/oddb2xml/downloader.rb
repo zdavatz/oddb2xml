@@ -8,12 +8,13 @@ module Oddb2xml
   module DownloadMethod
     private
     def download_as(file, option='r')
+      data = nil
       begin
         response = @agent.get(@url)
         response.save_as(file)
         response = nil # win
         io = File.open(file, option)
-        return io.read
+        data = io.read
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
@@ -22,6 +23,7 @@ module Oddb2xml
           File.unlink(file)
         end
       end
+      return data
     end
   end
   class Downloader
@@ -107,6 +109,13 @@ module Oddb2xml
     def download
       @url ||= 'https://raw.github.com/zdavatz/oddb2xml_files/master/LPPV.txt'
       download_as('oddb2xml_files_lppv.txt', 'r')
+    end
+  end
+  class ZurroseDownloader < Downloader
+    include DownloadMethod
+    def download
+      @url ||= 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/DOS/IGM01_ohne_MwSt/Vollstamm/transfer.dat'
+      download_as('oddb2xml_zurrose_transfer.dat', 'r:iso-8859-1:utf-8')
     end
   end
   class MedregbmDownloader < Downloader

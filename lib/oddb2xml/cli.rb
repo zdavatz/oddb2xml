@@ -22,6 +22,7 @@ module Oddb2xml
       @lppvs = {} # lppv.txt from files repo
       @infos = {} # [option] FI from SwissmedicInfo
       @packs = {} # [option] Packungen from Swissmedic for dat
+      @prices  = {} # [addition] prices from zurrose transfer.txt
       @migel   = {} # [addition] additional Non Pharma products from files repo
       @actions = [] # [addition] interactions from epha
       @orphans = [] # [addition] Orphaned drugs from Swissmedic xls
@@ -52,6 +53,9 @@ module Oddb2xml
         end
         if @options[:nonpharma]
           threads << download(:migel) # oddb2xml_files
+        end
+        if @options[:price] # zurrose
+          threads << download(@options[:price])
         end
         threads << download(:package) # swissmedic
         threads << download(:bm_update) # oddb2xml_files
@@ -109,7 +113,7 @@ module Oddb2xml
               builder.infos = @infos
               builder.packs = @packs
               # additional sources
-              %w[actions orphans fridges migel].each do |addition|
+              %w[actions orphans fridges migel prices].each do |addition|
                 builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
               end
             end
@@ -223,6 +227,15 @@ module Oddb2xml
           @mutex.synchronize do
             hsh = BagXmlExtractor.new(xml).to_hash
             @items = hsh
+          end
+        end
+      when :zurrose
+        Thread.new do
+          downloader = ZurroseDownloader.new(@options)
+          xml = downloader.download
+          @mutex.synchronize do
+            hsh = ZurroseExtractor.new(xml).to_hash
+            @prices = hsh
           end
         end
       when :index

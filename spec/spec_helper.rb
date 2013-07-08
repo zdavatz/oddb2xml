@@ -228,6 +228,20 @@ module ServerMockHelper
         :headers => {'Content-Type' => 'text/plain; charset=utf-8'},
         :body    => stub_response)
   end
+  def setup_zurrose_server_mock
+    # dat
+    stub_dat_url  = 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/DOS/IGM01_ohne_MwSt/Vollstamm/transfer.dat'
+    stub_response = File.read(File.expand_path('../data/zurrose_transfer.dat', __FILE__))
+    stub_request(:get, stub_dat_url).
+      with(:headers => {
+        'Accept' => '*/*',
+        'Host'   => 'zurrose.com',
+      }).
+      to_return(
+        :status  => 200,
+        :headers => {'Content-Type' => 'text/plain; charset=utf-8'},
+        :body    => stub_response)
+  end
 end
 
 RSpec.configure do |config|

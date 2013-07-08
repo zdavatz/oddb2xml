@@ -19,7 +19,7 @@ module Oddb2xml
   class Builder
     attr_accessor :subject, :index, :items, :flags, :lppvs,
                   :actions, :migel, :orphans, :fridges,
-                  :infos, :packs,
+                  :infos, :packs, :prices,
                   :ean14, :tag_suffix,
                   :companies, :people
     def initialize
@@ -31,6 +31,7 @@ module Oddb2xml
       @infos      = {}
       @packs      = {}
       @migel      = {}
+      @prices     = {} # zurrose
       @actions    = []
       @orphans    = []
       @fridges    = []
@@ -645,7 +646,14 @@ module Oddb2xml
                   #xml.LINENO
                   #xml.NOUNITS
                 #}
-                if pac
+                if !@prices.empty? && de_idx[:ean] && \
+                  price = @prices[de_idx[:ean]] # zurrose
+                  xml.ARTPRI {
+                   xml.VDAT  datetime
+                   xml.PTYP  "ZURROSE"
+                   xml.PRICE price
+                  }
+                elsif pac
                   pac[:prices].each_pair do |key, price|
                     xml.ARTPRI {
                      xml.VDAT  price[:valid_date] unless price[:valid_date].empty?
