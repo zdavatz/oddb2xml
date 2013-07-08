@@ -417,7 +417,7 @@ module Oddb2xml
         next unless line =~ /(7680\d{9})(\d{1})\r\n$/
         data[$1.to_s] = {
          :vat   => $2.to_s,
-         :price => line[60,6].gsub(/(\d{2})$/, "." + $1.to_s).to_f.round(2).to_s
+         :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, "." + $1.to_s).to_f)
         }
       end
       data
