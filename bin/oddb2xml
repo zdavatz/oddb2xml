@@ -47,7 +47,7 @@ parser.on('-o v', '--option v',     /^fi$/)         {|v| opts[:fi] = true }
 parser.on('-i v', '--include v',    /^ean14$/)      {|v| opts[:ean14] = true }
 parser.on('-t v', '--tag-suffix v', /^[A-z0-9]*$/i) {|v| opts[:tag_suffix] = v.upcase }
 parser.on('-x v', '--context v',    /^addr(ess)*$/i){|v| opts[:address] = true }
-parser.on('-p v', '--prices v',     /^zurrose$/)    {|v| opts[:price] = v.intern }
+parser.on('-p v', '--price v',      /^zurrose$/)    {|v| opts[:price] = v.intern }
 #parser.on('--debug') {|v| opts[:debug] = true }
 parser.on_tail('-h', '--help') { puts help; exit }
 
@@ -59,6 +59,11 @@ rescue OptionParser::MissingArgument,
        OptionParser::InvalidOption
   puts help
   exit
+end
+
+# TEMP
+if path = args.first
+  opts[:transfer_dat] = path
 end
 
 ui = Oddb2xml::Cli.new(opts)

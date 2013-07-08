@@ -231,7 +231,7 @@ module Oddb2xml
         end
       when :zurrose
         Thread.new do
-          downloader = ZurroseDownloader.new(@options)
+          downloader = ZurroseDownloader.new(@options, @options[:transfer_dat])
           xml = downloader.download
           @mutex.synchronize do
             hsh = ZurroseExtractor.new(xml).to_hash

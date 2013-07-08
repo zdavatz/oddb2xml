@@ -115,7 +115,12 @@ module Oddb2xml
     include DownloadMethod
     def download
       @url ||= 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat'
-      download_as('oddb2xml_zurrose_transfer.dat', 'r:iso-8859-1:utf-8')
+      unless @url =~ /^http/
+        io = File.open(@url, 'r:iso-8859-1:utf-8')
+        io.read
+      else
+        download_as('oddb2xml_zurrose_transfer.dat', 'r:iso-8859-1:utf-8')
+      end
     end
   end
   class MedregbmDownloader < Downloader
