@@ -230,7 +230,7 @@ module ServerMockHelper
   end
   def setup_zurrose_server_mock
     # dat
-    stub_dat_url  = 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/DOS/IGM01_ohne_MwSt/Vollstamm/transfer.dat'
+    stub_dat_url  = 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat'
     stub_response = File.read(File.expand_path('../data/zurrose_transfer.dat', __FILE__))
     stub_request(:get, stub_dat_url).
       with(:headers => {
