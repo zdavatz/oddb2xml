@@ -1,3 +1,7 @@
+=== 1.5.3 / 08.07.2013
+
+*  Add -p option for zurrose transfer.dat
+
 === 1.5.2 / 12.06.2013
 
 * Improve NINCD detection
