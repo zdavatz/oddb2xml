@@ -716,8 +716,9 @@ module Oddb2xml
         ) {
           length = 0
           %w[de fr].each do |lang|
-            length += @infos[lang].length
-            @infos[lang].each do |info|
+            infos = @infos[lang].uniq {|i| i[:monid] }
+            length += infos.length
+            infos.each do |info|
               xml.KMP(
                 'MONTYPE' => 'fi', # only
                 'LANG'    => lang.upcase,
