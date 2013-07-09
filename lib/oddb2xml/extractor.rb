@@ -409,7 +409,7 @@ module Oddb2xml
   end
   class ZurroseExtractor < Extractor
     def initialize(dat)
-      @io = StringIO.new(dat)
+      @io = StringIO.new(dat) if dat
     end
     def to_hash
       data = {}
@@ -417,9 +417,9 @@ module Oddb2xml
         next unless line =~ /(7680\d{9})(\d{1})\r\n$/
         data[$1.to_s] = {
          :vat   => $2.to_s,
-         :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, "." + $1.to_s).to_f)
+         :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f)
         }
-      end
+      end if @io
       data
     end
   end
