@@ -324,7 +324,7 @@ module Oddb2xml
           if text = html.xpath("///div[@id='Section7750']/p").text
             # 1 ~ 3 swissmedic number
             if text =~ /(\d{5})[,\s]*(\d{5})?|(\d{5})[,\s]*(\d{5})?[,\s]*(\d{5})?/
-              [$1, $2, $3].compact.each do |n|
+              [$1, $2, $3].compact.each do |n| # plural
                 item[:monid] = n
                 data[lang] << item
               end

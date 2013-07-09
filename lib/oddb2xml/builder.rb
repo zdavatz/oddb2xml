@@ -764,8 +764,9 @@ module Oddb2xml
               info_index[info[:monid]] = i
             end
           end
-          @products.select{|obj| obj[:seq] }.
-            group_by{|obj| obj[:seq][:swissmedic_number5] }.each_pair do |monid, products|
+          @products.group_by{|obj|
+            obj[:no8].to_s[0..4] # swissmedic_number5
+          }.each_pair do |monid, products|
             if info_index[monid]
               xml.KP('DT' => '') {
                 xml.MONID monid
