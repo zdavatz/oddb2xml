@@ -1,3 +1,7 @@
+=== 1.5.7 / 09.07.2013
+
+*  Update to include no seq entries into fi_product
+
 === 1.5.6 / 09.07.2013
 
 * Fix bug zurrose price format
