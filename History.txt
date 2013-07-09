@@ -1,3 +1,7 @@
+=== 1.5.8 / 09.07.2013
+
+* Update to add grouped fi with No5 into oddb_fi.xml
+
 === 1.5.7 / 09.07.2013
 
 *  Update to include no seq entries into fi_product
