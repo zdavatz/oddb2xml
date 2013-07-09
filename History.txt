@@ -1,3 +1,9 @@
+=== 1.5.6 / 09.07.2013
+
+* Fix bug zurrose price format
+* Update time format for zurrose import
+* Update to add ZURROSE Price as optional value
+
 === 1.5.5 / 08.07.2013
 
 * Add local PATH option support for zurrose
