@@ -664,7 +664,7 @@ module Oddb2xml
                 end
                 if price
                   xml.ARTPRI {
-                    xml.VDAT  datetime
+                    xml.VDAT  Time.parse(datetime).strftime("%d.%m.%Y")
                     xml.PTYP  "ZURROSE"
                     xml.PRICE price[:price]
                   }
