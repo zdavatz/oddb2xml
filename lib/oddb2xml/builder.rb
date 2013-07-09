@@ -653,13 +653,7 @@ module Oddb2xml
                   #xml.LINENO
                   #xml.NOUNITS
                 #}
-                if price # zurrose
-                  xml.ARTPRI {
-                   xml.VDAT  datetime
-                   xml.PTYP  "ZURROSE"
-                   xml.PRICE price[:price]
-                  }
-                elsif pac
+                if pac
                   pac[:prices].each_pair do |key, price|
                     xml.ARTPRI {
                      xml.VDAT  price[:valid_date] unless price[:valid_date].empty?
@@ -667,6 +661,13 @@ module Oddb2xml
                      xml.PRICE price[:price]      unless price[:price].empty?
                     }
                   end
+                end
+                if price
+                  xml.ARTPRI {
+                    xml.VDAT  datetime
+                    xml.PTYP  "ZURROSE"
+                    xml.PRICE price[:price]
+                  }
                 end
                 #xml.ARTMIG {
                   #xml.VDAT
