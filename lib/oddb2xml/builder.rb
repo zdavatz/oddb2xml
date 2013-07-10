@@ -560,6 +560,9 @@ module Oddb2xml
                     xml.SMNO no8.to_s
                   end
                 end
+                if ppac
+                  xml.PRODNO ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
+                end
                 #xml.HOSPCD
                 #xml.CLINCD
                 #xml.ARTTYP
