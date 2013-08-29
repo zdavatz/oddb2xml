@@ -1,5 +1,7 @@
 # oddb2xml
 
+[![Build Status](https://secure.travis-ci.org/zdavatz/oddb2xml.png)](http://travis-ci.org/zdavatz/oddb2xml)
+
 * oddb2xml -a nonpharma -o fi
 
 creates the following xml files:
