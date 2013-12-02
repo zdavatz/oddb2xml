@@ -1,3 +1,7 @@
+=== 1.6.1 / 02.12.2013
+
+* Add pub_price from zurRose
+
 === 1.6.0 / 22.11.2013
 
 * Update for Swissmedic Packungen.xls changes
