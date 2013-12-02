@@ -671,6 +671,11 @@ module Oddb2xml
                     xml.PTYP  "ZURROSE"
                     xml.PRICE price[:price]
                   }
+                  xml.ARTPRI {
+                    xml.VDAT  Time.parse(datetime).strftime("%d.%m.%Y")
+                    xml.PTYP  "ZURROSEPUB"
+                    xml.PRICE price[:pub_price]
+                  }
                 end
                 #xml.ARTMIG {
                   #xml.VDAT
