@@ -46,6 +46,10 @@ end
 
 describe Oddb2xml::Cli do
   include ServerMockHelper
+  before(:all) do
+    files = (Dir.glob('oddb_*.tar.gz')+ Dir.glob('oddb_*.zip')+ Dir.glob('oddb_*.xml'))# +Dir.glob('data/download/*'))
+    files.each{ |file| FileUtils.rm(file, :verbose => true) }
+  end
   before(:each) do
     setup_server_mocks
   end
@@ -72,7 +76,7 @@ describe Oddb2xml::Cli do
     it 'should not create any xml file' do
       capture(:stdout) { cli.run }.should match(/Pharma/)
       Dir.glob('oddb_*.xml').each do |file|
-        File.exists?(file).should be_nil
+        File.exists?(file).should be_false
       end
     end
     after(:each) do
@@ -104,7 +108,7 @@ describe Oddb2xml::Cli do
     it 'should not create any xml file' do
       capture(:stdout) { cli.run }.should match(/Pharma/)
       Dir.glob('oddb_*.xml').each do |file|
-        File.exists?(file).should be_nil
+        File.exists?(file).should be_false
       end
     end
     after(:each) do
