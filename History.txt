@@ -1,3 +1,7 @@
+=== 1.6.2 / 09.12.2013
+
+* Read article with no pharmacode from BAG.xml Preparation.xml
+
 === 1.6.1 / 02.12.2013
 
 * Add pub_price from zurRose
