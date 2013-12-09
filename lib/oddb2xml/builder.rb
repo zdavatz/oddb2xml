@@ -22,7 +22,8 @@ module Oddb2xml
                   :infos, :packs, :prices,
                   :ean14, :tag_suffix,
                   :companies, :people
-    def initialize
+    def initialize(args = {})
+      @options    = args
       @subject    = nil
       @index      = {}
       @items      = {}

@@ -36,13 +36,11 @@ module Oddb2xml
         end
         if File.exists? @compress_file
           @contents.each do |file|
-            File.unlink file
+            Oddb2xml.download_finished(file, )
           end
         end
-      rescue Errno::ENOENT, StandardError
-        if File.exists? @compress_file
-          File.unlink @compress_file
-        end
+      rescue Errno::ENOENT, StandardError  => e
+        Oddb2xml.download_finished(@compress_file)
         return false
       end
       return true

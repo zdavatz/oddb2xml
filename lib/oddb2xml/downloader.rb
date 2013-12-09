@@ -9,18 +9,22 @@ module Oddb2xml
     private
     def download_as(file, option='r')
       data = nil
-      begin
-        response = @agent.get(@url)
-        response.save_as(file)
-        response = nil # win
+      # require 'pry'; binding.pry
+      if Oddb2xml.skip_download(file)
         io = File.open(file, option)
         data = io.read
-      rescue Timeout::Error, Errno::ETIMEDOUT
-        retrievable? ? retry : raise
-      ensure
-        io.close if io and !io.closed? # win
-        if File.exists?(file)
-          File.unlink(file)
+      else
+        begin
+          response = @agent.get(@url)
+          response.save_as(file)
+          response = nil # win
+          io = File.open(file, option)
+          data = io.read
+        rescue Timeout::Error, Errno::ETIMEDOUT
+          retrievable? ? retry : raise
+        ensure
+          io.close if io and !io.closed? # win
+          Oddb2xml.download_finished(file)
         end
       end
       return data
@@ -153,17 +157,17 @@ module Oddb2xml
         if @options[:debug]
           FileUtils.copy(File.expand_path("../../../spec/data/#{file}", __FILE__), '.')
         else
-          response = @agent.get(@url)
-          response.save_as(file)
-          response = nil # win
+          unless Oddb2xml.skip_download(file)
+            response = @agent.get(@url)
+            response.save_as(file)
+            response = nil # win
+          end
         end
-        return read_xml_form_zip(/^Preparation/iu, file)
+        read_xml_form_zip(/^Preparation/iu, file)
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
-        if File.exists?(file)
-          File.unlink(file)
-        end
+        Oddb2xml.download_finished(file)
       end
     end
   end
@@ -239,9 +243,11 @@ XML
         page = @agent.get(@url)
         if link_node = page.search(@xpath).first
           link = Mechanize::Page::Link.new(link_node, @agent, page)
-          response = link.click
-          response.save_as(file)
-          response = nil # win
+          unless Oddb2xml.skip_download(file)
+            response = link.click
+            response.save_as(file)
+            response = nil # win
+          end
         end
         io = File.open(file, 'rb')
         return io.read
@@ -249,9 +255,7 @@ XML
         retrievable? ? retry : raise
       ensure
         io.close if io and !io.closed?
-        if File.exists?(file)
-          File.unlink(file)
-        end
+        Oddb2xml.download_finished(file)
       end
     end
   end
@@ -264,37 +268,29 @@ XML
     def download
       file = "swissmedic_info.zip"
       begin
-        response = nil
-        if home = @agent.get(@url)
-          form = home.form_with(:id => 'Form1')
-          bttn = form.button_with(:name => 'ctl00$MainContent$btnOK')
-          if page = form.submit(bttn)
-            form = page.form_with(:id => 'Form1')
-            bttn = form.button_with(:name => 'ctl00$MainContent$BtnYes')
-            response = form.submit(bttn)
+        unless Oddb2xml.skip_download(file)
+          response = nil
+          if home = @agent.get(@url)
+            form = home.form_with(:id => 'Form1')
+            bttn = form.button_with(:name => 'ctl00$MainContent$btnOK')
+            if page = form.submit(bttn)
+              form = page.form_with(:id => 'Form1')
+              bttn = form.button_with(:name => 'ctl00$MainContent$BtnYes')
+              response = form.submit(bttn)
+            end
+          end
+          if response          
+            response.save_as(file)
+            response = nil # win
           end
         end
-        if response
-          response.save_as(file)
-          response = nil # win
-        end
-        return read_xml_form_zip(/^AipsDownload_/iu, file)
+        read_xml_form_zip(/^AipsDownload_/iu, file)
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       rescue NoMethodError
         # pass
       ensure
-        # win
-        deleted = false
-        if File.exists?(file)
-          until deleted
-            begin
-              File.unlink(file)
-              deleted = true
-            rescue Errno::EACCES # Permission Denied on Windows
-            end
-          end
-        end
+        Oddb2xml.download_finished(file)
       end
     end
   end

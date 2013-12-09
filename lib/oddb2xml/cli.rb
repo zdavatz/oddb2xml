@@ -5,6 +5,7 @@ require 'oddb2xml/builder'
 require 'oddb2xml/downloader'
 require 'oddb2xml/extractor'
 require 'oddb2xml/compressor'
+require 'oddb2xml/util'
 
 module Oddb2xml
   class Cli
@@ -14,6 +15,7 @@ module Oddb2xml
     LANGUAGES = %w[DE FR] # EN does not exist
     def initialize(args)
       @options = args
+      Oddb2xml.save_options(@options)
       @mutex = Mutex.new
       # product
       @items = {} # Items from Preparations.xml in BAG
@@ -88,7 +90,7 @@ module Oddb2xml
     def build
       begin
         files.each_pair do |sbj, file|
-          builder = Builder.new do |builder|
+          builder = Builder.new(@options) do |builder|
             if @options[:address]
               builder.subject   = sbj
               builder.companies = @companies
@@ -143,7 +145,7 @@ module Oddb2xml
       rescue Interrupt
         files.values.each do |file|
           if File.exist? file
-            File.unlink file
+            File.unlink(file) # we don't save it as it might be only partly downloaded
           end
         end
         raise Interrupt

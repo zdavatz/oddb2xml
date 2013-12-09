@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'spec_helper'
+require "#{Dir.pwd}/lib/oddb2xml/downloader"
 
 describe Oddb2xml::Extractor do
   it "pending"
@@ -41,7 +42,15 @@ describe Oddb2xml::SwissIndexExtractor do
   it "pending"
 end
 
-describe Oddb2xml::SwissmedicExtractor do
+describe Oddb2xml::BMUpdateExtractor do
+  it "pending"
+end
+
+describe Oddb2xml::LppvExtractor do
+  it "pending"
+end
+
+describe Oddb2xml::SwissIndexExtractor do
   it "pending"
 end
 
@@ -50,7 +59,18 @@ describe Oddb2xml::MigelExtractor do
 end
 
 describe Oddb2xml::SwissmedicInfoExtractor do
-  it "pending"
+  context 'when transfer.dat is empty' do
+    subject { Oddb2xml::SwissmedicInfoExtractor.new("") }
+    it { expect(subject.to_hash).to be_empty }
+  end
+  context 'can parse swissmedic_packages.xls' do
+    it {
+        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_packages.xls')
+        bin = IO.read(filename)
+        @packs = Oddb2xml::SwissmedicExtractor.new(bin, :package).to_hash
+        expect(@packs.size).to eq(8) 
+       }
+  end
 end
 
 describe Oddb2xml::EphaExtractor do
@@ -58,10 +78,6 @@ describe Oddb2xml::EphaExtractor do
 end
 
 describe Oddb2xml::MedregbmExtractor do
-  it "pending"
-end
-
-describe Oddb2xml::ZurroseExtractor do
   it "pending"
 end
 

@@ -13,6 +13,7 @@ def help
 #$0 ver.#{Oddb2xml::VERSION}
 Usage:
   oddb2xml [option]
+    produced files are found under data
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
     -c F, --compress=F   Compress format F. {tar.gz|zip}
     -f F, --format=F     File format F, default is xml. {xml|dat}
@@ -24,6 +25,10 @@ Usage:
     -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9]
                          If S is given, it is also used as prefix of filename.
     -x N, --context=N    context N {product|address}. product is default.
+                         
+                         For debugging purposes
+    --skip-download      skips downloading files it the file is already under data/downloads.
+                         Downloaded files are saved under data/downloads
     -h,   --help         Show this help message.
 EOS
 end
@@ -38,6 +43,7 @@ opts = {
   :tag_suffix   => nil,
   :debug        => false,
   :ean14        => false,
+  :skip_download=> false,
 }
 
 parser.on('-a v', '--append v',     /^nonpharma$/)  {|v| opts[:nonpharma] = true }
@@ -48,7 +54,7 @@ parser.on('-i v', '--include v',    /^ean14$/)      {|v| opts[:ean14] = true }
 parser.on('-t v', '--tag-suffix v', /^[A-z0-9]*$/i) {|v| opts[:tag_suffix] = v.upcase }
 parser.on('-x v', '--context v',    /^addr(ess)*$/i){|v| opts[:address] = true }
 parser.on('-p v', '--price v',      /^zurrose$/)    {|v| opts[:price] = v.intern }
-#parser.on('--debug') {|v| opts[:debug] = true }
+parser.on('--skip-download') {|v| opts[:skip_download] = true }
 parser.on_tail('-h', '--help') { puts help; exit }
 
 args = ARGV.dup
@@ -81,6 +87,6 @@ then you will not see anymore warnings
   end
   ui.run
 rescue Interrupt
-  puts
   exit
 end
+puts "#{Time.now}: #{__LINE__} done"; $stdout.sync
