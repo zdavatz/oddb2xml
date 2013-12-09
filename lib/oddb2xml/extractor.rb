@@ -74,85 +74,86 @@ module Oddb2xml
         item[:pharmacodes] = []
         item[:packages]    = {} # pharmacode => package
         seq.xpath('.//Pack').each do |pac|
-          if phar = pac.attr('Pharmacode')
-            phar = correct_code(phar.to_s, 7)
-            # as common key with swissINDEX
-            item[:pharmacodes] << phar
-            # packages
-            item[:packages][phar] = {
-              :pharmacode          => phar,
-              :ean                 => (ean = pac.at_xpath('.//GTIN')) ? ean.text : '',
-              :swissmedic_category => (cat = pac.at_xpath('.//SwissmedicCategory')) ? cat.text : '',
-              :swissmedic_number8  => (num = pac.at_xpath('.//SwissmedicNo8'))      ? num.text.rjust(8, '0') : '',
-              :narcosis_flag       => (flg = pac.at_xpath('.//FlagNarcosis'))       ? flg.text : '',
-              :prices              => {
-                :exf_price => {
-                  :price      => (exf = pac.at_xpath('.//ExFactoryPrice/Price'))         ? exf.text : '',
-                  :valid_date => (exf = pac.at_xpath('.//ExFactoryPrice/ValidFromDate')) ? exf.text : '',
-                  :price_code => (exf = pac.at_xpath('.//ExFactoryPrice/PriceTypeCode')) ? exf.text : '',
-                },
-                :pub_price => {
-                  :price      => (pub = pac.at_xpath('.//PublicPrice/Price'))         ? pub.text : '',
-                  :valid_date => (pub = pac.at_xpath('.//PublicPrice/ValidFromDate')) ? pub.text : '',
-                  :price_code => (pub = pac.at_xpath('.//PublicPrice/PriceTypeCode')) ? pub.text : '',
-                }
+          phar = pac.attr('Pharmacode')
+          phar = correct_code(phar.to_s, 7)
+          ean = pac.at_xpath('.//GTIN')
+          search_key = phar.to_i != 0 ? phar : ean.text 
+          # as common key with swissINDEX
+          item[:pharmacodes] << phar
+          # packages
+          item[:packages][search_key] = {
+            :pharmacode          => phar,
+            :ean                 => (ean) ? ean.text : '',
+            :swissmedic_category => (cat = pac.at_xpath('.//SwissmedicCategory')) ? cat.text : '',
+            :swissmedic_number8  => (num = pac.at_xpath('.//SwissmedicNo8'))      ? num.text.rjust(8, '0') : '',
+            :narcosis_flag       => (flg = pac.at_xpath('.//FlagNarcosis'))       ? flg.text : '',
+            :prices              => {
+              :exf_price => {
+                :price      => (exf = pac.at_xpath('.//ExFactoryPrice/Price'))         ? exf.text : '',
+                :valid_date => (exf = pac.at_xpath('.//ExFactoryPrice/ValidFromDate')) ? exf.text : '',
+                :price_code => (exf = pac.at_xpath('.//ExFactoryPrice/PriceTypeCode')) ? exf.text : '',
+              },
+              :pub_price => {
+                :price      => (pub = pac.at_xpath('.//PublicPrice/Price'))         ? pub.text : '',
+                :valid_date => (pub = pac.at_xpath('.//PublicPrice/ValidFromDate')) ? pub.text : '',
+                :price_code => (pub = pac.at_xpath('.//PublicPrice/PriceTypeCode')) ? pub.text : '',
               }
             }
-            # related all limitations
-            item[:packages][phar][:limitations] = []
-            limitations = Hash.new{|h,k| h[k] = [] }
-            # in seq
-            limitations[:seq] = (lims = seq.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
-            # in it-codes
-            limitations[:itc] = (lims = seq.xpath('.//ItCodes/ItCode/Limitations/Limitation')) ? lims.to_a : nil
-            # in pac
-            limitations[:pac] = (lims = pac.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
-            limitations.each_pair do |lim_key, lims|
-              key = ''
-              id  = ''
-              case lim_key
-              when :seq, :itc
-                key = :swissmedic_number5
-                id  = item[key].to_s
-              when :pac
-                key = :swissmedic_number8
-                id  = item[:packages][phar][key].to_s
-              end
-              if id.empty? or id == '0'
-                key = :pharmacode
-                id  = phar.to_s
-              end
-              lims.each do |lim|
-                limitation = {
-                  :it      => item[:it_code],
-                  :key     => key,
-                  :id      => id,
-                  :code    => (lic = lim.at_xpath('.//LimitationCode'))   ? lic.text : '',
-                  :type    => (lit = lim.at_xpath('.//LimitationType'))   ? lit.text : '',
-                  :value   => (liv = lim.at_xpath('.//LimitationValue'))  ? liv.text : '',
-                  :niv     => (niv = lim.at_xpath('.//LimitationNiveau')) ? niv.text : '',
-                  :desc_de => (dsc = lim.at_xpath('.//DescriptionDe'))    ? dsc.text : '',
-                  :desc_fr => (dsc = lim.at_xpath('.//DescriptionFr'))    ? dsc.text : '',
-                  :vdate   => (dat = lim.at_xpath('.//ValidFromDate'))    ? dat.text : '',
-                }
-                deleted = false
-                if upto = ((thr = lim.at_xpath('.//ValidThruDate')) ? thr.text : nil) and
-                   upto =~ /\d{2}\.\d{2}\.\d{2}/
-                  begin
-                    deleted = true if Date.strptime(upto, '%d.%m.%y') >= Date.today
-                  rescue ArgumentError
-                  end
-                end
-                limitation[:del] = deleted
-                item[:packages][phar][:limitations] << limitation
-              end
+          }
+          # related all limitations
+          item[:packages][search_key][:limitations] = []
+          limitations = Hash.new{|h,k| h[k] = [] }
+          # in seq
+          limitations[:seq] = (lims = seq.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
+          # in it-codes
+          limitations[:itc] = (lims = seq.xpath('.//ItCodes/ItCode/Limitations/Limitation')) ? lims.to_a : nil
+          # in pac
+          limitations[:pac] = (lims = pac.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
+          limitations.each_pair do |lim_key, lims|
+            key = ''
+            id  = ''
+            case lim_key
+            when :seq, :itc
+              key = :swissmedic_number5
+              id  = item[key].to_s
+            when :pac
+              key = :swissmedic_number8
+              id  = item[:packages][search_key][key].to_s
             end
-            # limitation points
-            pts = pac.at_xpath('.//PointLimitations/PointLimitation/Points') # only first points
-            item[:packages][phar][:limitation_points] = pts ? pts.text : ''
-            # pharmacode => seq (same data)
-            data[phar] = item
+            if id.empty? or id == '0'
+              key = :pharmacode
+              id  = phar.to_s
+            end
+            lims.each do |lim|
+              limitation = {
+                :it      => item[:it_code],
+                :key     => key,
+                :id      => id,
+                :code    => (lic = lim.at_xpath('.//LimitationCode'))   ? lic.text : '',
+                :type    => (lit = lim.at_xpath('.//LimitationType'))   ? lit.text : '',
+                :value   => (liv = lim.at_xpath('.//LimitationValue'))  ? liv.text : '',
+                :niv     => (niv = lim.at_xpath('.//LimitationNiveau')) ? niv.text : '',
+                :desc_de => (dsc = lim.at_xpath('.//DescriptionDe'))    ? dsc.text : '',
+                :desc_fr => (dsc = lim.at_xpath('.//DescriptionFr'))    ? dsc.text : '',
+                :vdate   => (dat = lim.at_xpath('.//ValidFromDate'))    ? dat.text : '',
+              }
+              deleted = false
+              if upto = ((thr = lim.at_xpath('.//ValidThruDate')) ? thr.text : nil) and
+                  upto =~ /\d{2}\.\d{2}\.\d{2}/
+                begin
+                  deleted = true if Date.strptime(upto, '%d.%m.%y') >= Date.today
+                rescue ArgumentError
+                end
+              end
+              limitation[:del] = deleted
+              item[:packages][search_key][:limitations] << limitation
+            end
           end
+          # limitation points
+          pts = pac.at_xpath('.//PointLimitations/PointLimitation/Points') # only first points
+          item[:packages][search_key][:limitation_points] = pts ? pts.text : ''
+          # pharmacode => seq (same data)
+          data[search_key] = item
         end
       end
       data

@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rubyzip'
+gem 'rubyzip', '0.9.9'
 gem 'archive-tar-minitar'
 gem 'mechanize', '~> 2.5.1'
 gem 'nokogiri'
