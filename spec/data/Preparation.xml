@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Preparations ReleaseDate="01.12.2013">
+  <Preparation ProductCommercial="8620">
+    <NameDe>3TC</NameDe>
+    <NameFr>3TC</NameFr>
+    <NameIt>3TC</NameIt>
+    <DescriptionDe>Filmtabl 150 mg </DescriptionDe>
+    <DescriptionFr>cpr pell 150 mg </DescriptionFr>
+    <DescriptionIt>cpr pell 150 mg </DescriptionIt>
+    <AtcCode>J05AF05</AtcCode>
+    <SwissmedicNo5>53662</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode>O</OrgGenCode>
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="8620" Pharmacode="1699947" PackId="12442">
+        <DescriptionDe>60 Stk</DescriptionDe>
+        <DescriptionFr>60 pce</DescriptionFr>
+        <DescriptionIt>60 pce</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>53662013</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>16577</BagDossierNo>
+        <GTIN>7680536620137</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>164.55</Price>
+            <ValidFromDate>01.10.2011</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>FREIWILLIGEPS</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Freiwillige Preissenkung</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Baissement de prix volontairement</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Baissement de prix volontairement</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>205.3</Price>
+            <ValidFromDate>01.10.2011</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>FREIWILLIGEPS</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Freiwillige Preissenkung</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Baissement de prix volontairement</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Baissement de prix volontairement</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>ViiV Healthcare GmbH</Description>
+            <Street>Talstrasse 3-5</Street>
+            <ZipCode>3053</ZipCode>
+            <Place>Münchenbuchsee</Place>
+            <Phone>+41315607670</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1996</IntegrationDate>
+          <ValidFromDate>15.03.1996</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Lamivudinum</DescriptionLa>
+        <Quantity>150</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="08.">
+        <DescriptionDe>INFEKTIONSKRANKHEITEN</DescriptionDe>
+        <DescriptionFr>MALADIES INFECTIEUSES</DescriptionFr>
+        <DescriptionIt>MALADIES INFECTIEUSES</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="08.03.">
+        <DescriptionDe>Mittel gegen Viren</DescriptionDe>
+        <DescriptionFr>Préparations antivirales</DescriptionFr>
+        <DescriptionIt>Préparations antivirales</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>15.03.1996</IntegrationDate>
+      <ValidFromDate>15.03.1996</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+﻿  <Preparation ProductCommercial="26257">
+    <NameDe>Levetiracetam DESITIN</NameDe>
+    <NameFr>Levetiracetam DESITIN</NameFr>
+    <NameIt>Levetiracetam DESITIN</NameIt>
+    <DescriptionDe>Filmtabl 250 mg </DescriptionDe>
+    <DescriptionFr>cpr pell 250 mg </DescriptionFr>
+    <DescriptionIt>cpr pell 250 mg </DescriptionIt>
+    <AtcCode>N03AX14</AtcCode>
+    <SwissmedicNo5>62069</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="26257" PackId="32894">
+        <DescriptionDe>30 Stk</DescriptionDe>
+        <DescriptionFr>30 pce</DescriptionFr>
+        <DescriptionIt>30 pce</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>62069008</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>19417</BagDossierNo>
+        <GTIN>7680620690084</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>13.49</Price>
+            <ValidFromDate>01.09.2013</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>FREIWILLIGEPS</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Freiwillige Preissenkung</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Baissement de prix volontairement</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Baissement de prix volontairement</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>27.8</Price>
+            <ValidFromDate>01.09.2013</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>FREIWILLIGEPS</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Freiwillige Preissenkung</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Baissement de prix volontairement</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Baissement de prix volontairement</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Desitin Pharma GmbH</Description>
+            <Street>Hammerstrasse 47</Street>
+            <ZipCode>4410</ZipCode>
+            <Place>Liestal</Place>
+            <Phone>+41619266010</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.05.2011</IntegrationDate>
+          <ValidFromDate>01.05.2011</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Levetiracetamum</DescriptionLa>
+        <Quantity>250</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="01.">
+        <DescriptionDe>NERVENSYSTEM</DescriptionDe>
+        <DescriptionFr>SYSTEME NERVEUX</DescriptionFr>
+        <DescriptionIt>SYSTEME NERVEUX</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.07.">
+        <DescriptionDe>Antiepileptica</DescriptionDe>
+        <DescriptionFr>Antiepileptica</DescriptionFr>
+        <DescriptionIt>Antiepileptica</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.07.10.">
+        <DescriptionDe>Einfache Antiepileptica</DescriptionDe>
+        <DescriptionFr>Antiépileptiques simples</DescriptionFr>
+        <DescriptionIt>Antiépileptiques simples</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.05.2011</IntegrationDate>
+      <ValidFromDate>01.05.2011</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+</Preparations>

@@ -14,7 +14,7 @@ shared_examples_for 'any compressor' do
     @compressor.finalize!.should == true
     compress_file = @compressor.instance_variable_get(:@compress_file)
     File.exists?(compress_file).should == true
-    File.unstub!(:unlink)
+    File.unstub(:unlink)
   end
 end
 

@@ -6,6 +6,65 @@ describe Oddb2xml::Extractor do
   it "pending"
 end
 
+describe Oddb2xml::TxtExtractorMethods do
+  it "pending"
+end
+
+describe Oddb2xml::BagXmlExtractor do
+  context 'should handle articles with and without pharmacode' do
+    subject do
+      dat = File.read(File.expand_path('../data/Preparation.xml', __FILE__))
+      Oddb2xml::BagXmlExtractor.new(dat).to_hash
+    end
+    it { 
+      @items = subject.to_hash
+      with_pharma = @items['1699947']
+      expect(with_pharma).not_to be_nil
+      expect(with_pharma[:atc_code]).not_to be_nil
+      expect(with_pharma[:pharmacodes]).not_to be_nil
+      expect(with_pharma[:packages].size).to eq(1)
+      expect(with_pharma[:packages].first[0]).to eq('1699947')
+      expect(with_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('205.3')
+      expect(@items.size).to eq(2)
+      no_pharma = @items['7680620690084']
+      expect(no_pharma).not_to be_nil
+      expect(no_pharma[:atc_code]).not_to be_nil
+      expect(no_pharma[:pharmacodes]).not_to be_nil
+      expect(no_pharma[:packages].size).to eq(1)
+      expect(no_pharma[:packages].first[0]).to eq('7680620690084')
+      expect(no_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('27.8')
+    }
+  end
+end
+
+describe Oddb2xml::SwissIndexExtractor do
+  it "pending"
+end
+
+describe Oddb2xml::SwissmedicExtractor do
+  it "pending"
+end
+
+describe Oddb2xml::MigelExtractor do
+  it "pending"
+end
+
+describe Oddb2xml::SwissmedicInfoExtractor do
+  it "pending"
+end
+
+describe Oddb2xml::EphaExtractor do
+  it "pending"
+end
+
+describe Oddb2xml::MedregbmExtractor do
+  it "pending"
+end
+
+describe Oddb2xml::ZurroseExtractor do
+  it "pending"
+end
+
 describe Oddb2xml::ZurroseExtractor do
   context 'when transfer.dat is empty' do
     subject { Oddb2xml::ZurroseExtractor.new("") }

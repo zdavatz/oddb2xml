@@ -36,7 +36,7 @@ describe Oddb2xml::BagXmlDownloader do
       xml.should =~ /DescriptionDe/
     end
     it 'should clean up current directory' do
-      xml.should_not raise_error(Timeout::Error)
+      expect { xml }.not_to raise_error
       File.exist?('XMLPublications.zip').should be(false)
     end
   end
@@ -100,7 +100,7 @@ describe Oddb2xml::SwissmedicDownloader do
         bin.bytes.should_not nil
       end
       it 'should clean up current directory' do
-        bin.should_not raise_error(Timeout::Error)
+        expect { bin }.not_to raise_error
         File.exist?('oddb_orphan.xls').should be(false)
       end
     end
@@ -117,7 +117,7 @@ describe Oddb2xml::SwissmedicDownloader do
         bin.bytes.should_not nil
       end
       it 'should clean up current directory' do
-        bin.should_not raise_error(Timeout::Error)
+        expect { bin }.not_to raise_error
         File.exist?('oddb_fridge.xls').should be(false)
       end
     end
@@ -134,7 +134,7 @@ describe Oddb2xml::SwissmedicDownloader do
         bin.bytes.should_not nil
       end
       it 'should clean up current directory' do
-        bin.should_not raise_error(Timeout::Error)
+        expect { bin }.not_to raise_error
         File.exist?('oddb_package.xls').should be(false)
       end
     end
@@ -160,7 +160,7 @@ describe Oddb2xml::SwissmedicInfoDownloader do
       xml.should =~ /content/
     end
     it 'should clean up current directory' do
-      xml.should_not raise_error(Timeout::Error)
+      expect { xml }.not_to raise_error
       File.exist?('swissmedic_info.zip').should be(false)
     end
   end
@@ -180,7 +180,7 @@ describe Oddb2xml::EphaDownloader do
       csv.bytes.should_not nil
     end
     it 'should clean up current directory' do
-      csv.should_not raise_error(Timeout::Error)
+      expect { csv }.not_to raise_error
       File.exist?('epha_interactions.csv').should be(false)
     end
   end
@@ -200,7 +200,7 @@ describe Oddb2xml::BMUpdateDownloader do
       txt.bytes.should_not nil
     end
     it 'should clean up current directory' do
-      txt.should_not raise_error(Timeout::Error)
+      expect { txt }.not_to raise_error
       File.exist?('oddb2xml_files_bm_update.txt').should be(false)
     end
   end
@@ -220,7 +220,7 @@ describe Oddb2xml::LppvDownloader do
       txt.bytes.should_not nil
     end
     it 'should clean up current directory' do
-      txt.should_not raise_error(Timeout::Error)
+      expect { txt }.not_to raise_error
       File.exist?('oddb2xml_files_lppv.txt').should be(false)
     end
   end
@@ -240,7 +240,7 @@ describe Oddb2xml::MigelDownloader do
       bin.bytes.should_not nil
     end
     it 'should clean up current directory' do
-      bin.should_not raise_error(Timeout::Error)
+      expect { bin }.not_to raise_error
       File.exist?('oddb2xml_files_nonpharma.txt').should be(false)
     end
   end
@@ -261,7 +261,7 @@ describe Oddb2xml::MedregbmDownloader do
         txt.bytes.should_not nil
       end
       it 'should clean up current directory' do
-        txt.should_not raise_error(Timeout::Error)
+        expect { txt }.not_to raise_error
         File.exist?('oddb_company.xls').should be(false)
       end
     end
@@ -278,7 +278,7 @@ describe Oddb2xml::MedregbmDownloader do
         txt.bytes.should_not nil
       end
       it 'should clean up current directory' do
-        txt.should_not raise_error(Timeout::Error)
+        expect { txt }.not_to raise_error
         File.exist?('oddb_person.xls').should be(false)
       end
     end
@@ -299,7 +299,7 @@ describe Oddb2xml::ZurroseDownloader do
       dat.bytes.should_not nil
     end
     it 'should clean up current directory' do
-      dat.should_not raise_error(Timeout::Error)
+      expect { dat }.not_to raise_error
       File.exist?('oddb2xml_zurrose_transfer.dat').should be(false)
     end
   end
