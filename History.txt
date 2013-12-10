@@ -1,3 +1,9 @@
+=== 1.6.3 / 10.12.2013
+
+* Added more specs. Use ean to find price-info if no pharmacode
+* Fix running specs
+* Added skip-download for debugging
+
 === 1.6.2 / 09.12.2013
 
 * Read article with no pharmacode from BAG.xml Preparation.xml
