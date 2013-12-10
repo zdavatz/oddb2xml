@@ -48,7 +48,7 @@ describe Oddb2xml::Cli do
   include ServerMockHelper
   before(:all) do
     files = (Dir.glob('oddb_*.tar.gz')+ Dir.glob('oddb_*.zip')+ Dir.glob('oddb_*.xml'))# +Dir.glob('data/download/*'))
-    files.each{ |file| FileUtils.rm(file, :verbose => true) }
+    files.each{ |file| FileUtils.rm(file) }
   end
   before(:each) do
     setup_server_mocks

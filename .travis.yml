@@ -1,5 +1,7 @@
 language: ruby
 
+bundler_args: --without debugger
+
 script: bundle exec rake spec
 
 rvm:

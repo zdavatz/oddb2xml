@@ -68,13 +68,20 @@ describe Oddb2xml::SwissmedicInfoExtractor do
         filename = File.join(File.dirname(__FILE__), 'data/swissmedic_packages.xls')
         bin = IO.read(filename)
         @packs = Oddb2xml::SwissmedicExtractor.new(bin, :package).to_hash
-        expect(@packs.size).to eq(8) 
+        expect(@packs.size).to eq(14) 
        }
   end
 end
 
 describe Oddb2xml::EphaExtractor do
-  it "pending"
+  context 'can parse epha_interactions.csv' do
+    it {
+        filename = File.join(File.dirname(__FILE__), 'data/epha_interactions.csv')
+        string = IO.read(filename)
+        @actions = Oddb2xml::EphaExtractor.new(string).to_arry
+        expect(@actions.size).to eq(2) 
+       }
+  end
 end
 
 describe Oddb2xml::MedregbmExtractor do

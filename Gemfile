@@ -14,3 +14,7 @@ group :development do
   gem 'hoe', '>= 3.4'
   gem 'rdoc'
 end
+
+group :debugger do
+  gem 'pry-debugger'
+end

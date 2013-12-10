@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<Preparations ReleaseDate="15.10.2012">
+  <Preparation ProductCommercial="00001">
+    <NameDe>Foo</NameDe>
+    <NameFr>Foo</NameFr>
+    <NameIt>Foo</NameIt>
+    <DescriptionDe>Foo 100 mg </DescriptionDe>
+    <DescriptionFr>Foo 100 mg </DescriptionFr>
+    <DescriptionIt>Foo 100 mg </DescriptionIt>
+    <AtcCode>A00AA00</AtcCode>
+    <SwissmedicNo5>00001</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode>O</OrgGenCode>
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack Pharmacode="0000001" PackId="00001" ProductKey="00001">
+        <DescriptionDe>10 Stk</DescriptionDe>
+        <DescriptionFr>10 pce</DescriptionFr>
+        <DescriptionIt>10 pce</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>00000001</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>00001</BagDossierNo>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>100.50</Price>
+            <ValidFromDate>01.10.2012</ValidFromDate>
+            <Division />
+            <DivisionPriveIncVat />
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>Baz</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Bar</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Bar</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Bar</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Foo GmbH</Description>
+            <Street>Foo strasse 1</Street>
+            <ZipCode>0001</ZipCode>
+            <Place>Baz</Place>
+            <Phone>00-00-00</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>31.03.2000</IntegrationDate>
+          <ValidFromDate>31.03.2000</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Bar</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Bar</DescriptionLa>
+        <Quantity>100</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="01.">
+        <DescriptionDe>BAR</DescriptionDe>
+        <DescriptionFr>BAR</DescriptionFr>
+        <DescriptionIt>BAR</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.01.">
+        <DescriptionDe>BAZ</DescriptionDe>
+        <DescriptionFr>BAZ</DescriptionFr>
+        <DescriptionIt>BAZ</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>31.03.2000</IntegrationDate>
+      <ValidFromDate>31.03.2000</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Bar</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+</Preparations>

@@ -42,8 +42,8 @@ module ServerMockHelper
         :headers => {'Content-Type' => 'application/zip; charset=utf-8'},
         :body    => stub_response)
   end
-  def setup_swiss_index_server_mock
-    ['Pharma', 'NonPharma'].each do |type|
+  def setup_swiss_index_server_mock(types =  ['Pharma', 'NonPharma'])
+    types.each do |type|
       # wsdl
       stub_wsdl_url = "https://index.ws.e-mediat.net/Swissindex/#{type}/ws_#{type}_V101.asmx?WSDL"
       stub_response = File.read(File.expand_path("../data/wsdl_#{type.downcase}.xml", __FILE__))

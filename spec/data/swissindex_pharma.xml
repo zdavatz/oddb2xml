@@ -1,55 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope
-  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <soap:Body>
-    <PHARMA
+    <PHARMA xmlns="http://swissindex.e-mediat.net/SwissindexPharma_out_V101" CREATION_DATETIME="2013-12-10T10:09:26.8198427+01:00">
+      <!-- spec/data/swissindex_pharma.xml. Values for spec/builder_spec.rb -->
       CREATION_DATETIME="2012-10-18T06:31:19.4687619+02:00"
       xmlns="http://example.com/test">
-      <ITEM DT="2012-10-18T00:00:00">
-        <GTIN>0000000000000</GTIN>
-        <PHAR>00000</PHAR>
+      <ITEM DT="2013-06-22T00:00:00">
+        <GTIN>7680536620137</GTIN>
+        <PHAR>1699947</PHAR>
         <STATUS>A</STATUS>
-        <STDATE>2002-05-23T00:00:00</STDATE>
+        <STDATE>1996-03-20T00:00:00</STDATE>
         <LANG>DE</LANG>
-        <DSCR>Foo 1000 mg</DSCR>
-        <ADDSCR>Amp</ADDSCR>
-        <ATC>A00AA00</ATC>
+        <DSCR>3TC Filmtabl 150 mg</DSCR>
+        <ADDSCR>60 Stk</ADDSCR>
+        <ATC>J05AF05</ATC>
         <COMP>
-          <NAME>EXAMPLE.COM AG</NAME>
-          <GLN>0000000000000</GLN>
+          <NAME>ViiV Healthcare GmbH</NAME>
+          <GLN>7601001392175</GLN>
         </COMP>
       </ITEM>
-      <ITEM DT="2012-10-18T00:00:00">
-        <GTIN>0000000000001</GTIN>
-        <PHAR>00001</PHAR>
+      <ITEM DT="2013-12-06T00:00:00">
+        <GTIN>7680620690084</GTIN>
+        <PHAR>5819012</PHAR>
         <STATUS>A</STATUS>
-        <STDATE>2002-05-23T00:00:00</STDATE>
+        <STDATE>2013-10-26T00:00:00</STDATE>
         <LANG>DE</LANG>
-        <DSCR>Bar 10 Stk</DSCR>
-        <ADDSCR>10 Stk</ADDSCR>
-        <ATC>A02AA02</ATC>
+        <DSCR>LEVETIRACETAM DESITIN Filmtabl 250 mg</DSCR>
+        <ADDSCR>30 Stk</ADDSCR>
+        <ATC>N03AX14</ATC>
         <COMP>
-          <NAME>EXAMPLE.ORG AG</NAME>
-        </COMP>
-      </ITEM>
-      <ITEM DT="2012-10-18T00:00:00">
-        <GTIN>0000000000002</GTIN>
-        <PHAR>00002</PHAR>
-        <STATUS>A</STATUS>
-        <STDATE>2002-05-23T00:00:00</STDATE>
-        <LANG>DE</LANG>
-        <DSCR>Baz 10 Tablet</DSCR>
-        <ADDSCR>5 Stk</ADDSCR>
-        <ATC>A03AA03</ATC>
-        <COMP>
-          <NAME>EXAMPLE.AC AG</NAME>
+          <NAME>Desitin Pharma GmbH</NAME>
+          <GLN>7601001320451</GLN>
         </COMP>
       </ITEM>
       <RESULT>
         <OK_ERROR>OK</OK_ERROR>
-        <NBR_RECORD>3</NBR_RECORD>
+        <NBR_RECORD>2</NBR_RECORD>
       </RESULT>
     </PHARMA>
   </soap:Body>

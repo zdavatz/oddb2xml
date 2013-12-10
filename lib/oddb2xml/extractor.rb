@@ -240,6 +240,7 @@ module Oddb2xml
           no8 = sprintf('%05d',row[i_5].to_i) + sprintf('%03d',row[i_3].to_i)
           prodno = sprintf('%05d',row[i_5].to_i) + row[p_1_2].to_i.to_s
           unless no8.empty?
+            next if no8.to_i == 0
             ean_base12 = "7680#{no8}"
             data[no8.intern] = {
               :ean                  => (ean_base12.ljust(12, '0') + calc_checksum(ean_base12)),

@@ -391,8 +391,12 @@ module Oddb2xml
             seq = obj[:seq]
             length += 1
             xml.PRD('DT' => '') {
-              xml.GTIN obj[:ean].to_s
-              ppac = ((_ppac = @packs[obj[:ean].to_s[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
+              ean = obj[:ean].to_s
+              xml.GTIN ean
+              ppac = ((_ppac = @packs[ean[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
+              unless ppac
+                 ppac = @packs.find{|pac| pac.ean == ean }.first               
+              end
               xml.PRODNO ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
               if seq
                 %w[de fr].each do |l|
@@ -538,8 +542,12 @@ module Oddb2xml
               fr_idx = obj[:fr][i]              # swissindex FR
               pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
               ppac = nil                        # Packungen
+              ean = de_idx[:ean]
               if obj[:seq]
                 pac = obj[:seq][:packages][de_idx[:pharmacode]]
+                pac = obj[:seq][:packages][ean] unless pac
+              else
+                pac = @items[ean][:packages][ean] if @items and @items[ean]
               end
               if no8
                 ppac = ((_ppac = @packs[no8.intern] and !_ppac[:is_tier]) ? _ppac : nil)
@@ -574,7 +582,7 @@ module Oddb2xml
                 if de_idx
                   xml.SALECD(de_idx[:status].empty? ? 'N' : de_idx[:status])
                 end
-                if pac
+                if pac and pac[:limitation_points]
                   #xml.INSLIM
                   xml.LIMPTS pac[:limitation_points] unless pac[:limitation_points].empty?
                 end
@@ -657,7 +665,7 @@ module Oddb2xml
                   #xml.LINENO
                   #xml.NOUNITS
                 #}
-                if pac
+                if pac and pac[:prices]
                   pac[:prices].each_pair do |key, price|
                     xml.ARTPRI {
                      xml.VDAT  price[:valid_date] unless price[:valid_date].empty?
@@ -957,6 +965,7 @@ module Oddb2xml
             pac,no8 = nil,nil
             if obj[:seq]
               pac = obj[:seq][:packages][idx[:pharmacode]]
+              pac = obj[:seq][:packages][idx[:ean]] unless pac
             end
             # :swissmedic_numbers
             if pac
