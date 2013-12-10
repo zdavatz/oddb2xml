@@ -192,7 +192,6 @@ module Oddb2xml
         if @options[:debug]
           return File.read(File.expand_path("../../../spec/data/swissindex_#{@type}_#{@lang}.xml", __FILE__))
         end
-        file2save = File.expand_path("../../../data/download/swissindex_#{@type}_#{@lang}.xml", __FILE__)
         soap = <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -205,7 +204,11 @@ XML
         if response.success?
           if xml = response.to_xml
             response = nil # win
-            File.open(file2save, 'w+') { |file| file.puts xml }
+            if @options[:skip_download]
+              file2save = File.expand_path("../../../data/download/swissindex_#{@type}_#{@lang}.xml", __FILE__)
+              FileUtils.makedirs(File.dirname(file2save)) unless File.directory?(File.dirname(file2save))
+              File.open(file2save, 'w+') { |file| file.puts xml }
+            end
             return xml
           else
             # received broken data or internal error

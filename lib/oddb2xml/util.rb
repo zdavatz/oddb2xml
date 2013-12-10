@@ -18,8 +18,10 @@ module Oddb2xml
   
   def Oddb2xml.download_finished(file)
     dest = "#{Backup}/#{File.basename(file)}"
-    FileUtils.makedirs(Backup)
-    FileUtils.cp(file, dest, :verbose => false)
+    if @options[:skip_download]
+      FileUtils.makedirs(Backup)
+      FileUtils.cp(file, dest, :verbose => false)
+    end
     begin
       File.unlink(file) if File.exists?(file)
     rescue Errno::EACCES # Permission Denied on Windows      
