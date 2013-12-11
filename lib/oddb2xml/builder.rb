@@ -395,7 +395,7 @@ module Oddb2xml
               xml.GTIN ean
               ppac = ((_ppac = @packs[ean[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
               unless ppac
-                 ppac = @packs.find{|pac| pac.ean == ean }.first               
+                ppac = @packs.find{|pac| pac.ean == ean }.first
               end
               xml.PRODNO ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
               if seq
@@ -958,18 +958,25 @@ module Oddb2xml
       rows = []
       @articles.each do |obj|
         obj[:de].each_with_index do |idx, i|
-          next if ((idx[:ean].to_s.length != 13) and !ean14)
+          ean = idx[:ean]
+          next if ((ean.to_s.length != 13) and !ean14)
           row = ''
           # Oddb2tdat.parse
           if idx[:status] =~ /A|I/
             pac,no8 = nil,nil
             if obj[:seq]
               pac = obj[:seq][:packages][idx[:pharmacode]]
-              pac = obj[:seq][:packages][idx[:ean]] unless pac
+              pac = obj[:seq][:packages][ean] unless pac
+            else
+              pac = @items[ean][:packages][ean] if @items and @items[ean]
             end
-            # :swissmedic_numbers
+             # :swissmedic_numbers
             if pac
               no8 = pac[:swissmedic_number8].intern
+            end
+            if pac and pac[:prices] == nil and no8
+              ppac = ((ppac = @packs[no8.intern] and ppac[:is_tier]) ? ppac : nil)
+              pac = ppac if ppac
             end
             row << "%#{DAT_LEN[:RECA]}s"  % '11'
             row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = idx[:pharmacode] and phar.size > 3) # does not check expiration_date
@@ -986,7 +993,7 @@ module Oddb2xml
             row << format_name(abez)
             row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))
             row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
-            row << "%#{DAT_LEN[:CKZL]}s"  % if (@lppvs[idx[:ean]])
+            row << "%#{DAT_LEN[:CKZL]}s"  % if (@lppvs[ean])
                                               '2'
                                             elsif pac # sl_entry
                                               '1'
@@ -1000,7 +1007,7 @@ module Oddb2xml
                                               '0'
                                             end
             row << "%#{DAT_LEN[:CBGG]}s"  % if ((pac && pac[:narcosis_flag] == 'Y') or # BAGXml
-                                                (@flags[idx[:ean]]))                   # ywesee BM_update
+                                                (@flags[ean]))                   # ywesee BM_update
                                               '3'
                                             else
                                               '0'
@@ -1015,7 +1022,7 @@ module Oddb2xml
                                             else
                                               ('0' * DAT_LEN[:ITHE])
                                             end.to_i
-            row << "%0#{DAT_LEN[:CEAN]}d" % idx[:ean].to_i
+            row << "%0#{DAT_LEN[:CEAN]}d" % ean.to_i
             row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
             rows << row
           end
