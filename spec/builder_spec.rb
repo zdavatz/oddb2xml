@@ -59,12 +59,12 @@ describe Oddb2xml::Builder do
       article_xml.should match(/<SMNO>53662013</) 
       article_xml.should match(/<DSCRD>3TC Filmtabl 150 mg</) 
       article_xml.should match(/<COMPNO>7601001392175</) 
-      article_xml.should match(/<BC>7680536620137</) 
-      article_xml.should match(/<VDAT>01.10.2011</) 
-      article_xml.should match(/<PTYP>PEXF</) 
-      article_xml.should match(/<PRICE>164.55</) 
-      article_xml.should match(/<PTYP>PPUB</) 
-      article_xml.should match(/<PRICE>205.3</) 
+      article_xml.should match(/<BC>7680536620137</)
+      article_xml.should match(/<VDAT>01.10.2011</)
+      article_xml.should match(/<PTYP>PEXF</)
+      article_xml.should match(/<PRICE>164.55</)
+      article_xml.should match(/<PTYP>PPUB</)
+      article_xml.should match(/<PRICE>205.3</)
       
       article_xml.should match(/Levetiracetam DESITIN/i) # 
       article_xml.should match(/7680536620137/) # Pharmacode
@@ -77,6 +77,26 @@ describe Oddb2xml::Builder do
       article_xml.should match(/<PHAR>5819012</)
       article_xml.should match(/<DSCRD>LEVETIRACETAM DESITIN Filmtabl 250 mg/)
       article_xml.should match(/<COMPNO>7601001320451</)
+    end
+  end
+  
+  context 'when -a nonpharma -f dat is given' do
+    let(:cli) do
+      opts = {
+        :nonpharma    => 'true',
+        :format       => :dat,
+      }
+      Oddb2xml::Cli.new(opts)
+    end    
+    it 'should generate a valid oddb_with_migel.dat' do
+      res = capture(:stdout){ cli.run }
+      res.should match(/products/)
+      dat_filename = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_with_migel.dat'))
+      File.exists?(dat_filename).should be_true
+      oddb_dat = IO.read(dat_filename)
+#      $stdout.puts oddb_dat
+#      return
+      oddb_dat.should match(/1115819012LEVETIRACETAM DESITIN Filmtabl 250 mg 30 Stk      001349002780100B010710076806206900842/) 
     end
   end
 end
