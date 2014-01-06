@@ -63,13 +63,37 @@ describe Oddb2xml::SwissmedicInfoExtractor do
     subject { Oddb2xml::SwissmedicInfoExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
   end
-  context 'can parse swissmedic_packages.xls' do
+  context 'can parse swissmedic_package.xlsx' do
     it {
-        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_packages.xls')
-        bin = IO.read(filename)
-        @packs = Oddb2xml::SwissmedicExtractor.new(bin, :package).to_hash
-        expect(@packs.size).to eq(14) 
-       }
+        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_package.xlsx')
+        @packs = Oddb2xml::SwissmedicExtractor.new(filename, :package).to_hash
+        expect(@packs.size).to eq(14)
+        first = @packs.first[1]
+        expect(first[:atc_code]).to eq('J06AA')
+        expect(first[:swissmedic_category]).to eq('B')
+        expect(first[:package_size]).to eq('3')
+        expect(first[:einheit_swissmedic]).to eq('Suppositorien')
+        expect(first[:substance_swissmedic]).to eq('globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins)')
+        expect(@packs.first[0].to_s).to eq('00274001')
+      }
+  end
+  context 'can parse swissmedic_fridge.xlsx' do
+    it {
+        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_fridge.xlsx')
+        @packs = Oddb2xml::SwissmedicExtractor.new(filename, :fridge).to_arry
+        expect(@packs.size).to eq(17)
+        expect(@packs[0]).to eq("58618")
+        expect(@packs[1]).to eq("00696")
+      }
+  end
+  context 'can parse swissmedic_orphan.xls' do
+    it {
+        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_orphan.xls')
+        @packs = Oddb2xml::SwissmedicExtractor.new(filename, :orphan).to_arry
+        expect(@packs.size).to eq(72)
+        expect(@packs.first).to eq("62132")
+        expect(@packs[7]).to eq("00687")
+      }
   end
 end
 

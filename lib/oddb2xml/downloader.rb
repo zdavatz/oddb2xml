@@ -229,20 +229,20 @@ XML
       @type = type
       case @type
       when :orphan
-        action = "daten/00081/index.html?lang=de"
-        @xpath = "//div[@id='sprungmarke0_4']//a[@title='Humanarzneimittel']"
+        action = "arzneimittel/00156/00221/00222/00223/00224/00227/00228/index.html?lang=de"
+        @xpath = "//div[@id='sprungmarke10_3']//a[@title='Humanarzneimittel']"
       when :fridge
-        action = "daten/00080/00254/index.html?lang=de"
-        @xpath = "//table[@class='swmTableFlex']//a[@title='B3.1.35-d.xls']"
+        action = "arzneimittel/00156/00221/00222/00235/index.html?lang=de"
+        @xpath = "//div[@id='sprungmarke10_2']//a[@title='Excel-Version']"
       when :package
-        action = "daten/00080/00251/index.html?lang=de"
-        @xpath = "//div[@id='sprungmarke0_7']//a[@title='Excel-Version Zugelassene Verpackungen*']"
+        action = "arzneimittel/00156/00221/00222/00230/index.html?lang=de"
+        @xpath = "//div[@id='sprungmarke10_7']//a[@title='Excel-Version Zugelassene Verpackungen*']"
       end
       url = "http://www.swissmedic.ch/#{action}"
       super({}, url)
     end
     def download
-      file = "swissmedic_#{@type}.xls"
+      @type == :orphan ? file = "swissmedic_#{@type}.xls" :  file = "swissmedic_#{@type}.xlsx"
       begin
         page = @agent.get(@url)
         if link_node = page.search(@xpath).first
@@ -253,13 +253,11 @@ XML
             response = nil # win
           end
         end
-        io = File.open(file, 'rb')
-        return io.read
+        return File.expand_path(file)
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
-        io.close if io and !io.closed?
-        Oddb2xml.download_finished(file)
+        Oddb2xml.download_finished(file, false)
       end
     end
   end

@@ -6,6 +6,7 @@ require 'oddb2xml/downloader'
 require 'oddb2xml/extractor'
 require 'oddb2xml/compressor'
 require 'oddb2xml/util'
+require 'rubyXL'
 
 module Oddb2xml
   class Cli

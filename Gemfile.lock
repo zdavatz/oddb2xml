@@ -71,6 +71,7 @@ GEM
       diff-lcs (>= 1.1.3, < 2.0)
     rspec-mocks (2.14.4)
     ruby-ole (1.2.11.7)
+    rubyXL (1.2.10)
     rubyntlm (0.3.4)
     rubyzip (0.9.9)
     safe_yaml (0.9.7)
@@ -111,6 +112,7 @@ DEPENDENCIES
   pry-debugger
   rdoc
   rspec
+  rubyXL
   rubyzip (= 0.9.9)
   savon (>= 2.0)
   spreadsheet

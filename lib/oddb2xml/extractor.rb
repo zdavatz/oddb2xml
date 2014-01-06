@@ -196,11 +196,14 @@ module Oddb2xml
     end
   end
   class SwissmedicExtractor < Extractor
-    def initialize(bin, type)
-      io = StringIO.new(bin)
-      book = Spreadsheet.open(io, 'rb')
-      @sheet = book.worksheet(0)
+    def initialize(filename, type)
       @type  = type
+      if type == :orphan
+        book = Spreadsheet.open(filename, 'rb')
+        @sheet = book.worksheet(0)
+      else
+        @sheet = RubyXL::Parser.parse(File.expand_path(filename)).worksheets[0]
+      end
     end
     def to_arry
       data = []
@@ -208,15 +211,16 @@ module Oddb2xml
       when :orphan
         i = 1
         @sheet.each do |row|
-          if number = extract_number(row, i)
-            data << number.to_s
+          number = row[1].to_i
+          if number != 0
+            data << sprintf("%05d", number)
           end
         end
       when :fridge
         i,c = 1,7
         @sheet.each do |row|
-          if number = extract_number(row, i) and row[c] and row[c].to_s == 'x'
-            data << row[i].to_s
+          if row[i] and number = row[i].value and row[c] and row[c].value.to_s.downcase == 'x'
+            data << sprintf("%05d", number)
           end
         end
       end
@@ -237,20 +241,21 @@ module Oddb2xml
         sub       = 14   # :substance_swissmedic
         @sheet.each_with_index do |row, i|
           next if (i <= 1)
-          no8 = sprintf('%05d',row[i_5].to_i) + sprintf('%03d',row[i_3].to_i)
-          prodno = sprintf('%05d',row[i_5].to_i) + row[p_1_2].to_i.to_s
+          next unless row[i_5] and row[i_3]
+          no8 = sprintf('%05d',row[i_5].value.to_i) + sprintf('%03d',row[i_3].value.to_i)
+          prodno = sprintf('%05d',row[i_5].value.to_i) + row[p_1_2].value.to_i.to_s
           unless no8.empty?
             next if no8.to_i == 0
             ean_base12 = "7680#{no8}"
             data[no8.intern] = {
               :ean                  => (ean_base12.ljust(12, '0') + calc_checksum(ean_base12)),
-              :prodno               => prodno,
-              :ith_swissmedic       => row[ith].to_s,
-              :swissmedic_category  => row[cat].to_s,
-              :atc_code             => row[atc].to_s,
-              :package_size         => row[siz].to_s,
-              :einheit_swissmedic   => row[eht].to_s,
-              :substance_swissmedic => row[sub].to_s,
+              :prodno               => prodno ? prodno : '',
+              :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
+              :swissmedic_category  => row[cat].value.to_s,
+              :atc_code             => row[atc] ? row[atc].value.to_s : '',
+              :package_size         => row[siz] ? row[siz].value.to_s : '',
+              :einheit_swissmedic   => row[eht] ? row[eht].value.to_s : '',
+              :substance_swissmedic => row[sub] ? row[sub].value.to_s : '',
               :is_tier              => (row[typ] == 'Tierarzneimittel' ? true : false),
             }
           end
