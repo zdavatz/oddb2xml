@@ -3,6 +3,7 @@
 require 'nokogiri'
 require 'spreadsheet'
 require 'stringio'
+require 'rubyXL'
 
 module Oddb2xml
   module TxtExtractorMethods
@@ -197,6 +198,7 @@ module Oddb2xml
   end
   class SwissmedicExtractor < Extractor
     def initialize(filename, type)
+      @filename = filename
       @type  = type
       if type == :orphan
         book = Spreadsheet.open(filename, 'rb')
@@ -224,6 +226,7 @@ module Oddb2xml
           end
         end
       end
+      cleanup_file
       data.uniq
     end
     def to_hash # Packungen.xls
@@ -261,24 +264,17 @@ module Oddb2xml
           end
         end
       end
+      cleanup_file
       data
     end
     private
-    def extract_number(row, i, ptrn=/^\d{5}$/)
+    def cleanup_file
       begin
-        return nil unless row[i]
-        row[i] = row[i].to_i if row[i].is_a? Float
-        number = row[i].to_s.gsub(/[^0-9]/, '')
-        number = number.rjust(5, '0') if ptrn == /^\d{5}$/
-        if number =~ ptrn
-          return number
-        else
-          nil
-        end
-      rescue NoMethodError
-        nil
-      end
+        File.unlink(@filename) if File.exists?(@filename)
+        rescue Errno::EACCES # Permission Denied on Windows      
+      end unless defined?(RSpec)
     end
+
     def calc_checksum(str)
       str = str.strip
       sum = 0

@@ -72,26 +72,29 @@ module ServerMockHelper
   end
   def setup_swissmedic_server_mock
     host = 'www.swissmedic.ch'
-    {
-      :orphans  => {:html => '/daten/00081/index.html?lang=de',       :xls => '/download'},
-      :fridges  => {:html => '/daten/00080/00254/index.html?lang=de', :xls => '/download'},
-      :packages => {:html => '/daten/00080/00251/index.html?lang=de', :xls => '/download'},
+    {    
+      :orphans  => {:html => '/arzneimittel/00156/00221/00222/00223/00224/00227/00228/index.html?lang=de',       :xls => '/download'},
+      :fridges  => {:html => '/arzneimittel/00156/00221/00222/00235/index.html?lang=de', :xls => '/download'},
+      :packages => {:html => '/arzneimittel/00156/00221/00222/00230/index.html?lang=de', :xls => '/download'},
     }.each_pair do |type, urls|
       # html (dummy)
       stub_html_url = "http://#{host}" + urls[:html]
-      stub_response = File.read(File.expand_path("../data/swissmedic_#{type.to_s}.html", __FILE__))
+      filename = File.expand_path("../data/swissmedic_#{type.to_s}.html", __FILE__)
+      stub_response = File.read(filename)
       stub_request(:get, stub_html_url).
-        with(:headers => {
-          'Accept' => '*/*',
-          'Host'   => host,
-        }).
+         with(:headers => {'Accept'=>'*/*', 'Accept-Charset'=>'ISO-8859-1,utf-8;q=0.7,*;q=0.7', 'Accept-Encoding'=>'gzip,deflate,identity', 'Accept-Language'=>'en-us,en;q=0.5', 'Connection'=>'keep-alive', 'Host'=> host, 'Keep-Alive'=>'300', 'User-Agent'=>'Mozilla/5.0 (X11; Linux x86_64; rv:16.0) Gecko/20100101 Firefox/16.0'}).
         to_return(
           :status  => 200,
           :headers => {'Content-Type' => 'text/html; charset=utf-8'},
           :body    => stub_response)
       # xls
-      stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xls"
-      stub_response = File.read(File.expand_path("../data/swissmedic_#{type.to_s}.xls", __FILE__))
+      if type == :orphans
+        stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xls"
+        stub_response = File.read(File.expand_path("../data/swissmedic_#{type.to_s}.xls", __FILE__))
+      else
+        stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xlsx"
+        stub_response = File.read(File.expand_path("../data/swissmedic_#{type.to_s}.xlsx", __FILE__))
+      end
       stub_request(:get, stub_xls_url).
         with(:headers => {
           'Accept'          => '*/*',
