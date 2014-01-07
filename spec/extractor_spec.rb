@@ -63,9 +63,9 @@ describe Oddb2xml::SwissmedicInfoExtractor do
     subject { Oddb2xml::SwissmedicInfoExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
   end
-  context 'can parse swissmedic_package.xlsx' do
+  context 'can parse swissmedic_packages.xlsx' do
     it {
-        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_package.xlsx')
+        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_packages.xlsx')
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :package).to_hash
         expect(@packs.size).to eq(14)
         first = @packs.first[1]
@@ -77,18 +77,19 @@ describe Oddb2xml::SwissmedicInfoExtractor do
         expect(@packs.first[0].to_s).to eq('00274001')
       }
   end
-  context 'can parse swissmedic_fridge.xlsx' do
+  context 'can parse swissmedic_fridges.xlsx' do
     it {
-        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_fridge.xlsx')
+        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_fridges.xlsx')
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :fridge).to_arry
         expect(@packs.size).to eq(17)
         expect(@packs[0]).to eq("58618")
         expect(@packs[1]).to eq("00696")
       }
   end
-  context 'can parse swissmedic_orphan.xls' do
+  context 'can parse swissmedic_orphans.xls' do
     it {
-        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_orphan.xls')
+        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_orphans.xls')
+        expect(File.exists?(filename)).to eq(true), "File #{filename} must exists"
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :orphan).to_arry
         expect(@packs.size).to eq(72)
         expect(@packs.first).to eq("62132")

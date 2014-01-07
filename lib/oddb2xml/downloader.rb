@@ -30,6 +30,7 @@ module Oddb2xml
     end
   end
   class Downloader
+    attr_reader :type
     def initialize(options={}, url=nil)
       @options     = options
       @url         = url
