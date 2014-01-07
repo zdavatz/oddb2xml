@@ -200,6 +200,7 @@ module Oddb2xml
     def initialize(filename, type)
       @filename = filename
       @type  = type
+      return unless File.exists?(filename)
       if type == :orphan
         book = Spreadsheet.open(filename, 'rb')
         @sheet = book.worksheet(0)
@@ -209,6 +210,7 @@ module Oddb2xml
     end
     def to_arry
       data = []
+      return data unless @sheet
       case @type
       when :orphan
         i = 1
@@ -231,6 +233,7 @@ module Oddb2xml
     end
     def to_hash # Packungen.xls
       data = {}
+      return data unless @sheet
       case @type
       when :package
         typ = 6 # Heilmittelcode

@@ -82,7 +82,11 @@ module ServerMockHelper
       filename = File.expand_path("../data/swissmedic_#{type.to_s}.html", __FILE__)
       stub_response = File.read(filename)
       stub_request(:get, stub_html_url).
-         with(:headers => {'Accept'=>'*/*', 'Accept-Charset'=>'ISO-8859-1,utf-8;q=0.7,*;q=0.7', 'Accept-Encoding'=>'gzip,deflate,identity', 'Accept-Language'=>'en-us,en;q=0.5', 'Connection'=>'keep-alive', 'Host'=> host, 'Keep-Alive'=>'300', 'User-Agent'=>'Mozilla/5.0 (X11; Linux x86_64; rv:16.0) Gecko/20100101 Firefox/16.0'}).
+        with(:headers => {
+          'Accept' => '*/*',
+          'Accept-Encoding'=>'gzip,deflate,identity',
+          'Host'            => host,
+        }).
         to_return(
           :status  => 200,
           :headers => {'Content-Type' => 'text/html; charset=utf-8'},
@@ -93,7 +97,7 @@ module ServerMockHelper
         stub_response = File.read(File.expand_path("../data/swissmedic_#{type.to_s}.xls", __FILE__))
       else
         stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xlsx"
-        stub_response = File.read(File.expand_path("../data/swissmedic_#{type.to_s}.xlsx", __FILE__))
+        stub_response = 'no_such_file'
       end
       stub_request(:get, stub_xls_url).
         with(:headers => {

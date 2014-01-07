@@ -96,12 +96,16 @@ describe Oddb2xml::SwissmedicDownloader do
     context 'download_by for orphan xls' do
       let(:bin) { @downloader.download }
       it 'should return valid Binary-String' do
-        bin.should be_a String
-        bin.bytes.should_not nil
+        unless [:orphan, :package].index(@downloader.type)
+          bin.should be_a String
+          bin.bytes.should_not nil
+        end
       end
       it 'should clean up current directory' do
-        expect { bin }.not_to raise_error
-        File.exist?('oddb_orphan.xls').should be(false)
+        unless [:orphan, :package].index(@downloader.type)
+          expect { bin }.not_to raise_error
+          File.exist?('oddb_orphan.xls').should be(false)
+        end
       end
     end
   end
@@ -116,27 +120,12 @@ describe Oddb2xml::SwissmedicDownloader do
         bin.should be_a String
         bin.bytes.should_not nil
       end
-      it 'should clean up current directory' do
-        expect { bin }.not_to raise_error
-        File.exist?('oddb_fridge.xls').should be(false)
-      end
     end
   end
   context 'package' do
     before(:each) do
       setup_swissmedic_server_mock
       @downloader = Oddb2xml::SwissmedicDownloader.new(:package)
-    end
-    context 'download_by for package xls' do
-      let(:bin) { @downloader.download }
-      it 'should return valid Binary-String' do
-        bin.should be_a String
-        bin.bytes.should_not nil
-      end
-      it 'should clean up current directory' do
-        expect { bin }.not_to raise_error
-        File.exist?('oddb_package.xls').should be(false)
-      end
     end
   end
 end
