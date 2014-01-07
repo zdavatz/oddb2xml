@@ -25,6 +25,7 @@ Hoe.spec 'oddb2xml' do
   self.extra_deps << ['nokogiri']
   self.extra_deps << ['savon', '>= 2.0']
   self.extra_deps << ['spreadsheet']
+  self.extra_deps << ['rubyXL']
 
   # gem.add_development_dependency
   self.extra_dev_deps << ['rspec']
