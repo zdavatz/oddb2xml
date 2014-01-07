@@ -1,3 +1,7 @@
+=== 1.6.8 / 07.01.2013
+
+* Updated Rakefile to include rubyXL
+
 === 1.6.7 / 07.01.2013
 
 *  Adapted to swissmedic xlsx files
