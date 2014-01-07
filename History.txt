@@ -1,3 +1,7 @@
+=== 1.6.7 / 07.01.2013
+
+*  Adapted to swissmedic xlsx files
+
 === 1.6.6 / 12.12.2013
 
 * Added spec for generating *.dat file
