@@ -68,13 +68,15 @@ describe Oddb2xml::SwissmedicInfoExtractor do
         filename = File.join(File.dirname(__FILE__), 'data/swissmedic_packages.xlsx')
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :package).to_hash
         expect(@packs.size).to eq(14)
-        first = @packs.first[1]
-        expect(first[:atc_code]).to eq('J06AA')
-        expect(first[:swissmedic_category]).to eq('B')
-        expect(first[:package_size]).to eq('3')
-        expect(first[:einheit_swissmedic]).to eq('Suppositorien')
-        expect(first[:substance_swissmedic]).to eq('globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins)')
-        expect(@packs.first[0].to_s).to eq('00274001')
+        serocytol = nil
+        @packs.each{|pack|
+                    serocytol = pack[1] if pack[0].to_s == '00274001'
+                   }
+        expect(serocytol[:atc_code]).to eq('J06AA')
+        expect(serocytol[:swissmedic_category]).to eq('B')
+        expect(serocytol[:package_size]).to eq('3')
+        expect(serocytol[:einheit_swissmedic]).to eq('Suppositorien')
+        expect(serocytol[:substance_swissmedic]).to eq('globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins)')
       }
   end
   context 'can parse swissmedic_fridges.xlsx' do
