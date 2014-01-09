@@ -1,6 +1,6 @@
 language: ruby
 
-# bundler_args: --without debugger
+bundler_args: --without debugger
 
 before_install:
   - gem update --system 2.1.11
