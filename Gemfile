@@ -16,6 +16,6 @@ group :development do
   gem 'rdoc'
 end
 
-#group :debugger do
-#  gem 'pry-debugger'
-#end
+group :debugger do
+  gem 'pry-debugger'
+end
