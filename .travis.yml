@@ -2,6 +2,10 @@ language: ruby
 
 bundler_args: --without debugger
 
+before_install:
+  - gem update --system 2.1.11
+  - gem --version
+
 script: bundle exec rake spec
 
 rvm:
