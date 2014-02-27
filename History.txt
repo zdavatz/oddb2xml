@@ -1,3 +1,7 @@
+=== 1.7.2 / 27.02.2013
+
+* Added rubyzip 1.0.0 as dependency for RubyXL in Gemfile.lock ;/
+
 === 1.7.1 / 27.02.2013
 
 * Added rubyzip 1.0.0 as dependency for RubyXL ;/
