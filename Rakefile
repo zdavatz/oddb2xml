@@ -19,13 +19,13 @@ Hoe.spec 'oddb2xml' do
   self.urls        = ["https://github.com/zdavatz/oddb2xml"] # gem.homepage
 
   # gem.add_runtime_dependency
-  self.extra_deps << ['rubyzip', '~> 0.9.9']
+  self.extra_deps << ['rubyzip', '~> 1.0.0']
   self.extra_deps << ['archive-tar-minitar']
   self.extra_deps << ['mechanize', '~> 2.5.1']
   self.extra_deps << ['nokogiri']
   self.extra_deps << ['savon', '>= 2.0']
   self.extra_deps << ['spreadsheet']
-  self.extra_deps << ['rubyXL']
+  self.extra_deps << ['rubyXL', '~> 1.2.10']
 
   # gem.add_development_dependency
   self.extra_dev_deps << ['rspec']
