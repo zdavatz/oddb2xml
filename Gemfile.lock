@@ -65,7 +65,7 @@ GEM
     ruby-ole (1.2.11.7)
     rubyXL (1.2.10)
     rubyntlm (0.3.4)
-    rubyzip (1.0.0)
+    rubyzip
     safe_yaml (0.9.7)
     savon (2.3.3)
       akami (~> 1.2.0)
@@ -102,7 +102,7 @@ DEPENDENCIES
   rdoc
   rspec
   rubyXL
-  rubyzip (= 1.0.0)
+  rubyzip
   savon (>= 2.0)
   spreadsheet
   webmock
