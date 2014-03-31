@@ -415,20 +415,39 @@ module Oddb2xml
     end
   end
   class ZurroseExtractor < Extractor
-    def initialize(dat)
+    # see http://dev.ywesee.com/Bbmb/TransferDat
+    def initialize(dat, extended = false)
+      @@extended = extended
+      @@items_without_ean13s ||= 0
+      @@zur_rose_items ||= 0
       @io = StringIO.new(dat) if dat
     end
     def to_hash
       data = {}
       while line = @io.gets
-        next unless line =~ /(7680\d{9})(\d{1})\r\n$/
+        if @@extended
+          next unless line =~ /(\d{13})(\d{1})\r\n$/
+        else
+          next unless line =~ /(7680\d{9})(\d{1})\r\n$/
+        end
+        pharma_code = line[3..9]
+        if $1.to_s == '0000000000000'
+          @@items_without_ean13s += 1
+          next
+        end
         data[$1.to_s] = {
-         :vat   => $2.to_s,
-         :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
-         :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
+          :vat   => $2.to_s,
+          :description => line[10..59], # .sub(/\s+$/, ''),
+          :pharmacode => pharma_code,
+          :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
+          :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
         }
+        @@zur_rose_items += 1
       end if @io
       data
+    end
+    at_exit do
+      puts "Found #{@@items_without_ean13s} of #{@@zur_rose_items} items without an ean13 code when extracting the transfer.dat from \"Zur Rose\"" if @@extended
     end
   end
 end

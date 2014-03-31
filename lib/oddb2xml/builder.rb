@@ -99,12 +99,36 @@ module Oddb2xml
           end
           @articles << obj
         end
+        if @options[:extended]
+          nrAdded = 0
+          obj = {}
+          @prices.each{
+            |ean13, info|
+          %w[de fr].each do |lang|
+            next if @index[lang] and @index[lang][ean13]
+            entry = {
+                     :desc            => info[:description],
+                     :status          => 'I', # or it will not be emitted in the dat
+                     :atc_code        => '',
+                     :ean             => ean13,
+                     :lang            => lang.capitalize,
+                     :pharmacode      => info[:pharmacode],
+                     :price           => info[:price],
+                     :pub_price       => info[:pub_price],
+            }
+            obj[lang.intern] = [entry]
+          end
+          nrAdded += 1
+          @articles << obj
+          }
+        end
       end
     end
     def prepare_substances
       unless @substances
         @substances = []
         @items.values.uniq.each do |seq|
+          next unless seq[:substances]
           seq[:substances].each do |sub|
             @substances << sub[:name]
           end
@@ -117,6 +141,7 @@ module Oddb2xml
       unless @limitations
         limitations = []
         @items.values.uniq.each do |seq|
+          next unless seq[:packages]
           seq[:packages].each_value do |pac|
             limitations += pac[:limitations]
           end
@@ -539,7 +564,7 @@ module Oddb2xml
         ) {
           @articles.each do |obj|
             obj[:de].each_with_index do |de_idx, i|
-              fr_idx = obj[:fr][i]              # swissindex FR
+        fr_idx = obj[:fr][i]              # swissindex FR
               pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
               ppac = nil                        # Packungen
               ean = de_idx[:ean]
@@ -547,7 +572,7 @@ module Oddb2xml
                 pac = obj[:seq][:packages][de_idx[:pharmacode]]
                 pac = obj[:seq][:packages][ean] unless pac
               else
-                pac = @items[ean][:packages][ean] if @items and @items[ean]
+                pac = @items[ean][:packages][ean] if @items and @items[ean] and @items[ean][:packages]
               end
               if no8
                 ppac = ((_ppac = @packs[no8.intern] and !_ppac[:is_tier]) ? _ppac : nil)
@@ -630,7 +655,7 @@ module Oddb2xml
                 #xml.BAGSL
                 #xml.BAGSLC
                 #xml.LOACD
-                if de_idx[:status] == "I"
+                if de_idx[:status] == 'I'
                   xml.OUTSAL de_idx[:stat_date] unless de_idx[:stat_date].empty?
                 end
                 #xml.STTOX
@@ -889,6 +914,7 @@ module Oddb2xml
       else
         # fallback via EAN
         bag_entry_via_ean = @items.values.select do |i|
+          next unless i[:packages]
           i[:packages].values.select {|_pac| _pac[:ean] == de_idx[:ean] }.length != 0
         end.length
         if bag_entry_via_ean > 0
@@ -968,7 +994,7 @@ module Oddb2xml
               pac = obj[:seq][:packages][idx[:pharmacode]]
               pac = obj[:seq][:packages][ean] unless pac
             else
-              pac = @items[ean][:packages][ean] if @items and @items[ean]
+              pac = @items[ean][:packages][ean] if @items and @items[ean] and @items[ean][:packages]
             end
              # :swissmedic_numbers
             if pac
@@ -980,7 +1006,7 @@ module Oddb2xml
             end
             row << "%#{DAT_LEN[:RECA]}s"  % '11'
             row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = idx[:pharmacode] and phar.size > 3) # does not check expiration_date
-                                              idx[:status] == "I" ? '3' : '1'
+                                              idx[:status] == 'I' ? '3' : '1'
                                             else
                                               '3'
                                             end
@@ -988,7 +1014,7 @@ module Oddb2xml
             abez = ( # de name
               idx[:desc].to_s + " " +
               (pac ? pac[:name_de].to_s : '') +
-              idx[:additional_desc]
+              (idx[:additional_desc] ? idx[:additional_desc] : '')
             ).gsub(/"/, '')
             row << format_name(abez)
             row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))

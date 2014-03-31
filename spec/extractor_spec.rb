@@ -133,17 +133,6 @@ describe Oddb2xml::ZurroseExtractor do
     end
     it { expect(subject.to_hash).to be_empty }
   end
-  context 'when only 1 record have a valid EAN code' do
-    subject do
-      dat = <<-DAT
-1120020209ERYTRHOCIN I.V. Trockensub Fl 1g                  001518002010300B080160000000000000002\r\n
-1120020244FERRO-GRADUMET Depottabl 30 Stk                   000895001090300C060710076803164401152\r\n
-      DAT
-      Oddb2xml::ZurroseExtractor.new(dat)
-    end
-    it { expect(subject.to_hash.keys.length).to eq(1) }
-    it { expect(subject.to_hash.keys.first).to eq("7680316440115") }
-  end
   context 'when expected line is given' do
     subject do
       dat = <<-DAT
@@ -156,4 +145,42 @@ describe Oddb2xml::ZurroseExtractor do
     it { expect(subject.to_hash.values.first[:vat]).to eq("2") }
     it { expect(subject.to_hash.values.first[:price]).to eq("8.95") }
   end
+  context 'when Estradiol Creme is given' do
+    subject do
+      dat = <<-DAT
+1130921929OESTRADIOL Inj L�s 5 mg 10 Amp 1 ml               000940001630300B070820076802840708402\r\n
+      DAT
+      Oddb2xml::ZurroseExtractor.new(dat)
+    end
+    #it { expect(pp subject.to_hash) }
+    it { expect(subject.to_hash.keys.length).to eq(1) }
+    it { expect(subject.to_hash.keys.first).to eq("7680284070840") }
+    it { expect(subject.to_hash.values.first[:vat]).to eq("2") }
+    it { expect(subject.to_hash.values.first[:price]).to eq("9.40") }
+    it { expect(subject.to_hash.values.first[:pub_price]).to eq("16.30") }
+    it { expect(subject.to_hash.values.first[:pharmacode]).to eq("0921929") }
+  end
+  context 'when SELSUN Shampoo is given' do
+    subject do
+      dat = <<-DAT
+1120020652SELSUN Shampoo Susp 120 ml                        001576002430300D100400076801723306812\r\n
+      DAT
+      Oddb2xml::ZurroseExtractor.new(dat)
+    end
+    it { expect(subject.to_hash.keys.length).to eq(1) }
+    it { expect(subject.to_hash.keys.first).to eq("7680172330681") }
+    it { expect(subject.to_hash.values.first[:vat]).to eq("2") }
+    it { expect(subject.to_hash.values.first[:price]).to eq("15.76") }
+    it { expect(subject.to_hash.values.first[:pub_price]).to eq("24.30") }
+    it { expect(subject.to_hash.values.first[:pharmacode]).to eq("0020652") }
+    
+  end
+  
+  x =%(
+  Record-Art 1 Länge 97
+    :vat   => $2.to_s,
+    :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
+    :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
+    =
+    )
 end
