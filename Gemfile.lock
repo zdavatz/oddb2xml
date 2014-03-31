@@ -103,8 +103,8 @@ DEPENDENCIES
   pry-debugger
   rdoc
   rspec
-  rubyXL
+  rubyXL (~> 2.5)
   rubyzip
-  savon (>= 2.0)
+  savon (~> 2.0)
   spreadsheet
   webmock
