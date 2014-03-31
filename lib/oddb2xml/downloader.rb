@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'mechanize'
-require 'zip/zip'
+require 'zip'
 require 'savon'
 
 module Oddb2xml
@@ -64,7 +64,7 @@ module Oddb2xml
     def read_xml_form_zip(target, zipfile)
       xml = ''
       if RUBY_PLATFORM =~ /mswin|mingw|bccwin|cygwin/i
-        Zip::ZipFile.open(zipfile) do |zipFile|
+        Zip::File.open(zipfile) do |zipFile|
           zipFile.each do |entry|
             if entry.name =~ target
               io = entry.get_input_stream
@@ -78,7 +78,7 @@ module Oddb2xml
           end
         end
       else
-        Zip::ZipFile.foreach(zipfile) do |entry|
+        Zip::File.foreach(zipfile) do |entry|
           if entry.name =~ target
             entry.get_input_stream { |io| xml = io.read }
           end

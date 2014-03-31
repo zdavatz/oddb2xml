@@ -6,7 +6,7 @@ gem 'mechanize', '~> 2.5.1'
 gem 'nokogiri', '~> 1.5.10'
 gem 'savon', '>= 2.0'
 gem 'spreadsheet'
-gem 'rubyXL', '1.2.10'
+gem 'rubyXL'
 
 group :development do
   gem 'rspec'

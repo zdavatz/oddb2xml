@@ -2,7 +2,7 @@
 
 require 'zlib'
 require 'archive/tar/minitar'
-require 'zip/zip'
+require 'zip'
 
 module Oddb2xml
  class Compressor
@@ -27,7 +27,7 @@ module Oddb2xml
           tgz = Zlib::GzipWriter.new(File.open(@compress_file, 'wb'))
           Minitar.pack(@contents, tgz)
         when /\.zip$/
-          Zip::ZipFile.open(@compress_file, Zip::ZipFile::CREATE) do |zip|
+          Zip::File.open(@compress_file, Zip::File::CREATE) do |zip|
             @contents.each do |file|
               filename = File.basename(file)
               zip.add(filename, file)
