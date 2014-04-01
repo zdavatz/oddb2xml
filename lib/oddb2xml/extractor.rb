@@ -433,11 +433,16 @@ module Oddb2xml
         pharma_code = line[3..9]
         if $1.to_s == '0000000000000'
           @@items_without_ean13s += 1
-          next
+          ean13 = '000000' + pharma_code # dummy ean13
+          binding.pry if @@items_without_ean13s <= 2
+        else
+          ean13 = $1.to_s
         end
-        data[$1.to_s] = {
+        data[ean13] = {
+          :ean   => ean13,
           :vat   => $2.to_s,
           :description => line[10..59], # .sub(/\s+$/, ''),
+          :additional_desc => '',
           :pharmacode => pharma_code,
           :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
           :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
@@ -447,7 +452,7 @@ module Oddb2xml
       data
     end
     at_exit do
-      puts "Found #{@@items_without_ean13s} of #{@@zur_rose_items} items without an ean13 code when extracting the transfer.dat from \"Zur Rose\"" if @@extended
+      puts "Added #{@@items_without_ean13s} via pharmacodes of #{@@zur_rose_items} items when extracting the transfer.dat from \"Zur Rose\"" if @@extended
     end
   end
 end
