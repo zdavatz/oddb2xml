@@ -434,7 +434,6 @@ module Oddb2xml
         if $1.to_s == '0000000000000'
           @@items_without_ean13s += 1
           ean13 = '000000' + pharma_code # dummy ean13
-          binding.pry if @@items_without_ean13s <= 2
         else
           ean13 = $1.to_s
         end
