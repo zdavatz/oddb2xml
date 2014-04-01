@@ -624,11 +624,11 @@ module Oddb2xml
                   xml.BG(flag ? 'Y' : 'N')
                 end
                 #xml.EXP
-                xml.QTY   de_idx[:additional_desc] unless de_idx[:additional_desc].empty?
-                xml.DSCRD de_idx[:desc]            unless de_idx[:desc].empty?
-                xml.DSCRF fr_idx[:desc]            unless fr_idx[:desc].empty?
-                xml.SORTD de_idx[:desc].upcase     unless de_idx[:desc].empty?
-                xml.SORTF fr_idx[:desc].upcase     unless fr_idx[:desc].empty?
+                xml.QTY   de_idx[:additional_desc] if de_idx[:additional_desc] and not de_idx[:additional_desc].empty?
+                xml.DSCRD de_idx[:desc]            if de_idx[:desc] and not de_idx[:desc].empty?
+                xml.DSCRF fr_idx[:desc]            if fr_idx[:desc] and not fr_idx[:desc].empty?
+                xml.SORTD de_idx[:desc].upcase     if de_idx[:desc] and not de_idx[:desc].empty?
+                xml.SORTF fr_idx[:desc].upcase     if fr_idx[:desc] and not fr_idx[:desc].empty?
                 #xml.QTYUD
                 #xml.QTYUF
                 #xml.IMG
@@ -656,7 +656,7 @@ module Oddb2xml
                 #xml.BAGSLC
                 #xml.LOACD
                 if de_idx[:status] == 'I'
-                  xml.OUTSAL de_idx[:stat_date] unless de_idx[:stat_date].empty?
+                  xml.OUTSAL de_idx[:stat_date] if de_idx[:stat_date] and not de_idx[:stat_date].empty?
                 end
                 #xml.STTOX
                 #xml.NOTI
@@ -672,7 +672,7 @@ module Oddb2xml
                 #xml.DEL
                 xml.ARTCOMP {
                   # use ean13(gln) as COMPNO
-                  xml.COMPNO de_idx[:company_ean] unless de_idx[:company_ean].empty?
+                  xml.COMPNO de_idx[:company_ean] if de_idx[:company_ean] and not de_idx[:company_ean].empty?
                   #xml.ROLE
                   #xml.ARTNO1
                   #xml.ARTNO2
@@ -990,7 +990,7 @@ module Oddb2xml
           # Oddb2tdat.parse
           if idx[:status] =~ /A|I/
             pac,no8 = nil,nil
-            if obj[:seq]
+            if obj[:seq] and obj[:seq][:packages]
               pac = obj[:seq][:packages][idx[:pharmacode]]
               pac = obj[:seq][:packages][ean] unless pac
             else
@@ -1074,7 +1074,7 @@ module Oddb2xml
           row << "%0#{DAT_LEN[:PHAR]}d" % idx[:pharmacode].to_i
           abez = ( # de name
             idx[:desc].to_s + " " +
-            idx[:additional_desc]
+          (idx[:additional_desc] ? idx[:additional_desc] : '')
           ).gsub(/"/, '')
           row << format_name(abez)
           row << "%#{DAT_LEN[:PRMO]}s"  % ('0' * DAT_LEN[:PRMO])
