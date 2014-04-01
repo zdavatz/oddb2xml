@@ -106,7 +106,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 1.6)
+  bundler
   oddb2xml!
   pry-debugger
   rake
