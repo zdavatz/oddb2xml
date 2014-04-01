@@ -15,10 +15,8 @@ Usage:
   oddb2xml [option]
     produced files are found under data
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
-    -ae                  Combine options nonpharma, extended, prices from ZurRose to create a oddb_with_migel.dat file.
     -c F, --compress=F   Compress format F. {tar.gz|zip}
-    -e    --extended     Get also all articles (including prices) from zurrose which have an EAN13 code.
-                         (only valid if -p zurrose given)
+    -e    --extended     pharma, non-pharma plus prices and non-pharma from zurrose. Products without EAN-Code will also be listed.
     -f F, --format=F     File format F, default is xml. {xml|dat}
                          If F is given, -o option is ignored.
     -i I, --include=I    Include target option for 'dat' format. only 'ean14' is available.
@@ -51,13 +49,11 @@ opts = {
 }
 
 parser.on('-a v', '--append v',     /^nonpharma$/)  {|v| opts[:nonpharma] = true }
-parser.on('-ae')                                    {|v| opts[:nonpharma] = true;
-                                                     opts[:extended] = true;
-                                                    opts[:format] = :dat;
-                                                    opts[:price] = :zurrose;
-                                                    }
 parser.on('-c v', '--compress v',   /^tar\.gz|zip$/){|v| opts[:compress_ext] = v }
-parser.on('-e',   '--extended')                     {|v| opts[:extended] = true }
+parser.on('-e',   '--extended')                     {|v| opts[:extended] = true
+                                                     opts[:nonpharma] = :true
+                                                    opts[:price] = :zurrose
+                                                    }
 parser.on('-f v', '--format v',     /^xml|dat$/)    {|v| opts[:format] = v.intern }
 parser.on('-o v', '--option v',     /^fi$/)         {|v| opts[:fi] = true }
 parser.on('-i v', '--include v',    /^ean14$/)      {|v| opts[:ean14] = true }
