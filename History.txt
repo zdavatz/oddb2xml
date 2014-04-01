@@ -1,29 +1,33 @@
-=== 1.7.3 / 27.02.2013
+=== 1.7.4 / 01.04.2014
+
+* Added option --extended
+
+=== 1.7.3 / 27.02.2014
 
 * Added rubyzip 1.0.0 as dependency for RubyXL in Rakefile ;/
 
-=== 1.7.2 / 27.02.2013
+=== 1.7.2 / 27.02.2014
 
 * Added rubyzip 1.0.0 as dependency for RubyXL in Gemfile.lock ;/
 
-=== 1.7.1 / 27.02.2013
+=== 1.7.1 / 27.02.2014
 
 * Added rubyzip 1.0.0 as dependency for RubyXL ;/
 
-=== 1.7.0 / 27.02.2013
+=== 1.7.0 / 27.02.2014
 
 * Added rubyXL 1.2.10 as dependency version
 
-=== 1.6.9 / 07.01.2013
+=== 1.6.9 / 07.01.2014
 
 * Updated Rakefile for rubyzip ~> 0.9.9
 * Remove *.xls/x-Files after extraction
 
-=== 1.6.8 / 07.01.2013
+=== 1.6.8 / 07.01.2014
 
 * Updated Rakefile to include rubyXL
 
-=== 1.6.7 / 07.01.2013
+=== 1.6.7 / 07.01.2014
 
 *  Adapted to swissmedic xlsx files
 
