@@ -419,6 +419,7 @@ module Oddb2xml
     def initialize(dat, extended = false)
       @@extended = extended
       @@items_without_ean13s ||= 0
+      @@duplicated_ean13s ||= 0
       @@zur_rose_items ||= 0
       @io = StringIO.new(dat) if dat
     end
@@ -437,7 +438,14 @@ module Oddb2xml
         else
           ean13 = $1.to_s
         end
+        if data[ean13]
+          puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"
+          @@items_without_ean13s -= 1
+          @@duplicated_ean13s += 1
+          next
+        end
         data[ean13] = {
+          :line   => line.chomp,
           :ean   => ean13,
           :vat   => $2.to_s,
           :description => line[10..59], # .sub(/\s+$/, ''),
@@ -445,13 +453,17 @@ module Oddb2xml
           :pharmacode => pharma_code,
           :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
           :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
+          :type => :nonpharma,
         }
         @@zur_rose_items += 1
       end if @io
       data
     end
     at_exit do
-      puts "Added #{@@items_without_ean13s} via pharmacodes of #{@@zur_rose_items} items when extracting the transfer.dat from \"Zur Rose\"" if defined?(@@extended) and @@extended
+      if defined?(@@extended) and @@extended
+        puts "Added #{@@items_without_ean13s} via pharmacodes of #{@@zur_rose_items} items when extracting the transfer.dat from \"Zur Rose\"" 
+        puts "  found #{@@duplicated_ean13s} lines with duplicated ean13" if @@duplicated_ean13s > 0
+      end
     end
   end
 end

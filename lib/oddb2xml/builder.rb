@@ -101,11 +101,11 @@ module Oddb2xml
         end
         if @options[:extended]
           nrAdded = 0
-          obj = {}
           @prices.each{
             |ean13, info|
+            obj = {}
           %w[de fr].each do |lang|
-            next if @index[lang] and @index[lang][ean13]
+          next if @index[lang] and @index[lang][ean13]
             entry = {
                      :desc            => info[:description],
                      :status          => 'I', # or it will not be emitted in the dat
@@ -115,7 +115,8 @@ module Oddb2xml
                      :pharmacode      => info[:pharmacode],
                      :price           => info[:price],
                      :pub_price       => info[:pub_price],
-            }
+                     :type            => info[:type],
+                     }
             obj[lang.intern] = [entry]
           end
           nrAdded += 1
@@ -986,6 +987,7 @@ module Oddb2xml
         obj[:de].each_with_index do |idx, i|
           ean = idx[:ean]
           next if ((ean.to_s.length != 13) and !ean14)
+          next if idx[:type] == :nonpharma
           row = ''
           # Oddb2tdat.parse
           if idx[:status] =~ /A|I/
