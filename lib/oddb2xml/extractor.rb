@@ -451,7 +451,7 @@ module Oddb2xml
       data
     end
     at_exit do
-      puts "Added #{@@items_without_ean13s} via pharmacodes of #{@@zur_rose_items} items when extracting the transfer.dat from \"Zur Rose\"" if @@extended
+      puts "Added #{@@items_without_ean13s} via pharmacodes of #{@@zur_rose_items} items when extracting the transfer.dat from \"Zur Rose\"" if defined?(@@extended) and @@extended
     end
   end
 end
