@@ -1,3 +1,15 @@
+PATH
+  remote: .
+  specs:
+    oddb2xml (1.7.4)
+      archive-tar-minitar
+      mechanize (~> 2.5.1)
+      nokogiri (~> 1.5.10)
+      rubyXL (~> 2.5)
+      rubyzip (~> 1.0)
+      savon (~> 2.0)
+      spreadsheet
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -22,8 +34,6 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     gyoku (1.1.1)
       builder (>= 2.1.2)
-    hoe (3.10.0)
-      rake (>= 0.8, < 11.0)
     httpi (2.1.0)
       rack
       rubyntlm (~> 0.3.2)
@@ -69,7 +79,7 @@ GEM
     rubyntlm (0.3.4)
     rubyzip (1.1.2)
     safe_yaml (1.0.1)
-    savon (2.3.3)
+    savon (2.4.0)
       akami (~> 1.2.0)
       builder (>= 2.1.2)
       gyoku (~> 1.1.0)
@@ -96,15 +106,10 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  archive-tar-minitar
-  hoe (>= 3.4)
-  mechanize (~> 2.5.1)
-  nokogiri (~> 1.5.10)
+  bundler
+  oddb2xml!
   pry-debugger
+  rake
   rdoc
   rspec
-  rubyXL (~> 2.5)
-  rubyzip
-  savon (~> 2.0)
-  spreadsheet
   webmock
