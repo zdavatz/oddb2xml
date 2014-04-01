@@ -1,3 +1,8 @@
+=== 1.7.6 / 01.04.2014
+
+* Write duplicated ean13s to duplicate_ean13_from_zur_rose.txt
+* Removed option -ae
+
 === 1.7.5 / 01.04.2014
 
 * Added option -ae
