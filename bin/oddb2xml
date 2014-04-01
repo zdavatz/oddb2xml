@@ -15,7 +15,7 @@ Usage:
   oddb2xml [option]
     produced files are found under data
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
-    -ae                  Combind nonpharma, extended, prices from ZurRose to create a oddb.dat file.
+    -ae                  Combine options nonpharma, extended, prices from ZurRose to create a oddb_with_migel.dat file.
     -c F, --compress=F   Compress format F. {tar.gz|zip}
     -e    --extended     Get also all articles (including prices) from zurrose which have an EAN13 code.
                          (only valid if -p zurrose given)
