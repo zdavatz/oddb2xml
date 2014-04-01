@@ -418,6 +418,7 @@ module Oddb2xml
     # see http://dev.ywesee.com/Bbmb/TransferDat
     def initialize(dat, extended = false)
       @@extended = extended
+      @@error_file ||= File.open("duplicate_ean13_from_zur_rose.txt", 'w+')
       @@items_without_ean13s ||= 0
       @@duplicated_ean13s ||= 0
       @@zur_rose_items ||= 0
@@ -439,7 +440,7 @@ module Oddb2xml
           ean13 = $1.to_s
         end
         if data[ean13]
-          puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"
+          @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"
           @@items_without_ean13s -= 1
           @@duplicated_ean13s += 1
           next
@@ -461,8 +462,10 @@ module Oddb2xml
     end
     at_exit do
       if defined?(@@extended) and @@extended
-        puts "Added #{@@items_without_ean13s} via pharmacodes of #{@@zur_rose_items} items when extracting the transfer.dat from \"Zur Rose\"" 
-        puts "  found #{@@duplicated_ean13s} lines with duplicated ean13" if @@duplicated_ean13s > 0
+        msg = "Added #{@@items_without_ean13s} via pharmacodes of #{@@zur_rose_items} items when extracting the transfer.dat from \"Zur Rose\""
+        msg += "\n  found #{@@duplicated_ean13s} lines with duplicated ean13" if @@duplicated_ean13s > 0
+        puts msg
+        @@error_file.puts msg
       end
     end
   end
