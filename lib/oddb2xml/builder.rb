@@ -568,19 +568,19 @@ module Oddb2xml
               pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
               ppac = nil                        # Packungen
               ean = de_idx[:ean]
-              ean = 0 if ean.match(/^000000/)
+              ean = nil if ean.match(/^000000/)
               if obj[:seq]
                 pac = obj[:seq][:packages][de_idx[:pharmacode]]
                 pac = obj[:seq][:packages][ean] unless pac
               else
-                pac = @items[ean][:packages][ean] if @items and @items[ean] and @items[ean][:packages]
+                pac = @items[ean][:packages][ean] if @items and ean and @items[ean] and @items[ean][:packages]
               end
               if no8
                 ppac = ((_ppac = @packs[no8.intern] and !_ppac[:is_tier]) ? _ppac : nil)
               end
               price = nil
-              if !@prices.empty? && de_idx[:ean] && @prices[de_idx[:ean]]
-                price = @prices[de_idx[:ean]] # zurrose
+              if !@prices.empty? && ean && @prices[ean]
+                price = @prices[ean] # zurrose
               end
               xml.ART('DT' => '') {
                 xml.PHAR  de_idx[:pharmacode] unless de_idx[:pharmacode].empty?
@@ -591,7 +591,7 @@ module Oddb2xml
                   xml.SMCAT ppac[:swissmedic_category] unless ppac[:swissmedic_category].empty?
                 end
                 if no8 and !no8.to_s.empty?
-                  if de_idx[:ean][0..3] == "7680"
+                  if ean and ean[0..3] == "7680"
                     xml.SMNO no8.to_s
                   end
                 end
@@ -618,8 +618,8 @@ module Oddb2xml
                   xml.COOL 1 if @fridges.include?($1.to_s)
                 end
                 #xml.TEMP
-                unless de_idx[:ean].empty?
-                  flag = @flags[de_idx[:ean]]
+                if ean and not ean.empty?
+                  flag = @flags[ean]
                   # as same flag
                   xml.CDBG(flag ? 'Y' : 'N')
                   xml.BG(flag ? 'Y' : 'N')
@@ -681,7 +681,7 @@ module Oddb2xml
                 }
                 xml.ARTBAR {
                   xml.CDTYP  'E13'
-                  xml.BC     de_idx[:ean] unless de_idx[:ean].empty?
+                  xml.BC     ean if ean and not ean.empty?
                   xml.BCSTAT 'A' # P is alternative
                   #xml.PHAR2
                 }
