@@ -43,19 +43,26 @@ The following additional data is in the files:
 see `--help`.
 
 ```
-$ oddb2xml --help
-oddb2xml ver.1.2.7
+/usr/local/bin/oddb2xml ver.1.7.8
 Usage:
   oddb2xml [option]
+    produced files are found under data
     -a T, --append=T     Additional target. T, only 'nonpharma' is available.
     -c F, --compress=F   Compress format F. {tar.gz|zip}
+    -e    --extended     pharma, non-pharma plus prices and non-pharma from zurrose. Products without EAN-Code will also be listed.
     -f F, --format=F     File format F, default is xml. {xml|dat}
                          If F is given, -o option is ignored.
-    -o O, --optional=O   Optional output. O, only 'fi' is available.
     -i I, --include=I    Include target option for 'dat' format. only 'ean14' is available.
                          'xml' format includes always ean14 records.
+    -o O, --option=O     Optional output. O, only 'fi' is available.
+    -p P, --price=P      Price source (transfer.dat). P, only 'zurrose' is available.
     -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9]
                          If S is given, it is also used as prefix of filename.
+    -x N, --context=N    context N {product|address}. product is default.
+                         
+                         For debugging purposes
+    --skip-download      skips downloading files it the file is already under data/downloads.
+                         Downloaded files are saved under data/downloads
     -h,   --help         Show this help message.
 
 ```
