@@ -1,7 +1,6 @@
 # encoding: utf-8
 
 require 'nokogiri'
-
 module Nokogiri
   module XML
     class Document < Nokogiri::XML::Node
@@ -569,6 +568,7 @@ module Oddb2xml
               pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
               ppac = nil                        # Packungen
               ean = de_idx[:ean]
+              ean = 0 if ean.match(/^000000/)
               if obj[:seq]
                 pac = obj[:seq][:packages][de_idx[:pharmacode]]
                 pac = obj[:seq][:packages][ean] unless pac
@@ -1050,7 +1050,7 @@ module Oddb2xml
                                             else
                                               ('0' * DAT_LEN[:ITHE])
                                             end.to_i
-            row << "%0#{DAT_LEN[:CEAN]}d" % ean.to_i
+            row << "%0#{DAT_LEN[:CEAN]}d" % (ean.match(/^000000/) ? 0 : ean.to_i)
             row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
             rows << row
           end
@@ -1086,7 +1086,9 @@ module Oddb2xml
           row << "%#{DAT_LEN[:CBGG]}s"  % '0'
           row << "%#{DAT_LEN[:CIKS]}s"  % ' ' # no category
           row << "%0#{DAT_LEN[:ITHE]}d" %  0
-          row << "%0#{DAT_LEN[:CEAN]}d" % (idx[:ean] ? idx[:ean].to_i : 0)
+          ean = idx[:ean]
+          ean = 0 if ean.match(/^000000/)
+          row << "%0#{DAT_LEN[:CEAN]}d" % ean
           row << "%#{DAT_LEN[:CMWS]}s"  % '1' # nonpharma
           rows << row
         end
