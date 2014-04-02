@@ -1,3 +1,7 @@
+=== 1.7.8 / 02.04.2014
+
+* Don't emit field BC starting with 000000
+
 === 1.7.7 / 02.04.2014
 
 * Don't emit pseudo-eans starting with 000000
