@@ -243,7 +243,7 @@ XML
       super({}, url)
     end
     def download
-      @type == :orphan ? file = "swissmedic_#{@type}.xls" :  file = "swissmedic_#{@type}.xlsx"
+      @type == file = "swissmedic_#{@type}.xlsx"
       begin
         page = @agent.get(@url)
         if link_node = page.search(@xpath).first
