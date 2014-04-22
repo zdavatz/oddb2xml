@@ -1086,9 +1086,7 @@ module Oddb2xml
           row << "%#{DAT_LEN[:CBGG]}s"  % '0'
           row << "%#{DAT_LEN[:CIKS]}s"  % ' ' # no category
           row << "%0#{DAT_LEN[:ITHE]}d" %  0
-          ean = idx[:ean]
-          ean = 0 if ean.match(/^000000/)
-          row << "%0#{DAT_LEN[:CEAN]}d" % ean
+          row << idx[:ean].to_s.rjust(DAT_LEN[:CEAN], '0')
           row << "%#{DAT_LEN[:CMWS]}s"  % '1' # nonpharma
           rows << row
         end
