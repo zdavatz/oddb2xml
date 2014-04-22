@@ -93,8 +93,8 @@ module ServerMockHelper
           :body    => stub_response)
       # xls
       if type == :orphans
-        stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xls"
-        stub_response = File.read(File.expand_path("../data/swissmedic_#{type.to_s}.xls", __FILE__))
+        stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_orphan.xlsx"
+        stub_response = File.read(File.expand_path("../data/swissmedic_orphan.xlsx", __FILE__))
       else
         stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xlsx"
         stub_response = 'no_such_file'

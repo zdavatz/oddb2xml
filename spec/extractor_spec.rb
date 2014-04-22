@@ -90,10 +90,10 @@ describe Oddb2xml::SwissmedicInfoExtractor do
   end
   context 'can parse swissmedic_orphans.xls' do
     it {
-        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_orphans.xls')
+        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_orphan.xlsx')
         expect(File.exists?(filename)).to eq(true), "File #{filename} must exists"
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :orphan).to_arry
-        expect(@packs.size).to eq(72)
+        expect(@packs.size).to eq(79)
         expect(@packs.first).to eq("62132")
         expect(@packs[7]).to eq("00687")
       }
