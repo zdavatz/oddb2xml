@@ -14,3 +14,16 @@ desc 'Offer a gem task like hoe'
 task :gem => :build do
   Rake::Task[:build].invoke
 end
+
+desc 'Run oddb2xml with all commonly used combinations'
+task :test => :gem do
+  system("./test_options.rb 2>&1 | tee test_options.log")
+end
+
+require 'rake/clean'
+CLEAN.include FileList['*.xls*']
+CLEAN.include FileList['*.xml*']
+CLEAN.include FileList['*.dat*']
+CLEAN.include FileList['ruby*.tmp']
+CLEAN.include FileList['data/download']
+CLEAN.include FileList['duplicate_ean13_from_zur_rose.txt']
