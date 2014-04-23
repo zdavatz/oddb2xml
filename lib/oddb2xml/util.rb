@@ -1,7 +1,13 @@
 module Oddb2xml
   Backup = "#{Dir.pwd}/data/download"
   @options = {}
-  
+
+  def Oddb2xml.log(msg)
+    return unless @options[:log]
+    $stdout.puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}: #{msg}"
+    $stdout.flush
+  end
+
   def Oddb2xml.save_options(options)
     @options = options
   end

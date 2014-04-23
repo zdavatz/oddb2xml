@@ -10,7 +10,7 @@ require 'fileutils'
 
 def test_one_call(cmd)
   dest = File.join(Ausgabe, cmd.gsub(/[ -]/, '_'))
-  cmd.sub!('oddb2xml',  'oddb2xml --skip-download')
+  cmd.sub!('oddb2xml',  'oddb2xml --skip-download --log')
   files = (Dir.glob('%.xls*') + Dir.glob('*.dat*') + Dir.glob('*.xml'))
   FileUtils.rm(files, :verbose => true)
   puts "#{Time.now}: Running cmd #{cmd}"
@@ -32,9 +32,11 @@ end
 system("rake install") # build and install our gem first
 Ausgabe = File.join(Dir.pwd, 'ausgabe', Time.now.strftime('%Y.%m.%d-%H:%M'))
 FileUtils.makedirs(Ausgabe)
-test_one_call('oddb2xml -f dat', 'oddb.dat')
-test_one_call('oddb2xml -f xml', 'oddb.xml')
+test_one_call('oddb2xml -x address')
+test_one_call('oddb2xml -f dat')
+test_one_call('oddb2xml -f xml')
 test_one_call('oddb2xml -f dat -a nonpharma')
 test_one_call('oddb2xml -t md')
 test_one_call('oddb2xml -a nonpharma -t md -c tar.gz')
+test_one_call('oddb2xml -a nonpharma')
 test_one_call('oddb2xml -e') # take hours, therefor at the end
