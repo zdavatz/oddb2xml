@@ -33,6 +33,20 @@
           <GLN>7601001320451</GLN>
         </COMP>
       </ITEM>
+      <ITEM DT="2013-06-22T00:00:00">
+        <GTIN>7680555580054</GTIN>
+        <PHAR>2465312</PHAR>
+        <STATUS>A</STATUS>
+        <STDATE>2002-01-16T00:00:00</STDATE>
+        <LANG>DE</LANG>
+        <DSCR>ZYVOXID Filmtabl 600 mg</DSCR>
+        <ADDSCR>10 Stk</ADDSCR>
+        <ATC>J01XX08</ATC>
+        <COMP>
+          <NAME>Pfizer AG</NAME>
+          <GLN>7601001010604</GLN>
+        </COMP>
+      </ITEM>
       <RESULT>
         <OK_ERROR>OK</OK_ERROR>
         <NBR_RECORD>2</NBR_RECORD>

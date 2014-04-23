@@ -26,6 +26,7 @@ module ServerMockHelper
     setup_lppv_server_mock
     setup_migel_server_mock
     setup_medregbm_server_mock
+    setup_zurrose_server_mock
   end
   def setup_bag_xml_server_mock
     # zip
