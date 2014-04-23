@@ -28,8 +28,8 @@ Usage:
     -x N, --context=N    context N {product|address}. product is default.
                          
                          For debugging purposes
-    --skip-download      skips downloading files it the file is already under data/downloads.
-                         Downloaded files are saved under data/downloads
+    --skip-download      skips downloading files it the file is already under data/download.
+                         Downloaded files are saved under data/download
     -h,   --help         Show this help message.
 EOS
 end
