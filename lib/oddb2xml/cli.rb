@@ -233,13 +233,11 @@ module Oddb2xml
           end
         end
       when :zurrose
-        Oddb2xml.log("zurrose")
         Thread.new do
           downloader = ZurroseDownloader.new(@options, @options[:transfer_dat])
           xml = downloader.download
           @mutex.synchronize do
             hsh = ZurroseExtractor.new(xml, @options[:extended]).to_hash
-            @items = hsh if  @options[:extended]
             @prices = hsh
             Oddb2xml.log("zurrose added #{@prices.size} prices")
           end
