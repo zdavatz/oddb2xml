@@ -15,6 +15,8 @@ task :gem => :build do
   Rake::Task[:build].invoke
 end
 
+task :spec => :clean
+
 desc 'Run oddb2xml with all commonly used combinations'
 task :test => [:clean, :spec, :gem] do
   system("./test_options.rb 2>&1 | tee test_options.log")

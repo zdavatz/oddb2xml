@@ -153,6 +153,7 @@ module Oddb2xml
     end
     def prepare_substances
       unless @substances
+        Oddb2xml.log("prepare_substances from #{@items.size} items")
         @substances = []
         @items.values.uniq.each do |seq|
           next unless seq[:substances]
@@ -162,10 +163,13 @@ module Oddb2xml
         end
         @substances.uniq!
         @substances.sort!
+        Oddb2xml.log("prepare_substances done. Total #{@substances.size} from #{@items.size} items")
+        exit 2 if @options[:extended] and @substances.size == 0
       end
     end
     def prepare_limitations
       unless @limitations
+        Oddb2xml.log("prepare_limitations from #{@items.size} items")
         limitations = []
         @items.values.uniq.each do |seq|
           next unless seq[:packages]
@@ -177,6 +181,7 @@ module Oddb2xml
         # limitation.xml needs all duplicate entries by this keys.
         limitations.uniq! {|lim| lim[:id] + lim[:code] + lim[:type] }
         @limitations = limitations.sort_by {|lim| lim[:code] }
+        Oddb2xml.log("prepare_limitations done. Total #{@limitations.size} from #{@items.size} items")
       end
     end
     def prepare_interactions
@@ -259,6 +264,7 @@ module Oddb2xml
           'VALID_DATE'        => datetime
         ) {
           Oddb2xml.log "build_substance #{@substances.size} substances"
+        exit 2 if @options[:extended] and @substances.size == 0
         @substances.each_with_index do |sub_name, i|
             xml.SB('DT' => '') {
               xml.SUBNO((i + 1).to_i)
@@ -292,7 +298,7 @@ module Oddb2xml
           'PROD_DATE'         => datetime,
           'VALID_DATE'        => datetime
         ) {
-          @limitations.each do |lim|
+        @limitations.each do |lim|
             xml.LIM('DT' => '') {
               case lim[:key]
               when :swissmedic_number8
