@@ -8,6 +8,7 @@ module Oddb2xml
   module DownloadMethod
     private
     def download_as(file, option='r')
+      Oddb2xml.log "download_as file #{file} from #{@url}"
       data = nil
       if Oddb2xml.skip_download(file)
         io = File.open(file, option)
@@ -36,6 +37,7 @@ module Oddb2xml
       @url         = url
       @retry_times = 3
       HTTPI.log = false # disable httpi warning
+      Oddb2xml.log "Downloader from #{@url} for #{self.class}"
       init
     end
     def init
@@ -243,7 +245,7 @@ XML
       super({}, url)
     end
     def download
-      @type == :orphan ? file = "swissmedic_#{@type}.xls" :  file = "swissmedic_#{@type}.xlsx"
+      @type == file = "swissmedic_#{@type}.xlsx"
       begin
         page = @agent.get(@url)
         if link_node = page.search(@xpath).first

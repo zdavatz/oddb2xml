@@ -201,12 +201,7 @@ module Oddb2xml
       @filename = filename
       @type  = type
       return unless File.exists?(filename)
-      if type == :orphan
-        book = Spreadsheet.open(filename, 'rb')
-        @sheet = book.worksheet(0)
-      else
-        @sheet = RubyXL::Parser.parse(File.expand_path(filename)).worksheets[0]
-      end
+      @sheet = RubyXL::Parser.parse(File.expand_path(filename)).worksheets[0]
     end
     def to_arry
       data = []
@@ -215,7 +210,7 @@ module Oddb2xml
       when :orphan
         i = 1
         @sheet.each do |row|
-          number = row[1].to_i
+          number = row[1].value.to_i
           if number != 0
             data << sprintf("%05d", number)
           end

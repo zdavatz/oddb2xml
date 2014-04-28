@@ -44,6 +44,7 @@ module Oddb2xml
       end
     end
     def to_xml(subject=nil)
+      Oddb2xml.log "to_xml subject #{subject ? subject.to_s :  @subject.to_s} for #{self.class}"
       if subject
         self.send('build_' + subject.to_s)
       elsif @subject
@@ -51,6 +52,7 @@ module Oddb2xml
       end
     end
     def to_dat(subject=nil)
+      Oddb2xml.log  "to_dat subject #{subject ? subject.to_s :  @subject.to_s} for #{self.class}"
       if subject
         self.send('build_' + subject.to_s)
       elsif @subject
@@ -61,6 +63,7 @@ module Oddb2xml
     def prepare_articles(reset=false)
       @articles = nil if reset
       unless @articles
+        Oddb2xml.log("prepare_articles starting with #{@articles ? @articles.size : 'no'} articles")
         @articles = [] # base is 'DE'
         @index['DE'].each_pair do |phar, indices|
           obj = {
@@ -98,34 +101,59 @@ module Oddb2xml
           end
           @articles << obj
         end
+        nrAdded = 0
         if @options[:extended]
-          nrAdded = 0
+          Oddb2xml.log("prepare_articles prepare_local_index")
+          local_index = {}
+          %w[de fr].each { |lang| local_index[lang] = {} }
+          %w[de fr].each {
+            |lang|
+          @articles.each{|article|
+                         ean = article[lang.intern][0][:ean]
+                                                       next if ean == nil or ean.to_i == 0
+                                                      local_index[lang][ean] = article
+                                                      }
+                                                      }
+          Oddb2xml.log("prepare_articles extended")
           @prices.each{
             |ean13, info|
-            obj = {}
+          obj = {}
+          found = false
           %w[de fr].each do |lang|
-          next if @index[lang] and @index[lang][ean13]
-            entry = {
-                     :desc            => info[:description],
-                     :status          => 'I', # or it will not be emitted in the dat
-                     :atc_code        => '',
-                     :ean             => ean13,
-                     :lang            => lang.capitalize,
-                     :pharmacode      => info[:pharmacode],
-                     :price           => info[:price],
-                     :pub_price       => info[:pub_price],
-                     :type            => info[:type],
-                     }
-            obj[lang.intern] = [entry]
+          #              existing = @articles.find{|art| art[lang.intern] and art[lang.intern][0][:ean] == ean13 }
+          existing = local_index[lang][ean13]
+            if existing
+              found = true
+              existing[:price] = info[:price]
+                                      existing[:pub_price] = info[:pub_price]
+                      else
+                      entry = {
+                               :desc            => info[:description],
+                               :status          => 'I', # or it will not be emitted in the dat
+                              :atc_code        => '',
+                               :ean             => ean13,
+                               :lang            => lang.capitalize,
+                               :pharmacode      => info[:pharmacode],
+                               :price           => info[:price],
+                               :pub_price       => info[:pub_price],
+                               :type            => info[:type],
+                               }
+                      obj[lang.intern] = [entry]
+                      @index[lang.upcase][ean13] = entry
+                      end
+                      end
+                      unless found
+                      @articles << obj
+                      nrAdded += 1
+                      end
+                      }
           end
-          nrAdded += 1
-          @articles << obj
-          }
-        end
       end
+      Oddb2xml.log("prepare_articles done. Added #{nrAdded} prices. Total #{@articles.size}")
     end
     def prepare_substances
       unless @substances
+        Oddb2xml.log("prepare_substances from #{@items.size} items")
         @substances = []
         @items.values.uniq.each do |seq|
           next unless seq[:substances]
@@ -135,10 +163,13 @@ module Oddb2xml
         end
         @substances.uniq!
         @substances.sort!
+        Oddb2xml.log("prepare_substances done. Total #{@substances.size} from #{@items.size} items")
+        exit 2 if @options[:extended] and @substances.size == 0
       end
     end
     def prepare_limitations
       unless @limitations
+        Oddb2xml.log("prepare_limitations from #{@items.size} items")
         limitations = []
         @items.values.uniq.each do |seq|
           next unless seq[:packages]
@@ -150,6 +181,7 @@ module Oddb2xml
         # limitation.xml needs all duplicate entries by this keys.
         limitations.uniq! {|lim| lim[:id] + lim[:code] + lim[:type] }
         @limitations = limitations.sort_by {|lim| lim[:code] }
+        Oddb2xml.log("prepare_limitations done. Total #{@limitations.size} from #{@items.size} items")
       end
     end
     def prepare_interactions
@@ -231,7 +263,9 @@ module Oddb2xml
           'PROD_DATE'         => datetime,
           'VALID_DATE'        => datetime
         ) {
-          @substances.each_with_index do |sub_name, i|
+          Oddb2xml.log "build_substance #{@substances.size} substances"
+        exit 2 if @options[:extended] and @substances.size == 0
+        @substances.each_with_index do |sub_name, i|
             xml.SB('DT' => '') {
               xml.SUBNO((i + 1).to_i)
               #xml.NAMD
@@ -252,6 +286,7 @@ module Oddb2xml
     end
     def build_limitation
       prepare_limitations
+      Oddb2xml.log "build_limitation #{@limitations.size} limitations"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -263,7 +298,7 @@ module Oddb2xml
           'PROD_DATE'         => datetime,
           'VALID_DATE'        => datetime
         ) {
-          @limitations.each do |lim|
+        @limitations.each do |lim|
             xml.LIM('DT' => '') {
               case lim[:key]
               when :swissmedic_number8
@@ -310,6 +345,7 @@ module Oddb2xml
           'PROD_DATE'         => datetime,
           'VALID_DATE'        => datetime
         ) {
+          Oddb2xml.log "build_interaction #{@interactions.size} interactions"
           @interactions.sort_by{|ix| ix[:ixno] }.each do |ix|
             xml.IX('DT' => '') {
               xml.IXNO  ix[:ixno]
@@ -360,6 +396,7 @@ module Oddb2xml
     end
     def build_code
       prepare_codes
+      Oddb2xml.log "build_code #{@codes.size} codes"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -399,6 +436,7 @@ module Oddb2xml
       prepare_products
       prepare_interactions
       prepare_codes
+      Oddb2xml.log "build_product #{@products.size} products"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -551,6 +589,8 @@ module Oddb2xml
     def build_article
       prepare_limitations
       prepare_articles
+      idx = 0
+      Oddb2xml.log "build_article #{idx} of #{@articles.size} articles"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -563,8 +603,10 @@ module Oddb2xml
           'VALID_DATE'        => datetime
         ) {
           @articles.each do |obj|
-            obj[:de].each_with_index do |de_idx, i|
-        fr_idx = obj[:fr][i]              # swissindex FR
+            idx += 1
+        Oddb2xml.log "build_article #{idx} of #{@articles.size} articles" if idx % 500 == 0
+        obj[:de].each_with_index do |de_idx, i|
+              fr_idx = obj[:fr][i]              # swissindex FR
               pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
               ppac = nil                        # Packungen
               ean = de_idx[:ean]
@@ -743,6 +785,7 @@ module Oddb2xml
           }
         }
       end
+      Oddb2xml.log "build_article. Done #{idx} of #{@articles.size} articles"
       _builder.to_xml
     end
     def build_fi
@@ -834,6 +877,7 @@ module Oddb2xml
       _builder.to_xml
     end
     def build_company
+      Oddb2xml.log "build_company #{@companies.size} companies"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -870,6 +914,7 @@ module Oddb2xml
       _builder.to_xml
     end
     def build_person
+      Oddb2xml.log "build_person #{@people.size} persons"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -1086,9 +1131,7 @@ module Oddb2xml
           row << "%#{DAT_LEN[:CBGG]}s"  % '0'
           row << "%#{DAT_LEN[:CIKS]}s"  % ' ' # no category
           row << "%0#{DAT_LEN[:ITHE]}d" %  0
-          ean = idx[:ean]
-          ean = 0 if ean.match(/^000000/)
-          row << "%0#{DAT_LEN[:CEAN]}d" % ean
+          row << idx[:ean].to_s.rjust(DAT_LEN[:CEAN], '0')
           row << "%#{DAT_LEN[:CMWS]}s"  % '1' # nonpharma
           rows << row
         end

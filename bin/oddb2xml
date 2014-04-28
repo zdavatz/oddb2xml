@@ -28,8 +28,9 @@ Usage:
     -x N, --context=N    context N {product|address}. product is default.
                          
                          For debugging purposes
-    --skip-download      skips downloading files it the file is already under data/downloads.
-                         Downloaded files are saved under data/downloads
+    --skip-download      skips downloading files it the file is already under data/download.
+                         Downloaded files are saved under data/download
+    --log                log important actions
     -h,   --help         Show this help message.
 EOS
 end
@@ -46,7 +47,8 @@ opts = {
   :debug        => false,
   :ean14        => false,
   :skip_download=> false,
-}
+  :log          => false,
+  }
 
 parser.on('-a v', '--append v',     /^nonpharma$/)  {|v| opts[:nonpharma] = true }
 parser.on('-c v', '--compress v',   /^tar\.gz|zip$/){|v| opts[:compress_ext] = v }
@@ -60,7 +62,8 @@ parser.on('-i v', '--include v',    /^ean14$/)      {|v| opts[:ean14] = true }
 parser.on('-t v', '--tag-suffix v', /^[A-z0-9]*$/i) {|v| opts[:tag_suffix] = v.upcase }
 parser.on('-x v', '--context v',    /^addr(ess)*$/i){|v| opts[:address] = true }
 parser.on('-p v', '--price v',      /^zurrose$/)    {|v| opts[:price] = v.intern }
-parser.on('--skip-download') {|v| opts[:skip_download] = true }
+parser.on('--skip-download')                        {|v| opts[:skip_download] = true }
+parser.on('--log')                                  {|v| opts[:log] = :true }
 parser.on_tail('-h', '--help') { puts help; exit }
 
 args = ARGV.dup
@@ -78,6 +81,7 @@ if path = args.first
   opts[:transfer_dat] = path
 end
 
+startTime = Time.now
 ui = Oddb2xml::Cli.new(opts)
 begin
   if opts[:format] == :xml
@@ -95,4 +99,5 @@ then you will not see anymore warnings
 rescue Interrupt
   exit
 end
-puts "#{Time.now}: #{__LINE__} done"; $stdout.sync
+diff = (Time.now-startTime).to_i
+puts "#{Time.now}: #{__LINE__} done. Took #{diff} seconds"; $stdout.sync
