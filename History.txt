@@ -1,3 +1,19 @@
+=== 1.8.0 / 28.04.2014
+
+* Improved rake clean targer
+* More logging and exit 2 unless substances and limitations okay for extended
+* Fix problem with empty substances and limitation when running -e
+
+=== 1.7.9 / 22.04.2014
+
+* Added log option
+* Added clean target to rake
+* Added test target to rake
+* Add spec task to rake
+* Fix rspec
+* Avoid ArgumentError for sprintf
+* Orphan is now an xlsx file, too
+
 === 1.7.8 / 02.04.2014
 
 * Don't emit field BC starting with 000000
