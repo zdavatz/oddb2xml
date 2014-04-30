@@ -8,6 +8,7 @@ PATH
       rubyXL (~> 2.5)
       rubyzip (~> 1.0)
       savon (~> 2.0)
+      sax-machine
       spreadsheet
 
 GEM
@@ -87,6 +88,8 @@ GEM
       nokogiri (>= 1.4.0)
       nori (~> 2.3.0)
       wasabi (~> 3.2.2)
+    sax-machine (0.1.0)
+      nokogiri (> 0.0.0)
     slop (3.5.0)
     spreadsheet (0.9.7)
       ruby-ole (>= 1.0)
