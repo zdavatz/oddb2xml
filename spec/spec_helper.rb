@@ -156,12 +156,12 @@ module ServerMockHelper
   end
   def setup_epha_server_mock
     # csv
-    stub_csv_url = 'http://community.epha.ch/interactions_de_utf8.csv'
+    stub_csv_url = 'https://download.epha.ch/cleaned/matrix.csv'
     stub_response = File.read(File.expand_path('../data/epha_interactions.csv', __FILE__))
     stub_request(:get, stub_csv_url).
       with(:headers => {
         'Accept' => '*/*',
-        'Host'   => 'community.epha.ch',
+        'Host'   => 'download.epha.ch',
       }).
       to_return(
         :status  => 200,

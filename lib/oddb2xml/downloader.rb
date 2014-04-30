@@ -99,7 +99,7 @@ module Oddb2xml
   class EphaDownloader < Downloader
     include DownloadMethod
     def download
-      @url ||= 'http://community.epha.ch/interactions_de_utf8.csv'
+      @url ||= 'https://download.epha.ch/cleaned/matrix.csv'
       download_as('epha_interactions.csv', 'r')
     end
   end
@@ -165,7 +165,14 @@ module Oddb2xml
             response = nil # win
           end
         end
-        read_xml_form_zip(/^Preparation/iu, file)
+        inhalt = read_xml_form_zip(/^Preparation/iu, file)
+        if @options[:skip_download]
+          FileUtils.makedirs(Backup)
+          outfile = File.join(Backup, 'Preparations.xml')
+          Oddb2xml.log "Downloader saving outfile #{outfile} for #{self.class}"
+          File.open(outfile, 'w+') { |file| file.write inhalt}
+        end
+        inhalt
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
