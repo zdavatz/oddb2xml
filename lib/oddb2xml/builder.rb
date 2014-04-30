@@ -357,10 +357,12 @@ module Oddb2xml
               #xml.GRP2F
               xml.EFFD  ix[:effect]
               #xml.EFFF
-              if dict = @codes[ix[:grad].upcase]
-                xml.RLV  dict[:int]
-                xml.RLVD dict[:txt]
-                #xml.RLVF
+              if @codes and ix[:grad]
+                if dict = @codes[ix[:grad].upcase]
+                  xml.RLV  dict[:int]
+                  xml.RLVD dict[:txt]
+                  #xml.RLVF
+                end
               end
               #xml.EFFTXTD
               #xml.EFFTXTF

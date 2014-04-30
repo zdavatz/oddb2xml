@@ -26,7 +26,7 @@ describe Oddb2xml::BagXmlExtractor do
       expect(with_pharma[:packages].size).to eq(1)
       expect(with_pharma[:packages].first[0]).to eq('1699947')
       expect(with_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('205.3')
-      expect(@items.size).to eq(2)
+      expect(@items.size).to eq(5)
       no_pharma = @items['7680620690084']
       expect(no_pharma).not_to be_nil
       expect(no_pharma[:atc_code]).not_to be_nil

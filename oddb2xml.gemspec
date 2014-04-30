@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'savon', '~> 2.0'
   spec.add_dependency 'spreadsheet'
   spec.add_dependency 'rubyXL', '~> 2.5'
-  
+  spec.add_dependency 'sax-machine'
   
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"

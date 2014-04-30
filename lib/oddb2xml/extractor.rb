@@ -4,8 +4,11 @@ require 'nokogiri'
 require 'spreadsheet'
 require 'stringio'
 require 'rubyXL'
+require 'csv'
+require 'oddb2xml/xml_definitions'
 
 module Oddb2xml
+  Strip_For_Sax_Machine = '<?xml version="1.0" encoding="utf-8"?>'+"\n"
   module TxtExtractorMethods
     def initialize(str)
       @io = StringIO.new(str)
@@ -39,77 +42,91 @@ module Oddb2xml
   class LppvExtractor < Extractor
     include TxtExtractorMethods
   end
+
   class BagXmlExtractor < Extractor
     def to_hash
       data = {}
-      doc = Nokogiri::XML(@xml)
-      doc.xpath('//Preparation').each do |seq|
+      result = PreparationsEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
+      result.Preparations.Preparation.each do |seq|
         item = {}
-        item[:product_key]  = seq.attr('ProductCommercial').to_s
-        item[:desc_de]      = (desc = seq.at_xpath('.//DescriptionDe')) ? desc.text : ''
-        item[:desc_fr]      = (desc = seq.at_xpath('.//DescriptionFr')) ? desc.text : ''
-        item[:name_de]      = (name = seq.at_xpath('.//NameDe'))        ? name.text : ''
-        item[:name_fr]      = (name = seq.at_xpath('.//NameFr'))        ? name.text : ''
-        item[:swissmedic_number5] = (num5 = seq.at_xpath('.//SwissmedicNo5')) ? (num5.text.rjust(5,'0')) : ''
-        item[:org_gen_code] = (orgc = seq.at_xpath('.//OrgGenCode'))    ? orgc.text : ''
-        item[:deductible]   = (ddbl = seq.at_xpath('.//FlagSB20'))      ? ddbl.text : ''
-        item[:atc_code]     = (atcc = seq.at_xpath('.//AtcCode'))       ? atcc.text : ''
-        item[:comment_de]   = (info = seq.at_xpath('.//CommentDe'))     ? info.text : ''
-        item[:comment_fr]   = (info = seq.at_xpath('.//CommentFr'))     ? info.text : ''
+        item[:product_key]  = seq.ProductCommercial
+        item[:desc_de]      = (desc = seq.DescriptionDe) ? desc : ''
+        item[:desc_fr]      = (desc = seq.DescriptionFr) ? desc : ''
+        item[:name_de]      = (name = seq.NameDe)        ? name : ''
+        item[:name_fr]      = (name = seq.NameFr)        ? name : ''
+        item[:swissmedic_number5] = (num5 = seq.SwissmedicNo5) ? (num5.rjust(5,'0')) : ''
+        item[:org_gen_code] = (orgc = seq.OrgGenCode)    ? orgc : ''
+        item[:deductible]   = (ddbl = seq.FlagSB20)      ? ddbl : ''
+        item[:atc_code]     = (atcc = seq.AtcCode)       ? atcc : ''
+        item[:comment_de]   = (info = seq.CommentDe)     ? info : ''
+        item[:comment_fr]   = (info = seq.CommentFr)     ? info : ''
         item[:it_code]      = ''
-        seq.xpath('.//ItCode').each do |itc|
+        seq.ItCodes.ItCode.each do |itc|
           if item[:it_code].to_s.empty?
-            it_code = itc.attr('Code').to_s
+            it_code = itc.Code.to_s
             item[:it_code] = (it_code =~ /(\d+)\.(\d+)\.(\d+)./) ? it_code : ''
           end
         end
         item[:substances] = []
-        seq.xpath('.//Substance').each_with_index do |sub, i|
+        seq.Substances.Substance.each_with_index do |sub, i|
           item[:substances] << {
             :index    => i.to_s,
-            :name     => (name = sub.at_xpath('.//DescriptionLa')) ? name.text : '',
-            :quantity => (qtty = sub.at_xpath('.//Quantity'))      ? qtty.text : '',
-            :unit     => (unit = sub.at_xpath('.//QuantityUnit'))  ? unit.text : '',
+            :name     => (name = sub.DescriptionLa) ? name : '',
+            :quantity => (qtty = sub.Quantity)      ? qtty : '',
+            :unit     => (unit = sub.QuantityUnit)  ? unit : '',
           }
         end
         item[:pharmacodes] = []
         item[:packages]    = {} # pharmacode => package
-        seq.xpath('.//Pack').each do |pac|
-          phar = pac.attr('Pharmacode')
+        seq.Packs.Pack.each do |pac|
+          phar = pac.Pharmacode
           phar = correct_code(phar.to_s, 7)
-          ean = pac.at_xpath('.//GTIN')
-          search_key = phar.to_i != 0 ? phar : ean.text 
+          ean = pac.GTIN
+          search_key = phar.to_i != 0 ? phar : ean
           # as common key with swissINDEX
           item[:pharmacodes] << phar
           # packages
+          exf = {:price => '', :valid_date => '', :price_code => ''}
+          if pac.Prices and pac.Prices.ExFactoryPrice
+            exf[:price]      =  pac.Prices.ExFactoryPrice.Price         if pac.Prices.ExFactoryPrice.Price
+            exf[:valid_date] =  pac.Prices.ExFactoryPrice.ValidFromDate if pac.Prices.ExFactoryPrice.ValidFromDate
+            exf[:price_code] =  pac.Prices.ExFactoryPrice.PriceTypeCode if pac.Prices.ExFactoryPrice.PriceTypeCode
+          end
+          pub = {:price => '', :valid_date => '', :price_code => ''}
+          if pac.Prices and pac.Prices.PublicPrice
+            pub[:price]      =  pac.Prices.PublicPrice.Price         if pac.Prices.PublicPrice.Price
+            pub[:valid_date] =  pac.Prices.PublicPrice.ValidFromDate if pac.Prices.PublicPrice.ValidFromDate
+            pub[:price_code] =  pac.Prices.PublicPrice.PriceTypeCode if pac.Prices.PublicPrice.PriceTypeCode
+          end
           item[:packages][search_key] = {
             :pharmacode          => phar,
-            :ean                 => (ean) ? ean.text : '',
-            :swissmedic_category => (cat = pac.at_xpath('.//SwissmedicCategory')) ? cat.text : '',
-            :swissmedic_number8  => (num = pac.at_xpath('.//SwissmedicNo8'))      ? num.text.rjust(8, '0') : '',
-            :narcosis_flag       => (flg = pac.at_xpath('.//FlagNarcosis'))       ? flg.text : '',
-            :prices              => {
-              :exf_price => {
-                :price      => (exf = pac.at_xpath('.//ExFactoryPrice/Price'))         ? exf.text : '',
-                :valid_date => (exf = pac.at_xpath('.//ExFactoryPrice/ValidFromDate')) ? exf.text : '',
-                :price_code => (exf = pac.at_xpath('.//ExFactoryPrice/PriceTypeCode')) ? exf.text : '',
-              },
-              :pub_price => {
-                :price      => (pub = pac.at_xpath('.//PublicPrice/Price'))         ? pub.text : '',
-                :valid_date => (pub = pac.at_xpath('.//PublicPrice/ValidFromDate')) ? pub.text : '',
-                :price_code => (pub = pac.at_xpath('.//PublicPrice/PriceTypeCode')) ? pub.text : '',
-              }
-            }
+            :ean                 => (ean) ? ean : '',
+            :swissmedic_category => (cat = pac.SwissmedicCategory) ? cat : '',
+            :swissmedic_number8  => (num = pac.SwissmedicNo8)      ? num.rjust(8, '0') : '',
+            :narcosis_flag       => (flg = pac.FlagNarcosis)       ? flg : '',
+            :prices              => { :exf_price => exf, :pub_price => pub },
           }
           # related all limitations
           item[:packages][search_key][:limitations] = []
           limitations = Hash.new{|h,k| h[k] = [] }
-          # in seq
-          limitations[:seq] = (lims = seq.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
+          if seq.Limitations
+            limitations[:seq] = seq.Limitations.Limitation.collect { |x| x }
+          else
+            limitations[:seq] = nil
+          end
           # in it-codes
-          limitations[:itc] = (lims = seq.xpath('.//ItCodes/ItCode/Limitations/Limitation')) ? lims.to_a : nil
+          if seq and seq.ItCodes and seq.ItCodes.ItCode
+            limitations[:itc] = []
+            seq.ItCodes.ItCode.each { |x|  limitations[:itc] += x.Limitations.Limitation if x.Limitations.Limitation}
+          else
+            limitations[:itc] =nil
+          end
           # in pac
-          limitations[:pac] = (lims = pac.xpath('.//Limitations/Limitation')) ? lims.to_a : nil
+          if pac and pac.Limitations
+            limitations[:pac] = (lims = pac.Limitations.Limitation) ? lims.to_a : nil
+          else
+            limitations[:pac] = nil
+          end
           limitations.each_pair do |lim_key, lims|
             key = ''
             id  = ''
@@ -130,16 +147,16 @@ module Oddb2xml
                 :it      => item[:it_code],
                 :key     => key,
                 :id      => id,
-                :code    => (lic = lim.at_xpath('.//LimitationCode'))   ? lic.text : '',
-                :type    => (lit = lim.at_xpath('.//LimitationType'))   ? lit.text : '',
-                :value   => (liv = lim.at_xpath('.//LimitationValue'))  ? liv.text : '',
-                :niv     => (niv = lim.at_xpath('.//LimitationNiveau')) ? niv.text : '',
-                :desc_de => (dsc = lim.at_xpath('.//DescriptionDe'))    ? dsc.text : '',
-                :desc_fr => (dsc = lim.at_xpath('.//DescriptionFr'))    ? dsc.text : '',
-                :vdate   => (dat = lim.at_xpath('.//ValidFromDate'))    ? dat.text : '',
+                :code    => (lic = lim.LimitationCode)   ? lic : '',
+                :type    => (lit = lim.LimitationType)   ? lit : '',
+                :value   => (liv = lim.LimitationValue)  ? liv : '',
+                :niv     => (niv = lim.LimitationNiveau) ? niv : '',
+                :desc_de => (dsc = lim.DescriptionDe)    ? dsc : '',
+                :desc_fr => (dsc = lim.DescriptionFr)    ? dsc : '',
+                :vdate   => (dat = lim.ValidFromDate)    ? dat : '',
               }
               deleted = false
-              if upto = ((thr = lim.at_xpath('.//ValidThruDate')) ? thr.text : nil) and
+              if upto = ((thr = lim.ValidThruDate) ? thr : nil) and
                   upto =~ /\d{2}\.\d{2}\.\d{2}/
                 begin
                   deleted = true if Date.strptime(upto, '%d.%m.%y') >= Date.today
@@ -148,18 +165,18 @@ module Oddb2xml
               end
               limitation[:del] = deleted
               item[:packages][search_key][:limitations] << limitation
-            end
+            end if lims
           end
           # limitation points
-          pts = pac.at_xpath('.//PointLimitations/PointLimitation/Points') # only first points
-          item[:packages][search_key][:limitation_points] = pts ? pts.text : ''
-          # pharmacode => seq (same data)
+          pts = pac.PointLimitations.PointLimitation.first # only first points
+          item[:packages][search_key][:limitation_points] = pts ? pts.Points : ''
           data[search_key] = item
         end
       end
       data
     end
   end
+
   class SwissIndexExtractor < Extractor
     def initialize(xml, type)
       @type = (type == :pharma ? 'PHARMA' : 'NONPHARMA')
@@ -167,23 +184,24 @@ module Oddb2xml
     end
     def to_hash
       data = {}
-      doc = Nokogiri::XML(@xml)
-      doc.remove_namespaces!
-      doc.xpath("//Envelope/Body/#{@type}/ITEM").each do |pac|
+      result = PharmaEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
+      items = result.PHARMA.ITEM
+      $stderr.puts "SwissIndexExtractor #{__LINE__}: #{@type} with #{items.size} items"; $stderr.flush
+      items.each do |pac|
         item = {}
         item[:_type]           = @type.downcase.intern
-        item[:ean]             = (gtin = pac.at_xpath('.//GTIN'))   ? gtin.text : ''
-        item[:pharmacode]      = (phar = pac.at_xpath('.//PHAR'))   ? phar.text : ''
-        item[:status]          = (stat = pac.at_xpath('.//STATUS')) ? stat.text : ''
-        item[:stat_date]       = (date = pac.at_xpath('.//SDATE'))  ? date.text : ''
-        item[:lang]            = (lang = pac.at_xpath('.//LANG'))   ? lang.text : ''
-        item[:desc]            = (dscr = pac.at_xpath('.//DSCR'))   ? dscr.text : ''
-        item[:atc_code]        = (code = pac.at_xpath('.//ATC'))    ? code.text.to_s : ''
+        item[:ean]             = (gtin = pac.GTIN)   ? gtin: ''
+        item[:pharmacode]      = (phar = pac.PHAR)   ? phar: ''
+        item[:status]          = (stat = pac.STATUS) ? stat: ''
+        item[:stat_date]       = (date = pac.SDATE)  ? date: ''
+        item[:lang]            = (lang = pac.LANG)   ? lang: ''
+        item[:desc]            = (dscr = pac.DSCR)   ? dscr: ''
+        item[:atc_code]        = (code = pac.ATC)    ? code.to_s : ''
         # as quantity text
-        item[:additional_desc] = (dscr = pac.at_xpath('.//ADDSCR')) ? dscr.text : ''
-        if comp = pac.xpath('.//COMP')
-          item[:company_name] = (nam = comp.at_xpath('.//NAME')) ? nam.text : ''
-          item[:company_ean]  = (gln = comp.at_xpath('.//GLN'))  ? gln.text : ''
+        item[:additional_desc] = (dscr = pac.ADDSCR) ? dscr: ''
+        if comp = pac.COMP
+          item[:company_name] = (nam = comp.NAME) ? nam: ''
+          item[:company_ean]  = (gln = comp.GLN)  ? gln: ''
         end
         unless item[:pharmacode].empty?
           item[:pharmacode] = correct_code(item[:pharmacode].to_s, 7)
@@ -308,17 +326,19 @@ module Oddb2xml
       data
     end
   end
+
   class SwissmedicInfoExtractor < Extractor
     def to_hash
       data = Hash.new{|h,k| h[k] = [] }
-      doc = Nokogiri::XML(@xml)
-      doc.xpath("//medicalInformations/medicalInformation[@type='fi']").each do |fi|
-        lang = fi.attr('lang').to_s
+      return data unless @xml.size > 0
+      result = MedicalInformationsContent.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
+      result.medicalInformation.each do |pac|
+        lang = pac.lang.to_s
         next unless lang =~ /de|fr/
         item = {}
-        item[:name]  = (name = fi.at_xpath('.//title')) ? name.text : ''
-        item[:owner] = (ownr = fi.at_xpath('.//authHolder')) ? ownr.text : ''
-        if content = fi.at_xpath('.//content').children.detect{|child| child.cdata? }
+        item[:name]  = (name = pac.title) ? name : ''
+        item[:owner] = (ownr = pac.authHolder) ? ownr : ''
+        if content = /cdata/.match(pac.content)
           html = Nokogiri::HTML(content.to_s)
           # all HTML contents without MonTitle and ownerCompany
           item[:paragraph] =  "<title><p>#{item[:name]}</p></title>" +
@@ -344,9 +364,11 @@ module Oddb2xml
     def to_arry
       data = []
       ixno = 0
-      while line = @io.gets
-        next if line =~ /^ATC1;Name1;ATC2;Name2;/
-        row = line.chomp.gsub("\"", '').split(';')
+      inhalt = @io.read
+      inhalt.split("\n").each do |line|
+        next if line =~ /ATC1.*Name1.*ATC2.*Name2/
+        line = '"'+line unless /^"/.match(line)
+        row = CSV.parse_line(line)
         ixno += 1
         action = {}
         action[:ixno]      = ixno
