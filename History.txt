@@ -1,3 +1,9 @@
+=== 1.8.1 / 30.04.2014
+
+* Fix building NONPHARMA
+* Using SAX-Parser and sax-machine
+* Adapt to new location of epha interaction.csv
+
 === 1.8.0 / 28.04.2014
 
 * Improved rake clean targer
