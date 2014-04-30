@@ -110,6 +110,12 @@ describe Oddb2xml::Builder do
       Oddb2xml::Cli.new(opts)
     end
 
+    it 'should load correct number of nonpharma' do
+      res = capture(:stdout){ cli.run }
+      res.should match(/NonPharma/i)
+      res.should match(/NonPharma products: 60/)
+    end
+
     it 'should emit a correct oddb_limitation.xml' do
       res = capture(:stdout){ cli.run }
       # check limitations

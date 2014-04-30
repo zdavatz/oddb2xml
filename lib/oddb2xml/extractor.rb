@@ -185,7 +185,9 @@ module Oddb2xml
     def to_hash
       data = {}
       result = PharmaEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
-      result.PHARMA.ITEM.each do |pac|
+      items = result.PHARMA.ITEM
+      $stderr.puts "SwissIndexExtractor #{__LINE__}: #{@type} with #{items.size} items"; $stderr.flush
+      items.each do |pac|
         item = {}
         item[:_type]           = @type.downcase.intern
         item[:ean]             = (gtin = pac.GTIN)   ? gtin: ''
@@ -208,7 +210,7 @@ module Oddb2xml
           end
           data[item[:pharmacode]] << item
         end
-      end if result.PHARMA
+      end
       data
     end
   end
