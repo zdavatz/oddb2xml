@@ -183,7 +183,7 @@ describe Oddb2xml::Builder do
       titles = XPath.match( doc, "//TITD" )
       titles.size.should == 2
       titles.find_all{|x| x.text.match('Keine Interaktion') }.size.should == 1
-      titles.find_all{|x| x.text.match('Erhöhtes Risiko für Myopathie und Rhabdomyolyse') }.size.should == 1      
+      titles.find_all{|x| x.text.match('Erhöhtes Risiko für Myopathie und Rhabdomyolyse') }.size.should == 1
     end
 
     it 'should emit a correct oddb_product.xml' do

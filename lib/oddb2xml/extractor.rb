@@ -186,7 +186,6 @@ module Oddb2xml
       data = {}
       result = PharmaEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
       items = result.PHARMA.ITEM
-      $stderr.puts "SwissIndexExtractor #{__LINE__}: #{@type} with #{items.size} items"; $stderr.flush
       items.each do |pac|
         item = {}
         item[:_type]           = @type.downcase.intern
@@ -366,20 +365,25 @@ module Oddb2xml
       ixno = 0
       inhalt = @io.read
       inhalt.split("\n").each do |line|
-        next if line =~ /ATC1.*Name1.*ATC2.*Name2/
-        line = '"'+line unless /^"/.match(line)
-        row = CSV.parse_line(line)
         ixno += 1
-        action = {}
-        action[:ixno]      = ixno
-        action[:title]     = row[4]
-        action[:atc1]      = row[0]
-        action[:atc2]      = row[2]
-        action[:mechanism] = row[5]
-        action[:effect]    = row[6]
-        action[:measures]  = row[7]
-        action[:grad]      = row[8]
-        data << action
+        next if /ATC1.*Name1.*ATC2.*Name2/.match(line)
+        #line = '"'+line unless /^"/.match(line)
+        begin
+          row = CSV.parse_line(line.gsub('""','"'))
+          action = {}
+          next unless row.size > 8
+          action[:ixno]      = ixno
+          action[:title]     = row[4]
+          action[:atc1]      = row[0]
+          action[:atc2]      = row[2]
+          action[:mechanism] = row[5]
+          action[:effect]    = row[6]
+          action[:measures]  = row[7]
+          action[:grad]      = row[8]
+          data << action
+        rescue CSV::MalformedCSVError
+          puts "CSV::MalformedCSVError in line #{ixno}: #{line}"
+        end
       end
       data
     end
