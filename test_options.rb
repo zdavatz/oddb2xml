@@ -30,7 +30,7 @@ def test_one_call(cmd)
 end
 
 def prepare_for_gem_test
-  [ "rake clean gem"      , # build our gem first
+  [ "rake clean gem install"      , # build  and install our gem first
 #    "gem uninstall --all --ignore-dependencies --executables",
     "gem install pkg/*.gem"
   ].each {
