@@ -87,6 +87,18 @@ FR
         Pharma products: 14801
 ```
 
+## Supported ruby version
+
+We run tests on travis-ci.org for the Ruby versions mentioned in the .travis.yml file. These are
+* 1.9.3
+* 2.0.0
+* 2.1
+* ruby-head
+
+If you are running an older Ruby-Version (eg. 1.8 or 1.9.1), please upgrade before reporting a bug.
+See also http://bugs.ruby-lang.org/projects/ruby/wiki/ReleaseEngineering
+
+
 ## XSD files
 If you need the XSD files, generate them yourself using the javabeans tool:
 
