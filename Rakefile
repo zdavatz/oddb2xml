@@ -21,7 +21,9 @@ desc 'Run oddb2xml with all commonly used combinations'
 task :test => [:clean, :spec, :gem] do
   log_file = 'test_options.log'
   puts "Running test_options.rb with Output redirected to #{log_file}. This will take some time (e.g. 20 minutes)"
-  res = system("./test_options.rb 2>&1 > #{log_file}")
+  # must use bash -o pipefail to catch error in test_options.rb and not tee
+  # see http://stackoverflow.com/questions/985876/tee-and-exit-status
+  res = system("bash -c 'set -o pipefail && ./test_options.rb 2>&1 | tee #{log_file}'")
   puts "Running test_options.rb returned #{res.inspect}. Output was redirected to #{log_file}"
   exit 1 unless res
 end
