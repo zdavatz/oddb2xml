@@ -43,7 +43,7 @@ The following additional data is in the files:
 see `--help`.
 
 ```
-/usr/local/bin/oddb2xml ver.1.7.8
+/usr/local/bin/oddb2xml ver.1.8.2
 Usage:
   oddb2xml [option]
     produced files are found under data
