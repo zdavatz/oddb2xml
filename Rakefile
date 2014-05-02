@@ -19,10 +19,15 @@ task :spec => :clean
 
 desc 'Run oddb2xml with all commonly used combinations'
 task :test => [:clean, :spec, :gem] do
-  system("./test_options.rb 2>&1 | tee test_options.log")
+  log_file = 'test_options.log'
+  puts "Running test_options.rb with Output redirected to #{log_file}. This will take some time (e.g. 20 minutes)"
+  res = system("./test_options.rb 2>&1 > #{log_file}")
+  puts "Running test_options.rb returned #{res.inspect}. Output was redirected to #{log_file}"
+  exit 1 unless res
 end
 
 require 'rake/clean'
+CLEAN.include FileList['pkg/*.gem']
 CLEAN.include FileList['*.xls*']
 CLEAN.include FileList['*.xml*']
 CLEAN.include FileList['*.dat*']
