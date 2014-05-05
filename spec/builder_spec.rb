@@ -5,7 +5,7 @@ require "rexml/document"
 include REXML
 
 module Kernel
-  def capture(stream)
+  def buildr_capture(stream)
     begin
       stream = stream.to_s
       eval "$#{stream} = StringIO.new"
@@ -19,19 +19,24 @@ module Kernel
 end
 
 describe Oddb2xml::Builder do
+  NrExtendedArticles = 71
   include ServerMockHelper
-  before(:all) do
-    files = (Dir.glob('oddb_*.tar.gz')+ Dir.glob('oddb_*.zip')+ Dir.glob('oddb_*.xml'))# +Dir.glob('data/download/*'))
-    files.each{ |file| FileUtils.rm(file) }
-  end
-
   before(:each) do
+    @saveddir = Dir.pwd
+    cleanup_directories_before_run
     setup_server_mocks
     setup_swiss_index_server_mock(types =  ['NonPharma', 'Pharma'])
+    Dir.chdir Oddb2xml::WorkDir
   end
+  after(:each) do
+    Dir.chdir @saveddir
+    cleanup_directories_before_run
+    cleanup_compressor
+  end
+
   context 'should handle BAG-articles with and without pharmacode' do
     it {
-      dat = File.read(File.expand_path('../data/Preparation.xml', __FILE__))
+      dat = File.read(File.expand_path('../data/Preparations.xml', __FILE__))
       @items = Oddb2xml::BagXmlExtractor.new(dat).to_hash
       saved =  @items.clone
       expect(@items.size).to eq(5)
@@ -44,13 +49,14 @@ describe Oddb2xml::Builder do
       opts = {}
       Oddb2xml::Cli.new(opts)
     end
+
     it 'should generate a valid oddb_product.xml' do
-      res = capture(:stdout){ cli.run }
+      res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
-      article_filename = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_article.xml'))
+      article_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
       File.exists?(article_filename).should be_true
       article_xml = IO.read(article_filename)
-      product_filename = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_product.xml'))
+      product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
       File.exists?(product_filename).should be_true
       unless /1\.8\.7/.match(RUBY_VERSION)
         product_xml = IO.read(product_filename)
@@ -90,9 +96,9 @@ describe Oddb2xml::Builder do
       Oddb2xml::Cli.new(opts)
     end    
     it 'should generate a valid oddb_with_migel.dat' do
-      res = capture(:stdout){ cli.run }
+      res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
-      dat_filename = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_with_migel.dat'))
+      dat_filename = File.join(Oddb2xml::WorkDir, 'oddb_with_migel.dat')
       File.exists?(dat_filename).should be_true
       oddb_dat = IO.read(dat_filename)
       oddb_dat.should match(/1115819012LEVETIRACETAM DESITIN Filmtabl 250 mg 30 Stk/), "should have Desitin"
@@ -106,20 +112,30 @@ describe Oddb2xml::Builder do
         :extended    => :true,
         :nonpharma    => :true,
         :price      => :zurrose,
-        }
+        :log      => true,
+        :skip_download => true,
+      }
       Oddb2xml::Cli.new(opts)
     end
-
     it 'should load correct number of nonpharma' do
-      res = capture(:stdout){ cli.run }
+      res = buildr_capture(:stdout){ cli.run }
       res.should match(/NonPharma/i)
       res.should match(/NonPharma products: 60/)
+      article_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(article_filename).should be_true 
+      article_xml = IO.read(article_filename)
+      doc = REXML::Document.new File.new(article_filename)
+      dscrds = XPath.match( doc, "//ART" )
+      dscrds.size.should == NrExtendedArticles
+      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('1699947') }.size.should == 1 # swissmedic_packages Cardio-Pulmo-Rénal Sérocytol, suppositoire
+      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('2465312') }.size.should == 1 # from swissindex_pharma.xml"
+      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size.should == 1 # from swissindex_pharma.xml
     end
 
     it 'should emit a correct oddb_limitation.xml' do
-      res = capture(:stdout){ cli.run }
+      res = buildr_capture(:stdout){ cli.run }
       # check limitations
-      limitation_filename = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_limitation.xml'))
+      limitation_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_limitation.xml'))
       File.exists?(limitation_filename).should be_true
       limitation_xml = IO.read(limitation_filename)
       doc = REXML::Document.new File.new(limitation_filename)
@@ -132,8 +148,8 @@ describe Oddb2xml::Builder do
     end
 
     it 'should emit a correct oddb_article.xml' do
-      res = capture(:stdout){ cli.run }
-      article_filename = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_article.xml'))
+      res = buildr_capture(:stdout){ cli.run }
+      article_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
       File.exists?(article_filename).should be_true
       article_xml = IO.read(article_filename)
       doc = REXML::Document.new File.new(article_filename)
@@ -154,7 +170,7 @@ describe Oddb2xml::Builder do
         article_xml.should match(/7680536620137/) # Pharmacode
         article_xml.should match(/<PRICE>13.49</)
         article_xml.should match(/<PRICE>27.8</)
-        article_xml.scan(/<ART DT=/).size.should eq(60) # we should find some articles
+        article_xml.scan(/<ART DT=/).size.should eq(NrExtendedArticles) # we should find some articles
         article_xml.should match(/<PHAR>5819012</)
         article_xml.should match(/<DSCRD>LEVETIRACETAM DESITIN Filmtabl 250 mg/)
         article_xml.should match(/<COMPNO>7601001320451</)
@@ -167,19 +183,20 @@ describe Oddb2xml::Builder do
         dscrds.find_all{|x| x.text.match('ZYVOXID Filmtabl 600 mg') }.size.should == 1
         
       end
-      pending 'Checking for LIMPTS' # XPath.match( doc, "//LIMPTS" ).size.should == 1
+      #pending 'Checking for LIMPTS' # XPath.match( doc, "//LIMPTS" ).size.should == 1
     end
+
     it 'should emit a correct oddb_substance.xml' do
-      res = capture(:stdout){ cli.run }
-      doc = REXML::Document.new File.new(File.join(File.dirname(__FILE__), '..', 'oddb_substance.xml'))
+      res = buildr_capture(:stdout){ cli.run }
+      doc = REXML::Document.new File.new(File.join(Oddb2xml::WorkDir, 'oddb_substance.xml'))
       names = XPath.match( doc, "//NAML" )
       names.size.should == 10
       names.find_all{|x| x.text.match('Lamivudinum') }.size.should == 1
     end
 
     it 'should emit a correct oddb_interaction.xml' do
-      res = capture(:stdout){ cli.run }
-      doc = REXML::Document.new File.new(File.join(File.dirname(__FILE__), '..', 'oddb_interaction.xml'))
+      res = buildr_capture(:stdout){ cli.run }
+      doc = REXML::Document.new File.new(File.join(Oddb2xml::WorkDir, 'oddb_interaction.xml'))
       titles = XPath.match( doc, "//TITD" )
       titles.size.should == 2
       titles.find_all{|x| x.text.match('Keine Interaktion') }.size.should == 1
@@ -187,10 +204,10 @@ describe Oddb2xml::Builder do
     end
 
     it 'should emit a correct oddb_product.xml' do
-      res = capture(:stdout){ cli.run }
+      res = buildr_capture(:stdout){ cli.run }
       
       res.should match(/products/)
-      product_filename = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_product.xml'))
+      product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
       File.exists?(product_filename).should be_true
 
       unless /1\.8\.7/.match(RUBY_VERSION)

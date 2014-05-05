@@ -13,9 +13,37 @@ Bundler.require
 
 require 'rspec'
 require 'webmock/rspec'
+
+
+module Oddb2xml
+  # we override here a few directories to make input/output when running specs to
+  # be in different places compared when running
+  SpecData       = File.join(File.dirname(__FILE__), 'data')
+  WorkDir        = File.join(File.dirname(__FILE__), 'run')
+  Downloads      = File.join(WorkDir, 'downloads')
+  SpecCompressor = File.join(Oddb2xml::SpecData, 'compressor')
+end
+
 require 'oddb2xml'
 
 module ServerMockHelper
+  def cleanup_compressor
+    [ File.join(Oddb2xml::SpecCompressor, '*.zip'),
+      File.join(Oddb2xml::SpecCompressor, '*.tar.gz'),
+      File.join(Oddb2xml::SpecCompressor, 'epha_interactions.txt*'),
+      File.join(Oddb2xml::SpecCompressor, 'medregbm_company.txt*'),
+      File.join(Oddb2xml::SpecCompressor, 'medregbm_person.txt*'),
+      File.join(Oddb2xml::SpecCompressor, 'zurrose_transfer.dat.*'),
+      File.join(Oddb2xml::SpecCompressor, 'oddb2xml_files_nonpharma.xls.*'),
+      ].each { |file| FileUtils.rm_f(Dir.glob(file), :verbose => true) if Dir.glob(file).size > 0 }
+  end
+  def cleanup_directories_before_run
+    dirs = [ Oddb2xml::Downloads, Oddb2xml::WorkDir]
+    dirs.each{ |dir| FileUtils.rm_rf(dir, :verbose => false) }
+    dirs.each{ |dir| FileUtils.makedirs(dir, :verbose => false) }
+    cleanup_compressor
+  end
+  
   def setup_server_mocks
     setup_bag_xml_server_mock
     setup_swiss_index_server_mock
@@ -31,7 +59,7 @@ module ServerMockHelper
   def setup_bag_xml_server_mock
     # zip
     stub_zip_url = 'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip'
-    stub_response = File.read(File.expand_path('../data/XMLPublications.zip', __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, 'XMLPublications.zip'))
     stub_request(:get, stub_zip_url).
       with(:headers => {
         'Accept'          => '*/*',
@@ -47,7 +75,7 @@ module ServerMockHelper
     types.each do |type|
       # wsdl
       stub_wsdl_url = "https://index.ws.e-mediat.net/Swissindex/#{type}/ws_#{type}_V101.asmx?WSDL"
-      stub_response = File.read(File.expand_path("../data/wsdl_#{type.downcase}.xml", __FILE__))
+      stub_response = File.read(File.join(Oddb2xml::SpecData, "wsdl_#{type.downcase}.xml"))
       stub_request(:get, stub_wsdl_url).
         with(:headers => {
           'Accept' => '*/*',
@@ -59,7 +87,7 @@ module ServerMockHelper
           :body    => stub_response)
       # soap (dummy)
       stub_soap_url = 'https://example.com/test'
-      stub_response = File.read(File.expand_path("../data/swissindex_#{type.downcase}.xml", __FILE__))
+      stub_response = File.read(File.join(Oddb2xml::SpecData, "swissindex_#{type.downcase}.xml"))
       stub_request(:post, stub_soap_url).
         with(:headers => {
           'Accept' => '*/*',
@@ -80,7 +108,8 @@ module ServerMockHelper
     }.each_pair do |type, urls|
       # html (dummy)
       stub_html_url = "http://#{host}" + urls[:html]
-      filename = File.expand_path("../data/swissmedic_#{type.to_s}.html", __FILE__)
+      filename = File.join(Oddb2xml::SpecData, "swissmedic_#{type.to_s}.html")
+      
       stub_response = File.read(filename)
       stub_request(:get, stub_html_url).
         with(:headers => {
@@ -95,7 +124,7 @@ module ServerMockHelper
       # xls
       if type == :orphans
         stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_orphan.xlsx"
-        stub_response = File.read(File.expand_path("../data/swissmedic_orphan.xlsx", __FILE__))
+        stub_response = File.read(File.join(Oddb2xml::SpecData, "swissmedic_orphan.xlsx"))
       else
         stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xlsx"
         stub_response = 'no_such_file'
@@ -115,7 +144,7 @@ module ServerMockHelper
   def setup_swissmedic_info_server_mock
     # html (dummy)
     stub_html_url = "http://download.swissmedicinfo.ch/Accept.aspx?ReturnUrl=%2f"
-    stub_response = File.read(File.expand_path("../data/swissmedic_info.html", __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, "swissmedic_info.html"))
     stub_request(:get, stub_html_url).
       with(
         :headers => {
@@ -128,7 +157,7 @@ module ServerMockHelper
         :body    => stub_response)
     # html (dummy 2)
     stub_html_url = 'http://download.swissmedicinfo.ch/Accept.aspx?ctl00$MainContent$btnOK=1'
-    stub_response = File.read(File.expand_path("../data/swissmedic_info_2.html", __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, "swissmedic_info_2.html"))
     stub_request(:get, stub_html_url).
       with(
         :headers => {
@@ -141,7 +170,7 @@ module ServerMockHelper
         :body    => stub_response)
     # zip
     stub_zip_url = 'http://download.swissmedicinfo.ch/Accept.aspx?ctl00$MainContent$BtnYes=1'
-    stub_response = File.read(File.expand_path('../data/swissmedic_info.zip', __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, 'swissmedic_info.zip'))
     stub_request(:get, stub_zip_url).
       with(
         :headers => {
@@ -157,7 +186,7 @@ module ServerMockHelper
   def setup_epha_server_mock
     # csv
     stub_csv_url = 'https://download.epha.ch/cleaned/matrix.csv'
-    stub_response = File.read(File.expand_path('../data/epha_interactions.csv', __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, 'epha_interactions.csv'))
     stub_request(:get, stub_csv_url).
       with(:headers => {
         'Accept' => '*/*',
@@ -171,7 +200,7 @@ module ServerMockHelper
   def setup_bm_update_server_mock
     # txt
     stub_txt_url = 'https://raw.github.com/zdavatz/oddb2xml_files/master/BM_Update.txt'
-    stub_response = File.read(File.expand_path('../data/oddb2xml_files_bm_update.txt', __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, 'oddb2xml_files_bm_update.txt'))
     stub_request(:get, stub_txt_url).
       with(:headers => {
         'Accept' => '*/*',
@@ -185,7 +214,7 @@ module ServerMockHelper
   def setup_lppv_server_mock
     # txt
     stub_txt_url = 'https://raw.github.com/zdavatz/oddb2xml_files/master/LPPV.txt'
-    stub_response = File.read(File.expand_path('../data/oddb2xml_files_lppv.txt', __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, 'oddb2xml_files_lppv.txt'))
     stub_request(:get, stub_txt_url).
       with(:headers => {
         'Accept' => '*/*',
@@ -199,7 +228,7 @@ module ServerMockHelper
   def setup_migel_server_mock
     # xls
     stub_xls_url = 'https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls'
-    stub_response = File.read(File.expand_path('../data/oddb2xml_files_nonpharma.xls', __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, 'oddb2xml_files_nonpharma.xls'))
     stub_request(:get, stub_xls_url).
       with(:headers => {
         'Accept' => '*/*',
@@ -213,7 +242,7 @@ module ServerMockHelper
   def setup_medregbm_server_mock
     # txt betrieb
     stub_txt_url = 'https://www.medregbm.admin.ch/Publikation/CreateExcelListBetriebs'
-    stub_response = File.read(File.expand_path('../data/medregbm_betrieb.txt', __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, 'medregbm_betrieb.txt'))
     stub_request(:get, stub_txt_url).
       with(:headers => {
         'Accept' => '*/*',
@@ -225,7 +254,7 @@ module ServerMockHelper
         :body    => stub_response)
     stub_txt_url = 'https://www.medregbm.admin.ch/Publikation/CreateExcelListMedizinalPersons'
     # txt person
-    stub_response = File.read(File.expand_path('../data/medregbm_person.txt', __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, 'medregbm_person.txt'))
     stub_request(:get, stub_txt_url).
       with(:headers => {
         'Accept' => '*/*',
@@ -239,7 +268,7 @@ module ServerMockHelper
   def setup_zurrose_server_mock
     # dat
     stub_dat_url  = 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat'
-    stub_response = File.read(File.expand_path('../data/zurrose_transfer.dat', __FILE__))
+    stub_response = File.read(File.join(Oddb2xml::SpecData, 'zurrose_transfer.dat'))
     stub_request(:get, stub_dat_url).
       with(:headers => {
         'Accept' => '*/*',
