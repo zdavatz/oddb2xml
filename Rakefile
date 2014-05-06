@@ -30,6 +30,7 @@ end
 
 require 'rake/clean'
 CLEAN.include FileList['pkg/*.gem']
+CLEAN.include FileList['*.zip*']
 CLEAN.include FileList['*.xls*']
 CLEAN.include FileList['*.xml*']
 CLEAN.include FileList['*.dat*']

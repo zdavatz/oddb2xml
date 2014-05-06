@@ -74,7 +74,7 @@ module Oddb2xml
         if entry
           dest = "#{Downloads}/#{File.basename(entry)}"
           if File.exists?(dest)
-            Oddb2xml.log "read_xml_from_zip return content of #{dest}"
+            Oddb2xml.log "read_xml_from_zip return content of #{dest} #{File.size(dest)} bytes "
             return IO.read(dest)
           else
             Oddb2xml.log "read_xml_from_zip could not read #{dest}"
@@ -198,7 +198,9 @@ module Oddb2xml
           Oddb2xml.download_finished(file)
         end
       end
-      read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
+      content = read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
+      FileUtils.rm_f(file) unless defined?(Rspec)
+      content
     end
   end
   class SwissIndexDownloader < Downloader

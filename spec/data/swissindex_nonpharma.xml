@@ -7,7 +7,19 @@
     <NONPHARMA
       CREATION_DATETIME="2012-10-18T06:31:19.4687619+02:00"
       xmlns="http://example.com/test">
-      <ITEM DT="2012-10-18T00:00:00">
+        <ITEM DT="2013-06-22T00:00:00">
+          <GTIN>733905577161</GTIN>
+          <PHAR>5366964</PHAR>
+          <STATUS>A</STATUS>
+          <STDATE>2012-08-22T00:00:00</STDATE>
+          <LANG>FR</LANG>
+          <DSCR>1-DAY ACUVUE moist jour -2.00dpt BC 8.5</DSCR>
+          <ADDSCR>30 pce</ADDSCR>
+          <COMP>
+            <NAME>Johnson &amp; Johnson Consumer (Health Care / OTC)</NAME>
+          </COMP>
+        </ITEM>
+        <ITEM DT="2012-10-18T00:00:00">
         <GTIN>0000000000000</GTIN>
         <PHAR>00000</PHAR>
         <STATUS>A</STATUS>
