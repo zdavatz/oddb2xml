@@ -7,6 +7,7 @@
 
 
 require 'fileutils'
+require 'socket'
 
 def test_one_call(cmd)
   dest = File.join(Ausgabe, cmd.gsub(/[ -]/, '_'))
@@ -41,14 +42,17 @@ def prepare_for_gem_test
 end
 
 Ausgabe = File.join(Dir.pwd, 'ausgabe', Time.now.strftime('%Y.%m.%d-%H:%M'))
+puts "FQDN hostname #{Socket.gethostbyname(Socket.gethostname).first}"
 FileUtils.makedirs(Ausgabe)
 prepare_for_gem_test
-test_one_call('oddb2xml -e') # takes many minutes
-exit
+# we will skip some long running tests as travis jobs must finish in less than 50 minutes
+unless /travis/i.match(Socket.gethostbyname(Socket.gethostname).first)
+  test_one_call('oddb2xml -e')
+  test_one_call('oddb2xml -f dat -a nonpharma')
+  test_one_call('oddb2xml -a nonpharma')
+end
+test_one_call('oddb2xml -t md -c tar.gz')
 test_one_call('oddb2xml -f xml')
 test_one_call('oddb2xml -x address')
 test_one_call('oddb2xml -f dat')
-test_one_call('oddb2xml -f dat -a nonpharma')
 test_one_call('oddb2xml -t md')
-test_one_call('oddb2xml -a nonpharma -t md -c tar.gz')
-test_one_call('oddb2xml -a nonpharma')
