@@ -24,14 +24,14 @@ describe Oddb2xml::Builder do
   NrPharmaArticles = 4
   include ServerMockHelper
   before(:each) do
-    @saveddir = Dir.pwd
+    @savedDir = Dir.pwd
     cleanup_directories_before_run
     setup_server_mocks
     setup_swiss_index_server_mock(types =  ['NonPharma', 'Pharma'])
     Dir.chdir Oddb2xml::WorkDir
   end
   after(:each) do
-    Dir.chdir @saveddir
+    Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
 
   context 'should handle BAG-articles with and without pharmacode' do

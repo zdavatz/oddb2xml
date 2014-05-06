@@ -85,7 +85,7 @@ describe Oddb2xml::Compressor do
         @compressor = Oddb2xml::Compressor.new
       end
       after(:each) do
-        Dir.chdir @savedDir
+        Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
       end
       it 'should fail with no contents' do
         @compressor.finalize!.should == false
@@ -111,7 +111,7 @@ describe Oddb2xml::Compressor do
           @compressor = Oddb2xml::Compressor.new('oddb', {:compress_ext => 'zip'})
         end
         after(:each) do
-          Dir.chdir @savedDir
+          Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
         end
         it_behaves_like 'any compressor' if true
       end

@@ -142,7 +142,6 @@ describe Oddb2xml::ZurroseExtractor do
     end
     it { expect(subject.to_hash.keys.length).to eq(1) }
     it { expect(subject.to_hash.keys.first).to eq("7680316440115") }
-#    it { expect(subject.to_hash.values.first[:vat]).to eq("2") }
     it { expect(subject.to_hash.values.first[:price]).to eq("8.95") }
   end
   context 'when Estradiol Creme is given' do
@@ -155,7 +154,6 @@ describe Oddb2xml::ZurroseExtractor do
     #it { expect(pp subject.to_hash) }
     it { expect(subject.to_hash.keys.length).to eq(1) }
     it { expect(subject.to_hash.keys.first).to eq("7680284070840") }
-#    it { $stderr.puts "xxx #{subject.to_hash.values.first.inspect}" }
     it { expect(subject.to_hash.values.first[:vat]).to eq("2") }
     it { expect(subject.to_hash.values.first[:price]).to eq("9.40") }
     it { expect(subject.to_hash.values.first[:pub_price]).to eq("16.30") }
