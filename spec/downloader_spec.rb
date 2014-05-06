@@ -24,7 +24,7 @@ def common_before
 end
 
 def common_after
-  Dir.chdir(@savedDir)
+  Dir.chdir(@savedDir) if @savedDir and File.directory?(@savedDir)
 end
 
 describe Oddb2xml::BagXmlDownloader do

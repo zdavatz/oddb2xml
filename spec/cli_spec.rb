@@ -2,8 +2,6 @@
 
 require 'spec_helper'
 
-# for stdout/stderr on ruby 1.8.7
-# $stdout.should_receive(:puts).with() does not work
 module Kernel
   def cli_capture(stream)
     begin
@@ -55,7 +53,7 @@ describe Oddb2xml::Cli do
     Dir.chdir(Oddb2xml::WorkDir)
   end
   after(:each) do
-    Dir.chdir(@savedDir)
+    Dir.chdir(@savedDir) if @savedDir and File.directory?(@savedDir)
     cleanup_compressor
   end
   context 'when -c tar.gz option is given' do
@@ -108,7 +106,6 @@ describe Oddb2xml::Cli do
     it 'should not create any xml file' do
       Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file| FileUtil.rm_f(file) end
       cli_capture(:stdout) { cli.run }.should match(/Pharma/)
-      $stderr.puts Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml'))
       Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
         File.exists?(file).should be_false
       end
