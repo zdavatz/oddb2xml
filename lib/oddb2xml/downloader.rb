@@ -12,7 +12,7 @@ module Oddb2xml
       file2save = File.join(Downloads, File.basename(file))
       Oddb2xml.log "download_as file #{file2save} via #{tempFile} from #{@url}"
       data = nil
-      FileUtils.rm_f(tempFile)
+      FileUtils.rm_f(tempFile, :verbose => false)
       if Oddb2xml.skip_download(file)
         io = File.open(file, option)
         data = io.read
@@ -74,7 +74,7 @@ module Oddb2xml
         if entry
           dest = "#{Downloads}/#{File.basename(entry)}"
           if File.exists?(dest)
-            Oddb2xml.log "read_xml_from_zip return content of #{dest}"
+            Oddb2xml.log "read_xml_from_zip return content of #{dest} #{File.size(dest)} bytes "
             return IO.read(dest)
           else
             Oddb2xml.log "read_xml_from_zip could not read #{dest}"
@@ -198,7 +198,9 @@ module Oddb2xml
           Oddb2xml.download_finished(file)
         end
       end
-      read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
+      content = read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
+      FileUtils.rm_f(file, :verbose => false) unless defined?(Rspec)
+      content
     end
   end
   class SwissIndexDownloader < Downloader
@@ -223,7 +225,7 @@ module Oddb2xml
         filename =  "swissindex_#{@type}_#{@lang}.xml"
         file2save = File.join(Downloads, "swissindex_#{@type}_#{@lang}.xml")
         return IO.read(file2save) if Oddb2xml.skip_download? and File.exists?(file2save)
-        FileUtils.rm_f(file2save)
+        FileUtils.rm_f(file2save, :verbose => false)
         soap = <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -285,7 +287,7 @@ XML
         retrievable? ? retry : raise
       ensure
         Oddb2xml.download_finished(file, false)
-      end # unless Oddb2xml.skip_download(file)
+      end
       return File.expand_path(file)
     end
   end
@@ -297,7 +299,7 @@ XML
     end
     def download
       file = File.join(Downloads, "swissmedic_info.zip")
-      FileUtils.rm_f(file) unless Oddb2xml.skip_download?
+      FileUtils.rm_f(file, :verbose => false) unless Oddb2xml.skip_download?
       begin
         response = nil
         if home = @agent.get(@url)

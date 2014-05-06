@@ -173,6 +173,7 @@ module Oddb2xml
           @mutex.synchronize do
             hsh = SwissmedicInfoExtractor.new(xml).to_hash
             @infos = hsh
+            Oddb2xml.log("SwissmedicInfoExtractor added #{@infos.size} fachinfo")
           end
         end
       when :orphan, :fridge
@@ -184,6 +185,7 @@ module Oddb2xml
             "@#{var}".intern,
             SwissmedicExtractor.new(bin, what).to_arry
           )
+#          Oddb2xml.log("SwissmedicExtractor added #{self.instance_variable_get("@#{var}".intern).size} #{var}. File #{bin} was #{File.size(bin)} bytes")
         end
       when :interaction
         Thread.new do
@@ -191,6 +193,7 @@ module Oddb2xml
           str = downloader.download
           @mutex.synchronize do
             @actions = EphaExtractor.new(str).to_arry
+            Oddb2xml.log("EphaExtractor added #{@actions.size} interactions")
           end
         end
       when :migel
@@ -199,6 +202,7 @@ module Oddb2xml
           bin = downloader.download
           @mutex.synchronize do
             @migel = MigelExtractor.new(bin).to_hash
+            Oddb2xml.log("MigelExtractor added #{@migel.size} migel items")
           end
         end
       when :package
@@ -207,6 +211,7 @@ module Oddb2xml
           bin = downloader.download
           @mutex.synchronize do
             @packs = SwissmedicExtractor.new(bin, :package).to_hash
+#            Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs. File #{bin} was #{File.size(bin)} bytes")
           end
         end
       when :bm_update
@@ -215,6 +220,7 @@ module Oddb2xml
           str = downloader.download
           @mutex.synchronize do
             @flags = BMUpdateExtractor.new(str).to_hash
+            Oddb2xml.log("BMUpdateExtractor added #{@flags.size} flags")
           end
         end
       when :lppv
@@ -223,6 +229,7 @@ module Oddb2xml
           str = downloader.download
           @mutex.synchronize do
             @lppvs = LppvExtractor.new(str).to_hash
+            Oddb2xml.log("LppvExtractor added #{@lppvs.size} lppvs")
           end
         end
       when :bag
@@ -232,6 +239,7 @@ module Oddb2xml
           @mutex.synchronize do
             hsh = BagXmlExtractor.new(xml).to_hash
             @items = hsh
+            Oddb2xml.log("BagXmlDownloader added #{@items.size} items")
           end
         end
       when :zurrose
@@ -322,6 +330,9 @@ module Oddb2xml
               end
             end
           end
+        end
+        if @options[:extended]
+          lines << sprintf("\tPrices zur Rose: %i", @prices.length)
         end
       else
         {

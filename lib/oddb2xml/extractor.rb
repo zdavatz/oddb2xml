@@ -215,10 +215,11 @@ module Oddb2xml
   end
   class SwissmedicExtractor < Extractor
     def initialize(filename, type)
-      @filename = filename
+      @filename = File.join(Downloads, File.basename(filename))
+      @filename = File.join(SpecData, File.basename(filename)) if defined?(RSpec) and not File.exists?(@filename)
       @type  = type
-      return unless File.exists?(filename)
-      @sheet = RubyXL::Parser.parse(File.expand_path(filename)).worksheets[0]
+      return unless File.exists?(@filename)
+      @sheet = RubyXL::Parser.parse(File.expand_path(@filename)).worksheets[0]
     end
     def to_arry
       data = []
@@ -439,7 +440,7 @@ module Oddb2xml
     # see http://dev.ywesee.com/Bbmb/TransferDat
     def initialize(dat, extended = false)
       @@extended = extended
-      @@error_file ||= File.open("duplicate_ean13_from_zur_rose.txt", 'w+')
+      @@error_file ||= File.open(File.join(WorkDir, "duplicate_ean13_from_zur_rose.txt"), 'w+')
       @@items_without_ean13s ||= 0
       @@duplicated_ean13s ||= 0
       @@zur_rose_items ||= 0
@@ -448,10 +449,11 @@ module Oddb2xml
     def to_hash
       data = {}
       while line = @io.gets
+        line = line.chomp
         if @@extended
-          next unless line =~ /(\d{13})(\d{1})\r\n$/
+          next unless line =~ /(\d{13})(\d{1})$/
         else
-          next unless line =~ /(7680\d{9})(\d{1})\r\n$/
+          next unless line =~ /(7680\d{9})(\d{1})$/
         end
         pharma_code = line[3..9]
         if $1.to_s == '0000000000000'
@@ -466,10 +468,11 @@ module Oddb2xml
           @@duplicated_ean13s += 1
           next
         end
+
         data[ean13] = {
           :line   => line.chomp,
           :ean   => ean13,
-          :vat   => $2.to_s,
+          :vat   => line[96],
           :description => line[10..59], # .sub(/\s+$/, ''),
           :additional_desc => '',
           :pharmacode => pharma_code,
@@ -477,6 +480,9 @@ module Oddb2xml
           :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
           :type => :nonpharma,
         }
+        if /5366964/.match(ean13) then
+          Oddb2xml.log "found 5366964 data is now #{data[ean13].inspect}"
+        end
         @@zur_rose_items += 1
       end if @io
       data
