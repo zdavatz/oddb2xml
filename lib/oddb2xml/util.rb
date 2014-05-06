@@ -35,7 +35,7 @@ module Oddb2xml
     #return unless File.exists?(file)
     return unless file and File.exists?(file)
     return if File.expand_path(file).eql?(dest)
-    FileUtils.mv(src, dest, :verbose => false)
-    Oddb2xml.log("download_finished saved as #{dest}")
+    FileUtils.cp(src, dest, :verbose => false)
+    Oddb2xml.log("download_finished saved as #{dest} #{File.size(dest)} bytes.")
   end                            
 end

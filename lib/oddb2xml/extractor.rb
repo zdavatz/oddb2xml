@@ -215,10 +215,11 @@ module Oddb2xml
   end
   class SwissmedicExtractor < Extractor
     def initialize(filename, type)
-      @filename = filename
+      @filename = File.join(Downloads, File.basename(filename))
+      @filename = File.join(SpecData, File.basename(filename)) if defined?(RSpec) and not File.exists?(@filename)
       @type  = type
-      return unless File.exists?(filename)
-      @sheet = RubyXL::Parser.parse(File.expand_path(filename)).worksheets[0]
+      return unless File.exists?(@filename)
+      @sheet = RubyXL::Parser.parse(File.expand_path(@filename)).worksheets[0]
     end
     def to_arry
       data = []

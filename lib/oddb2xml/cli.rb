@@ -185,6 +185,7 @@ module Oddb2xml
             "@#{var}".intern,
             SwissmedicExtractor.new(bin, what).to_arry
           )
+#          Oddb2xml.log("SwissmedicExtractor added #{self.instance_variable_get("@#{var}".intern).size} #{var}. File #{bin} was #{File.size(bin)} bytes")
         end
       when :interaction
         Thread.new do
@@ -210,7 +211,7 @@ module Oddb2xml
           bin = downloader.download
           @mutex.synchronize do
             @packs = SwissmedicExtractor.new(bin, :package).to_hash
-            Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs")
+#            Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs. File #{bin} was #{File.size(bin)} bytes")
           end
         end
       when :bm_update

@@ -63,9 +63,9 @@ describe Oddb2xml::SwissmedicInfoExtractor do
     subject { Oddb2xml::SwissmedicInfoExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
   end
-  context 'can parse swissmedic_packages.xlsx' do
+  context 'can parse swissmedic_package.xlsx' do
     it {
-        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_packages.xlsx')
+        filename = File.join(Oddb2xml::SpecData, 'swissmedic_package.xlsx')
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :package).to_hash
         expect(@packs.size).to eq(14)
         serocytol = nil
@@ -79,9 +79,9 @@ describe Oddb2xml::SwissmedicInfoExtractor do
         expect(serocytol[:substance_swissmedic]).to eq('globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins)')
       }
   end
-  context 'can parse swissmedic_fridges.xlsx' do
+  context 'can parse swissmedic_fridge.xlsx' do
     it {
-        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_fridges.xlsx')
+        filename = File.join(Oddb2xml::SpecData, 'swissmedic_fridge.xlsx')
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :fridge).to_arry
         expect(@packs.size).to eq(17)
         expect(@packs[0]).to eq("58618")
@@ -90,10 +90,10 @@ describe Oddb2xml::SwissmedicInfoExtractor do
   end
   context 'can parse swissmedic_orphans.xls' do
     it {
-        filename = File.join(File.dirname(__FILE__), 'data/swissmedic_orphan.xlsx')
+        filename = File.join(Oddb2xml::SpecData, 'swissmedic_orphan.xlsx')
         expect(File.exists?(filename)).to eq(true), "File #{filename} must exists"
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :orphan).to_arry
-        expect(@packs.size).to eq(79)
+        expect(@packs.size).to eq(78)
         expect(@packs.first).to eq("62132")
         expect(@packs[7]).to eq("00687")
       }
@@ -103,7 +103,7 @@ end
 describe Oddb2xml::EphaExtractor do
   context 'can parse epha_interactions.csv' do
     it {
-        filename = File.join(File.dirname(__FILE__), 'data/epha_interactions.csv')
+        filename = File.join(Oddb2xml::SpecData, 'epha_interactions.csv')
         string = IO.read(filename)
         @actions = Oddb2xml::EphaExtractor.new(string).to_arry
         expect(@actions.size).to eq(2) 

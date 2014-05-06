@@ -129,6 +129,8 @@ describe Oddb2xml::Builder do
       dscrds = XPath.match( doc, "//ART" )
       XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size.should == 1
       dscrds.size.should == NrExtendedArticles
+      XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should == 1
+      XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('620691') }.size.should == 1
     end
 
     it 'should load correct number of nonpharma' do
@@ -220,7 +222,6 @@ describe Oddb2xml::Builder do
 
     it 'should emit a correct oddb_product.xml' do
       res = buildr_capture(:stdout){ cli.run }
-      
       res.should match(/products/)
       product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
       File.exists?(product_filename).should be_true
@@ -236,6 +237,10 @@ describe Oddb2xml::Builder do
         product_xml.should match(/7680555580054/) # ZYVOXID
         product_xml.should_not match(/ZYVOXID/i)
       end
+      doc = REXML::Document.new File.new(product_filename)
+      XPath.match( doc, "//PRD" ).find_all{|x| true}.size.should == 3
+      XPath.match( doc, "//GTIN" ).find_all{|x| true}.size.should == 3
+      XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should == 1
     end
   end
 end
