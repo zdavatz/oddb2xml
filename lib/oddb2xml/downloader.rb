@@ -8,8 +8,11 @@ module Oddb2xml
   module DownloadMethod
     private
     def download_as(file, option='r')
-      Oddb2xml.log "download_as file #{file} from #{@url}"
+      tempFile  = File.join(WorkDir,   File.basename(file))
+      file2save = File.join(Downloads, File.basename(file))
+      Oddb2xml.log "download_as file #{file2save} via #{tempFile} from #{@url}"
       data = nil
+      FileUtils.rm_f(tempFile)
       if Oddb2xml.skip_download(file)
         io = File.open(file, option)
         data = io.read
@@ -24,7 +27,7 @@ module Oddb2xml
           retrievable? ? retry : raise
         ensure
           io.close if io and !io.closed? # win
-          Oddb2xml.download_finished(file)
+          Oddb2xml.download_finished(tempFile)
         end
       end
       return data
@@ -63,12 +66,29 @@ module Oddb2xml
         false
       end
     end
-    def read_xml_form_zip(target, zipfile)
+    def read_xml_from_zip(target, zipfile)
+      Oddb2xml.log "read_xml_from_zip target is #{target} zip: #{zipfile} #{File.exists?(zipfile)}"
+      if Oddb2xml.skip_download?
+        entry = nil
+        Dir.glob(File.join(Downloads, '*')).each { |name| if target.match(name) then entry = name; break end }
+        if entry
+          dest = "#{Downloads}/#{File.basename(entry)}"
+          if File.exists?(dest)
+            Oddb2xml.log "read_xml_from_zip return content of #{dest}"
+            return IO.read(dest)
+          else
+            Oddb2xml.log "read_xml_from_zip could not read #{dest}"
+          end
+        else
+          Oddb2xml.log "read_xml_from_zip could not find #{target.to_s}"
+        end
+      end
       xml = ''
       if RUBY_PLATFORM =~ /mswin|mingw|bccwin|cygwin/i
         Zip::File.open(zipfile) do |zipFile|
           zipFile.each do |entry|
             if entry.name =~ target
+              Oddb2xml.log "read_xml_from_zip reading #{__LINE__}: #{entry.name}"
               io = entry.get_input_stream
               until io.eof?
                 bytes = io.read(1024)
@@ -76,13 +96,20 @@ module Oddb2xml
                 bytes = nil
               end
               io.close if io.respond_to?(:close)
+              dest = "#{Downloads}/#{File.basename(target)}"
+              File.open(dest, 'w+') { |f| f.write xml }
+              Oddb2xml.log "read_xml_from_zip saved as #{dest}"
             end
           end
         end
       else
         Zip::File.foreach(zipfile) do |entry|
           if entry.name =~ target
+            Oddb2xml.log "read_xml_from_zip #{__LINE__}: reading #{entry.name}"
+            dest = "#{Downloads}/#{File.basename(entry.name)}"
             entry.get_input_stream { |io| xml = io.read }
+            File.open(dest, 'w+') { |f| f.write xml }
+            Oddb2xml.log "read_xml_from_zip saved as #{dest}"
           end
         end
       end
@@ -123,9 +150,12 @@ module Oddb2xml
       @url ||= 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat'
       unless @url =~ /^http/
         io = File.open(@url, 'r:iso-8859-1:utf-8')
-        io.read
+        content = io.read
+        Oddb2xml.log("ZurroseDownloader #{__LINE__} download #{@url} @url returns #{content.bytes}")
+        content   
       else
-        download_as('oddb2xml_zurrose_transfer.dat', 'r:iso-8859-1:utf-8')
+        Oddb2xml.log("ZurroseDownloader #{__LINE__} download #{@url} @url")
+        download_as('zurrose_transfer.dat', 'r:iso-8859-1:utf-8')
       end
     end
   end
@@ -154,30 +184,21 @@ module Oddb2xml
       @url ||= 'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip'
     end
     def download
-      file = 'XMLPublications.zip'
-      begin
-        if @options[:debug]
-          FileUtils.copy(File.expand_path("../../../spec/data/#{file}", __FILE__), '.')
-        else
-          unless Oddb2xml.skip_download(file)
-            response = @agent.get(@url)
-            response.save_as(file)
-            response = nil # win
-          end
+      file = File.join(WorkDir, 'XMLPublications.zip')
+      Oddb2xml.log "BagXmlDownloader #{__LINE__}: #{file}"
+      unless Oddb2xml.skip_download(file)
+        Oddb2xml.log "BagXmlDownloader #{__LINE__}: #{file}"                                       
+        begin
+          response = @agent.get(@url)
+          response.save_as(file)
+          response = nil # win
+        rescue Timeout::Error, Errno::ETIMEDOUT
+          retrievable? ? retry : raise
+        ensure
+          Oddb2xml.download_finished(file)
         end
-        inhalt = read_xml_form_zip(/^Preparation/iu, file)
-        if @options[:skip_download]
-          FileUtils.makedirs(Backup)
-          outfile = File.join(Backup, 'Preparations.xml')
-          Oddb2xml.log "Downloader saving outfile #{outfile} for #{self.class}"
-          File.open(outfile, 'w+') { |file| file.write inhalt}
-        end
-        inhalt
-      rescue Timeout::Error, Errno::ETIMEDOUT
-        retrievable? ? retry : raise
-      ensure
-        Oddb2xml.download_finished(file)
       end
+      read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
     end
   end
   class SwissIndexDownloader < Downloader
@@ -199,9 +220,10 @@ module Oddb2xml
     end
     def download
       begin
-        if @options[:debug]
-          return File.read(File.expand_path("../../../spec/data/swissindex_#{@type}_#{@lang}.xml", __FILE__))
-        end
+        filename =  "swissindex_#{@type}_#{@lang}.xml"
+        file2save = File.join(Downloads, "swissindex_#{@type}_#{@lang}.xml")
+        return IO.read(file2save) if Oddb2xml.skip_download? and File.exists?(file2save)
+        FileUtils.rm_f(file2save)
         soap = <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -214,12 +236,8 @@ XML
         if response.success?
           if xml = response.to_xml
             response = nil # win
-            if @options[:skip_download]
-              file2save = File.expand_path("../../../data/download/swissindex_#{@type}_#{@lang}.xml", __FILE__)
-              FileUtils.makedirs(File.dirname(file2save)) unless File.directory?(File.dirname(file2save))
-              File.open(file2save, 'w+') { |file| file.puts xml }
-            end
-            return xml
+            FileUtils.makedirs(Downloads)
+            File.open(file2save, 'w+') { |file| file.write xml }
           else
             # received broken data or internal error
             raise StandardError
@@ -232,6 +250,7 @@ XML
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       end
+      xml
     end
   end
   class SwissmedicDownloader < Downloader
@@ -257,18 +276,17 @@ XML
         page = @agent.get(@url)
         if link_node = page.search(@xpath).first
           link = Mechanize::Page::Link.new(link_node, @agent, page)
-          unless Oddb2xml.skip_download(file)
-            response = link.click
-            response.save_as(file)
-            response = nil # win
-          end
+          response = link.click
+          response.save_as(file)
+          response = nil # win
         end
         return File.expand_path(file)
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
         Oddb2xml.download_finished(file, false)
-      end
+      end # unless Oddb2xml.skip_download(file)
+      return File.expand_path(file)
     end
   end
   class SwissmedicInfoDownloader < Downloader
@@ -278,32 +296,31 @@ XML
       @url ||= "http://download.swissmedicinfo.ch/Accept.aspx?ReturnUrl=%2f"
     end
     def download
-      file = "swissmedic_info.zip"
+      file = File.join(Downloads, "swissmedic_info.zip")
+      FileUtils.rm_f(file) unless Oddb2xml.skip_download?
       begin
-        unless Oddb2xml.skip_download(file)
-          response = nil
-          if home = @agent.get(@url)
-            form = home.form_with(:id => 'Form1')
-            bttn = form.button_with(:name => 'ctl00$MainContent$btnOK')
-            if page = form.submit(bttn)
-              form = page.form_with(:id => 'Form1')
-              bttn = form.button_with(:name => 'ctl00$MainContent$BtnYes')
-              response = form.submit(bttn)
-            end
-          end
-          if response          
-            response.save_as(file)
-            response = nil # win
+        response = nil
+        if home = @agent.get(@url)
+          form = home.form_with(:id => 'Form1')
+          bttn = form.button_with(:name => 'ctl00$MainContent$btnOK')
+          if page = form.submit(bttn)
+            form = page.form_with(:id => 'Form1')
+            bttn = form.button_with(:name => 'ctl00$MainContent$BtnYes')
+            response = form.submit(bttn)
           end
         end
-        read_xml_form_zip(/^AipsDownload_/iu, file)
+        if response
+          response.save_as(file)
+          response = nil # win
+        end
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       rescue NoMethodError
         # pass
       ensure
         Oddb2xml.download_finished(file)
-      end
+      end unless File.exists?(file)
+      read_xml_from_zip(/^AipsDownload_/iu, file)
     end
   end
 end

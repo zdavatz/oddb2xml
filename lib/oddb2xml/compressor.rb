@@ -12,13 +12,14 @@ module Oddb2xml
       @options = options
       @options[:compress_ext] ||= 'tar.gz'
       @options[:format]       ||= :xml
-      @compress_file = "#{prefix}_#{@options[:format].to_s}_" + 
-        Time.now.strftime("%d.%m.%Y_%H.%M.#{@options[:compress_ext]}")
+      @compress_file = "#{prefix}_#{@options[:format].to_s}_" + Time.now.strftime("%d.%m.%Y_%H.%M.#{@options[:compress_ext]}")                                 
+                                 #      @compress_file = File.join(WorkDir, "#{prefix}_#{@options[:format].to_s}_" +
+                                 #Time.now.strftime("%d.%m.%Y_%H.%M.#{@options[:compress_ext]}"))
       @contents = []
       super()
     end
     def finalize!
-      if @contents.empty?
+      if @contents.empty? and @contents.size == 0
         return false
       end
       begin
@@ -34,13 +35,12 @@ module Oddb2xml
             end
           end
         end
-        if File.exists? @compress_file
+        if File.exists? @compress_file and not defined?(Rspec)
           @contents.each do |file|
-            Oddb2xml.download_finished(file)
+            FileUtils.rm(file)
           end
         end
-      rescue Errno::ENOENT, StandardError
-        Oddb2xml.download_finished(@compress_file)
+        rescue Errno::ENOENT, StandardError => e
         return false
       end
       return true

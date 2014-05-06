@@ -5,23 +5,35 @@ require 'spec_helper'
 shared_examples_for 'any compressor' do
   it 'should create compress file' do
     File.stub(:unlink).and_return(false)
-    @compressor.contents << File.expand_path('../data/oddb_article.xml', __FILE__)
-    @compressor.contents << File.expand_path('../data/oddb_product.xml', __FILE__)
-    @compressor.contents << File.expand_path('../data/oddb_substance.xml', __FILE__)
-    @compressor.contents << File.expand_path('../data/oddb_limitation.xml', __FILE__)
-    @compressor.contents << File.expand_path('../data/oddb_fi.xml', __FILE__)
-    @compressor.contents << File.expand_path('../data/oddb_fi_product.xml', __FILE__)
-    @compressor.finalize!.should == true
+    @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_article.xml')
+    @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_product.xml')
+    @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_substance.xml')
+    @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_limitation.xml')
+    @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_fi.xml')
+    @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_fi_product.xml')
+    @compressor.finalize!.should eq(true)
     compress_file = @compressor.instance_variable_get(:@compress_file)
     File.exists?(compress_file).should == true
     File.unstub(:unlink)
+    @compressor = nil
   end
 end
 
 describe Oddb2xml::Compressor do
+  after(:each) do
+    cleanup_compressor
+    if @compress_file
+      compress_file = @compressor.instance_variable_get(:@compress_file)
+      FileUtils.rm_f(compress_file, :verbose => true)
+    end
+  end
+  after(:all) do
+    cleanup_compressor
+  end
   context 'at initialize' do
-    context 'any argment is given' do
+    context ' argment is given' do
       before(:each) do
+        cleanup_directories_before_run
         @compressor = Oddb2xml::Compressor.new
       end
       it 'should have empty contents as array' do
@@ -35,6 +47,7 @@ describe Oddb2xml::Compressor do
     end
     context "when swiss prefix is given" do
       before(:each) do
+        cleanup_directories_before_run
         @compressor = Oddb2xml::Compressor.new('swiss', {:compress_ext => 'tar.gz'})
       end
       it 'should have formated filename with datetime' do
@@ -44,6 +57,7 @@ describe Oddb2xml::Compressor do
     end
     context "when tar.gz ext is given" do
       before(:each) do
+        cleanup_directories_before_run
         @compressor = Oddb2xml::Compressor.new('oddb', {:compress_ext => 'tar.gz'})
       end
       it 'should have formated filename with datetime' do
@@ -53,6 +67,7 @@ describe Oddb2xml::Compressor do
     end
     context "when zip ext is given" do
       before(:each) do
+        cleanup_directories_before_run
         @compressor = Oddb2xml::Compressor.new('oddb', {:compress_ext => 'zip'})
       end
       it 'should have formated filename with datetime' do
@@ -64,7 +79,13 @@ describe Oddb2xml::Compressor do
   context 'when finalize! is called' do
     context 'unexpectedly' do
       before(:each) do
+        cleanup_directories_before_run
+        @savedDir = Dir.pwd
+        Dir.chdir Oddb2xml::SpecCompressor
         @compressor = Oddb2xml::Compressor.new
+      end
+      after(:each) do
+        Dir.chdir @savedDir
       end
       it 'should fail with no contents' do
         @compressor.finalize!.should == false
@@ -77,20 +98,22 @@ describe Oddb2xml::Compressor do
     context 'successfully' do
       context 'with tar.gz' do
         before(:each) do
+          cleanup_directories_before_run
           @compressor = Oddb2xml::Compressor.new
         end
         it_behaves_like 'any compressor'
       end
       context 'with zip' do
         before(:each) do
+          cleanup_directories_before_run
+          @savedDir = Dir.pwd
+          Dir.chdir Oddb2xml::SpecCompressor
           @compressor = Oddb2xml::Compressor.new('oddb', {:compress_ext => 'zip'})
         end
-        it_behaves_like 'any compressor'
-      end
-      after(:each) do
-        Dir.glob('oddb_xml_*').each do |file|
-          File.unlink(file) if File.exists?(file)
+        after(:each) do
+          Dir.chdir @savedDir
         end
+        it_behaves_like 'any compressor' if true
       end
     end
   end

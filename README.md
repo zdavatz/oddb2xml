@@ -20,7 +20,7 @@ and
 * oddb2xml -f dat
 * oddb2xml -f dat -a nonpharma
 
-creates .dat files according to ([IGM-11](http://dev.ywesee.com/uploads/att/IGM.pdf))
+creates .dat files according to ([IGM-11](http://dev.ywesee.com/uploads/att/IGM.pdf)). IGM-11 describes the structure of the zurrose_transfer.dat.
 
 * oddb.dat
 * oddb_with_migel.dat

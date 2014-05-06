@@ -9,6 +9,7 @@ require 'oddb2xml/util'
 require 'rubyXL'
 
 module Oddb2xml
+  
   class Cli
     SUBJECTS  = %w[product article]
     ADDITIONS = %w[substance limitation interaction code]
@@ -89,6 +90,7 @@ module Oddb2xml
     end
     private
     def build
+      Oddb2xml.log("Start build")
       begin
         files.each_pair do |sbj, file|
           builder = Builder.new(@options) do |builder|
@@ -141,7 +143,7 @@ module Oddb2xml
           else
             output = builder.to_xml
           end
-          File.open(file, 'w:utf-8'){ |fh| fh << output }
+          File.open(File.join(WorkDir, file), 'w:utf-8'){ |fh| fh << output }
         end
       rescue Interrupt
         files.values.each do |file|
@@ -236,10 +238,11 @@ module Oddb2xml
         Thread.new do
           downloader = ZurroseDownloader.new(@options, @options[:transfer_dat])
           xml = downloader.download
+          Oddb2xml.log("zurrose xml #{xml.size} bytes")
           @mutex.synchronize do
             hsh = ZurroseExtractor.new(xml, @options[:extended]).to_hash
             @prices = hsh
-            Oddb2xml.log("zurrose added #{@prices.size} prices")
+            Oddb2xml.log("zurrose added #{@prices.size} prices from xml with #{xml.size} bytes")
           end
         end
       when :index
@@ -265,8 +268,9 @@ module Oddb2xml
     def compress
       compressor = Compressor.new(prefix, @options)
       files.values.each do |file|
-        if File.exists?(file)
-          compressor.contents << file
+        work_file = File.join(WorkDir, file)
+        if File.exists?(work_file)
+          compressor.contents << work_file
         end
       end
       compressor.finalize!
