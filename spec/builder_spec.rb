@@ -20,6 +20,8 @@ end
 
 describe Oddb2xml::Builder do
   NrExtendedArticles = 71
+  NrPharmaAndNonPharmaArticles = 61
+  NrPharmaArticles = 4
   include ServerMockHelper
   before(:each) do
     @saveddir = Dir.pwd
@@ -30,8 +32,6 @@ describe Oddb2xml::Builder do
   end
   after(:each) do
     Dir.chdir @saveddir
-    cleanup_directories_before_run
-    cleanup_compressor
   end
 
   context 'should handle BAG-articles with and without pharmacode' do
@@ -43,7 +43,7 @@ describe Oddb2xml::Builder do
       expect(saved).to eq(@items)
     }
   end
-  
+
   context 'when no option is given' do
     let(:cli) do
       opts = {}
@@ -79,7 +79,7 @@ describe Oddb2xml::Builder do
 
         product_xml.should match(/3TC/)
         product_xml.should match(/7680620690084/) # Levetiracetam DESITIN
-        article_xml.scan(/<ART DT=/).size.should eq(3) # we should find two articles
+        article_xml.scan(/<ART DT=/).size.should eq(NrPharmaArticles)
         article_xml.should match(/<PHAR>5819012</)
         article_xml.should match(/<DSCRD>LEVETIRACETAM DESITIN Filmtabl 250 mg/)
         article_xml.should match(/<COMPNO>7601001320451</)
@@ -117,10 +117,24 @@ describe Oddb2xml::Builder do
       }
       Oddb2xml::Cli.new(opts)
     end
+
+    it 'should handle not duplicate pharmacode 5366964'  do
+      res = buildr_capture(:stdout){ cli.run }
+      res.should match(/NonPharma/i)
+      res.should match(/NonPharma products: #{NrPharmaAndNonPharmaArticles}/)
+      article_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(article_filename).should be_true
+      article_xml = IO.read(article_filename)
+      doc = REXML::Document.new File.new(article_filename)
+      dscrds = XPath.match( doc, "//ART" )
+      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size.should == 1
+      dscrds.size.should == NrExtendedArticles
+    end
+
     it 'should load correct number of nonpharma' do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/NonPharma/i)
-      res.should match(/NonPharma products: 60/)
+      res.should match(/NonPharma products: #{NrPharmaAndNonPharmaArticles}/)
       article_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
       File.exists?(article_filename).should be_true 
       article_xml = IO.read(article_filename)
@@ -138,6 +152,7 @@ describe Oddb2xml::Builder do
       limitation_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_limitation.xml'))
       File.exists?(limitation_filename).should be_true
       limitation_xml = IO.read(limitation_filename)
+      limitation_xml.should match(/Die aufgeführten Präparat/)
       doc = REXML::Document.new File.new(limitation_filename)
       limitations = XPath.match( doc, "//LIM" )
       limitations.size.should == 4

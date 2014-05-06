@@ -35,7 +35,7 @@ module ServerMockHelper
       File.join(Oddb2xml::SpecCompressor, 'medregbm_person.txt*'),
       File.join(Oddb2xml::SpecCompressor, 'zurrose_transfer.dat.*'),
       File.join(Oddb2xml::SpecCompressor, 'oddb2xml_files_nonpharma.xls.*'),
-      ].each { |file| FileUtils.rm_f(Dir.glob(file), :verbose => true) if Dir.glob(file).size > 0 }
+      ].each { |file| FileUtils.rm_f(Dir.glob(file), :verbose => false) if Dir.glob(file).size > 0 }
   end
   def cleanup_directories_before_run
     dirs = [ Oddb2xml::Downloads, Oddb2xml::WorkDir]

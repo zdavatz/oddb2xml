@@ -39,6 +39,7 @@ module Oddb2xml
       @companies  = []
       @people     = []
       @tag_suffix = nil
+      @pharmacode = {} # index pharmacode => item
       if block_given?
         yield self
       end
@@ -78,6 +79,7 @@ module Oddb2xml
             obj[:seq] = seq
           end
           @articles << obj
+          @pharmacode[phar] = obj
         end
         # add
         @migel.values.compact.each do |migel|
@@ -117,37 +119,44 @@ module Oddb2xml
           Oddb2xml.log("prepare_articles extended")
           @prices.each{
             |ean13, info|
+          pharmacode = info[:pharmacode]
+          if @pharmacode[pharmacode]
+            @pharmacode[pharmacode][:price]     = info[:price]
+            @pharmacode[pharmacode][:pub_price] = info[:pub_price]
+            next
+          end
           obj = {}
           found = false
           %w[de fr].each do |lang|
           #              existing = @articles.find{|art| art[lang.intern] and art[lang.intern][0][:ean] == ean13 }
-          existing = local_index[lang][ean13]
+
+            existing = local_index[lang][ean13]
             if existing
               found = true
-              existing[:price] = info[:price]
-                                      existing[:pub_price] = info[:pub_price]
-                      else
-                      entry = {
-                               :desc            => info[:description],
-                               :status          => 'I', # or it will not be emitted in the dat
-                              :atc_code        => '',
-                               :ean             => ean13,
-                               :lang            => lang.capitalize,
-                               :pharmacode      => info[:pharmacode],
-                               :price           => info[:price],
-                               :pub_price       => info[:pub_price],
-                               :type            => info[:type],
-                               }
-                      obj[lang.intern] = [entry]
-                      @index[lang.upcase][ean13] = entry
-                      end
-                      end
-                      unless found
-                      @articles << obj
-                      nrAdded += 1
-                      end
-                      }
+              existing[:price]     = info[:price]
+              existing[:pub_price] = info[:pub_price]
+            else
+              entry = {
+                        :desc            => info[:description],
+                        :status          => 'A', # for ZurRose 'A' means aktive, aka available in trade
+                        :atc_code        => '',
+                        :ean             => ean13,
+                        :lang            => lang.capitalize,
+                       :pharmacode      => pharmacode,
+                        :price           => info[:price],
+                        :pub_price       => info[:pub_price],
+                        :type            => info[:type],
+                        }
+              obj[lang.intern] = [entry]
+              @index[lang.upcase][ean13] = entry
+            end
           end
+          unless found
+            @articles << obj
+            nrAdded += 1
+          end
+          }
+        end
       end
       Oddb2xml.log("prepare_articles done. Added #{nrAdded} prices. Total #{@articles.size}")
     end
@@ -604,7 +613,7 @@ module Oddb2xml
           'PROD_DATE'         => datetime,
           'VALID_DATE'        => datetime
         ) {
-          @articles.each do |obj|
+        @articles.each do |obj|
             idx += 1
         Oddb2xml.log "build_article #{idx} of #{@articles.size} articles" if idx % 500 == 0
         obj[:de].each_with_index do |de_idx, i|
@@ -612,6 +621,7 @@ module Oddb2xml
               pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
               ppac = nil                        # Packungen
               ean = de_idx[:ean]
+              pharma_code = de_idx[:pharmacode]
               ean = nil if ean.match(/^000000/)
               if obj[:seq]
                 pac = obj[:seq][:packages][de_idx[:pharmacode]]
@@ -777,7 +787,7 @@ module Oddb2xml
                   }
                 end
               }
-            end
+            end if obj[:de]
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
