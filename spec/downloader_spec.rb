@@ -126,6 +126,7 @@ describe Oddb2xml::SwissmedicDownloader do
     before(:each) do
       setup_swissmedic_server_mock
       @downloader = Oddb2xml::SwissmedicDownloader.new(:fridge)
+      common_before
     end
     context 'download_by for fridge xls' do
       let(:bin) { @downloader.download }
