@@ -42,11 +42,12 @@ def prepare_for_gem_test
 end
 
 Ausgabe = File.join(Dir.pwd, 'ausgabe', Time.now.strftime('%Y.%m.%d-%H:%M'))
-puts "FQDN hostname #{Socket.gethostbyname(Socket.gethostname).first}"
+puts "FQDN hostname #{Socket.gethostbyname(Socket.gethostname).inspect}"
 FileUtils.makedirs(Ausgabe)
 prepare_for_gem_test
 # we will skip some long running tests as travis jobs must finish in less than 50 minutes
-unless /travis/i.match(Socket.gethostbyname(Socket.gethostname).first)
+# unfortunately it returns a very common name
+unless 'localhost.localdomain'.eql?(Socket.gethostbyname(Socket.gethostname).first)
   test_one_call('oddb2xml -e')
   test_one_call('oddb2xml -f dat -a nonpharma')
   test_one_call('oddb2xml -a nonpharma')

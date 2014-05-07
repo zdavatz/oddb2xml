@@ -96,7 +96,7 @@ module Oddb2xml
                 bytes = nil
               end
               io.close if io.respond_to?(:close)
-              dest = "#{Downloads}/#{File.basename(target)}"
+              dest = "#{Downloads}/#{File.basename(entry.name)}"
               File.open(dest, 'w+') { |f| f.write xml }
               Oddb2xml.log "read_xml_from_zip saved as #{dest}"
             end
