@@ -1,0 +1,1080 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+  targetNamespace="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration"
+  xmlns:ns1="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration"
+  >
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      oddb2xml is a ruby gem developed and maintained by yweese GmbH.
+      The source code is available under https://github.com/zdavatz/oddb2xml.
+      It might be installed (Ruby >= 1.9 required) via "gem install oddb2xml".
+      Under http://dev.ywesee.com/Main/Oddb2xml you find more information on how the data is generated.
+
+      In this XSD file we refer to the following sources:
+      # swissINDEX 
+      ## Pharma: https://index.ws.e-mediat.net/Swissindex/Pharma/ws_Pharma_V101.asmx?WSDL"
+      ## NonPharma https://index.ws.e-mediat.net/Swissindex/NonPharma/ws_NonPharma_V101.asmx?WSDL"
+      # Preparations.xml
+      ## Extracted from http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip
+      # Packungen.xls https://www.swissmedic.ch/arzneimittel/00156/00221/00222/00230/index.html?lang=de
+      # Prices (ZurRose)   http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat
+      # https://raw.github.com/zdavatz/oddb2xml_files/master/BM_Update.txt
+        see Anhang 1, 4, 5 und 6 zur AMZV; SR 821.212.22. http://www.admin.ch/opc/de/classified-compilation/20011693/
+      # LPPV: https://raw.github.com/zdavatz/oddb2xml_files/master/LPPV.txt
+      # https://www.medregbm.admin.ch/Publikation/CreateExcelListBetriebs
+      # https://www.medregbm.admin.ch/Publikation/CreateExcelListMedizinalPersons
+      # (epha-)interactions https://download.epha.ch/cleaned/matrix.csv
+
+      For historical reasons the generated *.XML have not a common layout and some fields have different meanings in differen files.
+
+      The two files oddb_article and oddb_product are not normalized. There if for one swissmedic IKSNR several
+      packages are available you will find an entry inside oddb_article and oddb_product for each of them.
+      The GTIN (Global Trade Item Number, aka EAN13) is emitted as field GTIN in oddb_product.xml. Inside
+      oddb_article you find it as element BC inside ARTBAR (Article barcode).
+
+      Some comments for invidual fields:
+      NINCD: possible values are 10 => BAG-XML (SL/LS), 13 -> MiGel, 20 => (LPPV) Limitation, empty => NonPharma)
+      GENCD: possible values are 'O' for original and 'G' for generic. We don't have a list of possible generics for a given original.
+             It is however possible find generics via ch.oddb.org where a sophisticated algorithm searches for similar medicaments
+             taking into account all ATC-codes and galenic information.
+      PHAR  Pharmacode: Taken from swissINDEX or ZurRose characters 3..9
+      PEXF  Price Ex-Factory (exkl. VAT):  Taken from the ZurRose.dat characters 60..65
+      PPUB  Public Price (inkl. VAT):      Taken from the ZurRose.dat characters 66..71
+      SLOPLUS Selbsbehalt/deductilbe, where 1 =>  20%, 2 => 10%, '' => not known
+
+      FIRST import all data from swissINDEX
+      * GTIN
+      * PHAR
+      * Status
+      * Since STDATE
+      * Bezeichnung (DE / FR)
+      * QTY  Quantity, e.g. 3 Flaschen 5 ml. The EAN13 specified that this package contains 3 bottles. Think of it as
+        as description of volume/size of the content.
+      * ATC
+      * company_name (only for migel)
+      * GLN company_ean, field COMPNO in oddb_article
+
+      then you add the following flags via Preparations.xml
+      * Ex-Factory Price
+      * Public Price
+      * SL Price valid from
+      * decuctible/SLOPLUS
+      * Original / Generic
+      * all Limitations (go into oddb_limitations.xml)
+      * narcotics (FlagNarcosis) emitted as element BG with value 'Y'  or 'N'
+
+      then you add the following flags via Packungen.xls
+      * Abgabekategorie (column 'N') as field SMCAT
+      * ATC (if missing from swissINDEX) -> Field SubstanceSwissmedic in oddb_article.xml
+      * Wirkstoff (column 'O') -> Field SubstanceSwissmedic in oddb_article.xml
+      * Packungsgrösse (column 'L') -> Field PackGrSwissmedic in oddb_article.xml
+      * Packungseinheit(column 'L') -> Field EinheitSwissmedic in oddb_article.xml
+      
+    </xs:documentation>
+  </xs:annotation>
+  
+  <xs:element name="ARTICLE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:ART"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ART">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:PHAR"/>
+        <xs:element minOccurs="0" ref="ns1:SMCAT"/>
+        <xs:element minOccurs="0" ref="ns1:SMNO"/>
+        <xs:element minOccurs="0" ref="ns1:PRODNO"/>
+        <xs:element minOccurs="0" ref="ns1:VAT"/>
+        <xs:element ref="ns1:SALECD"/>
+        <xs:choice minOccurs="0">
+          <xs:element ref="ns1:COOL"/>
+          <xs:element ref="ns1:LIMPTS" />
+        </xs:choice>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:CDBG"/>
+          <xs:element ref="ns1:BG"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:QTY"/>
+        <xs:element ref="ns1:DSCRD"/>
+        <xs:element ref="ns1:DSCRF"/>
+        <xs:element ref="ns1:SORTD"/>
+        <xs:element ref="ns1:SORTF"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:SYN1D"/>
+          <xs:element ref="ns1:SYN1F"/>
+          <xs:element ref="ns1:SLOPLUS"/>
+        </xs:sequence>
+        <xs:element ref="ns1:ARTCOMP"/>
+        <xs:element ref="ns1:ARTBAR"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:ARTPRI"/>
+        <xs:element minOccurs="0" ref="ns1:ARTINS"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PHAR" type="xs:integer"/>
+  <xs:element name="SMCAT">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="B"/>
+        <xs:enumeration value="C" />
+        <xs:enumeration value="D" />
+        <xs:enumeration value="A" />
+        <xs:enumeration value="E" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="SMNO" type="xs:integer"/>
+  <xs:element name="VAT">
+    <xs:simpleType>
+      <xs:restriction base="xs:byte">
+        <xs:enumeration value="2" />
+        <xs:enumeration value="1" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="SALECD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="A" />
+        <xs:enumeration value="I" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="LIMPTS">
+    <xs:simpleType>
+      <xs:restriction base="xs:byte">
+        <xs:enumeration value="20" />
+        <xs:enumeration value="30" />
+        <xs:enumeration value="60" />
+        <xs:enumeration value="10" />
+        <xs:enumeration value="40" />
+        <xs:enumeration value="50" />
+        <xs:enumeration value="80" />
+        <xs:enumeration value="100" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="COOL" type="xs:integer"/>
+  <xs:element name="CDBG">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="N" />
+        <xs:enumeration value="Y" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="BG">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="N" />
+        <xs:enumeration value="Y" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="SORTD" type="xs:string"/>
+  <xs:element name="SORTF" type="xs:string"/>
+  <xs:element name="SYN1D" type="xs:string"/>
+  <xs:element name="SYN1F" type="xs:string"/>
+  <xs:element name="SLOPLUS">
+    <xs:simpleType>
+      <xs:restriction base="xs:byte">
+        <xs:enumeration value="2" />
+        <xs:enumeration value="1" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="ARTCOMP">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:COMPNO"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="COMPNO" type="xs:integer"/>
+  <xs:element name="ARTBAR">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="CDTYP" type="xs:string"/>
+        <xs:element minOccurs="0" ref="ns1:BC"/>
+        <xs:element ref="ns1:BCSTAT"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BC" type="xs:integer"/>
+  <xs:element name="BCSTAT" type="xs:NCName"/>
+  <xs:element name="ARTPRI">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:VDAT"/>
+          <xs:element ref="ns1:PTYP"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:PRICE"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PTYP">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="PEXF" />
+        <xs:enumeration value="PPUB" />
+        <xs:enumeration value="ZURROSE" />
+        <xs:enumeration value="ZURROSEPUB" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="PRICE" type="xs:decimal"/>
+  <xs:element name="ARTINS">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:NINCD"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NINCD">
+    <xs:simpleType>
+      <xs:restriction base="xs:byte">
+        <xs:enumeration value="10" />
+        <xs:enumeration value="20" />
+        <xs:enumeration value="13" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="ARTICLEMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:ARTMD"/>
+        <xs:element ref="ns1:RESULTMD"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ARTMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:PHARMD"/>
+        <xs:element minOccurs="0" ref="ns1:SMCATMD"/>
+        <xs:element minOccurs="0" ref="ns1:SMNOMD"/>
+        <xs:element minOccurs="0" ref="ns1:PRODNOMD"/>
+        <xs:element ref="ns1:SALECDMD"/>
+        <xs:choice minOccurs="0">
+          <xs:element ref="ns1:COOLMD"/>
+          <xs:element ref="ns1:LIMPTSMD"/>
+        </xs:choice>
+        <xs:element ref="ns1:CDBGMD"/>
+        <xs:element ref="ns1:BGMD"/>
+        <xs:element ref="ns1:QTYMD"/>
+        <xs:element ref="ns1:DSCRDMD"/>
+        <xs:element ref="ns1:DSCRFMD"/>
+        <xs:element ref="ns1:SORTDMD"/>
+        <xs:element ref="ns1:SORTFMD"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:SYN1DMD"/>
+          <xs:element ref="ns1:SYN1FMD"/>
+          <xs:element ref="ns1:SLOPLUSMD"/>
+        </xs:sequence>
+        <xs:element ref="ns1:ARTCOMPMD"/>
+        <xs:element ref="ns1:ARTBARMD"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:ARTPRIMD"/>
+        <xs:element minOccurs="0" ref="ns1:ARTINSMD"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PHARMD" type="xs:integer"/>
+  <xs:element name="SMCATMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="B" />
+        <xs:enumeration value="C" />
+        <xs:enumeration value="D" />
+        <xs:enumeration value="A" />
+        <xs:enumeration value="E" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="SMNOMD" type="xs:integer"/>
+  <xs:element name="SALECDMD" type="xs:NCName"/>
+  <xs:element name="COOLMD" type="xs:integer"/>
+  <xs:element name="LIMPTSMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:integer"/>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="CDBGMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="N" />
+        <xs:enumeration value="Y" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="BGMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="N" />
+        <xs:enumeration value="Y" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="SORTDMD" type="xs:string"/>
+  <xs:element name="SORTFMD" type="xs:string"/>
+  <xs:element name="SYN1DMD" type="xs:string"/>
+  <xs:element name="SYN1FMD" type="xs:string"/>
+  <xs:element name="SLOPLUSMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:byte">
+        <xs:enumeration value="2" />
+        <xs:enumeration value="1" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="ARTCOMPMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:COMPNOMD"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="COMPNOMD" type="xs:integer"/>
+  <xs:element name="ARTBARMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="CDTYPMD">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="E13" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+        <xs:element ref="ns1:BCMD"/>
+        <xs:element ref="ns1:BCSTATMD"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BCMD" type="xs:integer"/>
+  <xs:element name="BCSTATMD" type="xs:NCName"/>
+  <xs:element name="ARTPRIMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:VDATMD"/>
+          <xs:element ref="ns1:PTYPMD"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:PRICEMD"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PTYPMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="PEXF" />
+        <xs:enumeration value="PPUB" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="PRICEMD" type="xs:decimal"/>
+  <xs:element name="ARTINSMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:NINCDMD"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NINCDMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:byte">
+        <xs:enumeration value="10" />
+        <xs:enumeration value="20" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="Betriebe">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:Betrieb"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Betrieb">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:GLN_Betrieb"/>
+        <xs:element ref="ns1:Betriebsname_1"/>
+        <xs:element minOccurs="0" ref="ns1:Betriebsname_2"/>
+        <xs:element minOccurs="0" ref="ns1:Strasse"/>
+        <xs:element minOccurs="0" ref="ns1:Nummer"/>
+        <xs:element ref="ns1:PLZ"/>
+        <xs:element ref="ns1:Ort"/>
+        <xs:element ref="ns1:Bewilligungskanton"/>
+        <xs:element ref="ns1:Land"/>
+        <xs:element ref="ns1:Betriebstyp"/>
+        <xs:element ref="ns1:BTM_Berechtigung"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GLN_Betrieb" type="xs:integer"/>
+  <xs:element name="Betriebsname_1" type="xs:string"/>
+  <xs:element name="Betriebsname_2" type="xs:string"/>
+  <xs:element name="Strasse" type="xs:string"/>
+  <xs:element name="Nummer" type="xs:string"/>
+  <xs:element name="Betriebstyp">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="Spitalapotheke, Andere" />
+        <xs:enumeration value="öffentliche Apotheke" />
+        <xs:enumeration value="wissenschaftliches Institut" />
+        <xs:enumeration value="kantonale Behörde" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="BTM_Berechtigung">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="6011 Verzeichnis a/b/c BetmVV-EDI" />
+        <xs:enumeration value="6026 Verzeichnis a/b/c/f BetmVV-EDI" />
+        <xs:enumeration value="6001 Verzeichnis a BetmVV-EDI" />
+        <xs:enumeration value="6008 Verzeichnis b/c BetmVV-EDI" />
+        <xs:enumeration value="6020 Verzeichnis f BetmVV-EDI" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="CODE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:CD"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:CDTYP"/>
+        <xs:element ref="ns1:CDVAL"/>
+        <xs:element ref="ns1:DSCRSD"/>
+        <xs:element ref="ns1:DEL"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CODEMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:CDMD"/>
+        <xs:element ref="ns1:RESULTMD"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CDMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:CDTYPMD"/>
+        <xs:element ref="ns1:CDVALMD"/>
+        <xs:element ref="ns1:DSCRSDMD"/>
+        <xs:element ref="ns1:DELMD"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DSCRSDMD" type="xs:string"/>
+  <xs:element name="INTERACTION">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:IX"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IX">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:IXNO"/>
+        <xs:element ref="ns1:TITD"/>
+        <xs:element ref="ns1:GRP1D"/>
+        <xs:element ref="ns1:GRP2D"/>
+        <xs:element ref="ns1:EFFD"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:RLV"/>
+          <xs:element ref="ns1:RLVD"/>
+        </xs:sequence>
+        <xs:element ref="ns1:MECHD"/>
+        <xs:element ref="ns1:MEASD"/>
+        <xs:element ref="ns1:DEL"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IXNO" type="xs:integer"/>
+  <xs:element name="TITD" type="xs:string"/>
+  <xs:element name="GRP1D" type="xs:NCName"/>
+  <xs:element name="GRP2D" type="xs:string"/>
+  <xs:element name="EFFD" type="xs:string"/>
+  <xs:element name="RLV">
+    <xs:simpleType>
+      <xs:restriction base="xs:byte">
+        <xs:enumeration value="16" />
+        <xs:enumeration value="13" />
+        <xs:enumeration value="11" />
+        <xs:enumeration value="14" />
+        <xs:enumeration value="15" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="RLVD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="keine Massnahmen" />
+        <xs:enumeration value="Kombination meiden" />
+        <xs:enumeration value="Kontraindiziert" />
+        <xs:enumeration value="Monitorisieren" />
+        <xs:enumeration value="Vorsichtsmassnahmen" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="MECHD" type="xs:string"/>
+  <xs:element name="MEASD" type="xs:string"/>
+  <xs:element name="INTERACTIONMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:IXMD"/>
+        <xs:element ref="ns1:RESULTMD"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IXMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:IXNOMD"/>
+        <xs:element ref="ns1:TITDMD"/>
+        <xs:element ref="ns1:GRP1DMD"/>
+        <xs:element ref="ns1:GRP2DMD"/>
+        <xs:element ref="ns1:EFFDMD"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:RLVMD"/>
+          <xs:element ref="ns1:RLVDMD"/>
+        </xs:sequence>
+        <xs:element ref="ns1:MECHDMD"/>
+        <xs:element ref="ns1:MEASDMD"/>
+        <xs:element ref="ns1:DELMD"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="IXNOMD" type="xs:integer"/>
+  <xs:element name="TITDMD" type="xs:string"/>
+  <xs:element name="GRP1DMD" type="xs:NCName"/>
+  <xs:element name="GRP2DMD" type="xs:string"/>
+  <xs:element name="EFFDMD" type="xs:string"/>
+  <xs:element name="RLVMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:byte">
+        <xs:enumeration value="16" />
+        <xs:enumeration value="13" />
+        <xs:enumeration value="11" />
+        <xs:enumeration value="14" />
+        <xs:enumeration value="15" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="RLVDMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="keine Massnahmen" />
+        <xs:enumeration value="Kombination meiden" />
+        <xs:enumeration value="Kontraindiziert" />
+        <xs:enumeration value="Monitorisieren" />
+        <xs:enumeration value="Vorsichtsmassnahmen" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+<xs:element name="MECHDMD" type="xs:string"/>
+  <xs:element name="MEASDMD" type="xs:string"/>
+  <xs:element name="LIMITATION">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:LIM"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LIM">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element ref="ns1:Pharmacode"/>
+          <xs:element ref="ns1:SwissmedicNo5"/>
+          <xs:element ref="ns1:SwissmedicNo8"/>
+        </xs:choice>
+        <xs:element ref="ns1:IT"/>
+        <xs:element ref="ns1:LIMTYP"/>
+        <xs:element ref="ns1:LIMVAL"/>
+        <xs:element ref="ns1:LIMNAMEBAG"/>
+        <xs:element ref="ns1:LIMNIV"/>
+        <xs:element ref="ns1:DSCRD"/>
+        <xs:element ref="ns1:DSCRF"/>
+        <xs:element ref="ns1:VDAT"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Pharmacode" type="xs:integer"/>
+  <xs:element name="SwissmedicNo5" type="xs:integer"/>
+  <xs:element name="SwissmedicNo8" type="xs:integer"/>
+  <xs:element name="LIMTYP">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="DIA" />
+        <xs:enumeration value="KOM" />
+        <xs:enumeration value="PKT" />
+        <xs:enumeration value="AUD" />
+        <xs:enumeration value="ZEI" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="LIMVAL" type="xs:string"/>
+  <xs:element name="LIMNAMEBAG" type="xs:string"/>
+  <xs:element name="LIMNIV">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="IP" />
+        <xs:enumeration value="I" />
+        <xs:enumeration value="P" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="LIMITATIONMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:LIMMD"/>
+        <xs:element ref="ns1:RESULTMD"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LIMMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element ref="ns1:PharmacodeMD"/>
+          <xs:element ref="ns1:SwissmedicNo5MD"/>
+          <xs:element ref="ns1:SwissmedicNo8MD"/>
+        </xs:choice>
+        <xs:element ref="ns1:ITMD"/>
+        <xs:element ref="ns1:LIMTYPMD"/>
+        <xs:element ref="ns1:LIMVALMD"/>
+        <xs:element ref="ns1:LIMNAMEBAGMD"/>
+        <xs:element ref="ns1:LIMNIVMD"/>
+        <xs:element ref="ns1:DSCRDMD"/>
+        <xs:element ref="ns1:DSCRFMD"/>
+        <xs:element ref="ns1:VDATMD"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PharmacodeMD" type="xs:integer"/>
+  <xs:element name="SwissmedicNo5MD" type="xs:integer"/>
+  <xs:element name="SwissmedicNo8MD" type="xs:integer"/>
+  <xs:element name="LIMTYPMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="DIA" />
+        <xs:enumeration value="KOM" />
+        <xs:enumeration value="PKT" />
+        <xs:enumeration value="AUD" />
+        <xs:enumeration value="ZEI" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="LIMVALMD">
+    <xs:simpleType>
+      <xs:union>
+        <xs:simpleType>
+          <xs:restriction base="xs:positiveInteger">
+          </xs:restriction>
+        </xs:simpleType>
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:enumeration value=""/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:union>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element type="xs:string" name="LIMNAMEBAGMD"/>
+  <xs:element name="LIMNIVMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="IP" />
+        <xs:enumeration value="I" />
+        <xs:enumeration value="P" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="PRODUCT">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:PRD"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PRD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:GTIN"/>
+        <xs:element minOccurs="0" ref="ns1:PRODNO"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:DSCRD"/>
+          <xs:element ref="ns1:DSCRF"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:ADINFD"/>
+        <xs:element minOccurs="0" ref="ns1:ADINFF"/>
+        <xs:element minOccurs="0" ref="ns1:GENCD"/>
+        <xs:element minOccurs="0" ref="ns1:ATC"/>
+        <xs:element minOccurs="0" ref="ns1:IT"/>
+        <xs:element minOccurs="0" ref="ns1:ORPH"/>
+        <xs:element ref="ns1:CPT"/>
+        <xs:element minOccurs="0" ref="ns1:PackGrSwissmedic"/>
+        <xs:element minOccurs="0" ref="ns1:EinheitSwissmedic"/>
+        <xs:element minOccurs="0" ref="ns1:SubstanceSwissmedic"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GTIN" type="xs:integer"/>
+  <xs:element name="ADINFD" type="xs:string"/>
+  <xs:element name="ADINFF" type="xs:string"/>
+  <xs:element name="GENCD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="O" />
+        <xs:enumeration value="K" />
+        <xs:enumeration value="G" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="ATC" type="xs:NCName"/>
+  <xs:element name="ORPH" type="xs:boolean"/>
+  <xs:element name="CPT">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:CPTCMP"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CPTCMP">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:LINE"/>
+        <xs:element ref="ns1:SUBNO"/>
+        <xs:element minOccurs="0" ref="ns1:QTY"/>
+        <xs:element minOccurs="0" ref="ns1:QTYU"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LINE" type="xs:integer"/>
+  <xs:element name="QTYU" type="xs:string"/>
+  <xs:element name="PackGrSwissmedic" type="xs:string"/>
+  <xs:element name="EinheitSwissmedic" type="xs:string"/>
+  <xs:element name="SubstanceSwissmedic" type="xs:string"/>
+  <xs:element name="PRODUCTMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:PRDMD"/>
+        <xs:element ref="ns1:RESULTMD"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PRDMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:GTINMD"/>
+        <xs:element minOccurs="0" ref="ns1:PRODNOMD"/>
+        <xs:sequence minOccurs="0">
+          <xs:element ref="ns1:DSCRDMD"/>
+          <xs:element ref="ns1:DSCRFMD"/>
+        </xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:ADINFDMD"/>
+        <xs:element minOccurs="0" ref="ns1:ADINFFMD"/>
+        <xs:element minOccurs="0" ref="ns1:GENCDMD"/>
+        <xs:element minOccurs="0" ref="ns1:ATCMD"/>
+        <xs:element minOccurs="0" ref="ns1:ITMD"/>
+        <xs:element minOccurs="0" ref="ns1:ORPHMD"/>
+        <xs:element ref="ns1:CPTMD"/>
+        <xs:element minOccurs="0" ref="ns1:PackGrSwissmedicMD"/>
+        <xs:element minOccurs="0" ref="ns1:EinheitSwissmedicMD"/>
+        <xs:element minOccurs="0" ref="ns1:SubstanceSwissmedicMD"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GTINMD" type="xs:integer"/>
+  <xs:element name="ADINFDMD" type="xs:string"/>
+  <xs:element name="ADINFFMD" type="xs:string"/>
+  <xs:element name="GENCDMD" type="xs:NCName"/>
+  <xs:element name="ATCMD" type="xs:NCName"/>
+  <xs:element name="ORPHMD" type="xs:boolean"/>
+  <xs:element name="CPTMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:CPTCMPMD"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CPTCMPMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:LINEMD"/>
+        <xs:element ref="ns1:SUBNOMD"/>
+        <xs:element minOccurs="0" ref="ns1:QTYMD"/>
+        <xs:element minOccurs="0" ref="ns1:QTYUMD"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LINEMD" type="xs:integer"/>
+  <xs:element name="QTYUMD" type="xs:string"/>
+  <xs:element name="PackGrSwissmedicMD" type="xs:string"/>
+  <xs:element name="EinheitSwissmedicMD" type="xs:string"/>
+  <xs:element name="SubstanceSwissmedicMD" type="xs:string"/>
+  <xs:element name="Personen">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:Person"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Person">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:GLN_Person"/>
+        <xs:element ref="ns1:Name"/>
+        <xs:element ref="ns1:Vorname"/>
+        <xs:element minOccurs="0" ref="ns1:PLZ"/>
+        <xs:element ref="ns1:Ort"/>
+        <xs:element ref="ns1:Bewilligungskanton"/>
+        <xs:element ref="ns1:Land"/>
+        <xs:element ref="ns1:Bewilligung_Selbstdispensation"/>
+        <xs:element ref="ns1:Diplom"/>
+        <xs:element name="BTM_Berechtigung">
+          <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="Ja" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GLN_Person" type="xs:integer"/>
+  <xs:element name="Name" type="xs:string"/>
+  <xs:element name="Vorname" type="xs:string"/>
+  <xs:element name="Bewilligung_Selbstdispensation">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="Nein" />
+        <xs:enumeration value="Ja" />
+        <xs:enumeration value="Unbekannt" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="Diplom" type="xs:string"/>
+  <xs:element name="SUBSTANCE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:SB"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SB">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:SUBNO"/>
+        <xs:element ref="ns1:NAML"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NAML" type="xs:string"/>
+  <xs:element name="SUBSTANCEMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:SBMD"/>
+        <xs:element ref="ns1:RESULTMD"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SBMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:SUBNOMD"/>
+        <xs:element ref="ns1:NAMLMD"/>
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NAMLMD" type="xs:string"/>
+  <xs:element name="PRODNO" type="xs:integer"/>
+  <xs:element name="DSCRD" type="xs:string"/>
+  <xs:element name="DSCRF" type="xs:string"/>
+  <xs:element name="IT" type="xs:string"/>
+  <xs:element name="SUBNO" type="xs:integer"/>
+  <xs:element name="QTY" type="xs:string"/>
+  <xs:element name="RESULT">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:OK_ERROR"/>
+        <xs:element ref="ns1:NBR_RECORD"/>
+        <xs:element ref="ns1:ERROR_CODE"/>
+        <xs:element ref="ns1:MESSAGE"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OK_ERROR" type="xs:NCName"/>
+  <xs:element name="NBR_RECORD" type="xs:integer"/>
+  <xs:element name="ERROR_CODE">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="MESSAGE">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="ITMD" type="xs:string"/>
+  <xs:element name="DSCRDMD" type="xs:string"/>
+  <xs:element name="DSCRFMD" type="xs:string"/>
+  <xs:element name="VDATMD" type="xs:NMTOKEN"/>
+  <xs:element name="RESULTMD">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:OK_ERRORMD"/>
+        <xs:element ref="ns1:NBR_RECORDMD"/>
+        <xs:element ref="ns1:ERROR_CODEMD"/>
+        <xs:element ref="ns1:MESSAGEMD"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="VDAT" type="xs:NMTOKEN"/>
+  <xs:element name="OK_ERRORMD" type="xs:NCName"/>
+  <xs:element name="NBR_RECORDMD" type="xs:integer"/>
+  <xs:element name="ERROR_CODEMD">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="MESSAGEMD">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="PLZ" type="xs:integer"/>
+  <xs:element name="Ort" type="xs:string"/>
+  <xs:element name="Bewilligungskanton" type="xs:string"/>
+  <xs:element name="Land" type="xs:NCName"/>
+  <xs:element name="PRODNOMD" type="xs:integer"/>
+  <xs:element name="SUBNOMD" type="xs:integer"/>
+  <xs:element name="QTYMD" type="xs:string"/>
+  <xs:element name="CDTYPMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:byte">
+        <xs:enumeration value="11" />
+        <xs:enumeration value="12" />
+        <xs:enumeration value="13" />
+        <xs:enumeration value="14" />
+        <xs:enumeration value="15" />
+        <xs:enumeration value="16" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="CDVALMD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="X" />
+        <xs:enumeration value="E" />
+        <xs:enumeration value="D" />
+        <xs:enumeration value="C" />
+        <xs:enumeration value="B" />
+        <xs:enumeration value="A" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="DELMD" type="xs:boolean"/>
+  <xs:element name="DEL" type="xs:boolean"/>
+  <xs:element name="CDTYP">
+    <xs:simpleType>
+      <xs:restriction base="xs:decimal">
+        <xs:enumeration value="11" />
+        <xs:enumeration value="12" />
+        <xs:enumeration value="13" />
+        <xs:enumeration value="14" />
+        <xs:enumeration value="15" />
+        <xs:enumeration value="16" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="CDVAL">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="X" />
+        <xs:enumeration value="E" />
+        <xs:enumeration value="D" />
+        <xs:enumeration value="C" />
+        <xs:enumeration value="B" />
+        <xs:enumeration value="A" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="DSCRSD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="Kontraindiziert" />
+        <xs:enumeration value="Kombination meiden" />
+        <xs:enumeration value="Monitorisieren" />
+        <xs:enumeration value="Vorsichtsmassnahmen" />
+        <xs:enumeration value="keine Massnahmen" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+</xs:schema>

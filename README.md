@@ -100,14 +100,17 @@ See also http://bugs.ruby-lang.org/projects/ruby/wiki/ReleaseEngineering
 
 
 ## XSD files
-If you need the XSD files, generate them yourself using the javabeans tool:
+
+The file oddb2xml.xsd was manually created by merging the output of the xmlbeans tools inst2xsd and trang
 
 * http://xmlbeans.apache.org/docs/2.0.0/guide/tools.html#inst2xsd
+* http://www.thaiopensource.com/relaxng/trang.html
 
-this will generate you a valid XSD file that can be used to validate against the XML file.
+Running rake spec will validated the XML-files generated during the tests using the Nokogiri validator.
 
-i.e.:
-* /home/zeno/.software/xmlbeans-2.6.0/bin/inst2xsd oddb_article.xml -outPrefix oddb_article
+Manually you can also validate (assuming that you have installed the xmlbeans tools) all generated XML-files using
+
+* xsdvalidate oddb2xml.xsd *.xml
 
 ## XML files
 

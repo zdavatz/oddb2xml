@@ -18,6 +18,18 @@ module Kernel
   end
 end
 
+def check_validation_via_xsd
+  @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
+  File.exists?(@oddb2xml_xsd).should be_true
+  files = Dir.glob('*.xml')
+  xsd = Nokogiri::XML::Schema(File.read(@oddb2xml_xsd))                                        
+  files.each{
+    |file|
+    doc = Nokogiri::XML(File.read(@article_xml))
+    xsd.validate(doc).each do |error|  error.message.should be_nil  end
+  }
+end
+
 describe Oddb2xml::Builder do
   NrExtendedArticles = 71
   NrPharmaAndNonPharmaArticles = 61
@@ -34,6 +46,23 @@ describe Oddb2xml::Builder do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
 
+  context 'XSD-generation: ' do
+    let(:cli) do
+        opts = {}
+        @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
+        @article_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+        @product_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
+        Oddb2xml::Cli.new(opts)
+    end
+
+    it 'should return true when validating oddb_article.xml against oddb_article.xsd' do
+      res = buildr_capture(:stdout){ cli.run }
+      File.exists?(@article_xml).should be_true
+      File.exists?(@product_xml).should be_true
+      check_validation_via_xsd
+    end
+  end
+  
   context 'should handle BAG-articles with and without pharmacode' do
     it {
       dat = File.read(File.expand_path('../data/Preparations.xml', __FILE__))
@@ -50,12 +79,16 @@ describe Oddb2xml::Builder do
       Oddb2xml::Cli.new(opts)
     end
 
+    it 'should pass validating via oddb2xml.xsd' do
+      check_validation_via_xsd
+    end
+    
     it 'should generate a valid oddb_product.xml' do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
-      article_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(article_filename).should be_true
-      article_xml = IO.read(article_filename)
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should be_true
+      article_xml = IO.read(@article_xml)
       product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
       File.exists?(product_filename).should be_true
       unless /1\.8\.7/.match(RUBY_VERSION)
@@ -118,14 +151,18 @@ describe Oddb2xml::Builder do
       Oddb2xml::Cli.new(opts)
     end
 
+    it 'should pass validating via oddb2xml.xsd' do
+      check_validation_via_xsd
+    end
+    
     it 'should handle not duplicate pharmacode 5366964'  do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/NonPharma/i)
       res.should match(/NonPharma products: #{NrPharmaAndNonPharmaArticles}/)
-      article_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(article_filename).should be_true
-      article_xml = IO.read(article_filename)
-      doc = REXML::Document.new File.new(article_filename)
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should be_true
+      article_xml = IO.read(@article_xml)
+      doc = REXML::Document.new File.new(@article_xml)
       dscrds = XPath.match( doc, "//ART" )
       XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size.should == 1
       dscrds.size.should == NrExtendedArticles
@@ -137,10 +174,10 @@ describe Oddb2xml::Builder do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/NonPharma/i)
       res.should match(/NonPharma products: #{NrPharmaAndNonPharmaArticles}/)
-      article_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(article_filename).should be_true 
-      article_xml = IO.read(article_filename)
-      doc = REXML::Document.new File.new(article_filename)
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should be_true
+      article_xml = IO.read(@article_xml)
+      doc = REXML::Document.new File.new(@article_xml)
       dscrds = XPath.match( doc, "//ART" )
       dscrds.size.should == NrExtendedArticles
       XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('1699947') }.size.should == 1 # swissmedic_packages Cardio-Pulmo-Rénal Sérocytol, suppositoire
@@ -166,10 +203,10 @@ describe Oddb2xml::Builder do
 
     it 'should emit a correct oddb_article.xml' do
       res = buildr_capture(:stdout){ cli.run }
-      article_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(article_filename).should be_true
-      article_xml = IO.read(article_filename)
-      doc = REXML::Document.new File.new(article_filename)
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should be_true
+      article_xml = IO.read(@article_xml)
+      doc = REXML::Document.new File.new(@article_xml)
       unless /1\.8\.7/.match(RUBY_VERSION)
         # check articles
         article_xml.should match(/3TC/)
@@ -195,7 +232,7 @@ describe Oddb2xml::Builder do
         article_xml.should match(/7680555580054/) # ZYVOXID
         article_xml.should match(/ZYVOXID/i)
         
-        doc = REXML::Document.new File.new article_filename
+        doc = REXML::Document.new File.new @article_xml
         dscrds = XPath.match( doc, "//DSCRD" )
         dscrds.find_all{|x| x.text.match('ZYVOXID Filmtabl 600 mg') }.size.should == 1
         
