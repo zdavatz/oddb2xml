@@ -707,10 +707,10 @@ module Oddb2xml
                 }
                 xml.ARTBAR {
                   xml.CDTYP  'E13'
-                  xml.BC     ean if ean and not ean.empty?
+                  xml.BC     ean
                   xml.BCSTAT 'A' # P is alternative
                   #xml.PHAR2
-                }
+                } if ean and not ean.empty?
                 #xml.ARTCH {
                   #xml.PHAR2
                   #xml.CHTYPE
