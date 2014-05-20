@@ -34,7 +34,8 @@
 
       Some comments for invidual fields:
       NINCD: possible values are 10 => BAG-XML (SL/LS), 13 -> MiGel, 20 => (LPPV) Limitation, empty => NonPharma)
-      GENCD: possible values are 'O' for original and 'G' for generic. We don't have a list of possible generics for a given original.
+      GENCD: possible values are 'O' for original and 'G' for generic, 'K' for Komplementärmedizin.
+             We don't have a list of possible generics for a given original.
              It is however possible find generics via ch.oddb.org where a sophisticated algorithm searches for similar medicaments
              taking into account all ATC-codes and galenic information.
       PHAR  Pharmacode: Taken from swissINDEX or ZurRose characters 3..9
@@ -64,7 +65,13 @@
       * narcotics (FlagNarcosis) emitted as element BG with value 'Y'  or 'N'
 
       then you add the following flags via Packungen.xls
-      * Abgabekategorie (column 'N') as field SMCAT
+      * Abgabekategorie (column 'N') as field SMCAT with the possible value
+        see also https://www.swissmedic.ch/arzneimittel/00156/00221/00222/00230/index.html?lang=de
+        A   Einmalige Abgabe auf ärztliche oder tierärztliche Verschreibung
+        B   Abgabe auf ärztliche oder tierärztliche Verschreibung
+        C   Abgabe nach Fachberatung durch Medizinalpersonen
+        D   Abgabe nach Fachberatung
+        E   Abgabe ohne Fachberatung
       * ATC (if missing from swissINDEX) -> Field SubstanceSwissmedic in oddb_article.xml
       * Wirkstoff (column 'O') -> Field SubstanceSwissmedic in oddb_article.xml
       * Packungsgrösse (column 'L') -> Field PackGrSwissmedic in oddb_article.xml
