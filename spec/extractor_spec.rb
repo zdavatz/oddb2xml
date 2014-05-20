@@ -67,7 +67,7 @@ describe Oddb2xml::SwissmedicInfoExtractor do
     it {
         filename = File.join(Oddb2xml::SpecData, 'swissmedic_package.xlsx')
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :package).to_hash
-        expect(@packs.size).to eq(14)
+        expect(@packs.size).to eq(16)
         serocytol = nil
         @packs.each{|pack|
                     serocytol = pack[1] if pack[0].to_s == '00274001'
