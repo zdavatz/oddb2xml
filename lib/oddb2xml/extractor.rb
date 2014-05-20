@@ -255,6 +255,23 @@ module Oddb2xml
         cat       = 13   # :swissmedic_category
         ith       = 4    # :ith_swissmedic IT-Code (swissmedic-diff)
         atc       = 5    # :atc_code
+        list_code = 6    #  Heilmittelcode, possible values are
+        # Allergene
+        # Anthroposophika
+        # ayurvedische Arzneimittel
+        # Bakterien- und Hefepräparate
+        # Biotechnologika
+        # Blutprodukte
+        # Generator
+        # Heilmittelcode
+        # Homöopathika
+        # Impfstoffe
+        # Phytotherapeutika
+        # Radiopharmazeutika
+        # Synthetika human
+        # tibetische Arzneimittel
+        # Tierarzneimittel
+        # Transplantat: Gewebeprodukt
         siz       = 11   # :package_size
         eht       = 12   # :einheit_swissmedic
         sub       = 14   # :substance_swissmedic
@@ -272,6 +289,7 @@ module Oddb2xml
               :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
               :swissmedic_category  => row[cat].value.to_s,
               :atc_code             => row[atc] ? row[atc].value.to_s : '',
+              :list_code            => row[list_code] ? row[list_code].value.to_s : '',
               :package_size         => row[siz] ? row[siz].value.to_s : '',
               :einheit_swissmedic   => row[eht] ? row[eht].value.to_s : '',
               :substance_swissmedic => row[sub] ? row[sub].value.to_s : '',

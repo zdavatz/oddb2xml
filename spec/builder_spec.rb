@@ -139,6 +139,7 @@ describe Oddb2xml::Builder do
     end
     it "pending should match EAN of Desitin. returns 0 at the moment" 
   end
+
   context 'when option -e is given' do
     let(:cli) do
       opts = {
@@ -155,6 +156,18 @@ describe Oddb2xml::Builder do
       check_validation_via_xsd
     end
     
+    it 'should not contain veterinary iksnr 47066'  do
+      res = buildr_capture(:stdout){ cli.run }
+      res.should match(/NonPharma/i)
+      res.should match(/NonPharma products: #{NrPharmaAndNonPharmaArticles}/)
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should be_true
+      article_xml = IO.read(@article_xml)
+      doc = REXML::Document.new File.new(@article_xml)
+      dscrds = XPath.match( doc, "//ART" )
+      XPath.match( doc, "//BC" ).find_all{|x| x.text.match('47066') }.size.should == 0
+    end
+
     it 'should handle not duplicate pharmacode 5366964'  do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/NonPharma/i)
@@ -166,7 +179,7 @@ describe Oddb2xml::Builder do
       dscrds = XPath.match( doc, "//ART" )
       XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size.should == 1
       dscrds.size.should == NrExtendedArticles
-      XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should == 1
+      XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should >= 1
       XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('620691') }.size.should == 1
     end
 

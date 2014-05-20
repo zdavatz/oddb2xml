@@ -579,6 +579,7 @@ module Oddb2xml
     def build_article
       prepare_limitations
       prepare_articles
+
       idx = 0
       Oddb2xml.log "build_article #{idx} of #{@articles.size} articles"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
@@ -591,6 +592,9 @@ module Oddb2xml
         obj[:de].each_with_index do |de_idx, i|
               fr_idx = obj[:fr][i]              # swissindex FR
               pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
+              pack_info = nil
+              pack_info = @packs[no8.intern] if no8 # info from Packungen.xlsx from swissmedic_info
+              next if pack_info and pack_info[:list_code].match(/Tierarzneimittel/) if no8 and no8.match(/47066/)
               ppac = nil                        # Packungen
               ean = de_idx[:ean]
               pharma_code = de_idx[:pharmacode]
@@ -602,7 +606,7 @@ module Oddb2xml
                 pac = @items[ean][:packages][ean] if @items and ean and @items[ean] and @items[ean][:packages]
               end
               if no8
-                ppac = ((_ppac = @packs[no8.intern] and !_ppac[:is_tier]) ? _ppac : nil)
+                ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
               end
               price = nil
               if !@prices.empty? && ean && @prices[ean]
@@ -992,6 +996,7 @@ module Oddb2xml
           next if ((ean.to_s.length != 13) and !ean14)
           next if idx[:type] == :nonpharma
           row = ''
+          pack_info = nil
           # Oddb2tdat.parse
           if idx[:status] =~ /A|I/
             pac,no8 = nil,nil
@@ -1004,9 +1009,10 @@ module Oddb2xml
              # :swissmedic_numbers
             if pac
               no8 = pac[:swissmedic_number8].intern
+              pack_info = @packs[no8.intern] if no8
             end
             if pac and pac[:prices] == nil and no8
-              ppac = ((ppac = @packs[no8.intern] and ppac[:is_tier]) ? ppac : nil)
+              ppac = ((ppac = pack_info and ppac[:is_tier]) ? ppac : nil)
               pac = ppac if ppac
             end
             row << "%#{DAT_LEN[:RECA]}s"  % '11'
@@ -1043,13 +1049,13 @@ module Oddb2xml
                                             else
                                               '0'
                                             end
-            row << "%#{DAT_LEN[:CIKS]}s"  % if (no8 && @packs[no8] && !@packs[no8][:is_tier]) # Packungen.xls
-                                              @packs[no8][:swissmedic_category]
+            row << "%#{DAT_LEN[:CIKS]}s"  % if (no8 && pack_info && !pack_info[:is_tier]) # Packungen.xls
+                                              pack_info[:swissmedic_category]
                                             else
                                               '0'
                                             end.gsub(/(\+|\s)/, '')
-            row << "%0#{DAT_LEN[:ITHE]}d" % if (no8 && @packs[no8] && !@packs[no8][:is_tier])
-                                              format_date(@packs[no8][:ith_swissmedic])
+            row << "%0#{DAT_LEN[:ITHE]}d" % if (no8 && pack_info && !pack_info[:is_tier])
+                                              format_date(pack_info[:ith_swissmedic])
                                             else
                                               ('0' * DAT_LEN[:ITHE])
                                             end.to_i
