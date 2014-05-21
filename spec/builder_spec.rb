@@ -127,7 +127,8 @@ describe Oddb2xml::Builder do
         :format       => :dat,
       }
       Oddb2xml::Cli.new(opts)
-    end    
+    end
+
     it 'should generate a valid oddb_with_migel.dat' do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
@@ -156,7 +157,7 @@ describe Oddb2xml::Builder do
       check_validation_via_xsd
     end
     
-    it 'should not contain veterinary iksnr 47066'  do
+    it 'should not contain veterinary iksnr 47066 CANIPHEDRIN'  do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/NonPharma/i)
       res.should match(/NonPharma products: #{NrPharmaAndNonPharmaArticles}/)
@@ -166,6 +167,7 @@ describe Oddb2xml::Builder do
       doc = REXML::Document.new File.new(@article_xml)
       dscrds = XPath.match( doc, "//ART" )
       XPath.match( doc, "//BC" ).find_all{|x| x.text.match('47066') }.size.should == 0
+      XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/CANIPHEDRIN/) }.size.should == 0
     end
 
     it 'should handle not duplicate pharmacode 5366964'  do

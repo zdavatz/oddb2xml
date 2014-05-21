@@ -276,6 +276,7 @@ module Oddb2xml
         eht       = 12   # :einheit_swissmedic
         sub       = 14   # :substance_swissmedic
         @sheet.each_with_index do |row, i|
+
           next if (i <= 1)
           next unless row[i_5] and row[i_3]
           no8 = sprintf('%05d',row[i_5].value.to_i) + sprintf('%03d',row[i_3].value.to_i)
@@ -468,6 +469,7 @@ module Oddb2xml
       data = {}
       while line = @io.gets
         line = line.chomp
+        next if line =~ /ad us vet/i
         if @@extended
           next unless line =~ /(\d{13})(\d{1})$/
         else
