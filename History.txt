@@ -1,3 +1,18 @@
+=== 1.8.4 / 21.05.2014
+
+* Don't emit "ad us vet" or marked in Packungen.xls as "Tierarzneimittel"
+
+=== 1.8.3 / 07.05.2014
+
+* Fixed build under windows
+
+=== 1.8.2 / 06.05.2014
+
+* Add oddb2xml.xsd (commented XSD schema for all generated oddb*.xml files)
+* Fix building limitations
+* Reworked download. Leaves always files under downloads
+* Adapt to new location of epha interaction.csv
+
 === 1.8.1 / 30.04.2014
 
 * Fix building NONPHARMA
