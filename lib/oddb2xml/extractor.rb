@@ -469,7 +469,7 @@ module Oddb2xml
       data = {}
       while line = @io.gets
         line = line.chomp
-        next if line =~ /ad us vet/i
+        next if line =~ /(ad us\.* vet)|(\(vet\))/i
         if @@extended
           next unless line =~ /(\d{13})(\d{1})$/
         else
