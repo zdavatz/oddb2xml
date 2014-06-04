@@ -1,3 +1,7 @@
+=== 1.8.5 / 04.06.2014
+
+* Added element REF_DATA when generating oddb_article.xml.
+
 === 1.8.4 / 21.05.2014
 
 * Don't emit "ad us vet" or marked in Packungen.xls as "Tierarzneimittel"

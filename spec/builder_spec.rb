@@ -31,7 +31,7 @@ def check_validation_via_xsd
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 71
+  NrExtendedArticles = 70
   NrPharmaAndNonPharmaArticles = 61
   NrPharmaArticles = 4
   include ServerMockHelper
@@ -45,7 +45,6 @@ describe Oddb2xml::Builder do
   after(:each) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
-
   context 'XSD-generation: ' do
     let(:cli) do
         opts = {}
@@ -140,7 +139,6 @@ describe Oddb2xml::Builder do
     end
     it "pending should match EAN of Desitin. returns 0 at the moment" 
   end
-
   context 'when option -e is given' do
     let(:cli) do
       opts = {
@@ -151,6 +149,30 @@ describe Oddb2xml::Builder do
         :skip_download => true,
       }
       Oddb2xml::Cli.new(opts)
+    end
+
+    def checkItemForRefdata(doc, pharmacode, isRefdata)
+      article = XPath.match( doc, "//ART[PHAR=#{pharmacode.to_s}]").first
+      name =  article.elements['DSCRD'].text
+      refdata =  article.elements['REF_DATA'].text
+      smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
+      puts "checking doc for pharmacode #{pharmacode} isRefdata #{isRefdata} == #{refdata}. SMNO: #{smno} #{name}" if $VERBOSE
+      article.elements['REF_DATA'].text.should == isRefdata.to_s
+    end
+
+    it 'should generate the flag non-refdata' do
+      res = buildr_capture(:stdout){ cli.run }
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      puts @article_xml
+      File.exists?(@article_xml).should be_true
+      FileUtils.cp(@article_xml, '/opt/src/oddb2xml/tst.xml', :verbose => true)
+      article_xml = IO.read(@article_xml)
+      doc = REXML::Document.new File.new(@article_xml)
+      XPath.match( doc, "//REF_DATA" ).size.should > 0
+      checkItemForRefdata(doc, "1699947", 1) # 3TC Filmtabl 150 mg SMNO 53662013 IKSNR 53‘662, 53‘663
+      checkItemForRefdata(doc, "0028470", 0) # Complamin
+      checkItemForRefdata(doc, "3036984", 1) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
+      checkItemForRefdata(doc, "5366964", 1) # 1-DAY ACUVUE moist jour
     end
 
     it 'should pass validating via oddb2xml.xsd' do

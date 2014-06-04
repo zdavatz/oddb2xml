@@ -42,6 +42,7 @@
       PEXF  Price Ex-Factory (exkl. VAT):  Taken from the ZurRose.dat characters 60..65
       PPUB  Public Price (inkl. VAT):      Taken from the ZurRose.dat characters 66..71
       SLOPLUS Selbsbehalt/deductilbe, where 1 =>  20%, 2 => 10%, '' => not known
+      REF_DATA 1 in oddb_article if coming from a refdata source (migel, bag, swissmedic), else 0
 
       FIRST import all data from swissINDEX
       * GTIN
@@ -94,6 +95,14 @@
   <xs:element name="ART">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="REF_DATA">
+          <xs:simpleType>
+            <xs:restriction base="xs:byte">
+              <xs:enumeration value="1" />
+              <xs:enumeration value="0" />
+            </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
         <xs:element ref="ns1:PHAR"/>
         <xs:element minOccurs="0" ref="ns1:SMCAT"/>
         <xs:element minOccurs="0" ref="ns1:SMNO"/>

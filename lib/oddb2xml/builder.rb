@@ -337,9 +337,6 @@ module Oddb2xml
       end
       _builder.to_xml
     end
-    def xml_and_comment(xml, *args, &block)
-      $stderr.puts "xml_and_comment #{args[0]}"
-    end
     def build_interaction
       prepare_interactions
       prepare_codes
@@ -612,9 +609,10 @@ module Oddb2xml
               if !@prices.empty? && ean && @prices[ean]
                 price = @prices[ean] # zurrose
               end
-                xml.ART('DT' => '') {
-                                    xml.PHAR  de_idx[:pharmacode] unless de_idx[:pharmacode].empty?
-                                                                                                           #xml.GRPCD
+              xml.ART('DT' => '') {
+                xml.REF_DATA (de_idx[:refdata] || @migel[pharma_code]) ? '1' : '0'
+                xml.PHAR  de_idx[:pharmacode] unless de_idx[:pharmacode].empty?
+                #xml.GRPCD
                 #xml.CDS01
                 #xml.CDS02
                 if ppac

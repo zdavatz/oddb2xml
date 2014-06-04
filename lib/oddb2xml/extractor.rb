@@ -49,6 +49,7 @@ module Oddb2xml
       result = PreparationsEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
       result.Preparations.Preparation.each do |seq|
         item = {}
+        item[:refdata]      = true
         item[:product_key]  = seq.ProductCommercial
         item[:desc_de]      = (desc = seq.DescriptionDe) ? desc : ''
         item[:desc_fr]      = (desc = seq.DescriptionFr) ? desc : ''
@@ -188,6 +189,7 @@ module Oddb2xml
       items = result.PHARMA.ITEM
       items.each do |pac|
         item = {}
+        item[:refdata]         = true
         item[:_type]           = @type.downcase.intern
         item[:ean]             = (gtin = pac.GTIN)   ? gtin: ''
         item[:pharmacode]      = (phar = pac.PHAR)   ? phar: ''
@@ -333,6 +335,7 @@ module Oddb2xml
         next if i.zero?
         phar = correct_code(row[1].to_s.gsub(/[^0-9]/, ''), 7)
         data[phar] = {
+          :refdata         => true,
           :ean             => row[0].to_i.to_s,
           :pharmacode      => phar,
           :desc_de         => row[3],
@@ -355,6 +358,7 @@ module Oddb2xml
         lang = pac.lang.to_s
         next unless lang =~ /de|fr/
         item = {}
+        item[:refdata] = true,
         item[:name]  = (name = pac.title) ? name : ''
         item[:owner] = (ownr = pac.authHolder) ? ownr : ''
         if content = /cdata/.match(pac.content)
@@ -500,9 +504,6 @@ module Oddb2xml
           :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
           :type => :nonpharma,
         }
-        if /5366964/.match(ean13) then
-          Oddb2xml.log "found 5366964 data is now #{data[ean13].inspect}"
-        end
         @@zur_rose_items += 1
       end if @io
       data
