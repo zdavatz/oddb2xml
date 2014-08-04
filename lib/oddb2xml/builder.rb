@@ -26,7 +26,7 @@ module Oddb2xml
   class Builder
     attr_accessor :subject, :index, :items, :flags, :lppvs,
                   :actions, :migel, :orphans, :fridges,
-                  :infos, :packs, :prices,
+                  :infos, :packs, :infos_zur_rose,
                   :ean14, :tag_suffix,
                   :companies, :people,
                   :xsd
@@ -40,7 +40,7 @@ module Oddb2xml
       @infos      = {}
       @packs      = {}
       @migel      = {}
-      @prices     = {} # zurrose
+      @infos_zur_rose     = {} # zurrose
       @actions    = []
       @orphans    = []
       @fridges    = []
@@ -126,7 +126,7 @@ module Oddb2xml
                                                       }
                                                       }
           Oddb2xml.log("prepare_articles extended")
-          @prices.each{
+          @infos_zur_rose.each{
             |ean13, info|
           pharmacode = info[:pharmacode]
           if @pharmacode[pharmacode]
@@ -606,8 +606,8 @@ module Oddb2xml
                 ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
               end
               price = nil
-              if !@prices.empty? && ean && @prices[ean]
-                price = @prices[ean] # zurrose
+              if !@infos_zur_rose.empty? && ean && @infos_zur_rose[ean]
+                price = @infos_zur_rose[ean] # zurrose
               end
               xml.ART('DT' => '') {
                 xml.REF_DATA (de_idx[:refdata] || @migel[pharma_code]) ? '1' : '0'

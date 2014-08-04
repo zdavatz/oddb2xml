@@ -26,7 +26,7 @@ module Oddb2xml
       @lppvs = {} # lppv.txt from files repo
       @infos = {} # [option] FI from SwissmedicInfo
       @packs = {} # [option] Packungen from Swissmedic for dat
-      @prices  = {} # [addition] prices from zurrose transfer.txt
+      @infos_zur_rose  = {} # [addition] infos_zur_rose and other infos from zurrose transfer.txt
       @migel   = {} # [addition] additional Non Pharma products from files repo
       @actions = [] # [addition] interactions from epha
       @orphans = [] # [addition] Orphaned drugs from Swissmedic xls
@@ -118,7 +118,7 @@ module Oddb2xml
               builder.infos = @infos
               builder.packs = @packs
               # additional sources
-              %w[actions orphans fridges migel prices].each do |addition|
+              %w[actions orphans fridges migel infos_zur_rose].each do |addition|
                 builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
               end
             end
@@ -249,8 +249,8 @@ module Oddb2xml
           Oddb2xml.log("zurrose xml #{xml.size} bytes")
           @mutex.synchronize do
             hsh = ZurroseExtractor.new(xml, @options[:extended]).to_hash
-            @prices = hsh
-            Oddb2xml.log("zurrose added #{@prices.size} prices from xml with #{xml.size} bytes")
+            @infos_zur_rose = hsh
+            Oddb2xml.log("zurrose added #{@infos_zur_rose.size} items from xml with #{xml.size} bytes")
           end
         end
       when :index
@@ -332,7 +332,7 @@ module Oddb2xml
           end
         end
         if @options[:extended]
-          lines << sprintf("\tPrices zur Rose: %i", @prices.length)
+          lines << sprintf("\tInformation items zur Rose: %i", @infos_zur_rose.length)
         end
       else
         {
