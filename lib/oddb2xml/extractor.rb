@@ -193,7 +193,6 @@ module Oddb2xml
         item[:_type]           = @type.downcase.intern
         item[:ean]             = (gtin = pac.GTIN)   ? gtin: ''
         item[:pharmacode]      = (phar = pac.PHAR)   ? phar: ''
-        item[:status]          = (stat = pac.STATUS) ? stat: ''
         item[:stat_date]       = (date = pac.SDATE)  ? date: ''
         item[:lang]            = (lang = pac.LANG)   ? lang: ''
         item[:desc]            = (dscr = pac.DSCR)   ? dscr: ''
@@ -503,6 +502,7 @@ module Oddb2xml
           :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
           :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
           :type => :nonpharma,
+          :cmut => line[2],
         }
         @@zur_rose_items += 1
       end if @io

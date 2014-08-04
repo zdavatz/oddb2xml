@@ -98,7 +98,6 @@ module Oddb2xml
             entry = {
               :ean             => migel[:ean],
               :pharmacode      => migel[:pharmacode],
-              :status          => 'I',
               :stat_date       => '',
               :lang            => lang.capitalize,
               :desc            => migel["desc_#{lang}".intern],
@@ -147,7 +146,7 @@ module Oddb2xml
             else
               entry = {
                         :desc            => info[:description],
-                        :status          => 'A', # for ZurRose 'A' means aktive, aka available in trade
+                        :status          => info[:status] == '3' ? 'I' : 'A', # from ZurRose, we got 1,2 or 3 means aktive, aka available in trade
                         :atc_code        => '',
                         :ean             => ean13,
                         :lang            => lang.capitalize,
@@ -605,9 +604,9 @@ module Oddb2xml
               if no8
                 ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
               end
-              price = nil
+              info_zur_rose = nil
               if !@infos_zur_rose.empty? && ean && @infos_zur_rose[ean]
-                price = @infos_zur_rose[ean] # zurrose
+                info_zur_rose = @infos_zur_rose[ean] # zurrose
               end
               xml.ART('DT' => '') {
                 xml.REF_DATA (de_idx[:refdata] || @migel[pharma_code]) ? '1' : '0'
@@ -629,13 +628,11 @@ module Oddb2xml
                 #xml.HOSPCD
                 #xml.CLINCD
                 #xml.ARTTYP
-                if price
-                  xml.VAT price[:vat]
+                if info_zur_rose
+                  xml.VAT info_zur_rose[:vat]
                 end
 
-                if de_idx
-                  xml.SALECD(de_idx[:status].empty? ? 'N' : de_idx[:status]) # XML_OPTIONS
-                end
+                xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
                 if pac and pac[:limitation_points]
                   #xml.INSLIM
                   xml.LIMPTS pac[:limitation_points] unless pac[:limitation_points].empty?
@@ -684,7 +681,7 @@ module Oddb2xml
                 #xml.BAGSL
                 #xml.BAGSLC
                 #xml.LOACD
-                if de_idx[:status] == 'I'
+                if de_idx[:stat_date]
                   xml.OUTSAL de_idx[:stat_date] if de_idx[:stat_date] and not de_idx[:stat_date].empty?
                 end
                 #xml.STTOX
@@ -728,16 +725,16 @@ module Oddb2xml
                     }
                   end
                 end
-                if price
+                if info_zur_rose
                   xml.ARTPRI {
                     xml.VDAT  Time.parse(datetime).strftime("%d.%m.%Y")
                     xml.PTYP  "ZURROSE"
-                    xml.PRICE price[:price]
+                    xml.PRICE info_zur_rose[:price]
                   }
                   xml.ARTPRI {
                     xml.VDAT  Time.parse(datetime).strftime("%d.%m.%Y")
                     xml.PTYP  "ZURROSEPUB"
-                    xml.PRICE price[:pub_price]
+                    xml.PRICE info_zur_rose[:pub_price]
                   }
                 end
                 #xml.ARTMIG {
@@ -996,71 +993,65 @@ module Oddb2xml
           row = ''
           pack_info = nil
           # Oddb2tdat.parse
-          if idx[:status] =~ /A|I/
-            pac,no8 = nil,nil
-            if obj[:seq] and obj[:seq][:packages]
-              pac = obj[:seq][:packages][idx[:pharmacode]]
-              pac = obj[:seq][:packages][ean] unless pac
-            else
-              pac = @items[ean][:packages][ean] if @items and @items[ean] and @items[ean][:packages]
-            end
-             # :swissmedic_numbers
-            if pac
-              no8 = pac[:swissmedic_number8].intern
-              pack_info = @packs[no8.intern] if no8
-            end
-            if pac and pac[:prices] == nil and no8
-              ppac = ((ppac = pack_info and ppac[:is_tier]) ? ppac : nil)
-              pac = ppac if ppac
-            end
-            row << "%#{DAT_LEN[:RECA]}s"  % '11'
-            row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = idx[:pharmacode] and phar.size > 3) # does not check expiration_date
-                                              idx[:status] == 'I' ? '3' : '1'
-                                            else
-                                              '3'
-                                            end
-            row << "%0#{DAT_LEN[:PHAR]}d" % idx[:pharmacode].to_i
-            abez = ( # de name
-              idx[:desc].to_s + " " +
-              (pac ? pac[:name_de].to_s : '') +
-              (idx[:additional_desc] ? idx[:additional_desc] : '')
-            ).gsub(/"/, '')
-            row << format_name(abez)
-            row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))
-            row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
-            row << "%#{DAT_LEN[:CKZL]}s"  % if (@lppvs[ean])
-                                              '2'
-                                            elsif pac # sl_entry
-                                              '1'
-                                            else
-                                              '3'
-                                            end
-            row << "%#{DAT_LEN[:CLAG]}s"  % if ((no8 && no8.to_s =~ /(\d{5})(\d{3})/) and
-                                                @fridges.include?($1.to_s))
-                                              '1'
-                                            else
-                                              '0'
-                                            end
-            row << "%#{DAT_LEN[:CBGG]}s"  % if ((pac && pac[:narcosis_flag] == 'Y') or # BAGXml
-                                                (@flags[ean]))                   # ywesee BM_update
-                                              '3'
-                                            else
-                                              '0'
-                                            end
-            row << "%#{DAT_LEN[:CIKS]}s"  % if (no8 && pack_info && !pack_info[:is_tier]) # Packungen.xls
-                                              pack_info[:swissmedic_category]
-                                            else
-                                              '0'
-                                            end.gsub(/(\+|\s)/, '')
-            row << "%0#{DAT_LEN[:ITHE]}d" % if (no8 && pack_info && !pack_info[:is_tier])
-                                              format_date(pack_info[:ith_swissmedic])
-                                            else
-                                              ('0' * DAT_LEN[:ITHE])
-                                            end.to_i
-            row << "%0#{DAT_LEN[:CEAN]}d" % (ean.match(/^000000/) ? 0 : ean.to_i)
-            row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
-            rows << row
+          pac,no8 = nil,nil
+          if obj[:seq] and obj[:seq][:packages]
+            pac = obj[:seq][:packages][idx[:pharmacode]]
+            pac = obj[:seq][:packages][ean] unless pac
+          else
+            pac = @items[ean][:packages][ean] if @items and @items[ean] and @items[ean][:packages]
           end
+            # :swissmedic_numbers
+          if pac
+            no8 = pac[:swissmedic_number8].intern
+            pack_info = @packs[no8.intern] if no8
+          end
+          if pac and pac[:prices] == nil and no8
+            ppac = ((ppac = pack_info and ppac[:is_tier]) ? ppac : nil)
+            pac = ppac if ppac
+          end
+          row << "%#{DAT_LEN[:RECA]}s"  % '11'
+          row << "%#{DAT_LEN[:CMUT]}s"  % idx[:cmut]
+          row << "%0#{DAT_LEN[:PHAR]}d" % idx[:pharmacode].to_i
+          abez = ( # de name
+            idx[:desc].to_s + " " +
+            (pac ? pac[:name_de].to_s : '') +
+            (idx[:additional_desc] ? idx[:additional_desc] : '')
+          ).gsub(/"/, '')
+          row << format_name(abez)
+          row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))
+          row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
+          row << "%#{DAT_LEN[:CKZL]}s"  % if (@lppvs[ean])
+                                            '2'
+                                          elsif pac # sl_entry
+                                            '1'
+                                          else
+                                            '3'
+                                          end
+          row << "%#{DAT_LEN[:CLAG]}s"  % if ((no8 && no8.to_s =~ /(\d{5})(\d{3})/) and
+                                              @fridges.include?($1.to_s))
+                                            '1'
+                                          else
+                                            '0'
+                                          end
+          row << "%#{DAT_LEN[:CBGG]}s"  % if ((pac && pac[:narcosis_flag] == 'Y') or # BAGXml
+                                              (@flags[ean]))                   # ywesee BM_update
+                                            '3'
+                                          else
+                                            '0'
+                                          end
+          row << "%#{DAT_LEN[:CIKS]}s"  % if (no8 && pack_info && !pack_info[:is_tier]) # Packungen.xls
+                                            pack_info[:swissmedic_category]
+                                          else
+                                            '0'
+                                          end.gsub(/(\+|\s)/, '')
+          row << "%0#{DAT_LEN[:ITHE]}d" % if (no8 && pack_info && !pack_info[:is_tier])
+                                            format_date(pack_info[:ith_swissmedic])
+                                          else
+                                            ('0' * DAT_LEN[:ITHE])
+                                          end.to_i
+          row << "%0#{DAT_LEN[:CEAN]}d" % (ean.match(/^000000/) ? 0 : ean.to_i)
+          row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
+          rows << row
         end
       end
       rows.join("\n")
