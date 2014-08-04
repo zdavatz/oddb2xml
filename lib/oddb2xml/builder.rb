@@ -1010,7 +1010,12 @@ module Oddb2xml
             pac = ppac if ppac
           end
           row << "%#{DAT_LEN[:RECA]}s"  % '11'
-          row << "%#{DAT_LEN[:CMUT]}s"  % idx[:cmut]
+          info_zur_rose = @infos_zur_rose[ean] # zurrose
+          if info_zur_rose && info_zur_rose[:cmut]
+            row << info_zur_rose[:cmut]
+          else
+            row << '1'
+          end
           row << "%0#{DAT_LEN[:PHAR]}d" % idx[:pharmacode].to_i
           abez = ( # de name
             idx[:desc].to_s + " " +

@@ -29,11 +29,10 @@ def check_validation_via_xsd
     xsd.validate(doc).each do |error|  error.message.should be_nil  end
   }
 end
-
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 70
-  NrPharmaAndNonPharmaArticles = 61
-  NrPharmaArticles = 4
+  NrExtendedArticles = 71
+  NrPharmaAndNonPharmaArticles = 62
+  NrPharmaArticles = 5
   include ServerMockHelper
   before(:each) do
     @savedDir = Dir.pwd
@@ -119,6 +118,28 @@ describe Oddb2xml::Builder do
     end
   end
 
+  context 'when -f dat is given' do
+    let(:cli) do
+      opts = {
+        :format       => :dat,
+      }
+      Oddb2xml::Cli.new(opts)
+    end
+
+    it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
+      puts Oddb2xml::WorkDir
+      res = buildr_capture(:stdout){ cli.run }
+      res.should match(/products/)
+      dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
+      File.exists?(dat_filename).should be_true
+      oddb_dat = IO.read(dat_filename)
+      oddb_dat.should match(/^..2/), "should have a record with '2' in CMUT field"
+      oddb_dat.should match(/^..3/), "should have a record with '3' in CMUT field"
+      oddb_dat.should match(/1115819012LEVETIRACETAM DESITIN Filmtabl 250 mg 30 Stk/), "should have Desitin"
+      # oddb_dat.should match(/^..1/), "should have a record with '1' in CMUT field" # we have no
+    end
+  end
+
   context 'when -a nonpharma -f dat is given' do
     let(:cli) do
       opts = {
@@ -137,8 +158,17 @@ describe Oddb2xml::Builder do
       oddb_dat.should match(/1115819012LEVETIRACETAM DESITIN Filmtabl 250 mg 30 Stk/), "should have Desitin"
       # oddb_dat.should match(/001349002780100B010710076806206900842/), "should match EAN of Desitin"
     end
-    it "pending should match EAN of Desitin. returns 0 at the moment" 
+
+    it "should match EAN of Desitin. returns 0 at the moment" do
+      res = buildr_capture(:stdout){ cli.run }
+      res.should match(/products/)
+      dat_filename = File.join(Oddb2xml::WorkDir, 'oddb_with_migel.dat')
+      File.exists?(dat_filename).should be_true
+      oddb_dat = IO.read(dat_filename)
+      oddb_dat.should match(/76806206900842/), "should match EAN of Desitin"
+    end
   end
+
   context 'when option -e is given' do
     let(:cli) do
       opts = {
@@ -312,9 +342,32 @@ describe Oddb2xml::Builder do
         product_xml.should_not match(/ZYVOXID/i)
       end
       doc = REXML::Document.new File.new(product_filename)
-      XPath.match( doc, "//PRD" ).find_all{|x| true}.size.should == 3
-      XPath.match( doc, "//GTIN" ).find_all{|x| true}.size.should == 3
+      XPath.match( doc, "//PRD" ).find_all{|x| true}.size.should == 4
+      XPath.match( doc, "//GTIN" ).find_all{|x| true}.size.should == 4
       XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should == 1
+    end
+
+    def checkItemForSALECD(doc, pharmacode, expected)
+      article = XPath.match( doc, "//ART[PHAR=#{pharmacode.to_s}]").first
+      name    =  article.elements['DSCRD'].text
+      salecd  =  article.elements['SALECD'].text
+      if $VERBOSE or article.elements['SALECD'].text != expected.to_s
+        puts "checking doc for pharmacode #{pharmacode} expected #{expected} == #{salecd}. #{name}"
+        puts article.text
+      end
+      article.elements['SALECD'].text.should == expected.to_s
+    end
+    it 'should generate the flag SALECD' do
+      res = buildr_capture(:stdout){ cli.run }
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      puts @article_xml
+      File.exists?(@article_xml).should be_true
+      FileUtils.cp(@article_xml, '/opt/src/oddb2xml/tst.xml', :verbose => true)
+      article_xml = IO.read(@article_xml)
+      doc = REXML::Document.new File.new(@article_xml)
+      XPath.match( doc, "//REF_DATA" ).size.should > 0
+      checkItemForSALECD(doc, "0020244", 'A') # FERRO-GRADUMET Depottabl 30 Stk
+      checkItemForSALECD(doc, "0598003", 'I') # SOFRADEX
     end
   end
 end

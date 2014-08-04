@@ -17,7 +17,7 @@ describe Oddb2xml::BagXmlExtractor do
       dat = File.read(File.join(Oddb2xml::SpecData, 'Preparations.xml'))
       Oddb2xml::BagXmlExtractor.new(dat).to_hash
     end
-    it { 
+    it "should handle pub_price for 1699947 correctly" do
       @items = subject.to_hash
       with_pharma = @items['1699947']
       expect(with_pharma).not_to be_nil
@@ -27,6 +27,9 @@ describe Oddb2xml::BagXmlExtractor do
       expect(with_pharma[:packages].first[0]).to eq('1699947')
       expect(with_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('205.3')
       expect(@items.size).to eq(5)
+    end
+    it "should handle pub_price for 7680620690084 correctly" do
+      @items = subject.to_hash
       no_pharma = @items['7680620690084']
       expect(no_pharma).not_to be_nil
       expect(no_pharma[:atc_code]).not_to be_nil
@@ -34,7 +37,7 @@ describe Oddb2xml::BagXmlExtractor do
       expect(no_pharma[:packages].size).to eq(1)
       expect(no_pharma[:packages].first[0]).to eq('7680620690084')
       expect(no_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('27.8')
-    }
+    end
   end
 end
 
@@ -172,14 +175,16 @@ describe Oddb2xml::ZurroseExtractor do
     it { expect(subject.to_hash.values.first[:price]).to eq("15.76") }
     it { expect(subject.to_hash.values.first[:pub_price]).to eq("24.30") }
     it { expect(subject.to_hash.values.first[:pharmacode]).to eq("0020652") }
-    
+    it 'should set the correct SALECD cmut code' do expect(subject.to_hash.values.first[:cmut]).to eq("2")  end
   end
-  
-  x =%(
-  Record-Art 1 Länge 97
-    :vat   => $2.to_s,
-    :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
-    :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
-    =
-    )
+  context 'when SOFRADEX is given' do
+    subject do
+      dat = <<-DAT
+1130598003SOFRADEX Gtt Auric 8 ml                           000718001545300B120130076803169501572\r\n
+      DAT
+      Oddb2xml::ZurroseExtractor.new(dat)
+    end
+    #it { expect(subject.to_hash.keys.first).to eq("7680316950157") }
+    it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("3") end
+  end
 end

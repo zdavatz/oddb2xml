@@ -58,9 +58,7 @@ module Oddb2xml
         if @options[:nonpharma]
           threads << download(:migel) # oddb2xml_files
         end
-        if @options[:price] # zurrose
-          threads << download(@options[:price])
-        end
+        threads << download(:zurrose)
         threads << download(:package) # swissmedic
         threads << download(:bm_update) # oddb2xml_files
         threads << download(:lppv) # oddb2xml_files

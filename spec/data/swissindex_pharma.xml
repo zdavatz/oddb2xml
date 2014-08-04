@@ -59,7 +59,21 @@
           <GLN>7601001010604</GLN>
         </COMP>
       </ITEM>
-      <RESULT>
+      <ITEM DT="2013-12-06T00:00:00">
+        <GTIN>7680316950157</GTIN>
+        <PHAR>598003</PHAR>
+        <STATUS>A</STATUS>
+        <STDATE>2012-04-13T00:00:00</STDATE>
+        <LANG>DE</LANG>
+        <DSCR>SOFRADEX Gtt Auric</DSCR>
+        <ADDSCR>8 ml</ADDSCR>
+        <ATC>S02CA06</ATC>
+        <COMP>
+          <NAME>Sanofi-Aventis (Suisse) SA</NAME>
+          <GLN>7601001002340</GLN>
+        </COMP>
+      </ITEM>
+       <RESULT>
         <OK_ERROR>OK</OK_ERROR>
         <NBR_RECORD>2</NBR_RECORD>
       </RESULT>
