@@ -158,6 +158,14 @@
   </xs:element>
   <xs:element name="SALECD">
     <xs:simpleType>
+      <xs:annotation>
+        <xs:documentation xml:lang="de">
+           Bedeutung ist 'A' = Aktiv,'I' = inaktiv == Ausser Handel
+        </xs:documentation>
+        <xs:documentation xml:lang="en">
+           meaning is 'A' = active,'I' = inactive == out of trade
+        </xs:documentation>
+      </xs:annotation>
       <xs:restriction base="xs:string">
         <xs:enumeration value="A" />
         <xs:enumeration value="I" />
