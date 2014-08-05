@@ -127,7 +127,6 @@ describe Oddb2xml::Builder do
     end
 
     it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
-      puts Oddb2xml::WorkDir
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
@@ -193,9 +192,8 @@ describe Oddb2xml::Builder do
     it 'should generate the flag non-refdata' do
       res = buildr_capture(:stdout){ cli.run }
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      puts @article_xml
       File.exists?(@article_xml).should be_true
-      FileUtils.cp(@article_xml, '/opt/src/oddb2xml/tst.xml', :verbose => true)
+      FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-non-refdata.xml'))
       article_xml = IO.read(@article_xml)
       doc = REXML::Document.new File.new(@article_xml)
       XPath.match( doc, "//REF_DATA" ).size.should > 0
@@ -360,9 +358,8 @@ describe Oddb2xml::Builder do
     it 'should generate the flag SALECD' do
       res = buildr_capture(:stdout){ cli.run }
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      puts @article_xml
       File.exists?(@article_xml).should be_true
-      FileUtils.cp(@article_xml, '/opt/src/oddb2xml/tst.xml', :verbose => true)
+      FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-SALECD.xml'))
       article_xml = IO.read(@article_xml)
       doc = REXML::Document.new File.new(@article_xml)
       XPath.match( doc, "//REF_DATA" ).size.should > 0
