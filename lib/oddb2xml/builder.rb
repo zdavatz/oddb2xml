@@ -632,7 +632,8 @@ module Oddb2xml
                   xml.VAT info_zur_rose[:vat]
                 end
 
-                xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
+                nincd = detect_nincd(de_idx)
+                (nincd and nincd == 13) ? xml.SALECD('A') : xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
                 if pac and pac[:limitation_points]
                   #xml.INSLIM
                   xml.LIMPTS pac[:limitation_points] unless pac[:limitation_points].empty?
@@ -750,7 +751,7 @@ module Oddb2xml
                 #xml.ARTLIM {
                 #  xml.LIMCD
                 #}
-                if nincd = detect_nincd(de_idx)
+                if nincd
                   xml.ARTINS {
                     #xml.VDAT
                     #xml.INCD

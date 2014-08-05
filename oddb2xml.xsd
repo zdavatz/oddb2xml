@@ -265,6 +265,11 @@
   </xs:element>
   <xs:element name="NINCD">
     <xs:simpleType>
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+          possible values are 10 => BAG-XML (SL/LS), 13 -> MiGel, 20 => (LPPV) Limitation, empty => NonPharma)
+        </xs:documentation>
+      </xs:annotation>
       <xs:restriction base="xs:byte">
         <xs:enumeration value="10" />
         <xs:enumeration value="20" />

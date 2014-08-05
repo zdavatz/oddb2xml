@@ -71,34 +71,33 @@ module ServerMockHelper
         :headers => {'Content-Type' => 'application/zip; charset=utf-8'},
         :body    => stub_response)
   end
-  def setup_swiss_index_server_mock(types =  ['Pharma', 'NonPharma'])
+  def setup_swiss_index_server_mock(types =['NonPharma', 'Pharma'], languages=['DE', 'FR'])
     types.each do |type|
-      # wsdl
-      stub_wsdl_url = "https://index.ws.e-mediat.net/Swissindex/#{type}/ws_#{type}_V101.asmx?WSDL"
-      stub_response = File.read(File.join(Oddb2xml::SpecData, "wsdl_#{type.downcase}.xml"))
-      stub_request(:get, stub_wsdl_url).
-        with(:headers => {
-          'Accept' => '*/*',
-          #'Host'   => 'ws.e-mediat.net'
-        }).
-        to_return(
-          :status  => 200,
-          :headers => {'Content-Type' => 'text/xml; charset=utf-8'},
-          :body    => stub_response)
-      # soap (dummy)
-      stub_soap_url = 'https://example.com/test'
-      stub_response = File.read(File.join(Oddb2xml::SpecData, "swissindex_#{type.downcase}.xml"))
-      stub_request(:post, stub_soap_url).
-        with(:headers => {
-          'Accept' => '*/*',
-          #'Host'   => 'example.com'
-        }).
-        to_return(
-          :status  => 200,
-          :headers => {'Content-Type' => 'text/xml; chaprset=utf-8'},
-          :body    => stub_response)
+      languages.each do |language|
+        # wsdl
+        stub_wsdl_url = "https://index.ws.e-mediat.net/Swissindex/#{type}/ws_#{type}_V101.asmx?WSDL"
+        first_file = File.join(Oddb2xml::SpecData, "wsdl_#{type.downcase}.xml")
+        stub_response_wsdl = File.read(File.join(Oddb2xml::SpecData, "wsdl_#{type.downcase}.xml"))
+        stub_request(:get, stub_wsdl_url).
+          with(:headers => {
+            'Accept' => '*/*',
+          }).
+          to_return(
+            :status  => 200,
+            :headers => {'Content-Type' => 'text/xml; charset=utf-8'},
+            :body    => stub_response_wsdl)
+        # soap (dummy)
+        stub_soap_url = 'https://example.com/test'
+        stub_file = File.join(Oddb2xml::SpecData, "swissindex_#{type}_#{language}.xml")
+        stub_response = File.read(stub_file)
+        stub_request(:post, "https://example.com/test").
+          with(:body => "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n<soap:Body>\n  <lang xmlns=\"http://swissindex.e-mediat.net/Swissindex#{type}_out_V101\">#{language}</lang>\n</soap:Body>\n</soap:Envelope>\n",
+                :headers => {'Accept'=>'*/*', 'Content-Type'=>'text/xml;charset=UTF-8', 'Soapaction'=>'"http://example.com/DownloadAll"', 'User-Agent'=>'Ruby'}).
+          to_return(:status => 200, :body => stub_response, :headers => {})
+      end
     end
   end
+
   def setup_swissmedic_server_mock
     host = 'www.swissmedic.ch'
     {    

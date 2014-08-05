@@ -25,25 +25,26 @@ def check_validation_via_xsd
   xsd = Nokogiri::XML::Schema(File.read(@oddb2xml_xsd))                                        
   files.each{
     |file|
-    doc = Nokogiri::XML(File.read(@article_xml))
+    $stderr.puts "Validating file #{file} with #{File.size(file)} bytes" if $VERBOSE
+    doc = Nokogiri::XML(File.read(file))
     xsd.validate(doc).each do |error|  error.message.should be_nil  end
   }
 end
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 71
-  NrPharmaAndNonPharmaArticles = 62
+  NrExtendedArticles = 73
+  NrPharmaAndNonPharmaArticles = 60
   NrPharmaArticles = 5
   include ServerMockHelper
   before(:each) do
     @savedDir = Dir.pwd
     cleanup_directories_before_run
     setup_server_mocks
-    setup_swiss_index_server_mock(types =  ['NonPharma', 'Pharma'])
     Dir.chdir Oddb2xml::WorkDir
   end
   after(:each) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
+
   context 'XSD-generation: ' do
     let(:cli) do
         opts = {}
@@ -53,7 +54,7 @@ describe Oddb2xml::Builder do
         Oddb2xml::Cli.new(opts)
     end
 
-    it 'should return true when validating oddb_article.xml against oddb_article.xsd' do
+    it 'should return true when validating xml against oddb2xml.xsd' do
       res = buildr_capture(:stdout){ cli.run }
       File.exists?(@article_xml).should be_true
       File.exists?(@product_xml).should be_true
@@ -187,6 +188,7 @@ describe Oddb2xml::Builder do
       smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
       puts "checking doc for pharmacode #{pharmacode} isRefdata #{isRefdata} == #{refdata}. SMNO: #{smno} #{name}" if $VERBOSE
       article.elements['REF_DATA'].text.should == isRefdata.to_s
+
     end
 
     it 'should generate the flag non-refdata' do
@@ -201,6 +203,16 @@ describe Oddb2xml::Builder do
       checkItemForRefdata(doc, "0028470", 0) # Complamin
       checkItemForRefdata(doc, "3036984", 1) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
       checkItemForRefdata(doc, "5366964", 1) # 1-DAY ACUVUE moist jour
+    end
+
+    it 'should generate SALECD A for migel (NINCD 13)' do
+      res = buildr_capture(:stdout){ cli.run }
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      doc = REXML::Document.new File.new(@article_xml)
+      article = XPath.match( doc, "//ART[ARTINS/NINCD=13]").first
+      article = XPath.match( doc, "//ART[PHAR=5366964]").first
+      article.elements['SALECD'].text.should == 'A'
+      article.elements['ARTINS/NINCD'].text.should == '13'
     end
 
     it 'should pass validating via oddb2xml.xsd' do
