@@ -6,7 +6,7 @@ before_install:
   - gem update --system 2.1.11
   - gem --version
 
-script: bundle exec rake test
+script: bundle exec rspec
 
 rvm:
   - 1.9.3
