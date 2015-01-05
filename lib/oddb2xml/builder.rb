@@ -1,6 +1,12 @@
 # encoding: utf-8
 
 require 'nokogiri'
+class Numeric
+  # round a given number to the nearest step
+  def round_by(increment)
+    (self / increment).round * increment
+  end
+end
 module Nokogiri
   module XML
     class Document < Nokogiri::XML::Node
@@ -735,7 +741,12 @@ module Oddb2xml
                   xml.ARTPRI {
                     xml.VDAT  Time.parse(datetime).strftime("%d.%m.%Y")
                     xml.PTYP  "ZURROSEPUB"
-                    xml.PRICE info_zur_rose[:pub_price]
+                    price = info_zur_rose[:pub_price]
+                    if @options[:percent] != nil
+                      price = (price.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2)
+                    else
+                    end
+                    xml.PRICE price
                   }
                 end
                 #xml.ARTMIG {
@@ -821,8 +832,7 @@ module Oddb2xml
               info_index[info[:monid]] = i
             end
           end
-          @products.group_by{|obj|
-            obj[:no8].to_s[0..4] # swissmedic_number5
+          @products.group_by{|obj| obj[:ean] 
           }.each_pair do |monid, products|
             if info_index[monid]
               xml.KP('DT' => '') {

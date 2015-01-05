@@ -49,6 +49,7 @@ prepare_for_gem_test
 # unfortunately it returns a very common name
 unless 'localhost.localdomain'.eql?(Socket.gethostbyname(Socket.gethostname).first)
   test_one_call('oddb2xml -e')
+  test_one_call('oddb2xml -e80')
   test_one_call('oddb2xml -f dat -a nonpharma')
   test_one_call('oddb2xml -a nonpharma')
 end

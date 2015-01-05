@@ -44,6 +44,7 @@ describe Oddb2xml::Builder do
   after(:each) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
+if false
   context 'XSD-generation: ' do
     let(:cli) do
         opts = {}
@@ -377,5 +378,69 @@ describe Oddb2xml::Builder do
       checkItemForSALECD(doc, "0598003", 'I') # SOFRADEX
     end
   end
+end
+  context 'testing -e option' do
+    let(:cli) do
+      opts = {
+        :extended    => :true,
+        :skip_download => true,
+      }
+      Oddb2xml::Cli.new(opts)
+    end
 
+		let(:cli_e80) do
+      opts = {
+        :extended    => :true,
+        :percent     => 80,
+        :skip_download => true,
+      }
+      Oddb2xml::Cli.new(opts)
+    end
+    search_path_rose = "//ART[PHAR=0023722]/ARTPRI[PTYP='ZURROSE']/PRICE"
+    search_path_pub  = "//ART[PHAR=0023722]/ARTPRI[PTYP='ZURROSEPUB']/PRICE"
+    # sl-entries have a PPUB price
+    search_path_desitin  = "//ART[SMNO='62069008']/ARTPRI[PTYP='PPUB']/PRICE"
+
+    it 'should should return the ZurRose prive if -e' do
+      res = buildr_capture(:stdout){ cli.run }
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should eq true
+      FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-e.xml'))
+      article_xml = IO.read(@article_xml)
+      doc = REXML::Document.new File.new(@article_xml)
+      XPath.match( doc, "//REF_DATA" ).size.should > 0
+      article = XPath.match( doc, "//ART[PHAR=0023722]").first
+      name =  article.elements['DSCRD'].text
+      refdata =  article.elements['REF_DATA'].text
+      smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
+      XPath.match( doc, search_path_rose).size.should eq 1
+      XPath.match( doc, search_path_rose).first.text.should eq '9.85'
+      price = 15.20 # This is the zurrose pub price.
+      XPath.match( doc, search_path_pub).first.text.to_f.should eq price
+      XPath.match( doc, search_path_desitin).first.text.should eq '27.8'
+    end
+
+    it 'should add 80 percent to zur_rose pubbprice if -e 80' do
+      res = buildr_capture(:stdout){ cli_e80.run }
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should eq true
+      FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-e80.xml'))
+      article_xml = IO.read(@article_xml)
+      doc = REXML::Document.new File.new(@article_xml)
+      article = XPath.match( doc, "//ART[PHAR=0023722]").first
+      name =  article.elements['DSCRD'].text
+      refdata =  article.elements['REF_DATA'].text
+      smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
+      XPath.match( doc, search_path_rose).size.should eq 1
+      XPath.match( doc, search_path_rose).first.text.should eq '9.85'
+      price = 15.20 # This is the zurrose pub price.
+      price2 = (price*1.8).round_by(0.05).round(2) # Our price should be now 80% higher
+      XPath.match( doc, search_path_pub).first.text
+      XPath.match( doc, search_path_pub).first.text.to_f.should eq price2
+      XPath.match( doc, search_path_desitin).first.text.should eq '27.8'
+      # sl-entries have a PPUB price, but no ZURROSEPUB, and vice versa
+      XPath.match( doc, "//ART[PHAR=0023722]/ARTPRI[PTYP='PPUB']").size.should eq 0
+      XPath.match( doc, "//ART[SMNO='62069008']/ARTPRI[PTYP='ZURROSEPUB']").size.should eq 0
+    end
+  end
 end

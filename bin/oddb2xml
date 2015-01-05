@@ -48,13 +48,15 @@ opts = {
   :ean14        => false,
   :skip_download=> false,
   :log          => false,
+  :percent      => 0,
   }
 
 parser.on('-a v', '--append v',     /^nonpharma$/)  {|v| opts[:nonpharma] = true }
 parser.on('-c v', '--compress v',   /^tar\.gz|zip$/){|v| opts[:compress_ext] = v }
-parser.on('-e',   '--extended')                     {|v| opts[:extended] = true
-                                                     opts[:nonpharma] = :true
+parser.on('-e [x]', '--extended [x]')               {|v| opts[:extended] = true
+                                                    opts[:nonpharma] = :true
                                                     opts[:price] = :zurrose
+                                                    opts[:percent] = v ? v.to_i : 0
                                                     }
 parser.on('-f v', '--format v',     /^xml|dat$/)    {|v| opts[:format] = v.intern }
 parser.on('-o v', '--option v',     /^fi$/)         {|v| opts[:fi] = true }
