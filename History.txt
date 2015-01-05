@@ -1,3 +1,7 @@
+=== 1.8.9 / upcoming
+
+* Added option -e x to add x percent to public prices for non-SL items
+
 === 1.8.8 / 04.12.2014
 
 * Updated spreadsheet-1.0.0 and rubyXL-3.3.1 dependencies.
