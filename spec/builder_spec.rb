@@ -20,7 +20,7 @@ end
 
 def check_validation_via_xsd
   @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
-  File.exists?(@oddb2xml_xsd).should be_true
+  File.exists?(@oddb2xml_xsd).should eq true
   files = Dir.glob('*.xml')
   xsd = Nokogiri::XML::Schema(File.read(@oddb2xml_xsd))                                        
   files.each{
@@ -44,7 +44,6 @@ describe Oddb2xml::Builder do
   after(:each) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
-
   context 'XSD-generation: ' do
     let(:cli) do
         opts = {}
@@ -56,8 +55,8 @@ describe Oddb2xml::Builder do
 
     it 'should return true when validating xml against oddb2xml.xsd' do
       res = buildr_capture(:stdout){ cli.run }
-      File.exists?(@article_xml).should be_true
-      File.exists?(@product_xml).should be_true
+      File.exists?(@article_xml).should eq true
+      File.exists?(@product_xml).should eq true
       check_validation_via_xsd
     end
   end
@@ -86,10 +85,10 @@ describe Oddb2xml::Builder do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(@article_xml).should be_true
+      File.exists?(@article_xml).should eq true
       article_xml = IO.read(@article_xml)
       product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
-      File.exists?(product_filename).should be_true
+      File.exists?(product_filename).should eq true
       unless /1\.8\.7/.match(RUBY_VERSION)
         product_xml = IO.read(product_filename)
         article_xml.should match(/3TC/)
@@ -131,7 +130,7 @@ describe Oddb2xml::Builder do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
-      File.exists?(dat_filename).should be_true
+      File.exists?(dat_filename).should eq true
       oddb_dat = IO.read(dat_filename)
       oddb_dat.should match(/^..2/), "should have a record with '2' in CMUT field"
       oddb_dat.should match(/^..3/), "should have a record with '3' in CMUT field"
@@ -153,7 +152,7 @@ describe Oddb2xml::Builder do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb_with_migel.dat')
-      File.exists?(dat_filename).should be_true
+      File.exists?(dat_filename).should eq true
       oddb_dat = IO.read(dat_filename)
       oddb_dat.should match(/1115819012LEVETIRACETAM DESITIN Filmtabl 250 mg 30 Stk/), "should have Desitin"
       # oddb_dat.should match(/001349002780100B010710076806206900842/), "should match EAN of Desitin"
@@ -163,12 +162,11 @@ describe Oddb2xml::Builder do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb_with_migel.dat')
-      File.exists?(dat_filename).should be_true
+      File.exists?(dat_filename).should eq true
       oddb_dat = IO.read(dat_filename)
       oddb_dat.should match(/76806206900842/), "should match EAN of Desitin"
     end
   end
-
   context 'when option -e is given' do
     let(:cli) do
       opts = {
@@ -194,7 +192,7 @@ describe Oddb2xml::Builder do
     it 'should generate the flag non-refdata' do
       res = buildr_capture(:stdout){ cli.run }
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(@article_xml).should be_true
+      File.exists?(@article_xml).should eq true
       FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-non-refdata.xml'))
       article_xml = IO.read(@article_xml)
       doc = REXML::Document.new File.new(@article_xml)
@@ -224,7 +222,7 @@ describe Oddb2xml::Builder do
       res.should match(/NonPharma/i)
       res.should match(/NonPharma products: #{NrPharmaAndNonPharmaArticles}/)
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(@article_xml).should be_true
+      File.exists?(@article_xml).should eq true
       article_xml = IO.read(@article_xml)
       doc = REXML::Document.new File.new(@article_xml)
       dscrds = XPath.match( doc, "//ART" )
@@ -237,7 +235,7 @@ describe Oddb2xml::Builder do
       res.should match(/NonPharma/i)
       res.should match(/NonPharma products: #{NrPharmaAndNonPharmaArticles}/)
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(@article_xml).should be_true
+      File.exists?(@article_xml).should eq true
       article_xml = IO.read(@article_xml)
       doc = REXML::Document.new File.new(@article_xml)
       dscrds = XPath.match( doc, "//ART" )
@@ -252,7 +250,7 @@ describe Oddb2xml::Builder do
       res.should match(/NonPharma/i)
       res.should match(/NonPharma products: #{NrPharmaAndNonPharmaArticles}/)
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(@article_xml).should be_true
+      File.exists?(@article_xml).should eq true
       article_xml = IO.read(@article_xml)
       doc = REXML::Document.new File.new(@article_xml)
       dscrds = XPath.match( doc, "//ART" )
@@ -266,7 +264,7 @@ describe Oddb2xml::Builder do
       res = buildr_capture(:stdout){ cli.run }
       # check limitations
       limitation_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_limitation.xml'))
-      File.exists?(limitation_filename).should be_true
+      File.exists?(limitation_filename).should eq true
       limitation_xml = IO.read(limitation_filename)
       limitation_xml.should match(/Die aufgeführten Präparat/)
       doc = REXML::Document.new File.new(limitation_filename)
@@ -281,7 +279,7 @@ describe Oddb2xml::Builder do
     it 'should emit a correct oddb_article.xml' do
       res = buildr_capture(:stdout){ cli.run }
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(@article_xml).should be_true
+      File.exists?(@article_xml).should eq true
       article_xml = IO.read(@article_xml)
       doc = REXML::Document.new File.new(@article_xml)
       unless /1\.8\.7/.match(RUBY_VERSION)
@@ -338,7 +336,7 @@ describe Oddb2xml::Builder do
       res = buildr_capture(:stdout){ cli.run }
       res.should match(/products/)
       product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
-      File.exists?(product_filename).should be_true
+      File.exists?(product_filename).should eq true
 
       unless /1\.8\.7/.match(RUBY_VERSION)
         # check articles
@@ -370,7 +368,7 @@ describe Oddb2xml::Builder do
     it 'should generate the flag SALECD' do
       res = buildr_capture(:stdout){ cli.run }
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(@article_xml).should be_true
+      File.exists?(@article_xml).should eq true
       FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-SALECD.xml'))
       article_xml = IO.read(@article_xml)
       doc = REXML::Document.new File.new(@article_xml)
@@ -379,4 +377,5 @@ describe Oddb2xml::Builder do
       checkItemForSALECD(doc, "0598003", 'I') # SOFRADEX
     end
   end
+
 end

@@ -74,7 +74,7 @@ describe Oddb2xml::Cli do
     it 'should create tar.gz file' do
       cli_capture(:stdout) { cli.run }.should match(/Pharma/)
       file = Dir.glob(File.join(Dir.pwd, 'oddb_*.tar.gz')).first
-      File.exists?(file).should be_true
+      File.exists?(file).should eq true
     end
     it 'should not create any xml file' do
       cli_capture(:stdout) { cli.run }.should match(/Pharma/)
@@ -101,7 +101,7 @@ describe Oddb2xml::Cli do
     it 'should create zip file' do
       cli_capture(:stdout) { cli.run }.should match(/Pharma/)
       file = Dir.glob(File.join(Dir.pwd, 'oddb_*.zip')).first
-      File.exists?(file).should be_true
+      File.exists?(file).should eq true
     end
     it 'should not create any xml file' do
       Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file| FileUtil.rm_f(file) end
@@ -142,7 +142,7 @@ describe Oddb2xml::Cli do
         'oddb_code.xml'
       ].length
       Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
-        File.exists?(file).should be_true
+        File.exists?(file).should eq true
       end.to_a.length.should equal expected
     end
   end
@@ -177,7 +177,7 @@ describe Oddb2xml::Cli do
         'swiss_code.xml'
       ].length
       Dir.glob(File.join(Oddb2xml::WorkDir, 'swiss_*.xml')).each do |file|
-        File.exists?(file).should be_true
+        File.exists?(file).should eq true
       end.to_a.length.should equal expected
     end
   end
@@ -214,7 +214,7 @@ describe Oddb2xml::Cli do
         'oddb_code.xml'
       ].length
       Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
-        File.exists?(file).should be_true
+        File.exists?(file).should eq true
       end.to_a.length.should equal expected
     end
   end
@@ -245,7 +245,7 @@ describe Oddb2xml::Cli do
         'oddb_medizinalperson.xml',
       ].length
       Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
-        File.exists?(file).should be_true
+        File.exists?(file).should eq true
       end.to_a.length.should equal expected
     end
   end
