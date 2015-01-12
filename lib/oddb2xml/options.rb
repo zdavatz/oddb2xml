@@ -33,6 +33,7 @@ Usage:
     -e    --extended     pharma, non-pharma plus prices and non-pharma from zurrose. Products without EAN-Code will also be listed.
     -f F, --format=F     File format F, default is xml. {xml|dat}
                          If F is given, -o option is ignored.
+    -I x, --increment=x  Increment price by x percent. Forces -f dat -p zurrose.
     -i I, --include=I    Include target option for 'dat' format. only 'ean14' is available.
                          'xml' format includes always ean14 records.
     -o O, --option=O     Optional output. O, only 'fi' is available.
@@ -60,6 +61,11 @@ EOS
                                                           }
       @parser.on('-f v', '--format v',     /^xml|dat$/)    {|v| @opts[:format] = v.intern }
       @parser.on('-o v', '--option v',     /^fi$/)         {|v| @opts[:fi] = true }
+      @parser.on('-I v', '--increment v',  /^[0-9]+$/)     {|v|
+                                                            @opts[:format]  = :dat
+                                                            @opts[:price]   = :zurrose
+                                                            @opts[:percent] = v ? v.to_i : 0
+                                                           }
       @parser.on('-i v', '--include v',    /^ean14$/)      {|v| @opts[:ean14] = true }
       @parser.on('-t v', '--tag-suffix v', /^[A-z0-9]*$/i) {|v| @opts[:tag_suffix] = v.upcase }
       @parser.on('-x v', '--context v',    /^addr(ess)*$/i){|v| @opts[:address] = true }

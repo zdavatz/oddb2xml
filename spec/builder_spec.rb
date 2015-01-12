@@ -433,4 +433,63 @@ describe Oddb2xml::Builder do
       XPath.match( doc, "//ART[SMNO='62069008']/ARTPRI[PTYP='ZURROSEPUB']").size.should eq 0
     end
   end
+
+  def check_article(line, check_prices = false, add_percents=0)
+    name          = line[10..59]
+    ckzl          = line[72]
+    ciks          = line[75]
+    price_arzt    = line[60..65].to_i
+    price_public  = line[66..71].to_i
+    puts "check_article: #{price_arzt} #{price_public} CKZL is #{ckzl} CIKS is #{ciks} name  #{name} " if $VERBOSE
+    return unless check_prices
+    if /11116999473TC/.match(line)
+      price_arzt.should eq 16455
+      # this is a SL-product. Therefore we may not have a price increase
+      ckzl.should eq '1'
+      price_public.should eq 20530
+    end
+    if /1130598003SOFRADEX/.match(line)
+      price_arzt.should eq 718
+      # this is a non  SL-product. Therefore we must increase its price
+      ckzl.should eq '3'
+      price_public.should eq ((1545.to_f)*(100+add_percents.to_f)/100).to_i
+    end
+  end
+
+  context 'when -f dat -p zurrose is given' do
+    let(:cli) do
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-f dat -p zurrose'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
+    end
+
+    it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
+      res = buildr_capture(:stdout){ cli.run }
+      res.should match(/products/)
+      dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
+      File.exists?(dat_filename).should eq true
+      oddb_dat = IO.read(dat_filename)
+      oddb_dat.should match(/^..2/), "should have a record with '2' in CMUT field"
+      oddb_dat.should match(/^..3/), "should have a record with '3' in CMUT field"
+      oddb_dat.should match(/1115819012LEVETIRACETAM DESITIN Filmtabl 250 mg 30 Stk/), "should have Desitin"
+      # oddb_dat.should match(/^..1/), "should have a record with '1' in CMUT field" # we have no
+    end
+  end
+
+  context 'when -f dat -I 80 is given' do
+    let(:cli) do
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-f dat -I 80'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
+    end
+    it 'should contain the corect prices' do
+      res = buildr_capture(:stdout){ cli.run }
+      res.should match(/products/)
+      dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
+      File.exists?(dat_filename).should eq true
+      oddb_dat = IO.read(dat_filename)
+      oddb_dat_lines = IO.readlines(dat_filename)
+      IO.readlines(dat_filename).each{ |line| check_article(line, true, 80) }
+    end
+  end
 end

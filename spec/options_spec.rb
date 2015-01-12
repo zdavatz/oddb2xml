@@ -106,20 +106,23 @@ describe Oddb2xml::Options do
     specify { expect(options.opts).to eq expected }
   end
 
-  context 'when -f dat -r 80 is given' do
+  context 'when -f dat -I 80 is given' do
     options = Oddb2xml::Options.new
-    options.parser.parse!('-f dat -r 80'.split(' '))
+    options.parser.parse!('-f dat -I 80'.split(' '))
     expected = Default_opts.clone
     expected[:format]  =  :dat
-    expected[:percent]   = 80
+    expected[:percent] = 80
+    expected[:price]   = :zurrose
     specify { expect(options.opts).to eq expected }
   end
 
-  context 'when -r 80 is given' do
+  context 'when -I 80 is given' do
     options = Oddb2xml::Options.new
-    options.parser.parse!('-r 80'.split(' '))
+    options.parser.parse!('-I 80'.split(' '))
     expected = Default_opts.clone
+    expected[:format]  =  :dat
     expected[:percent]   = 80
+    expected[:price]   = :zurrose
     specify { expect(options.opts).to eq expected }
   end
 

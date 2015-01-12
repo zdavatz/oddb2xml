@@ -1033,9 +1033,20 @@ module Oddb2xml
             (pac ? pac[:name_de].to_s : '') +
             (idx[:additional_desc] ? idx[:additional_desc] : '')
           ).gsub(/"/, '')
+          price_doctor = pac ? format_price(pac[:prices][:exf_price][:price]).to_s : nil
+          price_public = pac ? format_price(pac[:prices][:pub_price][:price]).to_s : nil
+          if @infos_zur_rose[ean]
+            price_doctor ||= ((@infos_zur_rose[ean][:price].to_f)*100).to_i     if  @infos_zur_rose[ean][:price]
+            if  @infos_zur_rose[ean][:pub_price]
+              price_public ||= ((@infos_zur_rose[ean][:pub_price].to_f)*100).to_i
+              if @options[:percent] != nil
+                price_public = (price_public.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2)
+              end
+            end
+          end
           row << format_name(abez)
-          row << "%#{DAT_LEN[:PRMO]}s"  % (pac ? format_price(pac[:prices][:exf_price][:price].to_s) : ('0' * DAT_LEN[:PRMO]))
-          row << "%#{DAT_LEN[:PRPU]}s"  % (pac ? format_price(pac[:prices][:pub_price][:price].to_s) : ('0' * DAT_LEN[:PRPU]))
+          row << "%#{DAT_LEN[:PRMO]}s"  % (price_doctor ? price_doctor.to_s : ('0' * DAT_LEN[:PRMO]))
+          row << "%#{DAT_LEN[:PRPU]}s"  % (price_public ? price_public.to_s : ('0' * DAT_LEN[:PRPU]))
           row << "%#{DAT_LEN[:CKZL]}s"  % if (@lppvs[ean])
                                             '2'
                                           elsif pac # sl_entry
