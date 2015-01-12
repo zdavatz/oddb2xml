@@ -1,8 +1,8 @@
-=== 1.8.10 / 12.01.2015
+=== 1.9.0 / 12.01.2015
 
 * Fixed adding prices from ZurRose if -f dat -p zurrose given
-* Added option -I x to add x percent to public prices for non-SL items (dat)
-  Setting -I opton forces the options -f dat and -p zurrose
+* Reorganized switches
+* Added option -I x to add x percent to public prices for non-SL items
 
 === 1.8.9 / 05.01.2015
 
