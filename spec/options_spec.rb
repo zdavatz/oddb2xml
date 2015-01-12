@@ -86,6 +86,18 @@ describe Oddb2xml::Options do
     expected[:price]      = :zurrose
     specify { expect(options.opts).to eq expected }
   end
+
+  context 'when -e 80 is given' do
+    options = Oddb2xml::Options.new
+    options.parser.parse!('-e 80'.split(' '))
+    expected = Default_opts.clone
+    expected[:extended]  =  true
+    expected[:nonpharma] =  true
+    expected[:percent]   = 80
+    expected[:price]      = :zurrose
+    specify { expect(options.opts).to eq expected }
+  end
+
   context 'when -f dat is given' do
     options = Oddb2xml::Options.new
     options.parser.parse!('-f dat'.split(' '))
@@ -93,6 +105,24 @@ describe Oddb2xml::Options do
     expected[:format]  =  :dat
     specify { expect(options.opts).to eq expected }
   end
+
+  context 'when -f dat -r 80 is given' do
+    options = Oddb2xml::Options.new
+    options.parser.parse!('-f dat -r 80'.split(' '))
+    expected = Default_opts.clone
+    expected[:format]  =  :dat
+    expected[:percent]   = 80
+    specify { expect(options.opts).to eq expected }
+  end
+
+  context 'when -r 80 is given' do
+    options = Oddb2xml::Options.new
+    options.parser.parse!('-r 80'.split(' '))
+    expected = Default_opts.clone
+    expected[:percent]   = 80
+    specify { expect(options.opts).to eq expected }
+  end
+
   context 'when -o fi is given' do
     options = Oddb2xml::Options.new
     options.parser.parse!('-o fi'.split(' '))
@@ -100,9 +130,10 @@ describe Oddb2xml::Options do
     expected[:fi]  =  true
     specify { expect(options.opts).to eq expected }
   end
+
   context 'when -i ean14 is given' do
     options = Oddb2xml::Options.new
-    options.parser.parse!('--i ean14'.split(' '))
+    options.parser.parse!('-i ean14'.split(' '))
     expected = Default_opts.clone
     expected[:ean14]  =  true
     specify { expect(options.opts).to eq expected }
@@ -115,6 +146,7 @@ describe Oddb2xml::Options do
     expected[:fi]  =  true
     specify { expect(options.opts).to eq expected }
   end
+
   context 'when -x addr is given' do
     options = Oddb2xml::Options.new
     options.parser.parse!('-x addr'.split(' '))
@@ -122,6 +154,7 @@ describe Oddb2xml::Options do
     expected[:address]  =  true
     specify { expect(options.opts).to eq expected }
   end
+
   context 'when -p zurrose is given' do
     options = Oddb2xml::Options.new
     options.parser.parse!('-p zurrose'.split(' '))
@@ -129,6 +162,7 @@ describe Oddb2xml::Options do
     expected[:price]  =  :zurrose
     specify { expect(options.opts).to eq expected }
   end
+
   context 'when -o fi --log is given' do
     options = Oddb2xml::Options.new
     options.parser.parse!('-o fi --log'.split(' '))

@@ -5,6 +5,7 @@ require 'oddb2xml/builder'
 require 'oddb2xml/downloader'
 require 'oddb2xml/extractor'
 require 'oddb2xml/compressor'
+require 'oddb2xml/options'
 require 'oddb2xml/util'
 require 'rubyXL'
 

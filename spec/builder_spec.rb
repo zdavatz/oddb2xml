@@ -44,14 +44,16 @@ describe Oddb2xml::Builder do
   after(:each) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
-if false
+
   context 'XSD-generation: ' do
     let(:cli) do
         opts = {}
         @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
         @article_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
         @product_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
-        Oddb2xml::Cli.new(opts)
+        options = Oddb2xml::Options.new
+        options.parser.parse!([])
+        Oddb2xml::Cli.new(options.opts)
     end
 
     it 'should return true when validating xml against oddb2xml.xsd' do
@@ -74,8 +76,9 @@ if false
 
   context 'when no option is given' do
     let(:cli) do
-      opts = {}
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!([])
+      Oddb2xml::Cli.new(options.opts)
     end
 
     it 'should pass validating via oddb2xml.xsd' do
@@ -121,10 +124,9 @@ if false
 
   context 'when -f dat is given' do
     let(:cli) do
-      opts = {
-        :format       => :dat,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-f dat'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
 
     it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
@@ -142,11 +144,9 @@ if false
 
   context 'when -a nonpharma -f dat is given' do
     let(:cli) do
-      opts = {
-        :nonpharma    => 'true',
-        :format       => :dat,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-a nonpharma -f dat'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
 
     it 'should generate a valid oddb_with_migel.dat' do
@@ -170,14 +170,9 @@ if false
   end
   context 'when option -e is given' do
     let(:cli) do
-      opts = {
-        :extended    => :true,
-        :nonpharma    => :true,
-        :price      => :zurrose,
-        :log      => true,
-        :skip_download => true,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-e'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
 
     def checkItemForRefdata(doc, pharmacode, isRefdata)
@@ -378,23 +373,18 @@ if false
       checkItemForSALECD(doc, "0598003", 'I') # SOFRADEX
     end
   end
-end
+
   context 'testing -e option' do
     let(:cli) do
-      opts = {
-        :extended    => :true,
-        :skip_download => true,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-e --skip-download'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
 
-		let(:cli_e80) do
-      opts = {
-        :extended    => :true,
-        :percent     => 80,
-        :skip_download => true,
-      }
-      Oddb2xml::Cli.new(opts)
+    let(:cli_e80) do
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-e 80 --skip-download'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
     search_path_rose = "//ART[PHAR=0023722]/ARTPRI[PTYP='ZURROSE']/PRICE"
     search_path_pub  = "//ART[PHAR=0023722]/ARTPRI[PTYP='ZURROSEPUB']/PRICE"

@@ -58,14 +58,9 @@ describe Oddb2xml::Cli do
   end
   context 'when -c tar.gz option is given' do
     let(:cli) do
-      opts = {
-        :compress_ext => 'tar.gz',
-        :nonpharma    => false,
-        :fi           => false,
-        :address      => false,
-        :tag_suffix   => nil,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-c tar.gz'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
     it_behaves_like 'any interface for product'
     it 'should have compress option' do
@@ -85,14 +80,9 @@ describe Oddb2xml::Cli do
   end
   context 'when -c zip option is given' do
     let(:cli) do
-      opts = {
-        :compress_ext => 'zip',
-        :nonpharma    => false,
-        :fi           => false,
-        :address      => false,
-        :tag_suffix   => nil,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-c zip'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
     it_behaves_like 'any interface for product'
     it 'should have compress option' do
@@ -113,14 +103,9 @@ describe Oddb2xml::Cli do
   end
   context 'when -a nonpharma option is given' do
     let(:cli) do
-      opts = {
-        :compress_ext => nil,
-        :nonpharma    => true,
-        :fi           => false,
-        :address      => false,
-        :tag_suffix   => nil,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-a nonpharma'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
     it_behaves_like 'any interface for product'
     it 'should have nonpharma option' do
@@ -148,14 +133,9 @@ describe Oddb2xml::Cli do
   end
   context 'when -t _swiss option is given' do
     let(:cli) do
-      opts = {
-        :compress_ext => nil,
-        :nonpharma    => false,
-        :fi           => false,
-        :address      => false,
-        :tag_suffix   => '_swiss'.upcase,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-t _swiss'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
     it_behaves_like 'any interface for product'
     it 'should have tag_suffix option' do
@@ -183,14 +163,9 @@ describe Oddb2xml::Cli do
   end
   context 'when -o fi option is given' do
     let(:cli) do
-      opts = {
-        :compress_ext => nil,
-        :nonpharma    => false,
-        :fi           => true,
-        :address      => false,
-        :tag_suffix   => nil,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-o fi'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
     it_behaves_like 'any interface for product'
     it 'should have nonpharma option' do
@@ -220,14 +195,9 @@ describe Oddb2xml::Cli do
   end
   context 'when -x address option is given' do
     let(:cli) do
-      opts = {
-        :compress_ext => nil,
-        :nonpharma    => false,
-        :fi           => false,
-        :address      => true,
-        :tag_suffix   => nil,
-      }
-      Oddb2xml::Cli.new(opts)
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-x address'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
     end
     it_behaves_like 'any interface for address'
     it 'should have address option' do
