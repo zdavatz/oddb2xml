@@ -143,10 +143,10 @@ describe Oddb2xml::Builder do
     end
   end
 
-  context 'when -a nonpharma -f dat is given' do
+  context 'when --append -f dat is given' do
     let(:cli) do
       options = Oddb2xml::Options.new
-      options.parser.parse!('-a nonpharma -f dat'.split(' '))
+      options.parser.parse!('--append -f dat'.split(' '))
       Oddb2xml::Cli.new(options.opts)
     end
 
@@ -169,12 +169,56 @@ describe Oddb2xml::Builder do
       oddb_dat.should match(/76806206900842/), "should match EAN of Desitin"
     end
   end
+
+  context 'when --append -I 80 -e is given' do
+    let(:cli) do
+      options = Oddb2xml::Options.new
+      options.parser.parse!('--append -I 80 -e'.split(' '))
+      Oddb2xml::Cli.new(options.opts)
+    end
+
+    it 'should contain the correct prices' do
+      cleanup_directories_before_run
+      res = buildr_capture(:stdout){ cli.run }
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should eq true
+      article_xml = IO.read(@article_xml)
+      product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
+      File.exists?(product_filename).should eq true
+      doc = REXML::Document.new File.new(@article_xml)
+      unless /1\.8\.7/.match(RUBY_VERSION)
+        price_zur_rose = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='ZURROSE']/PRICE").first.text
+        price_zur_rose.should eq '12.9'
+        price_zur_rose_pub = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='ZURROSEPUB']/PRICE").first.text
+        price_zur_rose_pub.should eq '15.45'
+      end
+    end
+  end
+
   context 'when option -e is given' do
     let(:cli) do
       options = Oddb2xml::Options.new
       options.parser.parse!('-e'.split(' '))
       Oddb2xml::Cli.new(options.opts)
     end
+
+    it 'should contain the correct prices' do
+      cleanup_directories_before_run
+      res = buildr_capture(:stdout){ cli.run }
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should eq true
+      article_xml = IO.read(@article_xml)
+      product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
+      File.exists?(product_filename).should eq true
+      doc = REXML::Document.new File.new(@article_xml)
+      unless /1\.8\.7/.match(RUBY_VERSION)
+        price_zur_rose = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='ZURROSE']/PRICE").first.text
+        price_zur_rose.should eq '7.2'
+        price_zur_rose_pub = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='ZURROSEPUB']/PRICE").first.text
+        price_zur_rose_pub.should eq '15.45'
+      end
+    end
+
 
     def checkItemForRefdata(doc, pharmacode, isRefdata)
       article = XPath.match( doc, "//ART[PHAR=#{pharmacode.to_s}]").first
@@ -382,7 +426,7 @@ describe Oddb2xml::Builder do
       Oddb2xml::Cli.new(options.opts)
     end
 
-    let(:cli_e80) do
+    let(:cli_I80) do
       options = Oddb2xml::Options.new
       options.parser.parse!('-e -I 80 --skip-download'.split(' '))
       Oddb2xml::Cli.new(options.opts)
@@ -412,7 +456,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should add 80 percent to zur_rose pubbprice if -I 80' do
-      res = buildr_capture(:stdout){ cli_e80.run }
+      res = buildr_capture(:stdout){ cli_I80.run }
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
       File.exists?(@article_xml).should eq true
       FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-e80.xml'))
@@ -423,11 +467,9 @@ describe Oddb2xml::Builder do
       refdata =  article.elements['REF_DATA'].text
       smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
       XPath.match( doc, search_path_rose).size.should eq 1
-      XPath.match( doc, search_path_rose).first.text.should eq '9.85'
-      price = 15.20 # This is the zurrose pub price.
-      price2 = (price*1.8).round_by(0.05).round(2) # Our price should be now 80% higher
+      XPath.match( doc, search_path_rose).first.text.should eq '17.75'
       XPath.match( doc, search_path_pub).first.text
-      XPath.match( doc, search_path_pub).first.text.to_f.should eq price2
+      XPath.match( doc, search_path_pub).first.text.should eq '15.20'
       XPath.match( doc, search_path_desitin).first.text.should eq '27.8'
       # sl-entries have a PPUB price, but no ZURROSEPUB, and vice versa
       XPath.match( doc, "//ART[PHAR=0023722]/ARTPRI[PTYP='PPUB']").size.should eq 0
@@ -451,16 +493,16 @@ describe Oddb2xml::Builder do
       line[66..71].should eq '020530'  # the dat format requires leading zeroes and not point
     end
     if /1130598003SOFRADEX/.match(line)
-      price_doctor.should eq 718
-      line[60..65].should eq '000718'
+      price_public.should eq    1545  # this is a non  SL-product, but no price increase was requested
+      line[66..71].should eq '001545' # the dat format requires leading zeroes and not point
 
       ckzl.should eq '3'
       if add_80_percents
-        price_public.should eq    2781  # = 1545*1.8 this is a non  SL-product. Therefore we must increase its price as requsted
-        line[66..71].should eq '002781' # the dat format requires leading zeroes and not point
+        price_doctor.should eq    1292  # = 1545*1.8 this is a non  SL-product. Therefore we must increase its price as requsted
+        line[60..65].should eq '001292' # dat format requires leading zeroes and not poin
       else
-        price_public.should eq    1545  # this is a non  SL-product, but no price increase was requested
-        line[66..71].should eq '001545' # the dat format requires leading zeroes and not point
+        price_doctor.should eq     718  # this is a non  SL-product, but no price increase was requested
+        line[60..65].should eq '000718' # the dat format requires leading zeroes and not point
       end
     end
   end
@@ -502,4 +544,5 @@ describe Oddb2xml::Builder do
       IO.readlines(dat_filename).each{ |line| check_article(line, true, true) }
     end
   end
+
 end

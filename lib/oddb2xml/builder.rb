@@ -736,17 +736,14 @@ module Oddb2xml
                   xml.ARTPRI {
                     xml.VDAT  Time.parse(datetime).strftime("%d.%m.%Y")
                     xml.PTYP  "ZURROSE"
-                    xml.PRICE info_zur_rose[:price]
+                    price = info_zur_rose[:price]
+                    price = (price.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2) if @options[:percent] != nil
+                    xml.PRICE price
                   }
                   xml.ARTPRI {
                     xml.VDAT  Time.parse(datetime).strftime("%d.%m.%Y")
                     xml.PTYP  "ZURROSEPUB"
-                    price = info_zur_rose[:pub_price]
-                    if @options[:percent] != nil
-                      price = (price.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2)
-                    else
-                    end
-                    xml.PRICE price
+                    xml.PRICE info_zur_rose[:pub_price]
                   }
                 end
                 #xml.ARTMIG {
@@ -1036,11 +1033,11 @@ module Oddb2xml
           price_doctor = pac ? format_price(pac[:prices][:exf_price][:price]).to_s : nil
           price_public = pac ? format_price(pac[:prices][:pub_price][:price]).to_s : nil
           if @infos_zur_rose[ean]
-            price_doctor ||= sprintf('%06i', ((@infos_zur_rose[ean][:price].to_f)*100).to_i)  if  @infos_zur_rose[ean][:price]
+            price_public ||= sprintf('%06i', ((@infos_zur_rose[ean][:pub_price].to_f)*100).to_i)
             if  @infos_zur_rose[ean][:pub_price]
-              price_public ||= sprintf('%06i', ((@infos_zur_rose[ean][:pub_price].to_f)*100).to_i)
+              price_doctor ||= sprintf('%06i', ((@infos_zur_rose[ean][:price].to_f)*100).to_i)  if  @infos_zur_rose[ean][:price]
               if @options[:percent] != nil
-                price_public = sprintf('%06i', (price_public.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2))
+                price_doctor = sprintf('%06i', (price_doctor.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2))
               end
             end
           end
