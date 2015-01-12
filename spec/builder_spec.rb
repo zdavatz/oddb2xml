@@ -138,6 +138,7 @@ describe Oddb2xml::Builder do
       oddb_dat.should match(/^..2/), "should have a record with '2' in CMUT field"
       oddb_dat.should match(/^..3/), "should have a record with '3' in CMUT field"
       oddb_dat.should match(/1115819012LEVETIRACETAM DESITIN Filmtabl 250 mg 30 Stk/), "should have Desitin"
+      IO.readlines(dat_filename).each{ |line| check_article(line, false, false) }
       # oddb_dat.should match(/^..1/), "should have a record with '1' in CMUT field" # we have no
     end
   end
@@ -383,7 +384,7 @@ describe Oddb2xml::Builder do
 
     let(:cli_e80) do
       options = Oddb2xml::Options.new
-      options.parser.parse!('-e 80 --skip-download'.split(' '))
+      options.parser.parse!('-e -I 80 --skip-download'.split(' '))
       Oddb2xml::Cli.new(options.opts)
     end
     search_path_rose = "//ART[PHAR=0023722]/ARTPRI[PTYP='ZURROSE']/PRICE"
@@ -410,7 +411,7 @@ describe Oddb2xml::Builder do
       XPath.match( doc, search_path_desitin).first.text.should eq '27.8'
     end
 
-    it 'should add 80 percent to zur_rose pubbprice if -e 80' do
+    it 'should add 80 percent to zur_rose pubbprice if -I 80' do
       res = buildr_capture(:stdout){ cli_e80.run }
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
       File.exists?(@article_xml).should eq true
@@ -464,10 +465,10 @@ describe Oddb2xml::Builder do
     end
   end
 
-  context 'when -f dat -p zurrose is given' do
+  context 'when -f dat -p is given' do
     let(:cli) do
       options = Oddb2xml::Options.new
-      options.parser.parse!('-f dat -p zurrose'.split(' '))
+      options.parser.parse!('-f dat -p'.split(' '))
       Oddb2xml::Cli.new(options.opts)
     end
 
