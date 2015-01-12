@@ -434,25 +434,33 @@ describe Oddb2xml::Builder do
     end
   end
 
-  def check_article(line, check_prices = false, add_percents=0)
+  def check_article(line, check_prices = false, add_80_percents=0)
     name          = line[10..59]
     ckzl          = line[72]
     ciks          = line[75]
-    price_arzt    = line[60..65].to_i
+    price_doctor  = line[60..65].to_i
     price_public  = line[66..71].to_i
-    puts "check_article: #{price_arzt} #{price_public} CKZL is #{ckzl} CIKS is #{ciks} name  #{name} " if $VERBOSE
+    puts "check_article: #{price_doctor} #{price_public} CKZL is #{ckzl} CIKS is #{ciks} name  #{name} " if $VERBOSE
     return unless check_prices
     if /11116999473TC/.match(line)
-      price_arzt.should eq 16455
-      # this is a SL-product. Therefore we may not have a price increase
+      price_doctor.should eq 16455
+      line[60..65].should eq '016455'
       ckzl.should eq '1'
-      price_public.should eq 20530
+      price_public.should eq 20530     # this is a SL-product. Therefore we may not have a price increase
+      line[66..71].should eq '020530'  # the dat format requires leading zeroes and not point
     end
     if /1130598003SOFRADEX/.match(line)
-      price_arzt.should eq 718
-      # this is a non  SL-product. Therefore we must increase its price
+      price_doctor.should eq 718
+      line[60..65].should eq '000718'
+
       ckzl.should eq '3'
-      price_public.should eq ((1545.to_f)*(100+add_percents.to_f)/100).to_i
+      if add_80_percents
+        price_public.should eq    2781  # = 1545*1.8 this is a non  SL-product. Therefore we must increase its price as requsted
+        line[66..71].should eq '002781' # the dat format requires leading zeroes and not point
+      else
+        price_public.should eq    1545  # this is a non  SL-product, but no price increase was requested
+        line[66..71].should eq '001545' # the dat format requires leading zeroes and not point
+      end
     end
   end
 
@@ -472,6 +480,7 @@ describe Oddb2xml::Builder do
       oddb_dat.should match(/^..2/), "should have a record with '2' in CMUT field"
       oddb_dat.should match(/^..3/), "should have a record with '3' in CMUT field"
       oddb_dat.should match(/1115819012LEVETIRACETAM DESITIN Filmtabl 250 mg 30 Stk/), "should have Desitin"
+      IO.readlines(dat_filename).each{ |line| check_article(line, true, false) }
       # oddb_dat.should match(/^..1/), "should have a record with '1' in CMUT field" # we have no
     end
   end
@@ -489,7 +498,7 @@ describe Oddb2xml::Builder do
       File.exists?(dat_filename).should eq true
       oddb_dat = IO.read(dat_filename)
       oddb_dat_lines = IO.readlines(dat_filename)
-      IO.readlines(dat_filename).each{ |line| check_article(line, true, 80) }
+      IO.readlines(dat_filename).each{ |line| check_article(line, true, true) }
     end
   end
 end

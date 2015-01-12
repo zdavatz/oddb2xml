@@ -1036,11 +1036,11 @@ module Oddb2xml
           price_doctor = pac ? format_price(pac[:prices][:exf_price][:price]).to_s : nil
           price_public = pac ? format_price(pac[:prices][:pub_price][:price]).to_s : nil
           if @infos_zur_rose[ean]
-            price_doctor ||= ((@infos_zur_rose[ean][:price].to_f)*100).to_i     if  @infos_zur_rose[ean][:price]
+            price_doctor ||= sprintf('%06i', ((@infos_zur_rose[ean][:price].to_f)*100).to_i)  if  @infos_zur_rose[ean][:price]
             if  @infos_zur_rose[ean][:pub_price]
-              price_public ||= ((@infos_zur_rose[ean][:pub_price].to_f)*100).to_i
+              price_public ||= sprintf('%06i', ((@infos_zur_rose[ean][:pub_price].to_f)*100).to_i)
               if @options[:percent] != nil
-                price_public = (price_public.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2)
+                price_public = sprintf('%06i', (price_public.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2))
               end
             end
           end
