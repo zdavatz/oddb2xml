@@ -1,3 +1,11 @@
+=== 1.9.1 / 19.01.2015
+
+* Reorganizing the switches lead to errors. These were
+** -a/--append dropped required parameter
+** -e/--extended dropped required parameter
+** -p--price dropped required parameter
+* extra parameters lead now to output like 'Please remove unused parameters ["nonpharma", "zurrose"]'
+
 === 1.9.0 / 12.01.2015
 
 * Fixed adding prices from ZurRose if -f dat -p zurrose given
