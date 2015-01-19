@@ -22,6 +22,11 @@ rescue OptionParser::MissingArgument,
 end
 
 opts = options.opts
+if opts.size > 0
+  puts "Please remove unused parameters #{args}"
+  exit 2
+end
+
 # TEMP
 if path = args.first
   opts[:transfer_dat] = path

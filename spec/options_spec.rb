@@ -183,5 +183,16 @@ describe Oddb2xml::Options do
     expected[:log]  =  true
     specify { expect(options.opts).to eq expected }
   end
+
+  context 'when -a nonpharma -p zurrose is given' do
+    options = Oddb2xml::Options.new
+    args = '-a nonpharma -p zurrose'.split(' ')
+    options.parser.parse!(args) # .should raise
+    expected = Default_opts.clone
+    expected[:price]  =  :zurrose
+    expected[:nonpharma]  =  true
+    specify { expect(options.opts).to eq expected }
+    specify { expect(args).to eq ["nonpharma", "zurrose"] } # will lead to an exit 2 in bin/oddb2xml
+  end
 end
 
