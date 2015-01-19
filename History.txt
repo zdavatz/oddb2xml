@@ -1,3 +1,8 @@
+=== 1.9.2 / 19.01.2015
+
+* Niklaus did not run all necesary tests!
+* Fixed bin/oddbxml
+
 === 1.9.1 / 19.01.2015
 
 * Reorganizing the switches lead to errors. These were

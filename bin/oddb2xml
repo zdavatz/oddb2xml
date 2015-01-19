@@ -22,7 +22,7 @@ rescue OptionParser::MissingArgument,
 end
 
 opts = options.opts
-if opts.size > 0
+if args.size > 0
   puts "Please remove unused parameters #{args}"
   exit 2
 end

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (1.9.1)
+    oddb2xml (1.9.2)
       archive-tar-minitar (~> 0.5.2)
       mechanize (~> 2.5.1)
       nokogiri (~> 1.5.10)
@@ -20,15 +20,16 @@ GEM
       nokogiri
     archive-tar-minitar (0.5.2)
     builder (3.2.2)
-    byebug (3.5.1)
-      columnize (~> 0.8)
-      debugger-linecache (~> 1.2)
-      slop (~> 3.6)
     coderay (1.1.0)
     columnize (0.9.0)
     crack (0.4.2)
       safe_yaml (~> 1.0.0)
+    debugger (1.6.8)
+      columnize (>= 0.3.1)
+      debugger-linecache (~> 1.2.0)
+      debugger-ruby_core_source (~> 1.3.5)
     debugger-linecache (1.2.0)
+    debugger-ruby_core_source (1.3.7)
     diff-lcs (1.2.5)
     domain_name (0.5.23)
       unf (>= 0.0.5, < 1.0.0)
@@ -56,9 +57,9 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    pry-byebug (2.0.0)
-      byebug (~> 3.4)
-      pry (~> 0.10)
+    pry-debugger (0.2.3)
+      debugger (~> 1.3)
+      pry (>= 0.9.10, < 0.11.0)
     rack (1.6.0)
     rake (10.4.2)
     rdoc (4.2.0)
@@ -112,7 +113,7 @@ PLATFORMS
 DEPENDENCIES
   bundler
   oddb2xml!
-  pry-byebug
+  pry-debugger
   rake
   rdoc
   rspec
