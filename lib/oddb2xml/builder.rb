@@ -233,7 +233,7 @@ module Oddb2xml
         @index['DE'].each_pair do |phar, indices|
           indices.each_with_index do |index, i|
             obj = {
-              :seq => @items[phar],
+              :seq => @items[phar] ? @items[phar] : @items[index[:ean]],
               :pac => nil,
               :no8 => nil,
               :de  => index,
@@ -455,6 +455,7 @@ module Oddb2xml
               xml.PRODNO ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
               if seq
                 %w[de fr].each do |l|
+
                   name = "name_#{l}".intern
                   desc = "desc_#{l}".intern
                   elem = "DSCR" + l[0].chr.upcase

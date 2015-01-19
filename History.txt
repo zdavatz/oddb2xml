@@ -2,6 +2,7 @@
 
 * Niklaus did not run all necesary tests!
 * Fixed bin/oddbxml
+* Fixed missing DSCRD/DSCF in oddb_product.xml because BAG-Preparation.xml ships without Pharmacode now
 
 === 1.9.1 / 19.01.2015
 
