@@ -252,6 +252,7 @@
         <xs:enumeration value="PPUB" />
         <xs:enumeration value="ZURROSE" />
         <xs:enumeration value="ZURROSEPUB" />
+        <xs:enumeration value="RESELLERPUB" />
       </xs:restriction>
     </xs:simpleType>
   </xs:element>

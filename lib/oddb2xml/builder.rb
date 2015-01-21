@@ -734,18 +734,23 @@ module Oddb2xml
                   end
                 end
                 if info_zur_rose
+                  price = info_zur_rose[:price]
+                  vdat  = Time.parse(datetime).strftime("%d.%m.%Y")
                   xml.ARTPRI {
-                    xml.VDAT  Time.parse(datetime).strftime("%d.%m.%Y")
+                    xml.VDAT  vdat
                     xml.PTYP  "ZURROSE"
-                    price = info_zur_rose[:price]
-                    price = (price.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2) if @options[:percent] != nil
                     xml.PRICE price
                   }
                   xml.ARTPRI {
-                    xml.VDAT  Time.parse(datetime).strftime("%d.%m.%Y")
+                    xml.VDAT  vdat
                     xml.PTYP  "ZURROSEPUB"
                     xml.PRICE info_zur_rose[:pub_price]
                   }
+                  xml.ARTPRI {
+                    xml.VDAT  vdat
+                    xml.PTYP  "RESELLERPUB"
+                    xml.PRICE (price.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2)
+                  } if @options[:percent] != nil
                 end
                 #xml.ARTMIG {
                   #xml.VDAT
@@ -1031,19 +1036,18 @@ module Oddb2xml
             (pac ? pac[:name_de].to_s : '') +
             (idx[:additional_desc] ? idx[:additional_desc] : '')
           ).gsub(/"/, '')
-          price_doctor = pac ? format_price(pac[:prices][:exf_price][:price]).to_s : nil
-          price_public = pac ? format_price(pac[:prices][:pub_price][:price]).to_s : nil
           if @infos_zur_rose[ean]
-            price_public ||= sprintf('%06i', ((@infos_zur_rose[ean][:pub_price].to_f)*100).to_i)
-            if  @infos_zur_rose[ean][:pub_price]
-              price_doctor ||= sprintf('%06i', ((@infos_zur_rose[ean][:price].to_f)*100).to_i)  if  @infos_zur_rose[ean][:price]
-              if @options[:percent] != nil
-                price_doctor = sprintf('%06i', (price_doctor.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2))
-              end
+            price_exf = sprintf('%06i', ((@infos_zur_rose[ean][:price].to_f)*100).to_i)
+            price_public = sprintf('%06i', ((@infos_zur_rose[ean][:pub_price].to_f)*100).to_i)
+            if @options[:percent] != nil
+              price_public = sprintf('%06i', (price_exf.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2))
             end
+          elsif pac and pac[:prices]
+            price_exf     = sprintf('%06i', (pac[:prices][:exf_price][:price].to_f*100).to_i) if pac[:prices][:exf_price] and pac[:prices][:exf_price][:price]
+            price_public  = sprintf('%06i', (pac[:prices][:pub_price][:price].to_f*100).to_i) if pac[:prices][:pub_price] and pac[:prices][:pub_price][:price]
           end
           row << format_name(abez)
-          row << "%#{DAT_LEN[:PRMO]}s"  % (price_doctor ? price_doctor.to_s : ('0' * DAT_LEN[:PRMO]))
+          row << "%#{DAT_LEN[:PRMO]}s"  % (price_exf ? price_exf.to_s : ('0' * DAT_LEN[:PRMO]))
           row << "%#{DAT_LEN[:PRPU]}s"  % (price_public ? price_public.to_s : ('0' * DAT_LEN[:PRPU]))
           row << "%#{DAT_LEN[:CKZL]}s"  % if (@lppvs[ean])
                                             '2'

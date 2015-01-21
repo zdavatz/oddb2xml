@@ -19,7 +19,7 @@ module Oddb2xml
         :ean14        => false,
         :skip_download=> false,
         :log          => false,
-        :percent      => 0,
+        :percent      => nil,
       }
     end
     def Options.help
@@ -34,6 +34,10 @@ Usage:
     -f F, --format=F     File format F, default is xml. {xml|dat}
                          If F is given, -o option is ignored.
     -I x, --increment=x  Increment price by x percent. Forces -f dat -p zurrose.
+    -I x, --increment=x  create additional field price_resellerpub as
+                         price_extfactory incremented by x percent (rounded to the next 0.05 francs)
+                         in oddb_article.xml. In generated zurrose_transfer.dat PRPU is set to this price
+                         Forces -f dat -p zurrose.
     -i,   --include      Include target option for ean14  for 'dat' format.
                          'xml' format includes always ean14 records.
     -o,   --option       Optional fachinfo output.

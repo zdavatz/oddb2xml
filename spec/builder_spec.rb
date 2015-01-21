@@ -192,10 +192,12 @@ describe Oddb2xml::Builder do
       File.exists?(product_filename).should eq true
       doc = REXML::Document.new File.new(@article_xml)
       unless /1\.8\.7/.match(RUBY_VERSION)
-        price_zur_rose = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='ZURROSE']/PRICE").first.text
-        price_zur_rose.should eq '12.9'
         price_zur_rose_pub = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='ZURROSEPUB']/PRICE").first.text
         price_zur_rose_pub.should eq '15.45'
+        price_reseller_pub = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='RESELLERPUB']/PRICE").first.text
+        price_reseller_pub.should eq '12.9'
+        price_zur_rose = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='ZURROSE']/PRICE").first.text
+        price_zur_rose.should eq '7.18'
       end
     end
   end
@@ -218,9 +220,11 @@ describe Oddb2xml::Builder do
       doc = REXML::Document.new File.new(@article_xml)
       unless /1\.8\.7/.match(RUBY_VERSION)
         price_zur_rose = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='ZURROSE']/PRICE").first.text
-        price_zur_rose.should eq '7.2'
+        price_zur_rose.should eq '7.18'
         price_zur_rose_pub = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='ZURROSEPUB']/PRICE").first.text
         price_zur_rose_pub.should eq '15.45'
+        price_reseller_pub = XPath.match( doc, "//ART[DSCRD='SOFRADEX Gtt Auric']/ARTPRI[PTYP='RESELLERPUB']/PRICE")
+        price_reseller_pub.size.should eq 0
       end
     end
 
@@ -436,8 +440,9 @@ describe Oddb2xml::Builder do
       options.parser.parse!('-e -I 80 --skip-download'.split(' '))
       Oddb2xml::Cli.new(options.opts)
     end
-    search_path_rose = "//ART[PHAR=0023722]/ARTPRI[PTYP='ZURROSE']/PRICE"
-    search_path_pub  = "//ART[PHAR=0023722]/ARTPRI[PTYP='ZURROSEPUB']/PRICE"
+    search_path_reseller = "//ART[PHAR=0023722]/ARTPRI[PTYP='RESELLERPUB']/PRICE"
+    search_path_rose     = "//ART[PHAR=0023722]/ARTPRI[PTYP='ZURROSE']/PRICE"
+    search_path_pub      = "//ART[PHAR=0023722]/ARTPRI[PTYP='ZURROSEPUB']/PRICE"
     # sl-entries have a PPUB price
     search_path_desitin  = "//ART[SMNO='62069008']/ARTPRI[PTYP='PPUB']/PRICE"
 
@@ -455,6 +460,7 @@ describe Oddb2xml::Builder do
       smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
       XPath.match( doc, search_path_rose).size.should eq 1
       XPath.match( doc, search_path_rose).first.text.should eq '9.85'
+      XPath.match( doc, search_path_reseller).size.should eq 0
       price = 15.20 # This is the zurrose pub price.
       XPath.match( doc, search_path_pub).first.text.to_f.should eq price
       XPath.match( doc, search_path_desitin).first.text.should eq '27.8'
@@ -472,43 +478,52 @@ describe Oddb2xml::Builder do
       refdata =  article.elements['REF_DATA'].text
       smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
       XPath.match( doc, search_path_rose).size.should eq 1
-      XPath.match( doc, search_path_rose).first.text.should eq '17.75'
+      XPath.match( doc, search_path_rose).first.text.should eq '9.85'
       XPath.match( doc, search_path_pub).first.text
       XPath.match( doc, search_path_pub).first.text.should eq '15.20'
+      XPath.match( doc, search_path_reseller).size.should eq 1
+      XPath.match( doc, search_path_reseller).first.text.should eq '17.75'
+
       XPath.match( doc, search_path_desitin).first.text.should eq '27.8'
+
       # sl-entries have a PPUB price, but no ZURROSEPUB, and vice versa
       XPath.match( doc, "//ART[PHAR=0023722]/ARTPRI[PTYP='PPUB']").size.should eq 0
       XPath.match( doc, "//ART[SMNO='62069008']/ARTPRI[PTYP='ZURROSEPUB']").size.should eq 0
+      XPath.match( doc, "//ART[SMNO='62069008']/ARTPRI[PTYP='RESELLERPUB']").size.should eq 0
     end
   end
 
+  # Check IGM-Format
   def check_article(line, check_prices = false, add_80_percents=0)
-    name          = line[10..59]
-    ckzl          = line[72]
-    ciks          = line[75]
-    price_doctor  = line[60..65].to_i
-    price_public  = line[66..71].to_i
+    typ            = line[0..1]
+    name           = line[10..59]
+    ckzl           = line[72]
+    ciks           = line[75]
+    price_exf      = line[60..65].to_i
+    price_reseller = line[66..71].to_i
+    price_public   = line[66..71].to_i
+    typ.should    eq '11'
     puts "check_article: #{price_doctor} #{price_public} CKZL is #{ckzl} CIKS is #{ciks} name  #{name} " if $VERBOSE
     return unless check_prices
     if /11116999473TC/.match(line)
-      price_doctor.should eq 16455
       line[60..65].should eq '016455'
+      price_exf.should eq 16455
       ckzl.should eq '1'
       price_public.should eq 20530     # this is a SL-product. Therefore we may not have a price increase
       line[66..71].should eq '020530'  # the dat format requires leading zeroes and not point
     end
     if /1130598003SOFRADEX/.match(line)
-      price_public.should eq    1545  # this is a non  SL-product, but no price increase was requested
-      line[66..71].should eq '001545' # the dat format requires leading zeroes and not point
-
+      # 1130598003SOFRADEX Gtt Auric 8 ml                           000718001545300B120130076803169501572
       ckzl.should eq '3'
       if add_80_percents
-        price_doctor.should eq    1292  # = 1545*1.8 this is a non  SL-product. Therefore we must increase its price as requsted
-        line[60..65].should eq '001292' # dat format requires leading zeroes and not poin
+        price_reseller.should eq    1292  # = 1545*1.8 this is a non  SL-product. Therefore we must increase its price as requsted
+        line[66..71].should eq '001292' # dat format requires leading zeroes and not poin
       else
-        price_doctor.should eq     718  # this is a non  SL-product, but no price increase was requested
-        line[60..65].should eq '000718' # the dat format requires leading zeroes and not point
-      end
+        price_reseller.should eq     718  # this is a non  SL-product, but no price increase was requested
+        line[66..71].should eq '000718' # the dat format requires leading zeroes and not point
+      end if false
+      line[60..65].should eq '000718' # the dat format requires leading zeroes and not point
+      price_exf.should eq    718      # this is a non  SL-product, but no price increase was requested
     end
   end
 
@@ -541,6 +556,7 @@ describe Oddb2xml::Builder do
     end
     it 'should contain the corect prices' do
       res = buildr_capture(:stdout){ cli.run }
+      # res = cli.run
       res.should match(/products/)
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
       File.exists?(dat_filename).should eq true

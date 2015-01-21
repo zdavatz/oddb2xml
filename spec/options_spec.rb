@@ -31,7 +31,7 @@ describe Oddb2xml::Options do
     :ean14        => false,
     :skip_download=> false,
     :log          => false,
-    :percent      => 0,
+    :percent      => nil,
   }
   context 'when default_opts' do
     specify { expect(Oddb2xml::Options.default_opts).to eq  Default_opts }
