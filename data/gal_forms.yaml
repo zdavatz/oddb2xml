@@ -1,0 +1,4704 @@
+---
+20756852: !ruby/struct:Struct::GalenicForm
+  oid: 20756852
+  descriptions:
+    de: Muco-adhesive Zahnfleischtabletten
+    en: Muco-adhesive ginival tablets
+    fr: Comprimés gingival muco-adhésifs
+    lt: Comprimés gingival muco-adhésifs
+  galenic_group: 754720
+31: !ruby/struct:Struct::GalenicForm
+  oid: 31
+  descriptions:
+    de: Kautabletten
+    en: Chewing tablets
+    fr: Comprimés à mâcher
+  galenic_group: 754720
+93: !ruby/struct:Struct::GalenicForm
+  oid: 93
+  descriptions:
+    de: Kaugummi
+    en: Chewing Gum
+    fr: Chewing Gum
+  galenic_group: 754720
+5: !ruby/struct:Struct::GalenicForm
+  oid: 5
+  descriptions:
+    de: Brausetabletten
+    en: Effervescent tablets
+    fr: comprimés effervescents
+  galenic_group: 890150
+287: !ruby/struct:Struct::GalenicForm
+  oid: 287
+  descriptions:
+    de: Hämofiltrationslösung
+    en: Hemofiltration solution
+    fr: Solution d'hémofiltration
+    lt: Solutio pro haemofiltrationem
+  galenic_group: 754487
+347: !ruby/struct:Struct::GalenicForm
+  oid: 347
+  descriptions:
+    de: Peritonealdialyselösung
+    en: Peritoneal dialysis solution
+    fr: Solution de dialyse peritoneale
+  galenic_group: 754487
+10801698: !ruby/struct:Struct::GalenicForm
+  oid: 10801698
+  descriptions:
+    de: Hämofiltrations- und Hämodialyselösung
+    en: Hemofiltration and hemodialysis solution
+    fr: Solution d'hémofiltration et d'hémodialyse
+  galenic_group: 754487
+73: !ruby/struct:Struct::GalenicForm
+  oid: 73
+  descriptions:
+    de: Dialyselösung
+    en: Dialysis solution
+    fr: Solution de dialyse
+  galenic_group: 754487
+16: !ruby/struct:Struct::GalenicForm
+  oid: 16
+  descriptions:
+    de: Tropfen
+    en: Drops
+    fr: Gouttes
+    lt: guttae
+  galenic_group: 890432
+23: !ruby/struct:Struct::GalenicForm
+  oid: 23
+  descriptions:
+    de: Ohrentropfen
+    en: Ear drops
+    fr: Gouttes auriculaires
+  galenic_group: 890432
+951638: !ruby/struct:Struct::GalenicForm
+  oid: 951638
+  descriptions:
+    de: Granulat, Retard
+    en: Granulate, retard
+    fr: Granulé, retard
+  galenic_group: 7830083
+1470800: !ruby/struct:Struct::GalenicForm
+  oid: 1470800
+  descriptions:
+    de: Pulver für Klistier
+    en: Powder for enema
+    fr: Poudre pour lavement
+  galenic_group: 1470796
+70: !ruby/struct:Struct::GalenicForm
+  oid: 70
+  descriptions:
+    de: Klistier
+    en: Enema
+    fr: Lavement
+  galenic_group: 1470796
+714574: !ruby/struct:Struct::GalenicForm
+  oid: 714574
+  descriptions:
+    de: Gewebekleber
+    en: Tissue adhesive
+    fr: Gluten tissulaire
+    lt: Collodium
+  galenic_group: 714576
+126: !ruby/struct:Struct::GalenicForm
+  oid: 126
+  descriptions:
+    de: Reagenzstreifen
+    en: Stripe
+    fr: Bandelette
+  galenic_group: 1479254
+127: !ruby/struct:Struct::GalenicForm
+  oid: 127
+  descriptions:
+    de: Schwangerschaftstest
+    en: Pregnancy test
+    fr: Test de grossesse
+  galenic_group: 1479254
+9672803: !ruby/struct:Struct::GalenicForm
+  oid: 9672803
+  descriptions:
+    de: Solvens
+    en: Solvent
+    fr: Solvant
+  galenic_group: 9672801
+9672805: !ruby/struct:Struct::GalenicForm
+  oid: 9672805
+  descriptions:
+    de: Diluens
+  galenic_group: 9672801
+299: !ruby/struct:Struct::GalenicForm
+  oid: 299
+  descriptions:
+    de: Implantat zur sc. Injektion
+    en: Hypodermic Implant
+    fr: Implant hypodermique
+  galenic_group: 1470567
+384: !ruby/struct:Struct::GalenicForm
+  oid: 384
+  descriptions:
+    de: Feststoffdepot
+    en: Solid Depot
+    fr: Dépôt solide
+  galenic_group: 1470567
+865060: !ruby/struct:Struct::GalenicForm
+  oid: 865060
+  descriptions:
+    de: Magensaftresistente Hartkapseln
+    en: Gastric-juice-resistant Capsules
+    fr: Capsules resistantes à suc gastrique
+  galenic_group: 890480
+890482: !ruby/struct:Struct::GalenicForm
+  oid: 890482
+  descriptions:
+    de: GITS-System
+  galenic_group: 890480
+71: !ruby/struct:Struct::GalenicForm
+  oid: 71
+  descriptions:
+    de: Bitabs
+    fr: Bitab
+  galenic_group: 890480
+9673390: !ruby/struct:Struct::GalenicForm
+  oid: 9673390
+  descriptions:
+    de: Tupfer
+    en: Swab
+    fr: Compresse
+    lt: Tela
+  galenic_group: 9672817
+400: !ruby/struct:Struct::GalenicForm
+  oid: 400
+  descriptions:
+    de: Roll-on
+    en: Roll-on
+  galenic_group: 1478018
+7745135: !ruby/struct:Struct::GalenicForm
+  oid: 7745135
+  descriptions:
+    de: Konzentrat
+  galenic_group: 1478018
+1478020: !ruby/struct:Struct::GalenicForm
+  oid: 1478020
+  descriptions:
+    de: Konzentrat zur Desinfektion
+    en: Concentrate for disinfection
+    fr: Concentré pour désinfection
+  galenic_group: 1478018
+1479815: !ruby/struct:Struct::GalenicForm
+  oid: 1479815
+  descriptions:
+    de: Desinfektionslösung
+    en: Disinfectant solution
+    fr: Solution à désinfection
+  galenic_group: 1478018
+801757: !ruby/struct:Struct::GalenicForm
+  oid: 801757
+  descriptions:
+    de: Filmbildende Lösung
+    en: Filmogenic solution
+    fr: Solution filmogène
+  galenic_group: 1478018
+48: !ruby/struct:Struct::GalenicForm
+  oid: 48
+  descriptions:
+    de: Tinktur
+    en: Tincture
+    fr: Teinture
+  galenic_group: 1478018
+7745412: !ruby/struct:Struct::GalenicForm
+  oid: 7745412
+  descriptions:
+    de: Injektionslösung (ad diluend.)
+    en: Injection solution (concentrated)
+    fr: Solution injectable concentré
+  galenic_group: 1471897
+10634130: !ruby/struct:Struct::GalenicForm
+  oid: 10634130
+  descriptions:
+    de: Konzentrat für Injektions-/Infusionslösung
+    en: Concentrate for Injection/Infusion
+    fr: Concentré pour injection/perfusion
+  galenic_group: 1471897
+9848277: !ruby/struct:Struct::GalenicForm
+  oid: 9848277
+  descriptions:
+    de: Lyophilisat für ein Konzentrat zur Herstellung einer Infusionslösung
+    en: Lyophilisate for concentratet infusion solution
+    fr: Lyophilisate pour solution pour perfusion concentrée
+  galenic_group: 1471897
+10929903: !ruby/struct:Struct::GalenicForm
+  oid: 10929903
+  descriptions:
+    de: Lyophilisat für Injektionslösung
+    en: Lyophilisate for injection solution
+    fr: Lyophilisate pour solution injectable
+  galenic_group: 1471897
+3034867: !ruby/struct:Struct::GalenicForm
+  oid: 3034867
+  descriptions:
+    de: Pulver zur Herstellung einer Lösung zur intravesikalen Anwendung
+    en: Powder for intravesical solution
+    fr: Poudre pour solution intravesicale
+  galenic_group: 1471897
+10449911: !ruby/struct:Struct::GalenicForm
+  oid: 10449911
+  descriptions:
+    de: Lyophilisat zur Injektion
+    en: Lyophilisat for injection
+    fr: Lyophilisat pour injection
+  galenic_group: 1471897
+10801657: !ruby/struct:Struct::GalenicForm
+  oid: 10801657
+  descriptions:
+    de: Lyophilisat für Infusionslösung
+    en: Lyophilisate for infusion solution
+    fr: Lyophilisate pour solution pour perfusion
+  galenic_group: 1471897
+19176550: !ruby/struct:Struct::GalenicForm
+  oid: 19176550
+  descriptions:
+    de: Pulver zur Herstellung einer Injektionssuspension
+    en: Powder for injection suspension
+    fr: Poudre et solvant pour suspension injectable
+  galenic_group: 1471897
+20755879: !ruby/struct:Struct::GalenicForm
+  oid: 20755879
+  descriptions:
+    de: Pulver zur Herstellung einer Injektions- oder Infusionslösung
+    en: Powder for injection- or infusion solution
+    fr: Poudre pour solution pour injection ou infusion
+  galenic_group: 1471897
+50: !ruby/struct:Struct::GalenicForm
+  oid: 50
+  descriptions:
+    de: Lyophilisat
+    en: Lyophilisate
+    fr: Lyophilisate
+    lt: PRAEPARATIO CRYODESICCATA
+  galenic_group: 1471897
+57: !ruby/struct:Struct::GalenicForm
+  oid: 57
+  descriptions:
+    de: Trockensubstanz
+    en: Dry substance
+    fr: Substance sèche
+  galenic_group: 1471897
+69: !ruby/struct:Struct::GalenicForm
+  oid: 69
+  descriptions:
+    de: Infusionskonzentrat
+    en: Concentrate for infusion
+    fr: Concentré pour perfusion
+  galenic_group: 1471897
+181: !ruby/struct:Struct::GalenicForm
+  oid: 181
+  descriptions:
+    de: Rektalschaum
+    en: Rectal foam
+    fr: Mousse rectale
+    lt: Spumosus rectale
+  galenic_group: 1472921
+293: !ruby/struct:Struct::GalenicForm
+  oid: 293
+  descriptions:
+    de: Rectal Tube
+    fr: Tube rectale
+  galenic_group: 1472921
+315: !ruby/struct:Struct::GalenicForm
+  oid: 315
+  descriptions:
+    de: Reinigungstüchlein
+    en: Cleaning towelette
+    fr: Tissu de nettoyage
+  galenic_group: 1472921
+7745826: !ruby/struct:Struct::GalenicForm
+  oid: 7745826
+  descriptions:
+    de: Microclisma
+  galenic_group: 1472921
+1850308: !ruby/struct:Struct::GalenicForm
+  oid: 1850308
+  descriptions:
+    de: Rektalsalbe
+  galenic_group: 1472921
+266: !ruby/struct:Struct::GalenicForm
+  oid: 266
+  descriptions:
+    de: Hautwaschemulsion
+    en: Emulsion/Skinwash
+    fr: Emulsion à lavage de peau
+  galenic_group: 1471899
+7745806: !ruby/struct:Struct::GalenicForm
+  oid: 7745806
+  descriptions:
+    de: Creme Shampoo
+    fr: Shampoing-crème
+  galenic_group: 1471899
+7745562: !ruby/struct:Struct::GalenicForm
+  oid: 7745562
+  descriptions:
+    de: Douche, flüssig
+    en: Douche, liquid
+    fr: Douche, liquide
+  galenic_group: 1471899
+1061698: !ruby/struct:Struct::GalenicForm
+  oid: 1061698
+  descriptions:
+    de: Medizinalshampoo
+    en: Medicinal shampoo
+    fr: Shampoo médicinal
+  galenic_group: 1471899
+7746165: !ruby/struct:Struct::GalenicForm
+  oid: 7746165
+  descriptions:
+    de: Hautwaschlotion
+  galenic_group: 1471899
+7745154: !ruby/struct:Struct::GalenicForm
+  oid: 7745154
+  descriptions:
+    de: flüssige Seife
+  galenic_group: 1471899
+1471950: !ruby/struct:Struct::GalenicForm
+  oid: 1471950
+  descriptions:
+    de: Douche-Oel
+    en: Douche oil
+    fr: Huile de douche
+  galenic_group: 1471899
+53: !ruby/struct:Struct::GalenicForm
+  oid: 53
+  descriptions:
+    de: Lotion
+    en: Lotion
+    fr: Lotion
+  galenic_group: 1471899
+82: !ruby/struct:Struct::GalenicForm
+  oid: 82
+  descriptions:
+    de: Shampoo
+  galenic_group: 1471899
+91: !ruby/struct:Struct::GalenicForm
+  oid: 91
+  descriptions:
+    de: Seife
+    en: Soap
+    fr: Savon
+  galenic_group: 1471899
+186: !ruby/struct:Struct::GalenicForm
+  oid: 186
+  descriptions:
+    de: Gel oral
+    en: Oral gel
+    fr: Gel oral
+    lt: Gelatum orale
+  galenic_group: 1472699
+220: !ruby/struct:Struct::GalenicForm
+  oid: 220
+  descriptions:
+    de: Mundspray
+    en: Mouth spray
+    fr: Spray buccal
+  galenic_group: 1472699
+221: !ruby/struct:Struct::GalenicForm
+  oid: 221
+  descriptions:
+    de: Mundspülung
+    en: Mouth rinse
+    fr: Lavage buccal
+  galenic_group: 1472699
+7745824: !ruby/struct:Struct::GalenicForm
+  oid: 7745824
+  descriptions:
+    de: Zementpulver
+  galenic_group: 1472699
+1478211: !ruby/struct:Struct::GalenicForm
+  oid: 1478211
+  descriptions:
+    de: Lösung (buccal)
+    en: Solution (buccal)
+    fr: Solution (buccal)
+  galenic_group: 1472699
+1472704: !ruby/struct:Struct::GalenicForm
+  oid: 1472704
+  descriptions:
+    de: Dental-Paste
+    en: Dental Paste
+    fr: Paste Dentaire
+  galenic_group: 1472699
+30: !ruby/struct:Struct::GalenicForm
+  oid: 30
+  descriptions:
+    de: Mundwasser
+    en: Mouthwash
+    fr: Eau dentifrice
+  galenic_group: 1472699
+32: !ruby/struct:Struct::GalenicForm
+  oid: 32
+  descriptions:
+    de: Zahnpaste
+    en: Toothpaste
+    fr: Dentifrice
+  galenic_group: 1472699
+119: !ruby/struct:Struct::GalenicForm
+  oid: 119
+  descriptions:
+    de: Styli
+    en: Cones
+    fr: Cônes
+  galenic_group: 1472699
+223: !ruby/struct:Struct::GalenicForm
+  oid: 223
+  descriptions:
+    de: Pulverspray
+  galenic_group: 1472713
+7745133: !ruby/struct:Struct::GalenicForm
+  oid: 7745133
+  descriptions:
+    de: Wundpuder
+  galenic_group: 1472713
+43: !ruby/struct:Struct::GalenicForm
+  oid: 43
+  descriptions:
+    de: Puder
+    en: Powder
+    fr: Poudre
+  galenic_group: 1472713
+54: !ruby/struct:Struct::GalenicForm
+  oid: 54
+  descriptions:
+    de: Spray
+  galenic_group: 1472713
+239: !ruby/struct:Struct::GalenicForm
+  oid: 239
+  descriptions:
+    de: Suspension retard
+    en: Delayed release suspension
+  galenic_group: 1472742
+128: !ruby/struct:Struct::GalenicForm
+  oid: 128
+  descriptions:
+    de: Gerät
+    en: Equipment
+    fr: Équipement
+  galenic_group: 1
+140: !ruby/struct:Struct::GalenicForm
+  oid: 140
+  descriptions:
+    de: Unbekannt
+  galenic_group: 1
+173: !ruby/struct:Struct::GalenicForm
+  oid: 173
+  descriptions:
+    la: PRAEPARATIONE
+  galenic_group: 1
+176: !ruby/struct:Struct::GalenicForm
+  oid: 176
+  descriptions:
+    de: Einmaldosen
+  galenic_group: 1
+341: !ruby/struct:Struct::GalenicForm
+  oid: 341
+  descriptions:
+    de: homöopathisches Arzneimittel
+  galenic_group: 1
+12791555: !ruby/struct:Struct::GalenicForm
+  oid: 12791555
+  descriptions:
+    de: Hydrogel
+  galenic_group: 1
+1850628: !ruby/struct:Struct::GalenicForm
+  oid: 1850628
+  descriptions:
+    de: Massage-Emulsion
+  galenic_group: 1
+1115916: !ruby/struct:Struct::GalenicForm
+  oid: 1115916
+  descriptions:
+    de: Gel zur intestinalen Anwendung
+    en: Gel for intestinal application
+    fr: Gel à l'application intestinale
+  galenic_group: 1
+16681996: !ruby/struct:Struct::GalenicForm
+  oid: 16681996
+  descriptions:
+    de: Depotsuspension zur s.c. Injektion
+    en: Depotsuspension for s.c. injection
+    fr: Suspension dépôt pour injéction s.c.
+  galenic_group: 1
+4575769: !ruby/struct:Struct::GalenicForm
+  oid: 4575769
+  descriptions:
+    de: Präparat zur parenteralen Anwendung
+  galenic_group: 1
+13441831: !ruby/struct:Struct::GalenicForm
+  oid: 13441831
+  descriptions:
+    de: Pulver zur Herstellung eines Infusionslösungskonzentrats
+  galenic_group: 1
+9847851: !ruby/struct:Struct::GalenicForm
+  oid: 9847851
+  descriptions:
+    de: Trockensubstanz zur Herstellung einer Infusionslösung
+  galenic_group: 1
+992307: !ruby/struct:Struct::GalenicForm
+  oid: 992307
+  descriptions:
+    de: Nagellack
+  galenic_group: 1
+1416516: !ruby/struct:Struct::GalenicForm
+  oid: 1416516
+  descriptions:
+    de: Kombipackung
+  galenic_group: 1
+1850966: !ruby/struct:Struct::GalenicForm
+  oid: 1850966
+  descriptions:
+    de: Pulver und Lösungsmittel zur Herstellung einer Injektionssuspension (i.m.
+      )
+  galenic_group: 1
+677723: !ruby/struct:Struct::GalenicForm
+  oid: 677723
+  descriptions:
+    de: In-vivo Diagnostikum
+  galenic_group: 1
+10449503: !ruby/struct:Struct::GalenicForm
+  oid: 10449503
+  descriptions:
+    de: sublinguale Lösung
+  galenic_group: 1
+7743845: !ruby/struct:Struct::GalenicForm
+  oid: 7743845
+  descriptions:
+    de: wässerige Lösung
+  galenic_group: 1
+1017446: !ruby/struct:Struct::GalenicForm
+  oid: 1017446
+  descriptions:
+    de: Kit
+  galenic_group: 1
+10203524: !ruby/struct:Struct::GalenicForm
+  oid: 10203524
+  descriptions:
+    de: tiefgefrorene Lösung
+  galenic_group: 1
+7743886: !ruby/struct:Struct::GalenicForm
+  oid: 7743886
+  descriptions:
+    de: Generator
+    fr: Générateur
+  galenic_group: 1
+10929555: !ruby/struct:Struct::GalenicForm
+  oid: 10929555
+  descriptions:
+    de: Trockensubstanz zur i.v. Injektion
+  galenic_group: 1
+11201731: !ruby/struct:Struct::GalenicForm
+  oid: 11201731
+  descriptions:
+    lt: praeparatione
+  galenic_group: 1
+16640233: !ruby/struct:Struct::GalenicForm
+  oid: 16640233
+  descriptions:
+    de: Creme + Vaginaltabletten
+  galenic_group: 1
+1478391: !ruby/struct:Struct::GalenicForm
+  oid: 1478391
+  descriptions:
+    de: Pulver für Tropfen
+    en: Powder for drops
+    fr: Poudre pour gouttes
+  galenic_group: 1
+3035385: !ruby/struct:Struct::GalenicForm
+  oid: 3035385
+  descriptions:
+    de: Duopack
+  galenic_group: 1
+26771200: !ruby/struct:Struct::GalenicForm
+  oid: 26771200
+  descriptions:
+    de: Zusatzampullen für Infusionslösungen
+  galenic_group: 1
+26771456: !ruby/struct:Struct::GalenicForm
+  oid: 26771456
+  descriptions:
+    de: soluzione iniettabile (flacone)
+  galenic_group: 1
+26771712: !ruby/struct:Struct::GalenicForm
+  oid: 26771712
+  descriptions:
+    de: Husten-Tropfen
+  galenic_group: 1
+26771968: !ruby/struct:Struct::GalenicForm
+  oid: 26771968
+  descriptions:
+    de: Konzentrat für Infusionslösung
+  galenic_group: 1
+26770689: !ruby/struct:Struct::GalenicForm
+  oid: 26770689
+  descriptions:
+    de: liquido
+  galenic_group: 1
+25608961: !ruby/struct:Struct::GalenicForm
+  oid: 25608961
+  descriptions:
+    de: Pulver und Lösungsmittel
+  galenic_group: 1
+26771202: !ruby/struct:Struct::GalenicForm
+  oid: 26771202
+  descriptions:
+    de: Hustentabletten
+  galenic_group: 1
+26771458: !ruby/struct:Struct::GalenicForm
+  oid: 26771458
+  descriptions:
+    de: ug +
+  galenic_group: 1
+26771714: !ruby/struct:Struct::GalenicForm
+  oid: 26771714
+  descriptions:
+    de: pastilles sans sucre
+  galenic_group: 1
+26771970: !ruby/struct:Struct::GalenicForm
+  oid: 26771970
+  descriptions:
+    de: Infusionskonznetrat
+  galenic_group: 1
+26773762: !ruby/struct:Struct::GalenicForm
+  oid: 26773762
+  descriptions:
+    de: -Getreidemischung Kombipackung
+  galenic_group: 1
+29843459: !ruby/struct:Struct::GalenicForm
+  oid: 29843459
+  descriptions:
+    de: Hustensaft
+  galenic_group: 1
+28869379: !ruby/struct:Struct::GalenicForm
+  oid: 28869379
+  descriptions:
+    de: Lösung zur Anwendung in der Mundhöhle
+  galenic_group: 1
+26771204: !ruby/struct:Struct::GalenicForm
+  oid: 26771204
+  descriptions:
+    de: alkoholische Povidon-Iod-Lösung
+  galenic_group: 1
+26771716: !ruby/struct:Struct::GalenicForm
+  oid: 26771716
+  descriptions:
+    de: gouttes buvables
+  galenic_group: 1
+26773764: !ruby/struct:Struct::GalenicForm
+  oid: 26773764
+  descriptions:
+    de: -Getreidemischung
+  galenic_group: 1
+26771206: !ruby/struct:Struct::GalenicForm
+  oid: 26771206
+  descriptions:
+    de: Pulver mit Applikator
+  galenic_group: 1
+26771462: !ruby/struct:Struct::GalenicForm
+  oid: 26771462
+  descriptions:
+    de: granulé pour suspension orale
+  galenic_group: 1
+26771718: !ruby/struct:Struct::GalenicForm
+  oid: 26771718
+  descriptions:
+    de: Lyophilisat pour perfusion
+  galenic_group: 1
+22750471: !ruby/struct:Struct::GalenicForm
+  oid: 22750471
+  descriptions:
+    de: flüssig in stationären Behältern
+  galenic_group: 1
+28585479: !ruby/struct:Struct::GalenicForm
+  oid: 28585479
+  descriptions:
+    de: Depotsuspension zur s.c. Injektion "
+  galenic_group: 1
+26771464: !ruby/struct:Struct::GalenicForm
+  oid: 26771464
+  descriptions:
+    de: homöopathisches Arzneimittel bei nervösen Bauchkrämpfen
+  galenic_group: 1
+26771720: !ruby/struct:Struct::GalenicForm
+  oid: 26771720
+  descriptions:
+    de: solution désinfectante
+  galenic_group: 1
+28385545: !ruby/struct:Struct::GalenicForm
+  oid: 28385545
+  descriptions:
+    de: Tropfen zum Einnehmen
+  galenic_group: 1
+25647369: !ruby/struct:Struct::GalenicForm
+  oid: 25647369
+  descriptions:
+    de: Pulver für Injektionslösung
+  galenic_group: 1
+26770697: !ruby/struct:Struct::GalenicForm
+  oid: 26770697
+  descriptions:
+    de: tibetisches Arzneimittel
+  galenic_group: 1
+26771209: !ruby/struct:Struct::GalenicForm
+  oid: 26771209
+  descriptions:
+    de: Schlaftropfen
+  galenic_group: 1
+28679433: !ruby/struct:Struct::GalenicForm
+  oid: 28679433
+  descriptions:
+    de: Hartkapseln mit veränderter Wirkstofffreisetzung
+  galenic_group: 1
+26771466: !ruby/struct:Struct::GalenicForm
+  oid: 26771466
+  descriptions:
+    de: Granulat (alte Seq.HS)
+  galenic_group: 1
+26771722: !ruby/struct:Struct::GalenicForm
+  oid: 26771722
+  descriptions:
+    de: orales Konzentrat
+  galenic_group: 1
+28584971: !ruby/struct:Struct::GalenicForm
+  oid: 28584971
+  descriptions:
+    de: Konzentrat zur Herstellung einer Lösung zum Einnehmen
+  galenic_group: 1
+26771211: !ruby/struct:Struct::GalenicForm
+  oid: 26771211
+  descriptions:
+    de: collyre en ampoules
+  galenic_group: 1
+32097547: !ruby/struct:Struct::GalenicForm
+  oid: 32097547
+  descriptions:
+    de: solution injectable en seringue pré-remplie
+  galenic_group: 1
+31672844: !ruby/struct:Struct::GalenicForm
+  oid: 31672844
+  descriptions:
+    de: Pulver und Lösungen zur Herstellung eines Konzentrates
+  galenic_group: 1
+25001740: !ruby/struct:Struct::GalenicForm
+  oid: 25001740
+  descriptions:
+    de: Suspension in Fertigspritzen
+  galenic_group: 1
+26771468: !ruby/struct:Struct::GalenicForm
+  oid: 26771468
+  descriptions:
+    de: Tabletten zur Herstellung einer Suspension zum Einnehmen
+  galenic_group: 1
+26771724: !ruby/struct:Struct::GalenicForm
+  oid: 26771724
+  descriptions:
+    de: tablettes
+  galenic_group: 1
+22577677: !ruby/struct:Struct::GalenicForm
+  oid: 22577677
+  descriptions:
+    de: Fertigpen (Triple-Dose)
+  galenic_group: 1
+26771214: !ruby/struct:Struct::GalenicForm
+  oid: 26771214
+  descriptions:
+    de: Tinktur ungefärbt
+  galenic_group: 1
+26771726: !ruby/struct:Struct::GalenicForm
+  oid: 26771726
+  descriptions:
+    de: lösliche Tabletten
+  galenic_group: 1
+24362254: !ruby/struct:Struct::GalenicForm
+  oid: 24362254
+  descriptions:
+    de: Suspension zur intramuskulären Injektion
+  galenic_group: 1
+28894990: !ruby/struct:Struct::GalenicForm
+  oid: 28894990
+  descriptions:
+    de: Lösung zur intravitrealen Injektion in einer Durchstechflasche
+  galenic_group: 1
+26019343: !ruby/struct:Struct::GalenicForm
+  oid: 26019343
+  descriptions:
+    de: überzogene Tabletten
+  galenic_group: 1
+26771216: !ruby/struct:Struct::GalenicForm
+  oid: 26771216
+  descriptions:
+    de: Tinktur gefärbt
+  galenic_group: 1
+23431441: !ruby/struct:Struct::GalenicForm
+  oid: 23431441
+  descriptions:
+    de: Kohlesuspension
+  galenic_group: 1
+30842897: !ruby/struct:Struct::GalenicForm
+  oid: 30842897
+  descriptions:
+    de: Lyophilisat für Injektion oder Infusion
+  galenic_group: 1
+29233426: !ruby/struct:Struct::GalenicForm
+  oid: 29233426
+  descriptions:
+    de: Lösung für Mundspülungen
+  galenic_group: 1
+22495250: !ruby/struct:Struct::GalenicForm
+  oid: 22495250
+  descriptions:
+    de: Auto-Injektor
+  galenic_group: 1
+26771218: !ruby/struct:Struct::GalenicForm
+  oid: 26771218
+  descriptions:
+    de: homöopathischer Spray bei Insektenstichen
+  galenic_group: 1
+26771730: !ruby/struct:Struct::GalenicForm
+  oid: 26771730
+  descriptions:
+    de: Zylinderampullen für Pen
+  galenic_group: 1
+24646419: !ruby/struct:Struct::GalenicForm
+  oid: 24646419
+  descriptions:
+    de: Lösung zur sublingualen Anwendung
+  galenic_group: 1
+24648467: !ruby/struct:Struct::GalenicForm
+  oid: 24648467
+  descriptions:
+    de: Lösung zur oralen Anwendung
+  galenic_group: 1
+22577939: !ruby/struct:Struct::GalenicForm
+  oid: 22577939
+  descriptions:
+    de: poudre pour injection ou perfusion
+  galenic_group: 1
+24264724: !ruby/struct:Struct::GalenicForm
+  oid: 24264724
+  descriptions:
+    de: Injektionslösung im Fertigpen
+  galenic_group: 1
+26771220: !ruby/struct:Struct::GalenicForm
+  oid: 26771220
+  descriptions:
+    de: Kürbiskernöl-Kapseln
+  galenic_group: 1
+22577173: !ruby/struct:Struct::GalenicForm
+  oid: 22577173
+  descriptions:
+    de: Filmabletten
+  galenic_group: 1
+26771733: !ruby/struct:Struct::GalenicForm
+  oid: 26771733
+  descriptions:
+    de: dose-granules homéopathiques
+  galenic_group: 1
+26773525: !ruby/struct:Struct::GalenicForm
+  oid: 26773525
+  descriptions:
+    de: mit Sorbit
+  galenic_group: 1
+26771222: !ruby/struct:Struct::GalenicForm
+  oid: 26771222
+  descriptions:
+    de: Opticaps
+  galenic_group: 1
+26771735: !ruby/struct:Struct::GalenicForm
+  oid: 26771735
+  descriptions:
+    de: gebrauchsfertige Infusionslösung
+  galenic_group: 1
+23015960: !ruby/struct:Struct::GalenicForm
+  oid: 23015960
+  descriptions:
+    de: Konzentrat für Infusionslösungen
+  galenic_group: 1
+26771225: !ruby/struct:Struct::GalenicForm
+  oid: 26771225
+  descriptions:
+    de: supposte per adulti
+  galenic_group: 1
+26771737: !ruby/struct:Struct::GalenicForm
+  oid: 26771737
+  descriptions:
+    de: Zweischichttabletten
+  galenic_group: 1
+26773017: !ruby/struct:Struct::GalenicForm
+  oid: 26773017
+  descriptions:
+    de: Gas zur medizinischen Anwendung
+  galenic_group: 1
+30040346: !ruby/struct:Struct::GalenicForm
+  oid: 30040346
+  descriptions:
+    de: Pulver und Lösungsmittel zur Herstellung einer Injektions-/Infusionslösung
+  galenic_group: 1
+26771227: !ruby/struct:Struct::GalenicForm
+  oid: 26771227
+  descriptions:
+    de: homöopathische Schlafchügeli für Kinder
+  galenic_group: 1
+26771739: !ruby/struct:Struct::GalenicForm
+  oid: 26771739
+  descriptions:
+    de: Lutschtabletten mit Mint-Aroma
+  galenic_group: 1
+30543644: !ruby/struct:Struct::GalenicForm
+  oid: 30543644
+  descriptions:
+    de: Trockensubstanz und Lösungsmittel zur Herstellung einer Injektionslösung
+  galenic_group: 1
+24365340: !ruby/struct:Struct::GalenicForm
+  oid: 24365340
+  descriptions:
+    de: comprrimés
+  galenic_group: 1
+26771229: !ruby/struct:Struct::GalenicForm
+  oid: 26771229
+  descriptions:
+    de: Lösung mit Schaumapplikator
+  galenic_group: 1
+26771741: !ruby/struct:Struct::GalenicForm
+  oid: 26771741
+  descriptions:
+    de: Lingualtabletten
+  galenic_group: 1
+26773022: !ruby/struct:Struct::GalenicForm
+  oid: 26773022
+  descriptions:
+    de: zuckerfrei mit Sorbit
+  galenic_group: 1
+31190302: !ruby/struct:Struct::GalenicForm
+  oid: 31190302
+  descriptions:
+    de: Einzeldosiertes Pulver zur Inhalation
+  galenic_group: 1
+26771231: !ruby/struct:Struct::GalenicForm
+  oid: 26771231
+  descriptions:
+    de: homöopathische Salbe bei Hautausschlägen
+  galenic_group: 1
+26771743: !ruby/struct:Struct::GalenicForm
+  oid: 26771743
+  descriptions:
+    de: Compresse pellicolari
+  galenic_group: 1
+25605919: !ruby/struct:Struct::GalenicForm
+  oid: 25605919
+  descriptions:
+    de: Tibetisches Arzneimittel
+  galenic_group: 1
+32892192: !ruby/struct:Struct::GalenicForm
+  oid: 32892192
+  descriptions:
+    de: Lutschtabletten mit Orangenaroma
+  galenic_group: 1
+30543905: !ruby/struct:Struct::GalenicForm
+  oid: 30543905
+  descriptions:
+    de: Trockensubstanz und Lösungsmittel
+  galenic_group: 1
+26771233: !ruby/struct:Struct::GalenicForm
+  oid: 26771233
+  descriptions:
+    de: homöopathische Tropfen bei Schlafstörungen
+  galenic_group: 1
+26771745: !ruby/struct:Struct::GalenicForm
+  oid: 26771745
+  descriptions:
+    de: Lösung zur Inhalation mit einem Vernebler
+  galenic_group: 1
+23832097: !ruby/struct:Struct::GalenicForm
+  oid: 23832097
+  descriptions:
+    de: magensaftresistente Filmtabletten
+  galenic_group: 1
+31830050: !ruby/struct:Struct::GalenicForm
+  oid: 31830050
+  descriptions:
+    de: Kapseln mit veränderter Wirkstofffreisetzung
+  galenic_group: 1
+28895010: !ruby/struct:Struct::GalenicForm
+  oid: 28895010
+  descriptions:
+    de: Lyophilisat zur Herstellung eines Konzentrates für Injektionslösung
+  galenic_group: 1
+26771235: !ruby/struct:Struct::GalenicForm
+  oid: 26771235
+  descriptions:
+    de: Pulver für Suspension
+  galenic_group: 1
+26771747: !ruby/struct:Struct::GalenicForm
+  oid: 26771747
+  descriptions:
+    de: solution pour injection / perfusion
+  galenic_group: 1
+25272355: !ruby/struct:Struct::GalenicForm
+  oid: 25272355
+  descriptions:
+    de: Lösung zur intramuskulären Injektion
+  galenic_group: 1
+32445476: !ruby/struct:Struct::GalenicForm
+  oid: 32445476
+  descriptions:
+    de: Pulver für orale Lösung
+  galenic_group: 1
+31830308: !ruby/struct:Struct::GalenicForm
+  oid: 31830308
+  descriptions:
+    de: Comprimés pellilculés
+  galenic_group: 1
+29233189: !ruby/struct:Struct::GalenicForm
+  oid: 29233189
+  descriptions:
+    de: Pulver und Lösungsmittel zur Herstellung einer Injektionssuspension (Lösungsmittel
+      in Fertigspritze)
+  galenic_group: 1
+26771237: !ruby/struct:Struct::GalenicForm
+  oid: 26771237
+  descriptions:
+    de: Transdermale therapeutische Systeme
+  galenic_group: 1
+26771749: !ruby/struct:Struct::GalenicForm
+  oid: 26771749
+  descriptions:
+    de: Kautabletten mit Aprikosenaroma
+  galenic_group: 1
+30671654: !ruby/struct:Struct::GalenicForm
+  oid: 30671654
+  descriptions:
+    de: Infusionslösung/Injektionslösung
+  galenic_group: 1
+27750951: !ruby/struct:Struct::GalenicForm
+  oid: 27750951
+  descriptions:
+    de: Kapseln (AE HS-Zusammensetzung)
+  galenic_group: 1
+26771239: !ruby/struct:Struct::GalenicForm
+  oid: 26771239
+  descriptions:
+    de: Granulat zur Herst.einer Suspension
+  galenic_group: 1
+26771751: !ruby/struct:Struct::GalenicForm
+  oid: 26771751
+  descriptions:
+    de: Zusatzampullen für Infusionen
+  galenic_group: 1
+32445737: !ruby/struct:Struct::GalenicForm
+  oid: 32445737
+  descriptions:
+    de: sirop pectoral
+  galenic_group: 1
+30031913: !ruby/struct:Struct::GalenicForm
+  oid: 30031913
+  descriptions:
+    de: Pulver und Lösungen zur Herstellung eines Konzentrates für eine liposomale
+      Infusionsdispersion
+  galenic_group: 1
+26771241: !ruby/struct:Struct::GalenicForm
+  oid: 26771241
+  descriptions:
+    de: soluzione per aerosol
+  galenic_group: 1
+26771753: !ruby/struct:Struct::GalenicForm
+  oid: 26771753
+  descriptions:
+    de: Emulgel Dispenser
+  galenic_group: 1
+28584490: !ruby/struct:Struct::GalenicForm
+  oid: 28584490
+  descriptions:
+    de: Pulver zur Herstellung einer Injektionslösung (Injektionskit)
+  galenic_group: 1
+26771243: !ruby/struct:Struct::GalenicForm
+  oid: 26771243
+  descriptions:
+    de: pastiglia
+  galenic_group: 1
+26771755: !ruby/struct:Struct::GalenicForm
+  oid: 26771755
+  descriptions:
+    de: poudre pour perfusion
+  galenic_group: 1
+31052843: !ruby/struct:Struct::GalenicForm
+  oid: 31052843
+  descriptions:
+    de: Brausetabletten mit Limone-Aroma
+  galenic_group: 1
+26771245: !ruby/struct:Struct::GalenicForm
+  oid: 26771245
+  descriptions:
+    de: Zusatzampulle zur Infusion
+  galenic_group: 1
+28645167: !ruby/struct:Struct::GalenicForm
+  oid: 28645167
+  descriptions:
+    de: Injektionslösung zur subkutanen Anwendung (Fertigspritze ohne Nadelschutz)
+  galenic_group: 1
+22494767: !ruby/struct:Struct::GalenicForm
+  oid: 22494767
+  descriptions:
+    de: mg Schmelztabletten
+  galenic_group: 1
+22181167: !ruby/struct:Struct::GalenicForm
+  oid: 22181167
+  descriptions:
+    de: soluté pour perfusions
+  galenic_group: 1
+26771247: !ruby/struct:Struct::GalenicForm
+  oid: 26771247
+  descriptions:
+    de: Hydrocrème
+  galenic_group: 1
+26771760: !ruby/struct:Struct::GalenicForm
+  oid: 26771760
+  descriptions:
+    de: transdermales Patch
+  galenic_group: 1
+26771249: !ruby/struct:Struct::GalenicForm
+  oid: 26771249
+  descriptions:
+    de: Lipocrème
+  galenic_group: 1
+25608497: !ruby/struct:Struct::GalenicForm
+  oid: 25608497
+  descriptions:
+    de: intrakutan
+  galenic_group: 1
+24365617: !ruby/struct:Struct::GalenicForm
+  oid: 24365617
+  descriptions:
+    de: Lyophilisat zur Herstellung einer Injektions- oder Infusionslösung
+  galenic_group: 1
+26771762: !ruby/struct:Struct::GalenicForm
+  oid: 26771762
+  descriptions:
+    de: solution pour injection/perfusion
+  galenic_group: 1
+24660019: !ruby/struct:Struct::GalenicForm
+  oid: 24660019
+  descriptions:
+    de: Dragée
+  galenic_group: 1
+26771251: !ruby/struct:Struct::GalenicForm
+  oid: 26771251
+  descriptions:
+    de: mousse
+  galenic_group: 1
+26771764: !ruby/struct:Struct::GalenicForm
+  oid: 26771764
+  descriptions:
+    de: Kit für die Herstellung eines Radiotherapeutikums
+  galenic_group: 1
+24364084: !ruby/struct:Struct::GalenicForm
+  oid: 24364084
+  descriptions:
+    de: Lösungen mit Applikationsset
+  galenic_group: 1
+26771253: !ruby/struct:Struct::GalenicForm
+  oid: 26771253
+  descriptions:
+    de: homöopathische Säuglings- und Kindersuppositorien
+  galenic_group: 1
+26771766: !ruby/struct:Struct::GalenicForm
+  oid: 26771766
+  descriptions:
+    de: Infusionslösung s.c. und i.v.
+  galenic_group: 1
+30671159: !ruby/struct:Struct::GalenicForm
+  oid: 30671159
+  descriptions:
+    de: polvere per soluzione orale
+  galenic_group: 1
+26771255: !ruby/struct:Struct::GalenicForm
+  oid: 26771255
+  descriptions:
+    de: Präparat zur Injektion / Instillation
+  galenic_group: 1
+27652663: !ruby/struct:Struct::GalenicForm
+  oid: 27652663
+  descriptions:
+    de: Schmelzfilm
+  galenic_group: 1
+26771768: !ruby/struct:Struct::GalenicForm
+  oid: 26771768
+  descriptions:
+    de: homöopathische Hustentropfen
+  galenic_group: 1
+26771257: !ruby/struct:Struct::GalenicForm
+  oid: 26771257
+  descriptions:
+    de: gebrauchsfertige Verdünnung
+  galenic_group: 1
+26773817: !ruby/struct:Struct::GalenicForm
+  oid: 26773817
+  descriptions:
+    de: -Gräser Kombipackung
+  galenic_group: 1
+26773050: !ruby/struct:Struct::GalenicForm
+  oid: 26773050
+  descriptions:
+    de: Flüssigkeit zur Herstellung eines Dampfs zur Inhalation
+  galenic_group: 1
+28753978: !ruby/struct:Struct::GalenicForm
+  oid: 28753978
+  descriptions:
+    de: Infusionslösung s.c und i.v.
+  galenic_group: 1
+26771259: !ruby/struct:Struct::GalenicForm
+  oid: 26771259
+  descriptions:
+    de: homöopathische Erkältungschügeli für Kinder
+  galenic_group: 1
+26771771: !ruby/struct:Struct::GalenicForm
+  oid: 26771771
+  descriptions:
+    de: Lipolotion
+  galenic_group: 1
+26773819: !ruby/struct:Struct::GalenicForm
+  oid: 26773819
+  descriptions:
+    de: -Gräser
+  galenic_group: 1
+24644156: !ruby/struct:Struct::GalenicForm
+  oid: 24644156
+  descriptions:
+    de: dispersible Tablette
+  galenic_group: 1
+26771261: !ruby/struct:Struct::GalenicForm
+  oid: 26771261
+  descriptions:
+    de: homöopathische Hustenchügeli für Kinder
+  galenic_group: 1
+24363325: !ruby/struct:Struct::GalenicForm
+  oid: 24363325
+  descriptions:
+    de: Trockensubstanz mit Solvens
+  galenic_group: 1
+31190077: !ruby/struct:Struct::GalenicForm
+  oid: 31190077
+  descriptions:
+    de: gel vaginale
+  galenic_group: 1
+26773822: !ruby/struct:Struct::GalenicForm
+  oid: 26773822
+  descriptions:
+    de: Esche Kombipackung
+  galenic_group: 1
+26771263: !ruby/struct:Struct::GalenicForm
+  oid: 26771263
+  descriptions:
+    de: gouttes bronchiques
+  galenic_group: 1
+26773824: !ruby/struct:Struct::GalenicForm
+  oid: 26773824
+  descriptions:
+    de: Esche
+  galenic_group: 1
+26771265: !ruby/struct:Struct::GalenicForm
+  oid: 26771265
+  descriptions:
+    de: Pflaster Stärke
+  galenic_group: 1
+26771777: !ruby/struct:Struct::GalenicForm
+  oid: 26771777
+  descriptions:
+    de: anthrop. Arzneimittel
+  galenic_group: 1
+26782273: !ruby/struct:Struct::GalenicForm
+  oid: 26782273
+  descriptions:
+    de: magensaftresistentes Granulat
+  galenic_group: 1
+24256834: !ruby/struct:Struct::GalenicForm
+  oid: 24256834
+  descriptions:
+    de: magensaftesistente Filmtabletten
+  galenic_group: 1
+26772290: !ruby/struct:Struct::GalenicForm
+  oid: 26772290
+  descriptions:
+    de: Pulver zur Herstellung einer Injektion
+  galenic_group: 1
+26773826: !ruby/struct:Struct::GalenicForm
+  oid: 26773826
+  descriptions:
+    lt: vitro
+  galenic_group: 1
+26771267: !ruby/struct:Struct::GalenicForm
+  oid: 26771267
+  descriptions:
+    de: teilbare Filmtabletten
+  galenic_group: 1
+26772292: !ruby/struct:Struct::GalenicForm
+  oid: 26772292
+  descriptions:
+    de: Dosier-Aerosol FCKW-frei
+  galenic_group: 1
+26771269: !ruby/struct:Struct::GalenicForm
+  oid: 26771269
+  descriptions:
+    de: substance sèche pour solution à injection ou à inhalation
+  galenic_group: 1
+26771525: !ruby/struct:Struct::GalenicForm
+  oid: 26771525
+  descriptions:
+    de: Pumpdosierspray
+  galenic_group: 1
+26772294: !ruby/struct:Struct::GalenicForm
+  oid: 26772294
+  descriptions:
+    de: gel ophthalmique
+  galenic_group: 1
+26773574: !ruby/struct:Struct::GalenicForm
+  oid: 26773574
+  descriptions:
+    de: enfants
+  galenic_group: 1
+25806150: !ruby/struct:Struct::GalenicForm
+  oid: 25806150
+  descriptions:
+    de: intravitreales Implantat in Applikator
+  galenic_group: 1
+26771271: !ruby/struct:Struct::GalenicForm
+  oid: 26771271
+  descriptions:
+    de: suspension rectale
+  galenic_group: 1
+26771527: !ruby/struct:Struct::GalenicForm
+  oid: 26771527
+  descriptions:
+    de: homöopathische Blasentropfen
+  galenic_group: 1
+26772296: !ruby/struct:Struct::GalenicForm
+  oid: 26772296
+  descriptions:
+    de: ) Yttriumchlorid
+  galenic_group: 1
+26771273: !ruby/struct:Struct::GalenicForm
+  oid: 26771273
+  descriptions:
+    de: homöopathisches Arzneimittel bei Fieber und Grippe Nr.
+  galenic_group: 1
+26771529: !ruby/struct:Struct::GalenicForm
+  oid: 26771529
+  descriptions:
+    de: homöopathische Nierentropfen
+  galenic_group: 1
+26772298: !ruby/struct:Struct::GalenicForm
+  oid: 26772298
+  descriptions:
+    de: Filmtabletten (Hersteller Roche S.p.A., Italien)
+  galenic_group: 1
+28869450: !ruby/struct:Struct::GalenicForm
+  oid: 28869450
+  descriptions:
+    de: Lösung zur intravenösen Infusion
+  galenic_group: 1
+32686666: !ruby/struct:Struct::GalenicForm
+  oid: 32686666
+  descriptions:
+    de: comprimées pelliculés
+  galenic_group: 1
+26771275: !ruby/struct:Struct::GalenicForm
+  oid: 26771275
+  descriptions:
+    de: homöopathisches Arzneimittel bei Magen-Darmbeschwerden
+  galenic_group: 1
+26771531: !ruby/struct:Struct::GalenicForm
+  oid: 26771531
+  descriptions:
+    de: homöopathische Magentropfen
+  galenic_group: 1
+26773579: !ruby/struct:Struct::GalenicForm
+  oid: 26773579
+  descriptions:
+    de: i.m.
+  galenic_group: 1
+25605964: !ruby/struct:Struct::GalenicForm
+  oid: 25605964
+  descriptions:
+    de: Fertigspritze mit Injektionslösung
+  galenic_group: 1
+22750797: !ruby/struct:Struct::GalenicForm
+  oid: 22750797
+  descriptions:
+    de: Solution pour injection
+  galenic_group: 1
+26771277: !ruby/struct:Struct::GalenicForm
+  oid: 26771277
+  descriptions:
+    de: homöopathisches Arzneimittel bei Hautausschlägen
+  galenic_group: 1
+26771533: !ruby/struct:Struct::GalenicForm
+  oid: 26771533
+  descriptions:
+    de: homöopathische Durchfalltropfen
+  galenic_group: 1
+27750222: !ruby/struct:Struct::GalenicForm
+  oid: 27750222
+  descriptions:
+    de: Injektionslösung in einer Patrone
+  galenic_group: 1
+25607246: !ruby/struct:Struct::GalenicForm
+  oid: 25607246
+  descriptions:
+    de: Lösung mit Applikationsset
+  galenic_group: 1
+24364366: !ruby/struct:Struct::GalenicForm
+  oid: 24364366
+  descriptions:
+    de: Suspension zur i.m. Injektion
+  galenic_group: 1
+26771023: !ruby/struct:Struct::GalenicForm
+  oid: 26771023
+  descriptions:
+    de: Streuli
+  galenic_group: 1
+26771279: !ruby/struct:Struct::GalenicForm
+  oid: 26771279
+  descriptions:
+    de: hom. AM bei Schnupfen mit Stirn- und Kieferhöhlenbeschwerden
+  galenic_group: 1
+26771535: !ruby/struct:Struct::GalenicForm
+  oid: 26771535
+  descriptions:
+    de: homöopathische Schlaftropfen
+  galenic_group: 1
+23832911: !ruby/struct:Struct::GalenicForm
+  oid: 23832911
+  descriptions:
+    de: lyophilisat pour injection/perfusion
+  galenic_group: 1
+25475664: !ruby/struct:Struct::GalenicForm
+  oid: 25475664
+  descriptions:
+    de: capsules retard
+  galenic_group: 1
+22750545: !ruby/struct:Struct::GalenicForm
+  oid: 22750545
+  descriptions:
+    de: Tabletten zum Auflösen
+  galenic_group: 1
+27750737: !ruby/struct:Struct::GalenicForm
+  oid: 27750737
+  descriptions:
+    de: Injektionslösung in einem Fertigpen
+  galenic_group: 1
+26771281: !ruby/struct:Struct::GalenicForm
+  oid: 26771281
+  descriptions:
+    de: Injektionslösung i.m. / Infusionskonzentrat i.v.
+  galenic_group: 1
+26568786: !ruby/struct:Struct::GalenicForm
+  oid: 26568786
+  descriptions:
+    de: lyophilisat pour solution perfusion
+  galenic_group: 1
+26771026: !ruby/struct:Struct::GalenicForm
+  oid: 26771026
+  descriptions:
+    de: Kapseln für Erwachsene
+  galenic_group: 1
+26771538: !ruby/struct:Struct::GalenicForm
+  oid: 26771538
+  descriptions:
+    de: sirop bronchique
+  galenic_group: 1
+23015507: !ruby/struct:Struct::GalenicForm
+  oid: 23015507
+  descriptions:
+    de: lyophilisat pour perfusion
+  galenic_group: 1
+26771283: !ruby/struct:Struct::GalenicForm
+  oid: 26771283
+  descriptions:
+    de: homöopathisches Arzneimittel bei Schluckweh
+  galenic_group: 1
+28679251: !ruby/struct:Struct::GalenicForm
+  oid: 28679251
+  descriptions:
+    de: compresse pellicolari (ersetzt Seq.
+  galenic_group: 1
+26771028: !ruby/struct:Struct::GalenicForm
+  oid: 26771028
+  descriptions:
+    de: Kapseln für Kinder
+  galenic_group: 1
+26771540: !ruby/struct:Struct::GalenicForm
+  oid: 26771540
+  descriptions:
+    de: Ampullen
+  galenic_group: 1
+31190100: !ruby/struct:Struct::GalenicForm
+  oid: 31190100
+  descriptions:
+    de: polvere per soluzione per infusione
+  galenic_group: 1
+26771285: !ruby/struct:Struct::GalenicForm
+  oid: 26771285
+  descriptions:
+    de: homöopathisches Arzneimittel bei Halsentzündungen
+  galenic_group: 1
+26771542: !ruby/struct:Struct::GalenicForm
+  oid: 26771542
+  descriptions:
+    de: Iobenguane (I-
+  galenic_group: 1
+25605462: !ruby/struct:Struct::GalenicForm
+  oid: 25605462
+  descriptions:
+    de: Granulat zur Zubereitung einer Suspension
+  galenic_group: 1
+26771031: !ruby/struct:Struct::GalenicForm
+  oid: 26771031
+  descriptions:
+    lt: granulatum corresp
+  galenic_group: 1
+26771287: !ruby/struct:Struct::GalenicForm
+  oid: 26771287
+  descriptions:
+    de: micronebulizzatore
+  galenic_group: 1
+26771544: !ruby/struct:Struct::GalenicForm
+  oid: 26771544
+  descriptions:
+    de: Diagnosekapseln
+  galenic_group: 1
+26773336: !ruby/struct:Struct::GalenicForm
+  oid: 26773336
+  descriptions:
+    de: Pulver zur Herstellung eines Infusionslösungkonzentrats
+  galenic_group: 1
+26771289: !ruby/struct:Struct::GalenicForm
+  oid: 26771289
+  descriptions:
+    de: compresse gastro-resistant
+  galenic_group: 1
+26771546: !ruby/struct:Struct::GalenicForm
+  oid: 26771546
+  descriptions:
+    de: Inhalationslösung (Einzeldosen)
+  galenic_group: 1
+26773338: !ruby/struct:Struct::GalenicForm
+  oid: 26773338
+  descriptions:
+    de: Granulato
+  galenic_group: 1
+26771035: !ruby/struct:Struct::GalenicForm
+  oid: 26771035
+  descriptions:
+    de: Japanisches Heilpflanzenöl
+  galenic_group: 1
+25607515: !ruby/struct:Struct::GalenicForm
+  oid: 25607515
+  descriptions:
+    de: nasal oder bronchial
+  galenic_group: 1
+26771292: !ruby/struct:Struct::GalenicForm
+  oid: 26771292
+  descriptions:
+    de: lotion de rinçage
+  galenic_group: 1
+26771548: !ruby/struct:Struct::GalenicForm
+  oid: 26771548
+  descriptions:
+    de: soluzione iniettabile (siringa di iniezione preriempita)
+  galenic_group: 1
+32891740: !ruby/struct:Struct::GalenicForm
+  oid: 32891740
+  descriptions:
+    de: Pulver zur Herstellung einer Injektionslösung / Infusionslösung
+  galenic_group: 1
+26771037: !ruby/struct:Struct::GalenicForm
+  oid: 26771037
+  descriptions:
+    de: Waschlotion
+  galenic_group: 1
+26771294: !ruby/struct:Struct::GalenicForm
+  oid: 26771294
+  descriptions:
+    de: homöopathisches Arzneimittel bei Heiserkeit
+  galenic_group: 1
+26771550: !ruby/struct:Struct::GalenicForm
+  oid: 26771550
+  descriptions:
+    de: homöopathische Heuschnupfentabletten
+  galenic_group: 1
+26773342: !ruby/struct:Struct::GalenicForm
+  oid: 26773342
+  descriptions:
+    de: miscela di erbe
+  galenic_group: 1
+26771039: !ruby/struct:Struct::GalenicForm
+  oid: 26771039
+  descriptions:
+    de: olio
+  galenic_group: 1
+26771296: !ruby/struct:Struct::GalenicForm
+  oid: 26771296
+  descriptions:
+    de: homöopathisches Arzneimittel bei Schlafstörungen
+  galenic_group: 1
+26771552: !ruby/struct:Struct::GalenicForm
+  oid: 26771552
+  descriptions:
+    de: implant pour injection sc. (
+  galenic_group: 1
+26773344: !ruby/struct:Struct::GalenicForm
+  oid: 26773344
+  descriptions:
+    de: Konzentrat zur Injektion / Instillation
+  galenic_group: 1
+27651936: !ruby/struct:Struct::GalenicForm
+  oid: 27651936
+  descriptions:
+    de: Infusionslösung zur totalen parenteralen Ernährung
+  galenic_group: 1
+26771041: !ruby/struct:Struct::GalenicForm
+  oid: 26771041
+  descriptions:
+    de: Arzneimittel auf Grundlage anthroposophi scher Erkenntnis
+  galenic_group: 1
+25646946: !ruby/struct:Struct::GalenicForm
+  oid: 25646946
+  descriptions:
+    de: poudre pour solution pour injection ou pour perfusion
+  galenic_group: 1
+26771298: !ruby/struct:Struct::GalenicForm
+  oid: 26771298
+  descriptions:
+    de: homöopathisches Arzneimittel bei Insektenstichen
+  galenic_group: 1
+26771554: !ruby/struct:Struct::GalenicForm
+  oid: 26771554
+  descriptions:
+    de: Therapiekapseln
+  galenic_group: 1
+31445859: !ruby/struct:Struct::GalenicForm
+  oid: 31445859
+  descriptions:
+    de: Konzentrat zur Herstellung einer Injektionslösung
+  galenic_group: 1
+26771300: !ruby/struct:Struct::GalenicForm
+  oid: 26771300
+  descriptions:
+    de: homöopathisches Arzneimittel bei Verletzungen
+  galenic_group: 1
+26771556: !ruby/struct:Struct::GalenicForm
+  oid: 26771556
+  descriptions:
+    de: Trockensubstanz zur Suspensionszubereitung
+  galenic_group: 1
+27652452: !ruby/struct:Struct::GalenicForm
+  oid: 27652452
+  descriptions:
+    de: Fertigpen
+  galenic_group: 1
+28360293: !ruby/struct:Struct::GalenicForm
+  oid: 28360293
+  descriptions:
+    de: Lyophilisat und Lösung (Durchstechflaschen)
+  galenic_group: 1
+26568294: !ruby/struct:Struct::GalenicForm
+  oid: 26568294
+  descriptions:
+    de: Softkapseln
+  galenic_group: 1
+26771302: !ruby/struct:Struct::GalenicForm
+  oid: 26771302
+  descriptions:
+    de: homöopathisches Arzneimittel bei Leber-Gallebeschwerden
+  galenic_group: 1
+26771047: !ruby/struct:Struct::GalenicForm
+  oid: 26771047
+  descriptions:
+    de: tibetisches Heilmittel
+  galenic_group: 1
+26771559: !ruby/struct:Struct::GalenicForm
+  oid: 26771559
+  descriptions:
+    de: Trockenpulver-Kapseln zur Inhalation
+  galenic_group: 1
+29948775: !ruby/struct:Struct::GalenicForm
+  oid: 29948775
+  descriptions:
+    de: générateur de radionucléides
+  galenic_group: 1
+26771304: !ruby/struct:Struct::GalenicForm
+  oid: 26771304
+  descriptions:
+    de: homöopathisches Arzneimittel bei Sonnenallergie
+  galenic_group: 1
+24363112: !ruby/struct:Struct::GalenicForm
+  oid: 24363112
+  descriptions:
+    de: Lyophilisat zur intravenösen Anwendung
+  galenic_group: 1
+26771049: !ruby/struct:Struct::GalenicForm
+  oid: 26771049
+  descriptions:
+    de: Cream Shampoo
+  galenic_group: 1
+26771561: !ruby/struct:Struct::GalenicForm
+  oid: 26771561
+  descriptions:
+    de: Tabletten (suspendierbar/kaubar)
+  galenic_group: 1
+26748266: !ruby/struct:Struct::GalenicForm
+  oid: 26748266
+  descriptions:
+    de: anthrop .Arzneimittel
+  galenic_group: 1
+25001834: !ruby/struct:Struct::GalenicForm
+  oid: 25001834
+  descriptions:
+    de: Injektionslösung in Fertigspritze mit Nadelschutz
+  galenic_group: 1
+26771306: !ruby/struct:Struct::GalenicForm
+  oid: 26771306
+  descriptions:
+    de: homöopathisches Arzneimittel bei Verstopfung
+  galenic_group: 1
+31965546: !ruby/struct:Struct::GalenicForm
+  oid: 31965546
+  descriptions:
+    de: Vaginalzäpfchen
+  galenic_group: 1
+24365930: !ruby/struct:Struct::GalenicForm
+  oid: 24365930
+  descriptions:
+    de: Pulver zum Einnehmen als Lösung
+  galenic_group: 1
+26771563: !ruby/struct:Struct::GalenicForm
+  oid: 26771563
+  descriptions:
+    de: homöopathische Tabletten bei Wechseljahrbeschwerden
+  galenic_group: 1
+26771052: !ruby/struct:Struct::GalenicForm
+  oid: 26771052
+  descriptions:
+    de: Tc-
+  galenic_group: 1
+26771308: !ruby/struct:Struct::GalenicForm
+  oid: 26771308
+  descriptions:
+    de: Instant-Tee Granulat
+  galenic_group: 1
+26771565: !ruby/struct:Struct::GalenicForm
+  oid: 26771565
+  descriptions:
+    de: Gestagen abgebendes Intrauterinsystem
+  galenic_group: 1
+27218798: !ruby/struct:Struct::GalenicForm
+  oid: 27218798
+  descriptions:
+    de: Injektionslösung in einem Einweg-Fertigpen zur mehrmaligen Anwendung
+  galenic_group: 1
+29843310: !ruby/struct:Struct::GalenicForm
+  oid: 29843310
+  descriptions:
+    de: Pulver zur Herstellung einer oralen Lösung
+  galenic_group: 1
+26771310: !ruby/struct:Struct::GalenicForm
+  oid: 26771310
+  descriptions:
+    de: homöopathisches Arzneimittel bei Zahnfleischbeschwerden
+  galenic_group: 1
+26771055: !ruby/struct:Struct::GalenicForm
+  oid: 26771055
+  descriptions:
+    de: Beutel
+  galenic_group: 1
+26771567: !ruby/struct:Struct::GalenicForm
+  oid: 26771567
+  descriptions:
+    de: Multidosen-Pulverinhalator
+  galenic_group: 1
+25806191: !ruby/struct:Struct::GalenicForm
+  oid: 25806191
+  descriptions:
+    de: Filmtablette
+  galenic_group: 1
+28827503: !ruby/struct:Struct::GalenicForm
+  oid: 28827503
+  descriptions:
+    de: Trockensubstanz zur Herstellung einer Lösung i.v./i.m.
+  galenic_group: 1
+32892015: !ruby/struct:Struct::GalenicForm
+  oid: 32892015
+  descriptions:
+    de: Pulver zur Herstellung einer Injektions- bwz. Infusionslösung
+  galenic_group: 1
+26771312: !ruby/struct:Struct::GalenicForm
+  oid: 26771312
+  descriptions:
+    de: homöopathisches Arzneimittel bei Nieren-Blasenbeschwerden
+  galenic_group: 1
+23833200: !ruby/struct:Struct::GalenicForm
+  oid: 23833200
+  descriptions:
+    de: MUPS-Tabletten
+  galenic_group: 1
+26771057: !ruby/struct:Struct::GalenicForm
+  oid: 26771057
+  descriptions:
+    de: sospensione
+  galenic_group: 1
+26771569: !ruby/struct:Struct::GalenicForm
+  oid: 26771569
+  descriptions:
+    de: gélules à libération prolongée
+  galenic_group: 1
+24644210: !ruby/struct:Struct::GalenicForm
+  oid: 24644210
+  descriptions:
+    de: Gebrauchsfertige Suspension für Aerosolgeräte
+  galenic_group: 1
+26771314: !ruby/struct:Struct::GalenicForm
+  oid: 26771314
+  descriptions:
+    de: avec sorbitol
+  galenic_group: 1
+31293298: !ruby/struct:Struct::GalenicForm
+  oid: 31293298
+  descriptions:
+    de: Gel Dispenser
+  galenic_group: 1
+26771059: !ruby/struct:Struct::GalenicForm
+  oid: 26771059
+  descriptions:
+    de: Knoblauchkapseln mit Weissdorn
+  galenic_group: 1
+26771571: !ruby/struct:Struct::GalenicForm
+  oid: 26771571
+  descriptions:
+    de: solution pour administration parentérale
+  galenic_group: 1
+26771316: !ruby/struct:Struct::GalenicForm
+  oid: 26771316
+  descriptions:
+    de: homöopathisches Arzneimittel bei Kopfschmerzen
+  galenic_group: 1
+32891764: !ruby/struct:Struct::GalenicForm
+  oid: 32891764
+  descriptions:
+    de: Lösung zur Anwendung auf der Haut
+  galenic_group: 1
+26770549: !ruby/struct:Struct::GalenicForm
+  oid: 26770549
+  descriptions:
+    de: Lösung zur Infusion
+  galenic_group: 1
+26771061: !ruby/struct:Struct::GalenicForm
+  oid: 26771061
+  descriptions:
+    de: Infusionszusatz
+  galenic_group: 1
+26771573: !ruby/struct:Struct::GalenicForm
+  oid: 26771573
+  descriptions:
+    de: Einreibemittel
+  galenic_group: 1
+31966325: !ruby/struct:Struct::GalenicForm
+  oid: 31966325
+  descriptions:
+    de: comprimés pelliculés gastrorésistants
+  galenic_group: 1
+26771318: !ruby/struct:Struct::GalenicForm
+  oid: 26771318
+  descriptions:
+    de: homöopathisches Arzneimittel bei Gelenkschmerzen
+  galenic_group: 1
+26770551: !ruby/struct:Struct::GalenicForm
+  oid: 26770551
+  descriptions:
+    de: Stechampulle mit Lyophilisat und Solvens
+  galenic_group: 1
+26771575: !ruby/struct:Struct::GalenicForm
+  oid: 26771575
+  descriptions:
+    de: teilbare Lutschtabletten
+  galenic_group: 1
+24363639: !ruby/struct:Struct::GalenicForm
+  oid: 24363639
+  descriptions:
+    de: Rectocaps
+  galenic_group: 1
+26771320: !ruby/struct:Struct::GalenicForm
+  oid: 26771320
+  descriptions:
+    de: compresse rivestita con film
+  galenic_group: 1
+26771065: !ruby/struct:Struct::GalenicForm
+  oid: 26771065
+  descriptions:
+    de: Abrasiv-Crème
+  galenic_group: 1
+26771577: !ruby/struct:Struct::GalenicForm
+  oid: 26771577
+  descriptions:
+    de: ug Inhalationspulver
+  galenic_group: 1
+31829881: !ruby/struct:Struct::GalenicForm
+  oid: 31829881
+  descriptions:
+    de: Lösung zur Inhalation
+  galenic_group: 1
+31830137: !ruby/struct:Struct::GalenicForm
+  oid: 31830137
+  descriptions:
+    de: Lyophilisat und Lösungsmittel zur Injektion
+  galenic_group: 1
+24363897: !ruby/struct:Struct::GalenicForm
+  oid: 24363897
+  descriptions:
+    de: Doppelkammer-Fertigspritze
+  galenic_group: 1
+24264826: !ruby/struct:Struct::GalenicForm
+  oid: 24264826
+  descriptions:
+    de: Pulver Hartkapseln zur Inhalation (mit Inhalator)
+  galenic_group: 1
+25001850: !ruby/struct:Struct::GalenicForm
+  oid: 25001850
+  descriptions:
+    de: Injektionslösung in Fertigspritze ohne Nadelschutz (verblistert)
+  galenic_group: 1
+24366202: !ruby/struct:Struct::GalenicForm
+  oid: 24366202
+  descriptions:
+    de: Fertigspritze
+  galenic_group: 1
+26771323: !ruby/struct:Struct::GalenicForm
+  oid: 26771323
+  descriptions:
+    de: Kindersuspension
+  galenic_group: 1
+26771579: !ruby/struct:Struct::GalenicForm
+  oid: 26771579
+  descriptions:
+    de: Inhaler
+  galenic_group: 1
+25607291: !ruby/struct:Struct::GalenicForm
+  oid: 25607291
+  descriptions:
+    de: Injektionslösung in vorgefülltem Autoinjektor
+  galenic_group: 1
+26770556: !ruby/struct:Struct::GalenicForm
+  oid: 26770556
+  descriptions:
+    de: sachets
+  galenic_group: 1
+25001340: !ruby/struct:Struct::GalenicForm
+  oid: 25001340
+  descriptions:
+    de: Filmtabetten
+  galenic_group: 1
+26771068: !ruby/struct:Struct::GalenicForm
+  oid: 26771068
+  descriptions:
+    lt: praeparationem
+  galenic_group: 1
+24659837: !ruby/struct:Struct::GalenicForm
+  oid: 24659837
+  descriptions:
+    de: Injetionssuspension
+  galenic_group: 1
+22181245: !ruby/struct:Struct::GalenicForm
+  oid: 22181245
+  descriptions:
+    de: komprimiert in Flaschen
+  galenic_group: 1
+26771325: !ruby/struct:Struct::GalenicForm
+  oid: 26771325
+  descriptions:
+    de: homöopathische Salbe bei Verletzungen
+  galenic_group: 1
+26771581: !ruby/struct:Struct::GalenicForm
+  oid: 26771581
+  descriptions:
+    de: Trinkampullen A
+  galenic_group: 1
+32097149: !ruby/struct:Struct::GalenicForm
+  oid: 32097149
+  descriptions:
+    de: Lutschpastillen mit Pfefferminz-Aroma
+  galenic_group: 1
+32892029: !ruby/struct:Struct::GalenicForm
+  oid: 32892029
+  descriptions:
+    de: Pulver und Lösungsmittel zur Herstellung einer Lösung zur intravesikalen Anwendung
+  galenic_group: 1
+26770558: !ruby/struct:Struct::GalenicForm
+  oid: 26770558
+  descriptions:
+    de: Lösung zur intravenösen Injektion
+  galenic_group: 1
+26771070: !ruby/struct:Struct::GalenicForm
+  oid: 26771070
+  descriptions:
+    de: dragées homéopathiques
+  galenic_group: 1
+31053438: !ruby/struct:Struct::GalenicForm
+  oid: 31053438
+  descriptions:
+    de: Depotab
+  galenic_group: 1
+32445823: !ruby/struct:Struct::GalenicForm
+  oid: 32445823
+  descriptions:
+    de: Pulver zum Herstellen einer Lösung zum Einnehmen
+  galenic_group: 1
+26771327: !ruby/struct:Struct::GalenicForm
+  oid: 26771327
+  descriptions:
+    de: homöopathische Salbe bei Gelenkschmerzen
+  galenic_group: 1
+26771583: !ruby/struct:Struct::GalenicForm
+  oid: 26771583
+  descriptions:
+    de: Trinkampullen B
+  galenic_group: 1
+26770560: !ruby/struct:Struct::GalenicForm
+  oid: 26770560
+  descriptions:
+    de: Injektionslösung zur intramuskulären Anwendung
+  galenic_group: 1
+26771072: !ruby/struct:Struct::GalenicForm
+  oid: 26771072
+  descriptions:
+    de: capsules vaginales
+  galenic_group: 1
+26771329: !ruby/struct:Struct::GalenicForm
+  oid: 26771329
+  descriptions:
+    de: homöopathische Salbe bei Sonnenallergie
+  galenic_group: 1
+26771585: !ruby/struct:Struct::GalenicForm
+  oid: 26771585
+  descriptions:
+    de: gel réfrigérant
+  galenic_group: 1
+25004417: !ruby/struct:Struct::GalenicForm
+  oid: 25004417
+  descriptions:
+    de: zuckerfrei
+  galenic_group: 1
+24366209: !ruby/struct:Struct::GalenicForm
+  oid: 24366209
+  descriptions:
+    de: Mehrfachdosenbehältnis
+  galenic_group: 1
+26771074: !ruby/struct:Struct::GalenicForm
+  oid: 26771074
+  descriptions:
+    de: Dental-Adhäsivpaste
+  galenic_group: 1
+26771587: !ruby/struct:Struct::GalenicForm
+  oid: 26771587
+  descriptions:
+    de: homöopathisches Arzneimittel bei Kreislaufbeschwerden
+  galenic_group: 1
+26909316: !ruby/struct:Struct::GalenicForm
+  oid: 26909316
+  descriptions:
+    de: Injektionslösung zur s.c. Anwendung
+  galenic_group: 1
+25271684: !ruby/struct:Struct::GalenicForm
+  oid: 25271684
+  descriptions:
+    de: solution pour application cutanée
+  galenic_group: 1
+26771333: !ruby/struct:Struct::GalenicForm
+  oid: 26771333
+  descriptions:
+    de: Kolloidale Suspension zur lokalen Injektion (ERMM-I)
+  galenic_group: 1
+26771589: !ruby/struct:Struct::GalenicForm
+  oid: 26771589
+  descriptions:
+    de: hydrogel
+  galenic_group: 1
+26771078: !ruby/struct:Struct::GalenicForm
+  oid: 26771078
+  descriptions:
+    de: Filmtabletten mit Bruchrille
+  galenic_group: 1
+30032263: !ruby/struct:Struct::GalenicForm
+  oid: 30032263
+  descriptions:
+    de: Suspension zum Einnehmen in Flaschen
+  galenic_group: 1
+26771591: !ruby/struct:Struct::GalenicForm
+  oid: 26771591
+  descriptions:
+    de: lyophilisiertes Injektionspräparat
+  galenic_group: 1
+26771080: !ruby/struct:Struct::GalenicForm
+  oid: 26771080
+  descriptions:
+    de: pommade homéopathique
+  galenic_group: 1
+25001864: !ruby/struct:Struct::GalenicForm
+  oid: 25001864
+  descriptions:
+    de: Injektionslösung in Fertigspritze ohne Nadelschutz (unverblistert)
+  galenic_group: 1
+26771336: !ruby/struct:Struct::GalenicForm
+  oid: 26771336
+  descriptions:
+    de: Wundspray
+  galenic_group: 1
+26771848: !ruby/struct:Struct::GalenicForm
+  oid: 26771848
+  descriptions:
+    de: anthro. Arzneimittel
+  galenic_group: 1
+26019977: !ruby/struct:Struct::GalenicForm
+  oid: 26019977
+  descriptions:
+    de: soluzione iniettabile (fiala)
+  galenic_group: 1
+26240905: !ruby/struct:Struct::GalenicForm
+  oid: 26240905
+  descriptions:
+    de: mcg Pulver und Lösungsmittel zur Herstellung einer Injektionslösung
+  galenic_group: 1
+26771593: !ruby/struct:Struct::GalenicForm
+  oid: 26771593
+  descriptions:
+    de: homöopathisches Arzneimittel bei Venenbeschwerden
+  galenic_group: 1
+29042570: !ruby/struct:Struct::GalenicForm
+  oid: 29042570
+  descriptions:
+    de: Augentropfen SDU
+  galenic_group: 1
+26771082: !ruby/struct:Struct::GalenicForm
+  oid: 26771082
+  descriptions:
+    de: Laiter
+  galenic_group: 1
+31293066: !ruby/struct:Struct::GalenicForm
+  oid: 31293066
+  descriptions:
+    de: Kautabletten zuckerfrei
+  galenic_group: 1
+31829898: !ruby/struct:Struct::GalenicForm
+  oid: 31829898
+  descriptions:
+    de: compresse rivestite con film
+  galenic_group: 1
+26771595: !ruby/struct:Struct::GalenicForm
+  oid: 26771595
+  descriptions:
+    de: Diskus
+  galenic_group: 1
+26770573: !ruby/struct:Struct::GalenicForm
+  oid: 26770573
+  descriptions:
+    de: erbe medicinali sm inuzzate
+  galenic_group: 1
+26771085: !ruby/struct:Struct::GalenicForm
+  oid: 26771085
+  descriptions:
+    de: Gurgellösung
+  galenic_group: 1
+26771341: !ruby/struct:Struct::GalenicForm
+  oid: 26771341
+  descriptions:
+    de: Pflanzliche Halsschmerztabletten
+  galenic_group: 1
+26771597: !ruby/struct:Struct::GalenicForm
+  oid: 26771597
+  descriptions:
+    de: Lösung (Einzeldosen)
+  galenic_group: 1
+23826317: !ruby/struct:Struct::GalenicForm
+  oid: 23826317
+  descriptions:
+    de: suppositoire
+  galenic_group: 1
+28895374: !ruby/struct:Struct::GalenicForm
+  oid: 28895374
+  descriptions:
+    de: rektale Kapseln
+  galenic_group: 1
+26771087: !ruby/struct:Struct::GalenicForm
+  oid: 26771087
+  descriptions:
+    de: Spray-Lösung
+  galenic_group: 1
+26771343: !ruby/struct:Struct::GalenicForm
+  oid: 26771343
+  descriptions:
+    de: Suspension zur Instillation
+  galenic_group: 1
+26771599: !ruby/struct:Struct::GalenicForm
+  oid: 26771599
+  descriptions:
+    de: Depot-Granulat
+  galenic_group: 1
+22495632: !ruby/struct:Struct::GalenicForm
+  oid: 22495632
+  descriptions:
+    de: comprimés effervescent
+  galenic_group: 1
+26770576: !ruby/struct:Struct::GalenicForm
+  oid: 26770576
+  descriptions:
+    de: pâte
+  galenic_group: 1
+32892048: !ruby/struct:Struct::GalenicForm
+  oid: 32892048
+  descriptions:
+    de: Pulver für ein Konzentrat zur Herstellung einer Infusionslösung
+  galenic_group: 1
+26771089: !ruby/struct:Struct::GalenicForm
+  oid: 26771089
+  descriptions:
+    de: Filmtabletten (suspendierbar)
+  galenic_group: 1
+26771345: !ruby/struct:Struct::GalenicForm
+  oid: 26771345
+  descriptions:
+    de: transdermales therapeutisches System
+  galenic_group: 1
+26771601: !ruby/struct:Struct::GalenicForm
+  oid: 26771601
+  descriptions:
+    de: medizinisches Badesalz aus dem Toten Meer
+  galenic_group: 1
+28809361: !ruby/struct:Struct::GalenicForm
+  oid: 28809361
+  descriptions:
+    de: Pulver zur Herstellung einer Lösung für einen Vernebler
+  galenic_group: 1
+29843090: !ruby/struct:Struct::GalenicForm
+  oid: 29843090
+  descriptions:
+    de: Mikrogramm
+  galenic_group: 1
+26770578: !ruby/struct:Struct::GalenicForm
+  oid: 26770578
+  descriptions:
+    de: émulsion
+  galenic_group: 1
+28645011: !ruby/struct:Struct::GalenicForm
+  oid: 28645011
+  descriptions:
+    de: Injektionslösung zur subkutanen Anwendung (Fertigspritze mit Nadelschutz)
+  galenic_group: 1
+26241171: !ruby/struct:Struct::GalenicForm
+  oid: 26241171
+  descriptions:
+    lt: emulsionem
+  galenic_group: 1
+26771091: !ruby/struct:Struct::GalenicForm
+  oid: 26771091
+  descriptions:
+    de: bastone
+  galenic_group: 1
+26771603: !ruby/struct:Struct::GalenicForm
+  oid: 26771603
+  descriptions:
+    de: Vaginalgel
+  galenic_group: 1
+26770580: !ruby/struct:Struct::GalenicForm
+  oid: 26770580
+  descriptions:
+    de: Injektionslösung s.c.
+  galenic_group: 1
+26771348: !ruby/struct:Struct::GalenicForm
+  oid: 26771348
+  descriptions:
+    de: sans sucre
+  galenic_group: 1
+31966612: !ruby/struct:Struct::GalenicForm
+  oid: 31966612
+  descriptions:
+    de: geschnitten Kräuter
+  galenic_group: 1
+26771093: !ruby/struct:Struct::GalenicForm
+  oid: 26771093
+  descriptions:
+    de: ayurvedisches Arzneimittel
+  galenic_group: 1
+26771605: !ruby/struct:Struct::GalenicForm
+  oid: 26771605
+  descriptions:
+    de: bain
+  galenic_group: 1
+26770582: !ruby/struct:Struct::GalenicForm
+  oid: 26770582
+  descriptions:
+    de: Pulver zur Herstellung einer Injektions-/Infusionslösung i.v.
+  galenic_group: 1
+26771350: !ruby/struct:Struct::GalenicForm
+  oid: 26771350
+  descriptions:
+    de: Magentropfen
+  galenic_group: 1
+26771095: !ruby/struct:Struct::GalenicForm
+  oid: 26771095
+  descriptions:
+    de: suspension nasale
+  galenic_group: 1
+26770584: !ruby/struct:Struct::GalenicForm
+  oid: 26770584
+  descriptions:
+    de: Pulver zur Herstellung einer Injektions-/Infusionslösung. i.v.
+  galenic_group: 1
+26771352: !ruby/struct:Struct::GalenicForm
+  oid: 26771352
+  descriptions:
+    de: homöopathische Tropfen bei nervösen Beschwerden
+  galenic_group: 1
+26771608: !ruby/struct:Struct::GalenicForm
+  oid: 26771608
+  descriptions:
+    de: Instant-Pulver mit Zitronenaroma
+  galenic_group: 1
+22578072: !ruby/struct:Struct::GalenicForm
+  oid: 22578072
+  descriptions:
+    de: poudre pour solution injectable
+  galenic_group: 1
+26019993: !ruby/struct:Struct::GalenicForm
+  oid: 26019993
+  descriptions:
+    de: soluzione iniettabile (siringa preriempita)
+  galenic_group: 1
+26771097: !ruby/struct:Struct::GalenicForm
+  oid: 26771097
+  descriptions:
+    de: Granulat zum Trinken
+  galenic_group: 1
+30544026: !ruby/struct:Struct::GalenicForm
+  oid: 30544026
+  descriptions:
+    de: Pulver und Lösung zur Herstellung einer Injektionslösung
+  galenic_group: 1
+29233818: !ruby/struct:Struct::GalenicForm
+  oid: 29233818
+  descriptions:
+    de: Lösung zur oralen und rektalen Applikation
+  galenic_group: 1
+26770586: !ruby/struct:Struct::GalenicForm
+  oid: 26770586
+  descriptions:
+    de: soluzione
+  galenic_group: 1
+26771610: !ruby/struct:Struct::GalenicForm
+  oid: 26771610
+  descriptions:
+    de: Lösung oral
+  galenic_group: 1
+24645019: !ruby/struct:Struct::GalenicForm
+  oid: 24645019
+  descriptions:
+    de: Depotsuspension zur Injektion
+  galenic_group: 1
+25647003: !ruby/struct:Struct::GalenicForm
+  oid: 25647003
+  descriptions:
+    de: Schaum zur Anwendung auf der Haut
+  galenic_group: 1
+26771099: !ruby/struct:Struct::GalenicForm
+  oid: 26771099
+  descriptions:
+    de: Doseur
+  galenic_group: 1
+30032284: !ruby/struct:Struct::GalenicForm
+  oid: 30032284
+  descriptions:
+    de: Suspension zum Einnehmen in Sachets
+  galenic_group: 1
+22182300: !ruby/struct:Struct::GalenicForm
+  oid: 22182300
+  descriptions:
+    de: Kombipack
+  galenic_group: 1
+26770588: !ruby/struct:Struct::GalenicForm
+  oid: 26770588
+  descriptions:
+    de: Dispergetten
+  galenic_group: 1
+26771612: !ruby/struct:Struct::GalenicForm
+  oid: 26771612
+  descriptions:
+    de: Neue Formel
+  galenic_group: 1
+26771101: !ruby/struct:Struct::GalenicForm
+  oid: 26771101
+  descriptions:
+    de: emplâtre
+  galenic_group: 1
+28895133: !ruby/struct:Struct::GalenicForm
+  oid: 28895133
+  descriptions:
+    de: Injektionslösung zur i.v. Applikation
+  galenic_group: 1
+26770590: !ruby/struct:Struct::GalenicForm
+  oid: 26770590
+  descriptions:
+    de: neue Formel
+  galenic_group: 1
+26771614: !ruby/struct:Struct::GalenicForm
+  oid: 26771614
+  descriptions:
+    de: Matrixtabletten
+  galenic_group: 1
+26771103: !ruby/struct:Struct::GalenicForm
+  oid: 26771103
+  descriptions:
+    de: Lipocreme
+  galenic_group: 1
+26770592: !ruby/struct:Struct::GalenicForm
+  oid: 26770592
+  descriptions:
+    de: homöopathische Leber-Gallentropfen
+  galenic_group: 1
+26771616: !ruby/struct:Struct::GalenicForm
+  oid: 26771616
+  descriptions:
+    de: Hustenpastillen
+  galenic_group: 1
+26771105: !ruby/struct:Struct::GalenicForm
+  oid: 26771105
+  descriptions:
+    de: homöopathisches Arzneimittel bei Heuschnupfen Nr.
+  galenic_group: 1
+30671266: !ruby/struct:Struct::GalenicForm
+  oid: 30671266
+  descriptions:
+    de: capsule molle
+  galenic_group: 1
+26770594: !ruby/struct:Struct::GalenicForm
+  oid: 26770594
+  descriptions:
+    de: homöopathische Nieren-Blasentropfen
+  galenic_group: 1
+26771618: !ruby/struct:Struct::GalenicForm
+  oid: 26771618
+  descriptions:
+    de: Injektionspräparat i.m./s.c.
+  galenic_group: 1
+30040483: !ruby/struct:Struct::GalenicForm
+  oid: 30040483
+  descriptions:
+    de: Konzentrat und Lösungsmittel zur Infusion
+  galenic_group: 1
+26770596: !ruby/struct:Struct::GalenicForm
+  oid: 26770596
+  descriptions:
+    de: homöopathische Tropfen bei Wechseljahrbeschwerden
+  galenic_group: 1
+26771620: !ruby/struct:Struct::GalenicForm
+  oid: 26771620
+  descriptions:
+    de: geschnittene Kräute
+  galenic_group: 1
+24362660: !ruby/struct:Struct::GalenicForm
+  oid: 24362660
+  descriptions:
+    de: Suspension zur Injektion und Lyophilisat
+  galenic_group: 1
+26771109: !ruby/struct:Struct::GalenicForm
+  oid: 26771109
+  descriptions:
+    de: Sachets
+  galenic_group: 1
+25271717: !ruby/struct:Struct::GalenicForm
+  oid: 25271717
+  descriptions:
+    de: Solution aqueuse pour application cutanée
+  galenic_group: 1
+26770598: !ruby/struct:Struct::GalenicForm
+  oid: 26770598
+  descriptions:
+    de: suppos. pour enfants (
+  galenic_group: 1
+26771622: !ruby/struct:Struct::GalenicForm
+  oid: 26771622
+  descriptions:
+    de: système transdermal
+  galenic_group: 1
+32097446: !ruby/struct:Struct::GalenicForm
+  oid: 32097446
+  descriptions:
+    de: Injektionslösung zur IV Applikation
+  galenic_group: 1
+29233319: !ruby/struct:Struct::GalenicForm
+  oid: 29233319
+  descriptions:
+    de: Tabletten mit veränderter Wirkstofffreisetzung
+  galenic_group: 1
+26771111: !ruby/struct:Struct::GalenicForm
+  oid: 26771111
+  descriptions:
+    de: homöopathisches Arzneimittel zur Beruhigung
+  galenic_group: 1
+26770600: !ruby/struct:Struct::GalenicForm
+  oid: 26770600
+  descriptions:
+    de: suppos. pour petits enfants (
+  galenic_group: 1
+26771624: !ruby/struct:Struct::GalenicForm
+  oid: 26771624
+  descriptions:
+    de: poudre en sachet
+  galenic_group: 1
+25607080: !ruby/struct:Struct::GalenicForm
+  oid: 25607080
+  descriptions:
+    de: Fertiglösung
+  galenic_group: 1
+26771113: !ruby/struct:Struct::GalenicForm
+  oid: 26771113
+  descriptions:
+    de: Inhalationskapseln
+  galenic_group: 1
+29541289: !ruby/struct:Struct::GalenicForm
+  oid: 29541289
+  descriptions:
+    de: Injektionslösung oder Konzentrat zur Herstellung einer Infusionslösung
+  galenic_group: 1
+26240426: !ruby/struct:Struct::GalenicForm
+  oid: 26240426
+  descriptions:
+    de: Lyophilisat und Lösung
+  galenic_group: 1
+26770602: !ruby/struct:Struct::GalenicForm
+  oid: 26770602
+  descriptions:
+    de: solution injectable i.m.
+  galenic_group: 1
+26771626: !ruby/struct:Struct::GalenicForm
+  oid: 26771626
+  descriptions:
+    de: Caplets
+  galenic_group: 1
+29843115: !ruby/struct:Struct::GalenicForm
+  oid: 29843115
+  descriptions:
+    de: Pulver zum Inhalieren
+  galenic_group: 1
+26771115: !ruby/struct:Struct::GalenicForm
+  oid: 26771115
+  descriptions:
+    de: Vaginaltablette
+  galenic_group: 1
+22578091: !ruby/struct:Struct::GalenicForm
+  oid: 22578091
+  descriptions:
+    de: i.m. et pour perfusion i.v.
+  galenic_group: 1
+26770604: !ruby/struct:Struct::GalenicForm
+  oid: 26770604
+  descriptions:
+    de: suspension
+  galenic_group: 1
+26771628: !ruby/struct:Struct::GalenicForm
+  oid: 26771628
+  descriptions:
+    de: Emulsion zur Injektion und Infusion
+  galenic_group: 1
+28894636: !ruby/struct:Struct::GalenicForm
+  oid: 28894636
+  descriptions:
+    de: disques d'équivalents épidermiques autologues
+  galenic_group: 1
+26771117: !ruby/struct:Struct::GalenicForm
+  oid: 26771117
+  descriptions:
+    de: Gel für Applikation im Mundbereich
+  galenic_group: 1
+32227245: !ruby/struct:Struct::GalenicForm
+  oid: 32227245
+  descriptions:
+    de: Propranololhydrochlorid Lösung
+  galenic_group: 1
+25646766: !ruby/struct:Struct::GalenicForm
+  oid: 25646766
+  descriptions:
+    de: Pulver und Lösungsmittel zur Herstellung einer Lösung für einen Vernebler
+      (mit Altera-Vernebler)
+  galenic_group: 1
+26770606: !ruby/struct:Struct::GalenicForm
+  oid: 26770606
+  descriptions:
+    de: gefüllt
+  galenic_group: 1
+26771630: !ruby/struct:Struct::GalenicForm
+  oid: 26771630
+  descriptions:
+    de: eau stérilisée pour préparations injectables
+  galenic_group: 1
+26771119: !ruby/struct:Struct::GalenicForm
+  oid: 26771119
+  descriptions:
+    de: homöopathisches Arzneimittel bei Magenbrennen
+  galenic_group: 1
+26770608: !ruby/struct:Struct::GalenicForm
+  oid: 26770608
+  descriptions:
+    de: Konzentrat für Infusionslösung / Injektionslösung
+  galenic_group: 1
+26771632: !ruby/struct:Struct::GalenicForm
+  oid: 26771632
+  descriptions:
+    de: gebrauchsfertige
+  galenic_group: 1
+26773680: !ruby/struct:Struct::GalenicForm
+  oid: 26773680
+  descriptions:
+    de: Proschmelz Fluorid Gelée
+  galenic_group: 1
+29843377: !ruby/struct:Struct::GalenicForm
+  oid: 29843377
+  descriptions:
+    de: Lösungsmittel
+  galenic_group: 1
+26771121: !ruby/struct:Struct::GalenicForm
+  oid: 26771121
+  descriptions:
+    de: granules homéopathiques
+  galenic_group: 1
+26770610: !ruby/struct:Struct::GalenicForm
+  oid: 26770610
+  descriptions:
+    de: Dépensier
+  galenic_group: 1
+26771634: !ruby/struct:Struct::GalenicForm
+  oid: 26771634
+  descriptions:
+    de: préparation lyophilisée
+  galenic_group: 1
+30603954: !ruby/struct:Struct::GalenicForm
+  oid: 30603954
+  descriptions:
+    de: Extractum aquosum
+  galenic_group: 1
+22750387: !ruby/struct:Struct::GalenicForm
+  oid: 22750387
+  descriptions:
+    de: poudre pour solution injectable ou pour perfusion
+  galenic_group: 1
+27749555: !ruby/struct:Struct::GalenicForm
+  oid: 27749555
+  descriptions:
+    de: concentré pour solution pour perfusion
+  galenic_group: 1
+26771123: !ruby/struct:Struct::GalenicForm
+  oid: 26771123
+  descriptions:
+    de: Anthroposophisches Arzneimittel
+  galenic_group: 1
+25647028: !ruby/struct:Struct::GalenicForm
+  oid: 25647028
+  descriptions:
+    de: Retardsuspension zur intramuskulären Injektion
+  galenic_group: 1
+26771636: !ruby/struct:Struct::GalenicForm
+  oid: 26771636
+  descriptions:
+    de: homöopathische Rheuma- und Ischiaschügeli
+  galenic_group: 1
+26773684: !ruby/struct:Struct::GalenicForm
+  oid: 26773684
+  descriptions:
+    de: ganz
+  galenic_group: 1
+26771125: !ruby/struct:Struct::GalenicForm
+  oid: 26771125
+  descriptions:
+    de: Ovulum
+  galenic_group: 1
+26771638: !ruby/struct:Struct::GalenicForm
+  oid: 26771638
+  descriptions:
+    de: homöopathische Nieren- und Blasenchügeli
+  galenic_group: 1
+23430582: !ruby/struct:Struct::GalenicForm
+  oid: 23430582
+  descriptions:
+    de: Augeninsert
+  galenic_group: 1
+25001143: !ruby/struct:Struct::GalenicForm
+  oid: 25001143
+  descriptions:
+    de: magenresistente Tabletten
+  galenic_group: 1
+26771127: !ruby/struct:Struct::GalenicForm
+  oid: 26771127
+  descriptions:
+    de: gouttes nasales pour enfants
+  galenic_group: 1
+31672504: !ruby/struct:Struct::GalenicForm
+  oid: 31672504
+  descriptions:
+    de: Depot-Injektionslösung
+  galenic_group: 1
+26771640: !ruby/struct:Struct::GalenicForm
+  oid: 26771640
+  descriptions:
+    de: homöopathische Schlaf-Globuli für Frauen
+  galenic_group: 1
+26771129: !ruby/struct:Struct::GalenicForm
+  oid: 26771129
+  descriptions:
+    de: gouttes nasales pour adultes
+  galenic_group: 1
+25475513: !ruby/struct:Struct::GalenicForm
+  oid: 25475513
+  descriptions:
+    de: Emulsion zur intravenösen Anwendung
+  galenic_group: 1
+26771642: !ruby/struct:Struct::GalenicForm
+  oid: 26771642
+  descriptions:
+    de: Lotion (Roll-on)
+  galenic_group: 1
+26568635: !ruby/struct:Struct::GalenicForm
+  oid: 26568635
+  descriptions:
+    de: concentré et solvant pour solution pour perfusion
+  galenic_group: 1
+26771131: !ruby/struct:Struct::GalenicForm
+  oid: 26771131
+  descriptions:
+    de: spray-doseur pour adultes et enfants
+  galenic_group: 1
+26771644: !ruby/struct:Struct::GalenicForm
+  oid: 26771644
+  descriptions:
+    de: crema nasale
+  galenic_group: 1
+29234109: !ruby/struct:Struct::GalenicForm
+  oid: 29234109
+  descriptions:
+    de: Kräuterbonbons
+  galenic_group: 1
+28855485: !ruby/struct:Struct::GalenicForm
+  oid: 28855485
+  descriptions:
+    de: Lutschtablette
+  galenic_group: 1
+26771133: !ruby/struct:Struct::GalenicForm
+  oid: 26771133
+  descriptions:
+    de: spray-doseur pour petits enfants et bébés
+  galenic_group: 1
+30671038: !ruby/struct:Struct::GalenicForm
+  oid: 30671038
+  descriptions:
+    de: homöopathischer Spray zur Anwendung in der Mundhöhle
+  galenic_group: 1
+22578110: !ruby/struct:Struct::GalenicForm
+  oid: 22578110
+  descriptions:
+    de: poudre pour solution injectable et pour perfusion
+  galenic_group: 1
+26772414: !ruby/struct:Struct::GalenicForm
+  oid: 26772414
+  descriptions:
+    de: solution injectable multidoses
+  galenic_group: 1
+24647359: !ruby/struct:Struct::GalenicForm
+  oid: 24647359
+  descriptions:
+    de: Lösung zur sublingualen Anwnedung
+  galenic_group: 1
+26771135: !ruby/struct:Struct::GalenicForm
+  oid: 26771135
+  descriptions:
+    de: Eucalyptus-Menthol
+  galenic_group: 1
+26771647: !ruby/struct:Struct::GalenicForm
+  oid: 26771647
+  descriptions:
+    de: Zydis Lingualtabletten
+  galenic_group: 1
+28584897: !ruby/struct:Struct::GalenicForm
+  oid: 28584897
+  descriptions:
+    de: Durchstechflasche mit Infusionskonzentrat
+  galenic_group: 1
+25646785: !ruby/struct:Struct::GalenicForm
+  oid: 25646785
+  descriptions:
+    de: compresse dispersibili
+  galenic_group: 1
+26771649: !ruby/struct:Struct::GalenicForm
+  oid: 26771649
+  descriptions:
+    de: Kautabletten für Kinder
+  galenic_group: 1
+26771138: !ruby/struct:Struct::GalenicForm
+  oid: 26771138
+  descriptions:
+    de: homöopathische Augentropfen
+  galenic_group: 1
+27651778: !ruby/struct:Struct::GalenicForm
+  oid: 27651778
+  descriptions:
+    de: Konzentrat zur Infusion nach Verdünnung
+  galenic_group: 1
+26771651: !ruby/struct:Struct::GalenicForm
+  oid: 26771651
+  descriptions:
+    de: Kautabletten für Kleinkinder
+  galenic_group: 1
+26771140: !ruby/struct:Struct::GalenicForm
+  oid: 26771140
+  descriptions:
+    de: homöopath.AM bei Sonnenbrand und kleinflächigen Verbrennungen
+  galenic_group: 1
+26771653: !ruby/struct:Struct::GalenicForm
+  oid: 26771653
+  descriptions:
+    de: Magnesium + Zinc orange
+  galenic_group: 1
+30603461: !ruby/struct:Struct::GalenicForm
+  oid: 30603461
+  descriptions:
+    de: Pulver zur Herstellung eines Konzentrates für eine Infusionslösung
+  galenic_group: 1
+22494406: !ruby/struct:Struct::GalenicForm
+  oid: 22494406
+  descriptions:
+    de: Tabletten mit kontrollierter Freisetzung
+  galenic_group: 1
+25647814: !ruby/struct:Struct::GalenicForm
+  oid: 25647814
+  descriptions:
+    de: kutanes Pflaster
+  galenic_group: 1
+26770630: !ruby/struct:Struct::GalenicForm
+  oid: 26770630
+  descriptions:
+    de: Brunnenkresse
+  galenic_group: 1
+26771142: !ruby/struct:Struct::GalenicForm
+  oid: 26771142
+  descriptions:
+    de: Pulver-Sachets
+  galenic_group: 1
+26568391: !ruby/struct:Struct::GalenicForm
+  oid: 26568391
+  descriptions:
+    de: Injektionspräparat im vorgefüllten Pen GoQuick
+  galenic_group: 1
+26771655: !ruby/struct:Struct::GalenicForm
+  oid: 26771655
+  descriptions:
+    de: Magnesium + Zink tropical
+  galenic_group: 1
+26770632: !ruby/struct:Struct::GalenicForm
+  oid: 26770632
+  descriptions:
+    de: Löwenzahn
+  galenic_group: 1
+26771144: !ruby/struct:Struct::GalenicForm
+  oid: 26771144
+  descriptions:
+    de: Gelsolets
+  galenic_group: 1
+26771657: !ruby/struct:Struct::GalenicForm
+  oid: 26771657
+  descriptions:
+    de: Magnesium + Zinc
+  galenic_group: 1
+26770634: !ruby/struct:Struct::GalenicForm
+  oid: 26770634
+  descriptions:
+    de: Schwarzrettich
+  galenic_group: 1
+26771146: !ruby/struct:Struct::GalenicForm
+  oid: 26771146
+  descriptions:
+    de: Emgel
+  galenic_group: 1
+26773450: !ruby/struct:Struct::GalenicForm
+  oid: 26773450
+  descriptions:
+    de: homöopathisches Arzneimittel bei Grippe und Erkältung
+  galenic_group: 1
+26773706: !ruby/struct:Struct::GalenicForm
+  oid: 26773706
+  descriptions:
+    de: Roggen Kombipackung
+  galenic_group: 1
+23827146: !ruby/struct:Struct::GalenicForm
+  oid: 23827146
+  descriptions:
+    de: dispositif transdermique
+  galenic_group: 1
+31053258: !ruby/struct:Struct::GalenicForm
+  oid: 31053258
+  descriptions:
+    de: Mikropellets
+  galenic_group: 1
+26771659: !ruby/struct:Struct::GalenicForm
+  oid: 26771659
+  descriptions:
+    de: Urethrastab
+  galenic_group: 1
+26909387: !ruby/struct:Struct::GalenicForm
+  oid: 26909387
+  descriptions:
+    de: Buccaltabletten
+  galenic_group: 1
+26781643: !ruby/struct:Struct::GalenicForm
+  oid: 26781643
+  descriptions:
+    de: Augentropfen Monodosen
+  galenic_group: 1
+29750475: !ruby/struct:Struct::GalenicForm
+  oid: 29750475
+  descriptions:
+    de: Nagellack (mit Tupfer)
+  galenic_group: 1
+25001164: !ruby/struct:Struct::GalenicForm
+  oid: 25001164
+  descriptions:
+    de: Pulver zur Herstellung einer Suspension zum Einnehmen
+  galenic_group: 1
+26770636: !ruby/struct:Struct::GalenicForm
+  oid: 26770636
+  descriptions:
+    de: Salbei
+  galenic_group: 1
+26771148: !ruby/struct:Struct::GalenicForm
+  oid: 26771148
+  descriptions:
+    de: comprimés pélliculés
+  galenic_group: 1
+26773708: !ruby/struct:Struct::GalenicForm
+  oid: 26773708
+  descriptions:
+    de: Roggen
+  galenic_group: 1
+23431628: !ruby/struct:Struct::GalenicForm
+  oid: 23431628
+  descriptions:
+    de: Pulver zur Herstellung einer i.v. Lösung
+  galenic_group: 1
+26771661: !ruby/struct:Struct::GalenicForm
+  oid: 26771661
+  descriptions:
+    de: sirop pectoral pour enfants
+  galenic_group: 1
+26770638: !ruby/struct:Struct::GalenicForm
+  oid: 26770638
+  descriptions:
+    de: Schafgarbe
+  galenic_group: 1
+26771150: !ruby/struct:Struct::GalenicForm
+  oid: 26771150
+  descriptions:
+    de: lavements
+  galenic_group: 1
+26773710: !ruby/struct:Struct::GalenicForm
+  oid: 26773710
+  descriptions:
+    de: Weide Kombipackung
+  galenic_group: 1
+26771663: !ruby/struct:Struct::GalenicForm
+  oid: 26771663
+  descriptions:
+    de: poudre pour solution buvable
+  galenic_group: 1
+26770640: !ruby/struct:Struct::GalenicForm
+  oid: 26770640
+  descriptions:
+    de: Spitzwegerich
+  galenic_group: 1
+26771152: !ruby/struct:Struct::GalenicForm
+  oid: 26771152
+  descriptions:
+    de: homöopathisches Arzneimittel bei Reisebeschwerden
+  galenic_group: 1
+26773712: !ruby/struct:Struct::GalenicForm
+  oid: 26773712
+  descriptions:
+    de: Weide
+  galenic_group: 1
+32445137: !ruby/struct:Struct::GalenicForm
+  oid: 32445137
+  descriptions:
+    de: Injektionslösung zur subkutanen Anwendung
+  galenic_group: 1
+28584913: !ruby/struct:Struct::GalenicForm
+  oid: 28584913
+  descriptions:
+    de: Lyophilisat und Lösungsmittel in Fertigspritzen
+  galenic_group: 1
+26771665: !ruby/struct:Struct::GalenicForm
+  oid: 26771665
+  descriptions:
+    de: gebrauchsfertige Suspension zur Inhalation
+  galenic_group: 1
+26770642: !ruby/struct:Struct::GalenicForm
+  oid: 26770642
+  descriptions:
+    de: Thymian
+  galenic_group: 1
+26771154: !ruby/struct:Struct::GalenicForm
+  oid: 26771154
+  descriptions:
+    de: homöopathischer Nasenspray
+  galenic_group: 1
+26771667: !ruby/struct:Struct::GalenicForm
+  oid: 26771667
+  descriptions:
+    de: Pulver zur Herstellung einer Kindersuspension
+  galenic_group: 1
+28753875: !ruby/struct:Struct::GalenicForm
+  oid: 28753875
+  descriptions:
+    de: preparazione iniettabile (siringa preriempita con solvente)
+  galenic_group: 1
+26748116: !ruby/struct:Struct::GalenicForm
+  oid: 26748116
+  descriptions:
+    de: Nerventropfen
+  galenic_group: 1
+26770644: !ruby/struct:Struct::GalenicForm
+  oid: 26770644
+  descriptions:
+    de: Weissdorn
+  galenic_group: 1
+26771156: !ruby/struct:Struct::GalenicForm
+  oid: 26771156
+  descriptions:
+    de: Depot-Tabletten
+  galenic_group: 1
+28679124: !ruby/struct:Struct::GalenicForm
+  oid: 28679124
+  descriptions:
+    de: Granulat mit Orangen-Aroma
+  galenic_group: 1
+26771669: !ruby/struct:Struct::GalenicForm
+  oid: 26771669
+  descriptions:
+    de: Pulver für Infusionslösung
+  galenic_group: 1
+26771925: !ruby/struct:Struct::GalenicForm
+  oid: 26771925
+  descriptions:
+    de: sciroppo pettorale
+  galenic_group: 1
+30602965: !ruby/struct:Struct::GalenicForm
+  oid: 30602965
+  descriptions:
+    de: Transplantatprodukt
+  galenic_group: 1
+29233878: !ruby/struct:Struct::GalenicForm
+  oid: 29233878
+  descriptions:
+    de: Tablette
+  galenic_group: 1
+26770646: !ruby/struct:Struct::GalenicForm
+  oid: 26770646
+  descriptions:
+    de: Zinnkraut
+  galenic_group: 1
+26771158: !ruby/struct:Struct::GalenicForm
+  oid: 26771158
+  descriptions:
+    de: gouttes nasal
+  galenic_group: 1
+26771414: !ruby/struct:Struct::GalenicForm
+  oid: 26771414
+  descriptions:
+    de: anthroposophisches Arzneimittel
+  galenic_group: 1
+22578134: !ruby/struct:Struct::GalenicForm
+  oid: 22578134
+  descriptions:
+    de: Emulsions-Gel
+  galenic_group: 1
+26771671: !ruby/struct:Struct::GalenicForm
+  oid: 26771671
+  descriptions:
+    de: compresse da sciogliere in bocca
+  galenic_group: 1
+26771927: !ruby/struct:Struct::GalenicForm
+  oid: 26771927
+  descriptions:
+    de: Injektions-/ Infusionspräparat
+  galenic_group: 1
+26771160: !ruby/struct:Struct::GalenicForm
+  oid: 26771160
+  descriptions:
+    de: Antithrombin III
+  galenic_group: 1
+28644825: !ruby/struct:Struct::GalenicForm
+  oid: 28644825
+  descriptions:
+    de: Spray-Puder
+  galenic_group: 1
+26770649: !ruby/struct:Struct::GalenicForm
+  oid: 26770649
+  descriptions:
+    de: mit Zucker
+  galenic_group: 1
+24362969: !ruby/struct:Struct::GalenicForm
+  oid: 24362969
+  descriptions:
+    de: Durchstichflasche mit Trockensubstanz
+  galenic_group: 1
+26771162: !ruby/struct:Struct::GalenicForm
+  oid: 26771162
+  descriptions:
+    de: granulato
+  galenic_group: 1
+26771930: !ruby/struct:Struct::GalenicForm
+  oid: 26771930
+  descriptions:
+    de: Konzentrat zur Injektion / Infusion
+  galenic_group: 1
+28384219: !ruby/struct:Struct::GalenicForm
+  oid: 28384219
+  descriptions:
+    de: Kapseln und Tabletten
+  galenic_group: 1
+25647835: !ruby/struct:Struct::GalenicForm
+  oid: 25647835
+  descriptions:
+    de: poudre pour la préparation d'une solution injectable
+  galenic_group: 1
+22577627: !ruby/struct:Struct::GalenicForm
+  oid: 22577627
+  descriptions:
+    de: Kontrastmittel für die Magnetresonanztomographie
+  galenic_group: 1
+28869083: !ruby/struct:Struct::GalenicForm
+  oid: 28869083
+  descriptions:
+    de: spray transdermal
+  galenic_group: 1
+32097243: !ruby/struct:Struct::GalenicForm
+  oid: 32097243
+  descriptions:
+    de: gas per inalazione
+  galenic_group: 1
+26771164: !ruby/struct:Struct::GalenicForm
+  oid: 26771164
+  descriptions:
+    de: homöopathisches Arzneimittel bei Zahnungsbeschwerden
+  galenic_group: 1
+26771676: !ruby/struct:Struct::GalenicForm
+  oid: 26771676
+  descriptions:
+    de: Ohrensuspension
+  galenic_group: 1
+29949404: !ruby/struct:Struct::GalenicForm
+  oid: 29949404
+  descriptions:
+    de: Pulver zur Herstellung eines Infusionslösungskonzentrates
+  galenic_group: 1
+25646557: !ruby/struct:Struct::GalenicForm
+  oid: 25646557
+  descriptions:
+    de: gouttes à avaler
+  galenic_group: 1
+31190493: !ruby/struct:Struct::GalenicForm
+  oid: 31190493
+  descriptions:
+    de: Injektionslösung zur intravitrealen Injektion in Fertigspritze
+  galenic_group: 1
+26771166: !ruby/struct:Struct::GalenicForm
+  oid: 26771166
+  descriptions:
+    de: homöopathische Heuschnupfentropfen
+  galenic_group: 1
+26771678: !ruby/struct:Struct::GalenicForm
+  oid: 26771678
+  descriptions:
+    de: emplâtre réfrigérant
+  galenic_group: 1
+26771934: !ruby/struct:Struct::GalenicForm
+  oid: 26771934
+  descriptions:
+    de: Injektionslsg anthrop. Arzneimittel
+  galenic_group: 1
+31052766: !ruby/struct:Struct::GalenicForm
+  oid: 31052766
+  descriptions:
+    de: Spray (ersetzt Seq.
+  galenic_group: 1
+32097503: !ruby/struct:Struct::GalenicForm
+  oid: 32097503
+  descriptions:
+    de: solution pour injection en seringue pré-remplie
+  galenic_group: 1
+26771168: !ruby/struct:Struct::GalenicForm
+  oid: 26771168
+  descriptions:
+    de: sterile Augensalbe
+  galenic_group: 1
+26771680: !ruby/struct:Struct::GalenicForm
+  oid: 26771680
+  descriptions:
+    de: Lutschtabletten Mint
+  galenic_group: 1
+26771936: !ruby/struct:Struct::GalenicForm
+  oid: 26771936
+  descriptions:
+    de: Injektionslösung anthropos. Arzneimittel
+  galenic_group: 1
+23833312: !ruby/struct:Struct::GalenicForm
+  oid: 23833312
+  descriptions:
+    de: Pulver zur Herstellung einer Infusionssuspension
+  galenic_group: 1
+30603232: !ruby/struct:Struct::GalenicForm
+  oid: 30603232
+  descriptions:
+    de: Spray zur Anwendung in der Mundhöhle
+  galenic_group: 1
+26771170: !ruby/struct:Struct::GalenicForm
+  oid: 26771170
+  descriptions:
+    de: erba medicinale sminuzzata
+  galenic_group: 1
+26771682: !ruby/struct:Struct::GalenicForm
+  oid: 26771682
+  descriptions:
+    de: gel émulsionné
+  galenic_group: 1
+31672291: !ruby/struct:Struct::GalenicForm
+  oid: 31672291
+  descriptions:
+    de: solution cutanée
+  galenic_group: 1
+26240995: !ruby/struct:Struct::GalenicForm
+  oid: 26240995
+  descriptions:
+    de: Lyophilisat zur Infusion
+  galenic_group: 1
+32445156: !ruby/struct:Struct::GalenicForm
+  oid: 32445156
+  descriptions:
+    de: Pulver und Lösungsmittel zur Herstellung einer Injektionslösung in einem Fertigpen
+  galenic_group: 1
+26771172: !ruby/struct:Struct::GalenicForm
+  oid: 26771172
+  descriptions:
+    de: homöopathisches Arzneimittel bei nervösen Beschwerden
+  galenic_group: 1
+26771428: !ruby/struct:Struct::GalenicForm
+  oid: 26771428
+  descriptions:
+    de: Arzneimittel auf Grundlage anthroposophischer Erkenntnis
+  galenic_group: 1
+26771684: !ruby/struct:Struct::GalenicForm
+  oid: 26771684
+  descriptions:
+    de: Emulsion zur Injektion/Infusion
+  galenic_group: 1
+26771174: !ruby/struct:Struct::GalenicForm
+  oid: 26771174
+  descriptions:
+    de: flüssiger Badezusatz
+  galenic_group: 1
+26771686: !ruby/struct:Struct::GalenicForm
+  oid: 26771686
+  descriptions:
+    de: Einmaldosen zur nasalen Spülung
+  galenic_group: 1
+26772711: !ruby/struct:Struct::GalenicForm
+  oid: 26772711
+  descriptions:
+    de: comprimés à libération contrôlée
+  galenic_group: 1
+24364263: !ruby/struct:Struct::GalenicForm
+  oid: 24364263
+  descriptions:
+    de: Lösung zur Konservierung von Organtransplantaten
+  galenic_group: 1
+26771176: !ruby/struct:Struct::GalenicForm
+  oid: 26771176
+  descriptions:
+    de: garze medicate
+  galenic_group: 1
+26771688: !ruby/struct:Struct::GalenicForm
+  oid: 26771688
+  descriptions:
+    de: Instant-Tabletten
+  galenic_group: 1
+28644841: !ruby/struct:Struct::GalenicForm
+  oid: 28644841
+  descriptions:
+    de: Poudre et solvant pour suspension injectable à libération prolongée
+  galenic_group: 1
+25647849: !ruby/struct:Struct::GalenicForm
+  oid: 25647849
+  descriptions:
+    de: poudre pour la préparation d'une solution injectable ou pour perfusion
+  galenic_group: 1
+22578409: !ruby/struct:Struct::GalenicForm
+  oid: 22578409
+  descriptions:
+    de: Flüssig
+  galenic_group: 1
+26771178: !ruby/struct:Struct::GalenicForm
+  oid: 26771178
+  descriptions:
+    de: sachets de poudre
+  galenic_group: 1
+26771690: !ruby/struct:Struct::GalenicForm
+  oid: 26771690
+  descriptions:
+    de: Trockensubstanz + Solvens
+  galenic_group: 1
+29042668: !ruby/struct:Struct::GalenicForm
+  oid: 29042668
+  descriptions:
+    de: Crème teintée
+  galenic_group: 1
+26771180: !ruby/struct:Struct::GalenicForm
+  oid: 26771180
+  descriptions:
+    de: steriles Tropfgel
+  galenic_group: 1
+26771436: !ruby/struct:Struct::GalenicForm
+  oid: 26771436
+  descriptions:
+    de: homöopathische Erkältungstropfen
+  galenic_group: 1
+26771692: !ruby/struct:Struct::GalenicForm
+  oid: 26771692
+  descriptions:
+    de: homöopathisches Arzneimittel bei Mund- und Halsentzündungen
+  galenic_group: 1
+25476333: !ruby/struct:Struct::GalenicForm
+  oid: 25476333
+  descriptions:
+    de: topische Lösung
+  galenic_group: 1
+26771182: !ruby/struct:Struct::GalenicForm
+  oid: 26771182
+  descriptions:
+    de: Lyophilisat für Aerosol
+  galenic_group: 1
+26771438: !ruby/struct:Struct::GalenicForm
+  oid: 26771438
+  descriptions:
+    de: homöopathische Beruhigungstropfen
+  galenic_group: 1
+26771694: !ruby/struct:Struct::GalenicForm
+  oid: 26771694
+  descriptions:
+    de: homöopathisches Arzneimittel zur Milchbildung
+  galenic_group: 1
+23833070: !ruby/struct:Struct::GalenicForm
+  oid: 23833070
+  descriptions:
+    de: Injektionslösung in Patronen
+  galenic_group: 1
+31672560: !ruby/struct:Struct::GalenicForm
+  oid: 31672560
+  descriptions:
+    de: wirkstoffhaltiger Nagellack
+  galenic_group: 1
+26568432: !ruby/struct:Struct::GalenicForm
+  oid: 26568432
+  descriptions:
+    de: Injektionspräparat im vorgefüllten Peno GoQuick
+  galenic_group: 1
+26771184: !ruby/struct:Struct::GalenicForm
+  oid: 26771184
+  descriptions:
+    de: soluzione iniettabile per diluizione
+  galenic_group: 1
+26771440: !ruby/struct:Struct::GalenicForm
+  oid: 26771440
+  descriptions:
+    de: homöopathische Venentropfen
+  galenic_group: 1
+26771696: !ruby/struct:Struct::GalenicForm
+  oid: 26771696
+  descriptions:
+    de: anthropos. Arzneimittel
+  galenic_group: 1
+25608945: !ruby/struct:Struct::GalenicForm
+  oid: 25608945
+  descriptions:
+    de: Lösung intrakutan
+  galenic_group: 1
+26771186: !ruby/struct:Struct::GalenicForm
+  oid: 26771186
+  descriptions:
+    de: single use
+  galenic_group: 1
+26771442: !ruby/struct:Struct::GalenicForm
+  oid: 26771442
+  descriptions:
+    de: homöopathische Leber-Galle-Tropfen
+  galenic_group: 1
+26771698: !ruby/struct:Struct::GalenicForm
+  oid: 26771698
+  descriptions:
+    de: spray-doseur pour petits enfants et nourrissons
+  galenic_group: 1
+24362226: !ruby/struct:Struct::GalenicForm
+  oid: 24362226
+  descriptions:
+    de: Suspension zur Injektion
+  galenic_group: 1
+26772467: !ruby/struct:Struct::GalenicForm
+  oid: 26772467
+  descriptions:
+    de: Lyophilisat pour suspension injectable
+  galenic_group: 1
+29234164: !ruby/struct:Struct::GalenicForm
+  oid: 29234164
+  descriptions:
+    de: Halspastille
+  galenic_group: 1
+31672820: !ruby/struct:Struct::GalenicForm
+  oid: 31672820
+  descriptions:
+    de: Pulver zur Herstellung einer Lösung zum Einnehmen
+  galenic_group: 1
+26770676: !ruby/struct:Struct::GalenicForm
+  oid: 26770676
+  descriptions:
+    de: homöopathische Gelenkschmerzentropfen
+  galenic_group: 1
+26771188: !ruby/struct:Struct::GalenicForm
+  oid: 26771188
+  descriptions:
+    de: Instant-Pulver
+  galenic_group: 1
+26771444: !ruby/struct:Struct::GalenicForm
+  oid: 26771444
+  descriptions:
+    de: atomiseur
+  galenic_group: 1
+26771700: !ruby/struct:Struct::GalenicForm
+  oid: 26771700
+  descriptions:
+    de: Disk (Pulverinhalation)
+  galenic_group: 1
+26770678: !ruby/struct:Struct::GalenicForm
+  oid: 26770678
+  descriptions:
+    de: homöopathische Herztropfen
+  galenic_group: 1
+26771190: !ruby/struct:Struct::GalenicForm
+  oid: 26771190
+  descriptions:
+    de: pain dermatologique
+  galenic_group: 1
+26771446: !ruby/struct:Struct::GalenicForm
+  oid: 26771446
+  descriptions:
+    de: homöopathische Prostatatropfen
+  galenic_group: 1
+26771702: !ruby/struct:Struct::GalenicForm
+  oid: 26771702
+  descriptions:
+    de: Kapseln zur Inhalation mit Aerolizer
+  galenic_group: 1
+26770680: !ruby/struct:Struct::GalenicForm
+  oid: 26770680
+  descriptions:
+    de: wässriges Konzentrat
+  galenic_group: 1
+26771192: !ruby/struct:Struct::GalenicForm
+  oid: 26771192
+  descriptions:
+    de: soluté alcoolique
+  galenic_group: 1
+26771448: !ruby/struct:Struct::GalenicForm
+  oid: 26771448
+  descriptions:
+    de: préparation injectable/pour perfusion
+  galenic_group: 1
+26771704: !ruby/struct:Struct::GalenicForm
+  oid: 26771704
+  descriptions:
+    de: Huflattichblatt
+  galenic_group: 1
+24365049: !ruby/struct:Struct::GalenicForm
+  oid: 24365049
+  descriptions:
+    de: gouttes orales
+  galenic_group: 1
+26771194: !ruby/struct:Struct::GalenicForm
+  oid: 26771194
+  descriptions:
+    de: granulato in bustine
+  galenic_group: 1
+26771450: !ruby/struct:Struct::GalenicForm
+  oid: 26771450
+  descriptions:
+    de: Minieinlauf
+  galenic_group: 1
+26771706: !ruby/struct:Struct::GalenicForm
+  oid: 26771706
+  descriptions:
+    de: Lösung zur subkutanen Injektion / intravenösen Infusion
+  galenic_group: 1
+26771962: !ruby/struct:Struct::GalenicForm
+  oid: 26771962
+  descriptions:
+    de: magensaftresistente Hartkapseln
+  galenic_group: 1
+23826939: !ruby/struct:Struct::GalenicForm
+  oid: 23826939
+  descriptions:
+    de: Lutschtabletten mit Blackcurrant-Aroma
+  galenic_group: 1
+28894971: !ruby/struct:Struct::GalenicForm
+  oid: 28894971
+  descriptions:
+    de: Lösung zur intravitrealen Injektion in einer Fertigspritze
+  galenic_group: 1
+22750716: !ruby/struct:Struct::GalenicForm
+  oid: 22750716
+  descriptions:
+    de: Liquide
+  galenic_group: 1
+26771196: !ruby/struct:Struct::GalenicForm
+  oid: 26771196
+  descriptions:
+    de: Depottabletten
+  galenic_group: 1
+26771452: !ruby/struct:Struct::GalenicForm
+  oid: 26771452
+  descriptions:
+    de: Disk
+  galenic_group: 1
+26771708: !ruby/struct:Struct::GalenicForm
+  oid: 26771708
+  descriptions:
+    de: tisane laxative
+  galenic_group: 1
+26771964: !ruby/struct:Struct::GalenicForm
+  oid: 26771964
+  descriptions:
+    de: Emulsion zur Injektion oder Infusion
+  galenic_group: 1
+26770686: !ruby/struct:Struct::GalenicForm
+  oid: 26770686
+  descriptions:
+    de: Badezussatz
+  galenic_group: 1
+26771198: !ruby/struct:Struct::GalenicForm
+  oid: 26771198
+  descriptions:
+    de: solution auriculaire
+  galenic_group: 1
+26771454: !ruby/struct:Struct::GalenicForm
+  oid: 26771454
+  descriptions:
+    de: Augen-Tropfgel
+  galenic_group: 1
+26771710: !ruby/struct:Struct::GalenicForm
+  oid: 26771710
+  descriptions:
+    de: Augentropfensuspension
+  galenic_group: 1
+30543359: !ruby/struct:Struct::GalenicForm
+  oid: 30543359
+  descriptions:
+    de: Trockensubstanz mit Lösungsmittel
+  galenic_group: 1
+26772991: !ruby/struct:Struct::GalenicForm
+  oid: 26772991
+  descriptions:
+    de: cartouches pour OptiClik
+  galenic_group: 1
+6: !ruby/struct:Struct::GalenicForm
+  oid: 6
+  descriptions:
+    de: Flüssigkeit
+    en: Fluid
+    fr: Fluide
+    lt: FLUIDUM
+  galenic_group: 1
+22: !ruby/struct:Struct::GalenicForm
+  oid: 22
+  descriptions:
+    de: Lösung
+    en: Solution
+    fr: Solution
+    lt: solutionem
+  galenic_group: 1
+44: !ruby/struct:Struct::GalenicForm
+  oid: 44
+  descriptions:
+    de: Suspension
+    lt: SUSPENSIONEM
+  galenic_group: 1
+47: !ruby/struct:Struct::GalenicForm
+  oid: 47
+  descriptions:
+    de: Perlen
+  galenic_group: 1
+79: !ruby/struct:Struct::GalenicForm
+  oid: 79
+  descriptions:
+    de: Tüchlein
+    fr: lingettes
+  galenic_group: 1
+118: !ruby/struct:Struct::GalenicForm
+  oid: 118
+  descriptions:
+    de: Intrauterinpessar
+    en: Intra-uterine system
+    fr: Système intra-utérin
+  galenic_group: 1
+122: !ruby/struct:Struct::GalenicForm
+  oid: 122
+  descriptions:
+    de: Pellets
+  galenic_group: 1
+125: !ruby/struct:Struct::GalenicForm
+  oid: 125
+  descriptions:
+    de: Pillen
+    en: Pills
+    fr: Pilles
+  galenic_group: 2
+224: !ruby/struct:Struct::GalenicForm
+  oid: 224
+  descriptions:
+    de: Weichkapseln
+    en: Soft capsules
+    fr: Capsules molles
+  galenic_group: 2
+362: !ruby/struct:Struct::GalenicForm
+  oid: 362
+  descriptions:
+    de: Tabletten teilbar
+    en: Divitabs
+    fr: Comprimés sécables
+  galenic_group: 2
+792931: !ruby/struct:Struct::GalenicForm
+  oid: 792931
+  descriptions:
+    de: Dispersible Tabletten
+    en: Dispersible Tablets
+    fr: Comprimés dispersibles
+    lt: compresso dispersibilum
+  galenic_group: 2
+10802030: !ruby/struct:Struct::GalenicForm
+  oid: 10802030
+  descriptions:
+    de: Filmtabletten teilbar
+    en: Coated divitabs
+    fr: Comprimés pélliculés sécables
+  galenic_group: 2
+865141: !ruby/struct:Struct::GalenicForm
+  oid: 865141
+  descriptions:
+    de: Wochentabletten
+    en: Weekly tablets
+    fr: Comprimés hebdomadaires
+  galenic_group: 2
+10801139: !ruby/struct:Struct::GalenicForm
+  oid: 10801139
+  descriptions:
+    de: Magensaftresistente Kapseln
+    en: Gastric juice resistant capsules
+    fr: Capsules résistants au suc gastrique
+    lt: Magensaftresistente Kapseln
+  galenic_group: 2
+26771728: !ruby/struct:Struct::GalenicForm
+  oid: 26771728
+  descriptions:
+    de: Minipacks mit Retard-Mini-Filmtabletten
+  galenic_group: 2
+22132015: !ruby/struct:Struct::GalenicForm
+  oid: 22132015
+  descriptions:
+    de: Tabletten (kaubar, dispergierbar)
+    en: Tablets (chewable, dispersible)
+    fr: Comprimés (à mâcher, dispersibles)
+  galenic_group: 2
+20756545: !ruby/struct:Struct::GalenicForm
+  oid: 20756545
+  descriptions:
+    de: Magensaftresistente Tabletten
+    en: Gastric juice resistant tablets
+    fr: Comprimés résistants au suc gastrique
+  galenic_group: 2
+26241111: !ruby/struct:Struct::GalenicForm
+  oid: 26241111
+  descriptions:
+    de: Minipacks mit Mini-Filmtabletten
+  galenic_group: 2
+1: !ruby/struct:Struct::GalenicForm
+  oid: 1
+  descriptions:
+    de: Tabletten
+    en: Tablets
+    fr: Comprimés
+    lt: compresso
+  galenic_group: 2
+15: !ruby/struct:Struct::GalenicForm
+  oid: 15
+  descriptions:
+    de: Dragées
+    en: Dragées
+    fr: Dragées
+  galenic_group: 2
+21: !ruby/struct:Struct::GalenicForm
+  oid: 21
+  descriptions:
+    de: Filmtabletten
+    en: Coated tablets
+    fr: Comprimés filmés
+    lt: compresso obducto
+  galenic_group: 2
+24: !ruby/struct:Struct::GalenicForm
+  oid: 24
+  descriptions:
+    de: Kapseln
+    en: Capsules
+    fr: Capsules
+    lt: capsula
+  galenic_group: 2
+26: !ruby/struct:Struct::GalenicForm
+  oid: 26
+  descriptions:
+    de: Globuli
+    en: Globules
+    fr: Globules
+  galenic_group: 2
+174: !ruby/struct:Struct::GalenicForm
+  oid: 174
+  descriptions:
+    de: Injektionslösung in Fertigspritze
+    en: Injection solution in prefilled syringe
+    fr: Solution injectable en seringue prête à l'emploi
+  galenic_group: 3
+253: !ruby/struct:Struct::GalenicForm
+  oid: 253
+  descriptions:
+    de: Lyophilisat und Lösungsmittel
+    en: Lyophilisate and solvent
+    fr: Lyophilisat et solvant
+  galenic_group: 3
+294: !ruby/struct:Struct::GalenicForm
+  oid: 294
+  descriptions:
+    de: Injektionssuspension (Einwegspritze)
+    en: Injection suspension in prefilled syringe
+    fr: Suspension injectable en seringue prête à l'emploi
+  galenic_group: 3
+327: !ruby/struct:Struct::GalenicForm
+  oid: 327
+  descriptions:
+    de: Injektions-Pen
+    en: Injection-Pen
+    fr: Pen pour injection
+    lt: Pen ad iniectionem
+  galenic_group: 3
+9848107: !ruby/struct:Struct::GalenicForm
+  oid: 9848107
+  descriptions:
+    de: Lösung zur intravenösen Injektion/Infusion
+    en: Solution for intravenous injection/infusion
+    fr: Solution pour injection/infusion intravéneuse
+  galenic_group: 3
+7746100: !ruby/struct:Struct::GalenicForm
+  oid: 7746100
+  descriptions:
+    de: Kurzinfusionslösung
+  galenic_group: 3
+9430073: !ruby/struct:Struct::GalenicForm
+  oid: 9430073
+  descriptions:
+    de: Zusatz zu Infusionslösungen
+    en: Adjuvant to infusion solutions
+    fr: Supplémentaire aux solutions pour perfusion
+    lt: Zusatz zu Infusionslösungen
+  galenic_group: 3
+1480015: !ruby/struct:Struct::GalenicForm
+  oid: 1480015
+  descriptions:
+    de: Instillationssuspension
+    en: Instillation suspension
+    fr: Suspension instillable
+  galenic_group: 3
+12791454: !ruby/struct:Struct::GalenicForm
+  oid: 12791454
+  descriptions:
+    de: Lösung zur Injektion/Instillation
+    en: Solution for injection/instillation
+    fr: Solution pour injection/instillation
+  galenic_group: 3
+15273895: !ruby/struct:Struct::GalenicForm
+  oid: 15273895
+  descriptions:
+    de: Lösung für parenterale Anwendung
+    en: Solution for parenteral use
+    fr: Solution pour usage parenterale
+  galenic_group: 3
+714726: !ruby/struct:Struct::GalenicForm
+  oid: 714726
+  descriptions:
+    de: Plasma
+    en: Plasma
+    fr: Plasma
+  galenic_group: 3
+13601278: !ruby/struct:Struct::GalenicForm
+  oid: 13601278
+  descriptions:
+    de: raumtemperaturstabiles Injektionspräparat
+    en: Injection preparation, stable at room temperature
+    fr: Preparation injectable, stable à température ambiante
+  galenic_group: 3
+25: !ruby/struct:Struct::GalenicForm
+  oid: 25
+  descriptions:
+    de: Injektionslösung
+    en: Injection solution
+    fr: Solution injectable
+  galenic_group: 3
+39: !ruby/struct:Struct::GalenicForm
+  oid: 39
+  descriptions:
+    de: Injektionspräparat
+    en: Injection preparation
+    fr: Préparation injectable
+  galenic_group: 3
+41: !ruby/struct:Struct::GalenicForm
+  oid: 41
+  descriptions:
+    de: Infusionslösung
+    en: Infusion solution
+    fr: Solution pour perfusion
+    lt: Solutio pro infusionem
+  galenic_group: 3
+46: !ruby/struct:Struct::GalenicForm
+  oid: 46
+  descriptions:
+    de: Injektionssuspension
+    en: Injection suspension
+    fr: Suspension injectable
+  galenic_group: 3
+49: !ruby/struct:Struct::GalenicForm
+  oid: 49
+  descriptions:
+    de: Infusionspräparat
+    en: Infusion preparation
+    fr: Préparation pour perfusion
+  galenic_group: 3
+67: !ruby/struct:Struct::GalenicForm
+  oid: 67
+  descriptions:
+    de: Infusionsemulsion
+    en: Infusion emulsion
+    fr: Emulsion pour perfusion
+  galenic_group: 3
+88: !ruby/struct:Struct::GalenicForm
+  oid: 88
+  descriptions:
+    de: Injektionsemulsion
+    en: Injection emulsion
+    fr: Emulsion pour injection
+  galenic_group: 3
+97: !ruby/struct:Struct::GalenicForm
+  oid: 97
+  descriptions:
+    de: Instillationslösung
+    en: Instillation solution
+    fr: Solution à instillation
+  galenic_group: 3
+243: !ruby/struct:Struct::GalenicForm
+  oid: 243
+  descriptions:
+    de: Crème
+    en: Cream
+    fr: Crème
+  galenic_group: 4
+338: !ruby/struct:Struct::GalenicForm
+  oid: 338
+  descriptions:
+    de: Lipogel
+  galenic_group: 4
+7745625: !ruby/struct:Struct::GalenicForm
+  oid: 7745625
+  descriptions:
+    de: Fettsalbe
+  galenic_group: 4
+819096: !ruby/struct:Struct::GalenicForm
+  oid: 819096
+  descriptions:
+    de: Liniment
+    en: Liniment
+    fr: Liniment
+    lt: Liniment
+  galenic_group: 4
+7744921: !ruby/struct:Struct::GalenicForm
+  oid: 7744921
+  descriptions:
+    de: Schaum
+  galenic_group: 4
+940716: !ruby/struct:Struct::GalenicForm
+  oid: 940716
+  descriptions:
+    de: Fettlotion
+  galenic_group: 4
+907181: !ruby/struct:Struct::GalenicForm
+  oid: 907181
+  descriptions:
+    de: Fettcrème
+    en: Lipocream
+  galenic_group: 4
+7744435: !ruby/struct:Struct::GalenicForm
+  oid: 7744435
+  descriptions:
+    de: Umschlagpaste
+  galenic_group: 4
+7744441: !ruby/struct:Struct::GalenicForm
+  oid: 7744441
+  descriptions:
+    de: Lösung (topisch)
+    en: Solution (topic)
+    fr: Solution (topique)
+  galenic_group: 4
+3: !ruby/struct:Struct::GalenicForm
+  oid: 3
+  descriptions:
+    de: Stift
+    en: Stick
+    fr: Baton
+    lt: Bastone
+  galenic_group: 4
+4: !ruby/struct:Struct::GalenicForm
+  oid: 4
+  descriptions:
+    de: Salbe
+    en: Ointment
+    fr: Onguent
+    lt: unguentum
+  galenic_group: 4
+28: !ruby/struct:Struct::GalenicForm
+  oid: 28
+  descriptions:
+    de: Emulsion
+    lt: EMULSIONEM
+  galenic_group: 4
+35: !ruby/struct:Struct::GalenicForm
+  oid: 35
+  descriptions:
+    de: Paste
+  galenic_group: 4
+63: !ruby/struct:Struct::GalenicForm
+  oid: 63
+  descriptions:
+    de: Gel
+    en: Gel
+    fr: gel
+    lt: gelatum
+  galenic_group: 4
+72: !ruby/struct:Struct::GalenicForm
+  oid: 72
+  descriptions:
+    de: Oel
+    en: Oil
+    fr: Huile
+  galenic_group: 4
+78: !ruby/struct:Struct::GalenicForm
+  oid: 78
+  descriptions:
+    de: Balsam
+    en: Balm
+    fr: Baume
+  galenic_group: 4
+195: !ruby/struct:Struct::GalenicForm
+  oid: 195
+  descriptions:
+    de: Augentropfen (Monodosen)
+    en: Eye drops (monodoses)
+    fr: Collyres (monodoses)
+  galenic_group: 5
+291: !ruby/struct:Struct::GalenicForm
+  oid: 291
+  descriptions:
+    de: Augen-Gel (Monodosen)
+    en: Ophtalmic gel (monodoses)
+    fr: Gel oculaire (monodoses)
+    lt: Gelatum oculare (monodoses)
+  galenic_group: 5
+852575: !ruby/struct:Struct::GalenicForm
+  oid: 852575
+  descriptions:
+    de: Augenkompressen
+    en: Ophtalmic compresses
+    fr: Compresses oculaires
+  galenic_group: 5
+17: !ruby/struct:Struct::GalenicForm
+  oid: 17
+  descriptions:
+    de: Augenbad
+    en: Ophtalmic bath
+    fr: Bain oculaire
+  galenic_group: 5
+38: !ruby/struct:Struct::GalenicForm
+  oid: 38
+  descriptions:
+    de: Augensalbe
+    en: Ophtalmic ointment
+    fr: Onguent oculaire
+  galenic_group: 5
+52: !ruby/struct:Struct::GalenicForm
+  oid: 52
+  descriptions:
+    de: Augentropfen
+    en: Eye drops
+    fr: Collyre
+  galenic_group: 5
+103: !ruby/struct:Struct::GalenicForm
+  oid: 103
+  descriptions:
+    de: Augen-Gel
+    en: Ophtalmic gel
+    fr: Gel oculaire
+    lt: Gelatum oculare
+  galenic_group: 5
+267: !ruby/struct:Struct::GalenicForm
+  oid: 267
+  descriptions:
+    de: Nebulisator
+    en: Nebulisator
+    fr: Nébuliseur
+  galenic_group: 6
+337: !ruby/struct:Struct::GalenicForm
+  oid: 337
+  descriptions:
+    de: Mikrozerstäuber
+    fr: Microdoseur
+  galenic_group: 6
+13442109: !ruby/struct:Struct::GalenicForm
+  oid: 13442109
+  descriptions:
+    de: Inhalationsgas
+    en: Inhalation gas
+    fr: Gaz pour inhalation
+  galenic_group: 6
+1479851: !ruby/struct:Struct::GalenicForm
+  oid: 1479851
+  descriptions:
+    de: Inhalationssuspension
+    en: Inhalation suspension
+    fr: Suspension à l'inhalation
+  galenic_group: 6
+84: !ruby/struct:Struct::GalenicForm
+  oid: 84
+  descriptions:
+    de: Inhalationslösung
+    en: Inhalation solution
+    fr: Solution d'inhalation
+  galenic_group: 6
+85: !ruby/struct:Struct::GalenicForm
+  oid: 85
+  descriptions:
+    de: Dosier-Aerosol
+    en: Metered dose aerosol
+    fr: Nébuliseur-doseur
+  galenic_group: 6
+112: !ruby/struct:Struct::GalenicForm
+  oid: 112
+  descriptions:
+    de: Gas
+    fr: Gaz
+  galenic_group: 6
+113: !ruby/struct:Struct::GalenicForm
+  oid: 113
+  descriptions:
+    de: Inhalationspulver
+    en: Inhalation Powder
+    fr: Poudre pour inhalation
+  galenic_group: 6
+387: !ruby/struct:Struct::GalenicForm
+  oid: 387
+  descriptions:
+    de: Teebeutel
+    fr: Sachet
+  galenic_group: 7
+7744574: !ruby/struct:Struct::GalenicForm
+  oid: 7744574
+  descriptions:
+    de: Alkoholat
+    en: Alcoholat
+    fr: Alcoholat
+    lt: Alcoholat
+  galenic_group: 7
+7745414: !ruby/struct:Struct::GalenicForm
+  oid: 7745414
+  descriptions:
+    de: Brausesalz
+  galenic_group: 7
+10801044: !ruby/struct:Struct::GalenicForm
+  oid: 10801044
+  descriptions:
+    de: Granulat zur oralen Suspension
+    en: Granulate for oral suspension
+    fr: Granulé à suspension orale
+  galenic_group: 7
+2: !ruby/struct:Struct::GalenicForm
+  oid: 2
+  descriptions:
+    de: Geschnittene Kräuter
+    en: Chopped herbs
+    fr: Herbes coupées
+  galenic_group: 7
+12: !ruby/struct:Struct::GalenicForm
+  oid: 12
+  descriptions:
+    de: Sirup
+    en: Sirup
+    fr: Sirop
+  galenic_group: 7
+36: !ruby/struct:Struct::GalenicForm
+  oid: 36
+  descriptions:
+    de: Granulat
+    en: Granulate
+    fr: Granulé
+    lt: GRANULATUM
+  galenic_group: 7
+58: !ruby/struct:Struct::GalenicForm
+  oid: 58
+  descriptions:
+    de: Pulver
+    en: Soluble Powder
+    fr: Poudre soluble
+    lt: Pulverum
+  galenic_group: 7
+65: !ruby/struct:Struct::GalenicForm
+  oid: 65
+  descriptions:
+    de: Brausepulver
+    en: Effervescent powder
+    fr: Poudre effervescente
+  galenic_group: 7
+111: !ruby/struct:Struct::GalenicForm
+  oid: 111
+  descriptions:
+    de: Brausegranulat
+    en: Effervescent granulate
+    fr: Granulé effervescent
+  galenic_group: 7
+216: !ruby/struct:Struct::GalenicForm
+  oid: 216
+  descriptions:
+    de: Öl-Bad
+    en: Bath oil
+    fr: Huile de bain
+    lt: Badeöl
+  galenic_group: 8
+907105: !ruby/struct:Struct::GalenicForm
+  oid: 907105
+  descriptions:
+    de: Bad
+    en: Bath
+    fr: Bain
+  galenic_group: 8
+1471400: !ruby/struct:Struct::GalenicForm
+  oid: 1471400
+  descriptions:
+    de: Badeemulsion
+    en: Bath emulsion
+    fr: Emulsion à bain
+  galenic_group: 8
+14: !ruby/struct:Struct::GalenicForm
+  oid: 14
+  descriptions:
+    de: Badesalz
+    en: Bath salt
+    fr: Sel de bain
+  galenic_group: 8
+105: !ruby/struct:Struct::GalenicForm
+  oid: 105
+  descriptions:
+    de: Badeessenz
+    en: Bath essence
+    fr: Essence de bain
+  galenic_group: 8
+182: !ruby/struct:Struct::GalenicForm
+  oid: 182
+  descriptions:
+    de: Stengel
+    en: Bar
+    fr: Barre
+  galenic_group: 9
+7745822: !ruby/struct:Struct::GalenicForm
+  oid: 7745822
+  descriptions:
+    de: Kräutermischung
+  galenic_group: 9
+7745186: !ruby/struct:Struct::GalenicForm
+  oid: 7745186
+  descriptions:
+    de: Gelée
+  galenic_group: 9
+1471956: !ruby/struct:Struct::GalenicForm
+  oid: 1471956
+  descriptions:
+    de: Margarine
+    en: Margarine
+    fr: Margarine
+    lt: Margarine
+  galenic_group: 9
+61: !ruby/struct:Struct::GalenicForm
+  oid: 61
+  descriptions:
+    de: Körner
+    en: Grains
+    fr: Grains
+    lt: Grani
+  galenic_group: 9
+95: !ruby/struct:Struct::GalenicForm
+  oid: 95
+  descriptions:
+    de: Biskuits
+    en: Biscuits
+  galenic_group: 9
+114: !ruby/struct:Struct::GalenicForm
+  oid: 114
+  descriptions:
+    de: Schokolade
+    en: Chocolat
+    fr: Chocolate
+  galenic_group: 9
+120: !ruby/struct:Struct::GalenicForm
+  oid: 120
+  descriptions:
+    de: Würfel
+    en: Cube
+    fr: Cube
+  galenic_group: 9
+123: !ruby/struct:Struct::GalenicForm
+  oid: 123
+  descriptions:
+    de: Sublingualtabletten
+    en: Sublingual tablets
+    fr: Comprimés sublinguaux
+  galenic_group: 10
+178: !ruby/struct:Struct::GalenicForm
+  oid: 178
+  descriptions:
+    de: Schmelztabletten
+    en: Melting tablets
+    fr: Comprimés orodispersibles
+  galenic_group: 10
+19177613: !ruby/struct:Struct::GalenicForm
+  oid: 19177613
+  descriptions:
+    de: Kaubonbons
+    en: Chewing bonbons
+    fr: Bonbons à mâcher
+  galenic_group: 10
+8: !ruby/struct:Struct::GalenicForm
+  oid: 8
+  descriptions:
+    de: Bonbons
+    en: Bonbons
+    fr: Bonbons
+    lt: Bonbons
+  galenic_group: 10
+29: !ruby/struct:Struct::GalenicForm
+  oid: 29
+  descriptions:
+    de: Pastillen
+    en: Pastilles
+    fr: Pastilles
+    lt: pastillo
+  galenic_group: 10
+60: !ruby/struct:Struct::GalenicForm
+  oid: 60
+  descriptions:
+    de: Lutschtabletten
+    en: Lozenges
+    fr: Comprimés à succer
+  galenic_group: 10
+335: !ruby/struct:Struct::GalenicForm
+  oid: 335
+  descriptions:
+    de: Suspension (oral)
+    en: Suspension (oral)
+    fr: Suspension (orale)
+    lt: Suspensionum (orale)
+  galenic_group: 11
+7745141: !ruby/struct:Struct::GalenicForm
+  oid: 7745141
+  descriptions:
+    de: Saft
+  galenic_group: 11
+7745659: !ruby/struct:Struct::GalenicForm
+  oid: 7745659
+  descriptions:
+    de: Mixtur
+  galenic_group: 11
+1471395: !ruby/struct:Struct::GalenicForm
+  oid: 1471395
+  descriptions:
+    de: Trinkemulsion
+    en: Drinkable emulsion
+    fr: Emulsion buvable
+  galenic_group: 11
+10: !ruby/struct:Struct::GalenicForm
+  oid: 10
+  descriptions:
+    de: Elixier
+    en: Elixir
+    fr: Elixir
+  galenic_group: 11
+19: !ruby/struct:Struct::GalenicForm
+  oid: 19
+  descriptions:
+    de: Tonikum
+    en: Tonic
+    fr: Tonique
+  galenic_group: 11
+34: !ruby/struct:Struct::GalenicForm
+  oid: 34
+  descriptions:
+    de: Lösung (oral)
+    en: Solution (oral)
+    fr: Solution (orale)
+  galenic_group: 11
+42: !ruby/struct:Struct::GalenicForm
+  oid: 42
+  descriptions:
+    de: Extrakt
+    en: Extract
+    fr: Extrait
+  galenic_group: 11
+59: !ruby/struct:Struct::GalenicForm
+  oid: 59
+  descriptions:
+    de: Artischocke
+    en: Juice
+    fr: Jus
+  galenic_group: 11
+104: !ruby/struct:Struct::GalenicForm
+  oid: 104
+  descriptions:
+    de: Konzentrat (oral)
+    en: Concentrate (oral)
+    fr: Concentré (oral)
+    lt: Concentratum (orale)
+  galenic_group: 11
+110: !ruby/struct:Struct::GalenicForm
+  oid: 110
+  descriptions:
+    de: Essenz
+    en: Essence
+    fr: Essence
+  galenic_group: 11
+249: !ruby/struct:Struct::GalenicForm
+  oid: 249
+  descriptions:
+    de: Ketten
+    en: Chains
+    fr: Billes
+  galenic_group: 12
+250: !ruby/struct:Struct::GalenicForm
+  oid: 250
+  descriptions:
+    de: Miniketten
+    en: Minichains
+    fr: Billes minuscules
+  galenic_group: 12
+90: !ruby/struct:Struct::GalenicForm
+  oid: 90
+  descriptions:
+    de: Implantat
+    en: Implant
+    fr: Implant
+  galenic_group: 12
+92: !ruby/struct:Struct::GalenicForm
+  oid: 92
+  descriptions:
+    de: Markierungsbesteck
+    en: Marker kit
+    fr: Kit de marquage
+  galenic_group: 12
+96: !ruby/struct:Struct::GalenicForm
+  oid: 96
+  descriptions:
+    de: Faden
+    en: Thread
+    fr: Fil
+  galenic_group: 12
+121: !ruby/struct:Struct::GalenicForm
+  oid: 121
+  descriptions:
+    de: Technetium-Generator
+    fr: Generateur Technetium
+  galenic_group: 12
+802528: !ruby/struct:Struct::GalenicForm
+  oid: 802528
+  descriptions:
+    de: Inhalierstift
+    en: Inhalation stick
+    fr: Bâton d'inhalation
+  galenic_group: 13
+7745526: !ruby/struct:Struct::GalenicForm
+  oid: 7745526
+  descriptions:
+    de: Nasenöl
+    en: Nasal oil
+    fr: Huile nasale
+  galenic_group: 13
+13: !ruby/struct:Struct::GalenicForm
+  oid: 13
+  descriptions:
+    de: Nasensalbe
+    en: Nose ointment
+    fr: Onguent nasal
+  galenic_group: 13
+27: !ruby/struct:Struct::GalenicForm
+  oid: 27
+  descriptions:
+    de: Nasentropfen
+    en: Nose drops
+    fr: Gouttes nasales
+  galenic_group: 13
+56: !ruby/struct:Struct::GalenicForm
+  oid: 56
+  descriptions:
+    de: Nasenspray
+    en: Nasal spray
+    fr: Spray nasale
+  galenic_group: 13
+80: !ruby/struct:Struct::GalenicForm
+  oid: 80
+  descriptions:
+    de: Nasengel
+    en: Nose gel
+    fr: Gel nasal
+  galenic_group: 13
+298: !ruby/struct:Struct::GalenicForm
+  oid: 298
+  descriptions:
+    de: Retardminitabletten
+    en: Delayed release minitablets
+    fr: Comprimés retard minuscules
+  galenic_group: 14
+11780384: !ruby/struct:Struct::GalenicForm
+  oid: 11780384
+  descriptions:
+    de: Tabletten mit modifizierter Wirkstofffreigabe
+    en: Modified release tablets
+    fr: Comprimés à libération modifiée
+    lt: Tabletten mit modifizierter Wirkstofffreigabe
+  galenic_group: 14
+13763922: !ruby/struct:Struct::GalenicForm
+  oid: 13763922
+  descriptions:
+    de: Retard-Tabletten teilbar
+    en: Delayed release divitabs
+    fr: Comprimés retards sécables
+  galenic_group: 14
+3034976: !ruby/struct:Struct::GalenicForm
+  oid: 3034976
+  descriptions:
+    de: Retard-Filmtabletten
+    en: Delayed release coated tablets
+    fr: Comprimés filmés retards
+    lt: Compresso obducto retardivum
+  galenic_group: 14
+55: !ruby/struct:Struct::GalenicForm
+  oid: 55
+  descriptions:
+    de: Retard-Tabletten
+    en: Delayed release tablets
+    fr: Comprimés retards
+  galenic_group: 14
+62: !ruby/struct:Struct::GalenicForm
+  oid: 62
+  descriptions:
+    de: Retard-Dragées
+    en: Delayed release dragées
+    fr: Dragées retard
+  galenic_group: 14
+74: !ruby/struct:Struct::GalenicForm
+  oid: 74
+  descriptions:
+    de: Retard-Kapseln
+    en: Delayed release capsules
+    fr: Capsules retard
+  galenic_group: 14
+289: !ruby/struct:Struct::GalenicForm
+  oid: 289
+  descriptions:
+    de: Vaginalring
+    en: Vaginal ring
+    fr: Anneau vaginal
+  galenic_group: 15
+940903: !ruby/struct:Struct::GalenicForm
+  oid: 940903
+  descriptions:
+    de: Crème + Vaginaltabletten
+    en: Cream + Vaginal tablets
+    fr: Crème + Comprimés vaginaux
+  galenic_group: 15
+40: !ruby/struct:Struct::GalenicForm
+  oid: 40
+  descriptions:
+    de: Vaginalovula
+    en: Vaginal ovules
+    fr: Ovules vaginaux
+  galenic_group: 15
+81: !ruby/struct:Struct::GalenicForm
+  oid: 81
+  descriptions:
+    de: Film
+  galenic_group: 15
+83: !ruby/struct:Struct::GalenicForm
+  oid: 83
+  descriptions:
+    de: Vaginaltabletten
+    en: Vaginal tablets
+    fr: Comprimés vaginaux
+  galenic_group: 15
+86: !ruby/struct:Struct::GalenicForm
+  oid: 86
+  descriptions:
+    de: Vaginalcrème
+    en: Vaginal cream
+    fr: Crème vaginale
+  galenic_group: 15
+98: !ruby/struct:Struct::GalenicForm
+  oid: 98
+  descriptions:
+    de: Spirale
+    en: Spiral
+  galenic_group: 15
+100: !ruby/struct:Struct::GalenicForm
+  oid: 100
+  descriptions:
+    de: Vaginalkapseln
+    en: Vaginal capsules
+    fr: Capsule vaginales
+  galenic_group: 15
+101: !ruby/struct:Struct::GalenicForm
+  oid: 101
+  descriptions:
+    de: Vaginaltampons
+    en: Vaginal tampons
+    fr: Tampons vaginaux
+  galenic_group: 15
+106: !ruby/struct:Struct::GalenicForm
+  oid: 106
+  descriptions:
+    de: Uterustabletten
+  galenic_group: 15
+115: !ruby/struct:Struct::GalenicForm
+  oid: 115
+  descriptions:
+    de: Intravaginalpessar
+    en: Intravaginal pessary
+    fr: Dispositif vaginal
+  galenic_group: 15
+204: !ruby/struct:Struct::GalenicForm
+  oid: 204
+  descriptions:
+    de: Hornhaut- und Hühneraugenpflaster
+    en: Corn patch
+    fr: Pansements à cors
+  galenic_group: 16
+205: !ruby/struct:Struct::GalenicForm
+  oid: 205
+  descriptions:
+    de: Warzenpflaster
+    en: Wart patch
+    fr: Pansement à verrues
+  galenic_group: 16
+247: !ruby/struct:Struct::GalenicForm
+  oid: 247
+  descriptions:
+    de: Transdermales Pflaster
+    en: Transdermal patch
+    fr: Timbre transdermique
+  galenic_group: 16
+256: !ruby/struct:Struct::GalenicForm
+  oid: 256
+  descriptions:
+    de: Rheumapflaster
+    en: Rheumatism patch
+    fr: Pansement de rheumatisme
+  galenic_group: 16
+274: !ruby/struct:Struct::GalenicForm
+  oid: 274
+  descriptions:
+    de: imprägnierte Verbandgaze
+    en: Impregnated Gauze
+    fr: Compresse impregnée
+  galenic_group: 16
+7744349: !ruby/struct:Struct::GalenicForm
+  oid: 7744349
+  descriptions:
+    de: Pulver für Umschläge
+  galenic_group: 16
+10929608: !ruby/struct:Struct::GalenicForm
+  oid: 10929608
+  descriptions:
+    de: Matrixpflaster
+    en: Matrix plaster
+    fr: Pansement matrice
+  galenic_group: 16
+714746: !ruby/struct:Struct::GalenicForm
+  oid: 714746
+  descriptions:
+    de: Wundauflage
+    en: Sponge
+    fr: Éponge
+  galenic_group: 16
+7: !ruby/struct:Struct::GalenicForm
+  oid: 7
+  descriptions:
+    de: Pflaster
+    en: Patch
+    fr: Pansement
+  galenic_group: 16
+64: !ruby/struct:Struct::GalenicForm
+  oid: 64
+  descriptions:
+    de: Kompressen
+    en: Compresses
+    fr: Compresses
+  galenic_group: 16
+99: !ruby/struct:Struct::GalenicForm
+  oid: 99
+  descriptions:
+    de: Transdermales Therapeutisches System
+    en: Transdermal System
+    fr: Système Transdermique
+  galenic_group: 16
+11: !ruby/struct:Struct::GalenicForm
+  oid: 11
+  descriptions:
+    de: Suppositorien
+    en: Suppositories
+    fr: Suppositoires
+  galenic_group: 17
+102: !ruby/struct:Struct::GalenicForm
+  oid: 102
+  descriptions:
+    de: Rektalkapseln
+    en: Rectal capsules
+    fr: Capsules rectales
+  galenic_group: 17

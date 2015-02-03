@@ -1,0 +1,217 @@
+---
+754720: !ruby/struct:Struct::GalenicGroup
+  oid: 754720
+  descriptions:
+    de: Kaugummi
+    en: Chewing Gum
+    fr: Chewing Gum
+890150: !ruby/struct:Struct::GalenicGroup
+  oid: 890150
+  descriptions:
+    de: Brausetabletten
+    en: Solutabs
+    fr: Comprimés Effervescents
+754487: !ruby/struct:Struct::GalenicGroup
+  oid: 754487
+  descriptions:
+    de: Dialyse
+    en: Dialysis
+    fr: Dialyse
+890432: !ruby/struct:Struct::GalenicGroup
+  oid: 890432
+  descriptions:
+    de: Tropfen
+    en: Drops
+    fr: Gouttes
+7830083: !ruby/struct:Struct::GalenicGroup
+  oid: 7830083
+  descriptions:
+    de: Lösbar zur Einnahme Retard
+    en: Delayed releas soluble for ingestion
+    fr: Soluble pour ingestion retard
+1470796: !ruby/struct:Struct::GalenicGroup
+  oid: 1470796
+  descriptions:
+    de: Klistiere
+    en: Enemas
+    fr: Lavements
+714576: !ruby/struct:Struct::GalenicGroup
+  oid: 714576
+  descriptions:
+    de: Klebstoff
+    en: Adhesive
+    fr: Gluten
+1479254: !ruby/struct:Struct::GalenicGroup
+  oid: 1479254
+  descriptions:
+    de: Tests
+    en: Tests
+    fr: Tests
+9672801: !ruby/struct:Struct::GalenicGroup
+  oid: 9672801
+  descriptions:
+    de: Lösungsmittel
+    en: Solvent
+    fr: Solvant
+1470567: !ruby/struct:Struct::GalenicGroup
+  oid: 1470567
+  descriptions:
+    de: Subkutane Implantate
+    en: Hypodermic Implants
+    fr: Implants hypodermiques
+890480: !ruby/struct:Struct::GalenicGroup
+  oid: 890480
+  descriptions:
+    de: Gastrointenstinales Therapiesystem
+    en: Gastro-Intestinal Therapeutic System
+    fr: Système Therapeutique Gastro-Intestinale
+9672817: !ruby/struct:Struct::GalenicGroup
+  oid: 9672817
+  descriptions:
+    de: Tupfer/Gaze
+    en: Swab/Gauze
+    fr: Compresse/Gaze
+1478018: !ruby/struct:Struct::GalenicGroup
+  oid: 1478018
+  descriptions:
+    de: Tinkturen/Desinfektion
+    en: Tinctures/Disinfection
+    fr: Teintures/Désinfection
+1471897: !ruby/struct:Struct::GalenicGroup
+  oid: 1471897
+  descriptions:
+    de: Lösbar zur Injektion/Infusion
+    en: Soluble for injection/infusion
+    fr: Soluble pour injection/infusion
+1472921: !ruby/struct:Struct::GalenicGroup
+  oid: 1472921
+  descriptions:
+    de: Rektal-Produkte
+    en: Rectal Products
+    fr: Produits Rectaux
+1471899: !ruby/struct:Struct::GalenicGroup
+  oid: 1471899
+  descriptions:
+    de: Seifen und Shampoos
+    en: Soaps and Shampoos
+    fr: Savons et Shampoos
+1472699: !ruby/struct:Struct::GalenicGroup
+  oid: 1472699
+  descriptions:
+    de: Buccal-/Dentalprodukte
+    en: Buccal/dental products
+    fr: Produits buccodentaires
+1472713: !ruby/struct:Struct::GalenicGroup
+  oid: 1472713
+  descriptions:
+    de: Spray/Puder
+    en: Spray/Powder
+    fr: Spray/Poudre
+1472742: !ruby/struct:Struct::GalenicGroup
+  oid: 1472742
+  descriptions:
+    de: Trinkflüssigkeiten Retard
+    en: Delayed release drinkable liquids
+    fr: Liquides buvables retard
+1: !ruby/struct:Struct::GalenicGroup
+  oid: 1
+  descriptions:
+    de: unbekannt
+    en: unbekannt
+    fr: unbekannt
+2: !ruby/struct:Struct::GalenicGroup
+  oid: 2
+  descriptions:
+    de: Tabletten
+    en: Tablets
+    fr: Comprimés
+3: !ruby/struct:Struct::GalenicGroup
+  oid: 3
+  descriptions:
+    de: Injektion/Infusion
+    en: Injection/Infusion
+    fr: Injection/Infusion
+4: !ruby/struct:Struct::GalenicGroup
+  oid: 4
+  descriptions:
+    de: Salben
+    en: Ointments
+    fr: Onguents
+5: !ruby/struct:Struct::GalenicGroup
+  oid: 5
+  descriptions:
+    de: Augenmittel
+    en: Ophtalmics
+    fr: Préparations oculaires
+6: !ruby/struct:Struct::GalenicGroup
+  oid: 6
+  descriptions:
+    de: Inhalation
+    en: Inhalation
+    fr: Inhalation
+7: !ruby/struct:Struct::GalenicGroup
+  oid: 7
+  descriptions:
+    de: Lösbar zur Einnahme
+    en: Soluble for ingestion
+    fr: Soluble pour ingestion
+8: !ruby/struct:Struct::GalenicGroup
+  oid: 8
+  descriptions:
+    de: Badezusatz
+    en: Bath additives
+    fr: Bains
+9: !ruby/struct:Struct::GalenicGroup
+  oid: 9
+  descriptions:
+    de: Essbare
+    en: Edibles
+    fr: Denrées
+10: !ruby/struct:Struct::GalenicGroup
+  oid: 10
+  descriptions:
+    de: Lutschtabletten
+    en: Lozenges
+    fr: Comprimés à succer
+11: !ruby/struct:Struct::GalenicGroup
+  oid: 11
+  descriptions:
+    de: Trinkflüssigkeiten
+    en: Drinkable liquids
+    fr: Liquides buvables
+12: !ruby/struct:Struct::GalenicGroup
+  oid: 12
+  descriptions:
+    de: Zubehör
+    en: Other
+    fr: Autres
+13: !ruby/struct:Struct::GalenicGroup
+  oid: 13
+  descriptions:
+    de: Nasenmittel
+    en: Nasal products
+    fr: Remèdes nasales
+14: !ruby/struct:Struct::GalenicGroup
+  oid: 14
+  descriptions:
+    de: Retard-Tabletten
+    en: Delayed release tablets
+    fr: Comprimés retards
+15: !ruby/struct:Struct::GalenicGroup
+  oid: 15
+  descriptions:
+    de: Vaginal-Produkte
+    en: Vaginal products
+    fr: Produits Vaginaux
+16: !ruby/struct:Struct::GalenicGroup
+  oid: 16
+  descriptions:
+    de: Pflaster/Transdermale Systeme
+    en: Patches/Transdermal Systems
+    fr: Pansements/Systèmes transdermales
+17: !ruby/struct:Struct::GalenicGroup
+  oid: 17
+  descriptions:
+    de: Suppositorien
+    en: Suppositories
+    fr: Suppositoires
