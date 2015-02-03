@@ -254,6 +254,7 @@ module Oddb2xml
         i_5,i_3   = 0,10 # :swissmedic_numbers
         p_5,p_1_2 = 0,1  # :prodno
         cat       = 13   # :swissmedic_category
+        seq_name  = 2
         ith       = 4    # :ith_swissmedic IT-Code (swissmedic-diff)
         atc       = 5    # :atc_code
         list_code = 6    #  Heilmittelcode, possible values are
@@ -286,7 +287,7 @@ module Oddb2xml
             next if no8.to_i == 0
             ean_base12 = "7680#{no8}"
             data[no8.intern] = {
-              :ean                  => (ean_base12.ljust(12, '0') + calc_checksum(ean_base12)),
+              :ean                  => (ean_base12.ljust(12, '0') + Oddb2xml.calc_checksum(ean_base12)),
               :prodno               => prodno ? prodno : '',
               :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
               :swissmedic_category  => row[cat].value.to_s,
@@ -295,6 +296,7 @@ module Oddb2xml
               :package_size         => row[siz] ? row[siz].value.to_s : '',
               :einheit_swissmedic   => row[eht] ? row[eht].value.to_s : '',
               :substance_swissmedic => row[sub] ? row[sub].value.to_s : '',
+              :sequence_name        => row[seq_name] ? row[seq_name].value.to_s : '',
               :is_tier              => (row[typ] == 'Tierarzneimittel' ? true : false),
             }
           end
@@ -311,16 +313,6 @@ module Oddb2xml
       end unless defined?(RSpec)
     end
 
-    def calc_checksum(str)
-      str = str.strip
-      sum = 0
-      val =   str.split(//u)
-      12.times do |idx|
-        fct = ((idx%2)*2)+1
-        sum += fct*val[idx].to_i
-      end
-      ((10-(sum%10))%10).to_s
-    end
   end
   class MigelExtractor < Extractor
     def initialize(bin)

@@ -14,6 +14,7 @@ module Oddb2xml
         :extended     => false,
         :compress_ext => nil,
         :format       => :xml,
+        :galenic      => false,
         :tag_suffix   => nil,
         :debug        => false,
         :ean14        => false,
@@ -45,6 +46,7 @@ Usage:
     -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9]
                          If S is given, it is also used as prefix of filename.
     -x N, --context=N    context N {product|address}. product is default.
+    --galenic            create only oddb_calc.xml with GTIN, name and galenic information
 
                          For debugging purposes
     --skip-download      skips downloading files it the file is already under downloads.
@@ -63,6 +65,7 @@ EOS
                                                               @opts[:price] = :zurrose
                                                             }
       @parser.on('-f v', '--format v',     /^xml|dat$/)    {|v| @opts[:format] = v.intern }
+      @parser.on('--galenic')                              {|v| @opts[:galenic] = true }
       @parser.on('-o',   '--option')                       {|v| @opts[:fi] = true }
       @parser.on('-I v', '--increment v',  /^[0-9]+$/)     {|v| @opts[:percent] = v ? v.to_i : 0
                                                                 @opts[:price] = :zurrose

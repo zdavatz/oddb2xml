@@ -1,6 +1,9 @@
 # encoding: utf-8
 
 require 'nokogiri'
+require 'oddb2xml/util'
+require 'oddb2xml/galenic'
+
 class Numeric
   # round a given number to the nearest step
   def round_by(increment)
@@ -60,7 +63,7 @@ module Oddb2xml
       end
     end
     def to_xml(subject=nil)
-      Oddb2xml.log "to_xml subject #{subject ? subject.to_s :  @subject.to_s} for #{self.class}"
+      Oddb2xml.log "to_xml subject #{subject} #{@subject} for #{self.class}"
       if subject
         self.send('build_' + subject.to_s)
       elsif @subject
@@ -232,6 +235,7 @@ module Oddb2xml
         @products = []
         @index['DE'].each_pair do |phar, indices|
           indices.each_with_index do |index, i|
+            next if index and index.is_a?(Hash) and index[:atc_code] and /^Q/i.match(index[:atc_code])
             obj = {
               :seq => @items[phar] ? @items[phar] : @items[index[:ean]],
               :pac => nil,
@@ -443,6 +447,7 @@ module Oddb2xml
           list = []
           length = 0
           @products.each do |obj|
+            next if /^Q/i.match(obj[:atc])
             seq = obj[:seq]
             length += 1
               xml.PRD('DT' => '') {
@@ -575,6 +580,43 @@ module Oddb2xml
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
+        }
+      end
+      _builder.to_xml
+    end
+
+    def build_calc
+      packungen_xlsx = 'swissmedic_package.xlsx'
+      idx = 0
+      workbook = RubyXL::Parser.parse(packungen_xlsx)
+      row_nr = 0
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T%z')
+        xml.ARTICLES(XML_OPTIONS) {
+          workbook.worksheets[0].each do |row|
+            row_nr += 1
+            next unless row and row.cells[0] and row.cells[0].value and row.cells[0].value.to_i > 0
+            iksnr               = "%05i" % row.cells[0].value.to_i
+            seqnr               = "%02d" % row.cells[1].value.to_i
+            no8                 = sprintf('%05d',row.cells[0].value.to_i) + sprintf('%03d',row.cells[10].value.to_i)
+            name                = row.cells[2].value
+            package_size        = row.cells[11] ? row.cells[11].value : nil
+            unit                = row.cells[12] ? row.cells[12].value : nil
+            active_substance    = row.cells[14] ? row.cells[14].value : nil
+            composition         = row.cells[15] ? row.cells[15].value : nil
+            info = Galenic.new(name, package_size, unit, composition)
+            ean12 = '7680' + no8
+            xml.ARTICLE {
+              xml.GTIN     (ean12 + Oddb2xml.calc_checksum(ean12))
+              xml.NAME     name
+              xml.COUNT    info.count
+              xml.MULTI    info.multi
+              xml.MEASURE  info.measure
+              xml.ADDITION info.addition
+              xml.SCALE    info.scale
+            }
+          end
         }
       end
       _builder.to_xml

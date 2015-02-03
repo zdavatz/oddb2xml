@@ -78,7 +78,7 @@ module Oddb2xml
       @galenic_form = Galenic.get_galenic_form(parts[1]) if parts.size > 1
       name.strip! if name
       @name = name
-      res = @pkg_size.split(/x/i)
+      res = @pkg_size ? @pkg_size.split(/x/i) : []
       if res.size >= 1
         @count = res[0].to_i
       else

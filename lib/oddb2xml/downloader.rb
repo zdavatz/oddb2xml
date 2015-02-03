@@ -240,6 +240,7 @@ XML
             response = nil # win
             FileUtils.makedirs(Downloads)
             File.open(file2save, 'w+') { |file| file.write xml }
+            Oddb2xml.log "SwissIndexDownloader #{__LINE__}: #{file2save}"
           else
             # received broken data or internal error
             raise StandardError
@@ -274,6 +275,11 @@ XML
     end
     def download
       @type == file = "swissmedic_#{@type}.xlsx"
+      if Oddb2xml.skip_download? and File.exists?(file) and (Time.now-File.ctime(file)).to_i < 24*60*60
+        Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{file} #{File.size(file)}"
+        return File.expand_path(file)
+      end
+      FileUtils.rm(File.expand_path(file), :verbose => true) if File.exists?(file)
       begin
         page = @agent.get(@url)
         if link_node = page.search(@xpath).first
@@ -286,6 +292,7 @@ XML
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
+        Oddb2xml.log "SwissmedicDownloader #{__LINE__}: #{file} #{File.size(file)}"
         Oddb2xml.download_finished(file, false)
       end
       return File.expand_path(file)

@@ -8,6 +8,7 @@ require 'oddb2xml/compressor'
 require 'oddb2xml/options'
 require 'oddb2xml/util'
 require 'rubyXL'
+require 'date' # for today
 
 module Oddb2xml
   
@@ -42,7 +43,9 @@ module Oddb2xml
     end
     def run
       threads = []
-      if @options[:address]
+      if @options[:galenic]
+        threads << download(:package) # swissmedic
+      elsif @options[:address]
         [:company, :person].each do |type|
           threads << download(type) # medregbm.admin
         end
@@ -91,9 +94,13 @@ module Oddb2xml
     def build
       Oddb2xml.log("Start build")
       begin
+        files = {"calc"=>"oddb_calc.xml"} if @options[:galenic]
         files.each_pair do |sbj, file|
           builder = Builder.new(@options) do |builder|
-            if @options[:address]
+            if @options[:galenic]
+              builder.packs = @packs
+              builder.subject = sbj
+            elsif @options[:address]
               builder.subject   = sbj
               builder.companies = @companies
               builder.people    = @people
@@ -210,8 +217,9 @@ module Oddb2xml
           bin = downloader.download
           @mutex.synchronize do
             @packs = SwissmedicExtractor.new(bin, :package).to_hash
-#            Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs. File #{bin} was #{File.size(bin)} bytes")
-          end
+            Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs from #{bin}")
+            @packs
+          end unless @options[:galenic]
         end
       when :bm_update
         Thread.new do
@@ -296,9 +304,9 @@ module Oddb2xml
         else # xml
           ##
           # building order
-          #   1. addtions
+          #   1. additions
           #   2. subjects
-          #   3. optionals
+          #   3. optional SUBJECTS
           _files = (ADDITIONS + SUBJECTS)
           _files += OPTIONALS if @options[:fi]
           _files.each do|sbj|
