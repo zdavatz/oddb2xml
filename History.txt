@@ -1,3 +1,7 @@
+=== 1.9.5 /03.02.2015
+
+* Unittests for upcoming oddb_calc.xml
+
 === 1.9.4 /21.01.2015
 
 * Create additional field resellerpub in oddb_article.xml
