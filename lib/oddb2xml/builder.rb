@@ -3,6 +3,7 @@
 require 'nokogiri'
 require 'oddb2xml/util'
 require 'oddb2xml/calc'
+require 'csv'
 
 class Numeric
   # round a given number to the nearest step
@@ -589,6 +590,7 @@ module Oddb2xml
       packungen_xlsx = 'swissmedic_package.xlsx'
       idx = 0
       workbook = RubyXL::Parser.parse(packungen_xlsx)
+      items = {}
       row_nr = 0
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
@@ -607,9 +609,12 @@ module Oddb2xml
             composition         = row.cells[15] ? row.cells[15].value : nil
             info = Calc.new(name, package_size, unit, composition)
             ean12 = '7680' + no8
+            ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
+            items[ean13] = info
             xml.ARTICLE {
-              xml.GTIN     (ean12 + Oddb2xml.calc_checksum(ean12))
+              xml.GTIN     ean13
               xml.NAME     name
+              xml.PKG_SIZE package_size
               xml.COUNT    info.count
               xml.MULTI    info.multi
               xml.MEASURE  info.measure
@@ -618,6 +623,13 @@ module Oddb2xml
             }
           end
         }
+      end
+      csv_name = File.join(WorkDir, 'oddb_calc.csv')
+      CSV.open(csv_name, "w+") do |csv|
+        csv << ['gtin'] + items.values.first.headers
+        items.each do |key, value|
+          csv <<  [key] + value.to_array
+        end
       end
       _builder.to_xml
     end

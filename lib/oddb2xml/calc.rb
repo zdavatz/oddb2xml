@@ -60,6 +60,14 @@ module Oddb2xml
     def galenic_group
       @@galenic_groups[@galenic_form.galenic_group]
     end
+
+    # helper for generating csv
+    def headers
+      ["name", "pkg_size", "count", "multi", "measure", "addition", "scale", "unit"]
+    end
+    def to_array
+      [ @name, @pkg_size, @count, @multi, @measure, @addition, @scale, @unit]
+    end
   private
     def capitalize(string)
       string.split(/\s+/u).collect { |word| word.capitalize }.join(' ')

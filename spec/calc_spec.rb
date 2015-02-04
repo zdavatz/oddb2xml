@@ -28,12 +28,14 @@ describe Oddb2xml::Calc do
     specify { expect(result.description).to eq 'unbekannt' }
   end
 
-  TestExample = Struct.new("TestExample", :test_description, :iksnr, :seqnr, :pack, :package_size, :einheit, :name, :composition)
+  TestExample = Struct.new("TestExample", :test_description, :iksnr, :seqnr, :pack, :package_size, :einheit, :name, :composition,
+                           :values_to_compare)
 
   example1 = TestExample.new('Das ist eine Injektionslösung von einer Packung mit 5 x 100 ml',
                              54015, 01, 100, '1 x 5 x 100', 'ml',
                              "Naropin 0,2 %, Infusionslösung / Injektionslösung",
                              'ropivacaini hydrochloridum 2 mg, natrii chloridum, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.',
+                             { :count => 1, :multi => 5, :measure => '100 ml' }
                             )
   class TestExample
     def url
@@ -41,6 +43,19 @@ describe Oddb2xml::Calc do
     end
   end
 
+  [example1].each {
+    |tst|
+      context "verify #{tst.iksnr}: #{tst.url}" do
+        info = Calc.new(tst.name, tst.package_size, tst.einheit, tst.composition)
+        tst.values_to_compare.each do
+          |key, value|
+          context key do
+            cmd = "expect(info.#{key}.to_s).to eq '#{value.to_s}'"
+            specify { eval(cmd) }
+          end
+        end
+      end
+  }
   context 'find correct result for Injektionslösung' do
     info = Calc.new(example1.name, example1.package_size, example1.einheit, example1.composition)
     specify { expect(example1.url).to eq 'http://ch.oddb.org/de/gcc/drug/reg/54015/seq/01/pack/100' }

@@ -150,6 +150,9 @@ module Oddb2xml
             output = builder.to_xml
           end
           File.open(File.join(WorkDir, file), 'w:utf-8'){ |fh| fh << output }
+          if @options[:calc]
+            FileUtils.cp(File.join(WorkDir, file), File.join(WorkDir, file.sub('.xml', '_'+Time.now.strftime("%d.%m.%Y_%H.%M")+'.xml')), :verbose => true)
+          end
         end
       rescue Interrupt
         files.values.each do |file|
