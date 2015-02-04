@@ -616,7 +616,7 @@ module Oddb2xml
               xml.NAME          name
               xml.PKG_SIZE      package_size
               xml.COUNT         info.count
-              xml.MULTI         .multi
+              xml.MULTI         info.multi
               xml.MEASURE       info.measure
               xml.ADDITION      info.addition
               xml.SCALE         info.scale

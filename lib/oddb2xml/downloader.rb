@@ -256,8 +256,9 @@ XML
     end
   end
   class SwissmedicDownloader < Downloader
-    def initialize(type=:orphan)
+    def initialize(type=:orphan, options = {})
       @type = type
+      @options = options
       case @type
       when :orphan
         action = "arzneimittel/00156/00221/00222/00223/00224/00227/00228/index.html?lang=de"
@@ -270,14 +271,14 @@ XML
         @xpath = "//div[@id='sprungmarke10_7']//a[@title='Excel-Version Zugelassene Verpackungen*']"
       end
       url = "http://www.swissmedic.ch/#{action}"
-      super({}, url)
+      super(@options, url)
     end
     def download
       @type == file = "swissmedic_#{@type}.xlsx"
-      if Oddb2xml.skip_download? and File.exists?(file) and (Time.now-File.ctime(file)).to_i < 24*60*60
-        Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{file} #{File.size(file)}"
+      if  @options[:calc] and @options[:skip_download] and File.exists?(file) and (Time.now-File.ctime(file)).to_i < 24*60*60
+        Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{file} #{File.size(file)} bytes"
         return File.expand_path(file)
-      end if @options[:calc] and @options[:skip_download]
+      end
       begin
         FileUtils.rm(File.expand_path(file), :verbose => true) if File.exists?(File.expand_path(file))
         page = @agent.get(@url)

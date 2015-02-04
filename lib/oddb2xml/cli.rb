@@ -216,7 +216,7 @@ module Oddb2xml
         end
       when :package
         Thread.new do
-          downloader = SwissmedicDownloader.new(:package)
+          downloader = SwissmedicDownloader.new(:package, @options)
           bin = downloader.download
           @mutex.synchronize do
             @packs = SwissmedicExtractor.new(bin, :package).to_hash
