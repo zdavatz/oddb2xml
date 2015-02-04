@@ -622,7 +622,7 @@ module Oddb2xml
               xml.GTIN          ean13
               xml.NAME          name
               xml.PKG_SIZE      package_size
-              xml.SELLING_UNTIS (info.count * info.multi)
+              xml.SELLING_UNITS (info.selling_units)
               xml.COUNT         info.count
               xml.MULTI         info.multi
               xml.MEASURE       info.measure

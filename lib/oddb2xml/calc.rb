@@ -32,7 +32,7 @@ module Oddb2xml
     @@names_without_galenic_forms = []
     attr_accessor   :galenic_form, :unit, :pkg_size
     attr_reader     :name, :substances, :composition
-    attr_reader     :count, :multi, :measure, :addition, :scale # s.a. commercial_form in oddb.org/src/model/part.rb
+    attr_reader     :selling_units, :count, :multi, :measure, :addition, :scale # s.a. commercial_form in oddb.org/src/model/part.rb
     def self.get_galenic_group(name, lang = 'de')
       @@galenic_groups.values.collect { |galenic_group|
         return galenic_group if galenic_group.descriptions[lang].eql?(name)
@@ -129,6 +129,7 @@ module Oddb2xml
       end
       @addition = 0
       @scale = 1
+      @selling_units = @count * @multi
     end
   end
 end
