@@ -94,7 +94,7 @@ module Oddb2xml
     def build
       Oddb2xml.log("Start build")
       begin
-        files = {"calc"=>"oddb_calc.xml"} if @options[:calc]
+        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc]
         files.each_pair do |sbj, file|
           builder = Builder.new(@options) do |builder|
             if @options[:calc]
