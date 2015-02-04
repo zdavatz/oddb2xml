@@ -587,7 +587,7 @@ module Oddb2xml
     end
 
     def build_calc
-      packungen_xlsx = 'swissmedic_package.xlsx'
+      packungen_xlsx = File.join(Oddb2xml::WorkDir, "swissmedic_package.xlsx")
       idx = 0
       workbook = RubyXL::Parser.parse(packungen_xlsx)
       items = {}
@@ -603,10 +603,17 @@ module Oddb2xml
             seqnr               = "%02d" % row.cells[1].value.to_i
             no8                 = sprintf('%05d',row.cells[0].value.to_i) + sprintf('%03d',row.cells[10].value.to_i)
             name                = row.cells[2].value
+            atc_code            = row.cells[5]  ? row.cells[5].value  : nil
+            list_code           = row.cells[6]  ? row.cells[6].value  : nil
             package_size        = row.cells[11] ? row.cells[11].value : nil
             unit                = row.cells[12] ? row.cells[12].value : nil
             active_substance    = row.cells[14] ? row.cells[14].value : nil
             composition         = row.cells[15] ? row.cells[15].value : nil
+
+            # skip veterinary product
+            next if atc_code  and /^Q/i.match(atc_code)
+            next if list_code and /Tierarzneimittel/.match(list_code)
+
             info = Calc.new(name, package_size, unit, composition)
             ean12 = '7680' + no8
             ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
