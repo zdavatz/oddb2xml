@@ -622,13 +622,19 @@ module Oddb2xml
               xml.GTIN          ean13
               xml.NAME          name
               xml.PKG_SIZE      package_size
+              xml.SELLING_UNTIS (info.count * info.multi)
               xml.COUNT         info.count
               xml.MULTI         info.multi
               xml.MEASURE       info.measure
               xml.ADDITION      info.addition
               xml.SCALE         info.scale
-              xml.GALENIC_FORM  info.galenic_form.description
-              xml.GALENIC_GROUP info.galenic_group.description
+              if  info.galenic_form.is_a?(String)
+                xml.GALENIC_FORM  info.galenic_form
+                xml.GALENIC_GROUP "Unknown"
+              else
+                xml.GALENIC_FORM  info.galenic_form.description
+                xml.GALENIC_GROUP info.galenic_group ? info.galenic_group.description : "Unknown"
+              end
             }
           end
         }

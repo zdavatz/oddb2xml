@@ -274,7 +274,7 @@ XML
       super(@options, url)
     end
     def download
-      @type == file = "swissmedic_#{@type}.xlsx"
+      @type == file = File.join(Oddb2xml::WorkDir, "swissmedic_#{@type}.xlsx")
       if  @options[:calc] and @options[:skip_download] and File.exists?(file) and (Time.now-File.ctime(file)).to_i < 24*60*60
         Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{file} #{File.size(file)} bytes"
         return File.expand_path(file)

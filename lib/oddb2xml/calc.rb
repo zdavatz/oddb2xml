@@ -28,11 +28,12 @@ module Oddb2xml
     Data_dir = File.expand_path(File.join(File.dirname(__FILE__),'..','..', 'data'))
     @@galenic_groups  = YAML.load_file(File.join(Data_dir, 'gal_groups.yaml'))
     @@galenic_forms   = YAML.load_file(File.join(Data_dir, 'gal_forms.yaml'))
+    @@new_galenic_forms = []
+    @@names_without_galenic_forms = []
     attr_accessor   :galenic_form, :unit, :pkg_size
     attr_reader     :name, :substances, :composition
     attr_reader     :count, :multi, :measure, :addition, :scale # s.a. commercial_form in oddb.org/src/model/part.rb
     def self.get_galenic_group(name, lang = 'de')
-      # @@galenic_groups.find{ |key, value| value.descriptions[lang].eql?(name) }.first
       @@galenic_groups.values.collect { |galenic_group|
         return galenic_group if galenic_group.descriptions[lang].eql?(name)
       }
@@ -40,12 +41,28 @@ module Oddb2xml
     end
 
     def self.get_galenic_form(name, lang = 'de')
-      # @@galenic_forms.find{ |key, value| value.descriptions[lang].eql?(name) }.first
       @@galenic_forms.values.collect { |galenic_form|
         return galenic_form if galenic_form.descriptions[lang].eql?(name)
-        return galenic_form if galenic_form.descriptions[lang].eql?(name.sub(' / ', '/'))
+        if name and galenic_form.descriptions[lang].eql?(name.sub(' / ', '/'))
+          return galenic_form
+        end
       }
       @@galenic_forms[UnknownGalenicForm]
+    end
+
+    def self.dump_new_galenic_forms
+      if @@new_galenic_forms.size > 0
+        "\nAdded the following galenic_forms\n"+ @@new_galenic_forms.uniq.join("\n")
+      else
+        "\nNo new galenic forms added"
+      end
+    end
+    def self.dump_names_without_galenic_forms
+      if @@names_without_galenic_forms.size > 0
+        "\nThe following products did not have a galenic form in column Präparateliste\n"+ @@names_without_galenic_forms.sort.uniq.join("\n")
+      else
+        "\nColumn Präparateliste has everywhere a name\n"
+      end
     end
 
     def initialize(name = nil, size = nil, unit = nil, composition= nil)
@@ -66,7 +83,9 @@ module Oddb2xml
       ["name", "pkg_size", "count", "multi", "measure", "addition", "scale", "unit", "galenic_form", "galenic_group"]
     end
     def to_array
-      [ @name, @pkg_size, @count, @multi, @measure, @addition, @scale, @unit, galenic_form.description, galenic_group.description]
+      [ @name, @pkg_size, @count, @multi, @measure, @addition, @scale, @unit,
+        galenic_form  ? galenic_form.description  : '' ,
+        galenic_group ? galenic_group.description : '' ]
     end
   private
     def capitalize(string)
@@ -79,13 +98,19 @@ module Oddb2xml
       @substances = @composition.split(/\s*,(?!\d|[^(]+\))\s*/u).collect { |name| capitalize(name) }.uniq if @composition
 
       name = @name.clone
-      parts = name.split(/\s*,(?!\d|[^(]+\))\s*/u)
-      unless name = parts.first[/[^\d]{3,}/]
-       name = parts.last[/[^\d]{3,}/]
+      parts = name.split(',')
+      if parts.size == 1
+        @@names_without_galenic_forms << name
+      else
+        form_name = parts[-1].strip
+        @galenic_form = Calc.get_galenic_form(form_name)
+        # puts "oid #{UnknownGalenicForm} #{@galenic_form.oid} for #{name}"
+        if @galenic_form.oid == UnknownGalenicForm
+          @galenic_form =  GalenicForm.new(0, {'de' => form_name}, @@galenic_forms[UnknownGalenicForm] )
+          @@new_galenic_forms << form_name
+        end
       end
-      @galenic_form = Calc.get_galenic_form(parts[1]) if parts.size > 1
-      name.strip! if name
-      @name = name
+      @name = name.strip
       res = @pkg_size ? @pkg_size.split(/x/i) : []
       if res.size >= 1
         @count = res[0].to_i
@@ -105,34 +130,5 @@ module Oddb2xml
       @addition = 0
       @scale = 1
     end
-    def update_galenic_form(seq, comp, row, opts={})
-      opts = {:create_only => false}.merge opts
-      return if comp.galenic_form && !opts[:fix_galenic_form]
-      if((german = seq.name_descr) && !german.empty?)
-        _update_galenic_form(comp, :de, german)
-      elsif(match = GALFORM_P.match(comp.source.to_s))
-        _update_galenic_form(comp, :lt, match[:galform].strip)
-      end
-    end
-    def _update_galenic_form(comp, lang, name)
-      # remove counts and doses from the name - this is assuming name looks
-      # (in the worst case) something like this: "10 Filmtabletten"
-      # or: "Infusionsemulsion, 1875ml"
-      parts = name.split(/\s*,(?!\d|[^(]+\))\s*/u)
-      unless name = parts.first[/[^\d]{3,}/]
-       name = parts.last[/[^\d]{3,}/]
-      end
-      name.strip! if name
-
-      unless(gf = @app.galenic_form(name))
-        ptr = Persistence::Pointer.new([:galenic_group, 1],
-                                       [:galenic_form]).creator
-
-        @app.update(ptr, {lang => name}, :swissmedic)
-      end
-      @app.update(comp.pointer, { :galenic_form => name }, :swissmedic)
-    end
-
   end
-
 end

@@ -324,6 +324,10 @@ module Oddb2xml
     end
     def report
       lines = []
+      if @options[:calc]
+        lines << Calc.dump_new_galenic_forms
+        lines << Calc.dump_names_without_galenic_forms
+      end
       unless @options[:address]
         LANGUAGES.each do |lang|
           lines << lang
