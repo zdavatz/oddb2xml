@@ -2,7 +2,7 @@
 
 require 'nokogiri'
 require 'oddb2xml/util'
-require 'oddb2xml/galenic'
+require 'oddb2xml/calc'
 
 class Numeric
   # round a given number to the nearest step
@@ -605,7 +605,7 @@ module Oddb2xml
             unit                = row.cells[12] ? row.cells[12].value : nil
             active_substance    = row.cells[14] ? row.cells[14].value : nil
             composition         = row.cells[15] ? row.cells[15].value : nil
-            info = Galenic.new(name, package_size, unit, composition)
+            info = Calc.new(name, package_size, unit, composition)
             ean12 = '7680' + no8
             xml.ARTICLE {
               xml.GTIN     (ean12 + Oddb2xml.calc_checksum(ean12))

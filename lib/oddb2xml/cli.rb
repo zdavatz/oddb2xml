@@ -43,7 +43,7 @@ module Oddb2xml
     end
     def run
       threads = []
-      if @options[:galenic]
+      if @options[:calc]
         threads << download(:package) # swissmedic
       elsif @options[:address]
         [:company, :person].each do |type|
@@ -94,10 +94,10 @@ module Oddb2xml
     def build
       Oddb2xml.log("Start build")
       begin
-        files = {"calc"=>"oddb_calc.xml"} if @options[:galenic]
+        files = {"calc"=>"oddb_calc.xml"} if @options[:calc]
         files.each_pair do |sbj, file|
           builder = Builder.new(@options) do |builder|
-            if @options[:galenic]
+            if @options[:calc]
               builder.packs = @packs
               builder.subject = sbj
             elsif @options[:address]
@@ -219,7 +219,7 @@ module Oddb2xml
             @packs = SwissmedicExtractor.new(bin, :package).to_hash
             Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs from #{bin}")
             @packs
-          end unless @options[:galenic]
+          end unless @options[:calc]
         end
       when :bm_update
         Thread.new do

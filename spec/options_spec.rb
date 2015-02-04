@@ -26,7 +26,7 @@ describe Oddb2xml::Options do
     :extended     => false,
     :compress_ext => nil,
     :format       => :xml,
-    :galenic      => false,
+    :calc         => false,
     :tag_suffix   => nil,
     :debug        => false,
     :ean14        => false,
@@ -196,12 +196,12 @@ describe Oddb2xml::Options do
     specify { expect(args).to eq ["nonpharma", "zurrose"] } # will lead to an exit 2 in bin/oddb2xml
   end
 
-  context 'when --galenic is given' do
+  context 'when --calc is given' do
     options = Oddb2xml::Options.new
-    args = '--galenic'.split(' ')
+    args = '--calc'.split(' ')
     options.parser.parse!(args) # .should raise
     expected = Default_opts.clone
-    expected[:galenic]  =  true
+    expected[:calc]  =  true
     specify { expect(options.opts).to eq expected }
     specify { expect(args).to eq [] }
   end

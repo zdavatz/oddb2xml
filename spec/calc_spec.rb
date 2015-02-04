@@ -2,26 +2,26 @@
 
 require 'pp'
 require 'spec_helper'
-require "#{Dir.pwd}/lib/oddb2xml/galenic"
+require "#{Dir.pwd}/lib/oddb2xml/calc"
 include Oddb2xml
 
-describe Oddb2xml::Galenic do
+describe Oddb2xml::Calc do
 
   context 'should find galenic_group for Kaugummi' do
-    result = Galenic.get_galenic_group('Kaugummi')
+    result = Calc.get_galenic_group('Kaugummi')
     specify { expect(result.class).to eq  GalenicGroup }
     specify { expect(result.description).to eq 'Kaugummi' }
   end
 
   context 'should find galenic_form for Infusionslösung / Injektionslösung' do
     value = 'Infusionslösung / Injektionslösung'
-    result = Galenic.get_galenic_form(value)
+    result = Calc.get_galenic_form(value)
     specify { expect(result.class).to eq  GalenicForm }
     specify { expect(result.description).to eq 'Infusionslösung/Injektionslösung' }
   end
 
   context 'should return galenic_group unknown for galenic_group Dummy' do
-    result = Galenic.get_galenic_group('Dummy')
+    result = Calc.get_galenic_group('Dummy')
     specify { expect(result.class).to eq  GalenicGroup }
     specify { expect(result.oid).to eq  1 }
     specify { expect(result.descriptions['de']).to eq 'unbekannt' }
@@ -42,10 +42,10 @@ describe Oddb2xml::Galenic do
   end
 
   context 'find correct result for Injektionslösung' do
-    info = Galenic.new(example1.name, example1.package_size, example1.einheit, example1.composition)
+    info = Calc.new(example1.name, example1.package_size, example1.einheit, example1.composition)
     specify { expect(example1.url).to eq 'http://ch.oddb.org/de/gcc/drug/reg/54015/seq/01/pack/100' }
     specify { expect(info.galenic_form.description).to eq  'Infusionslösung/Injektionslösung' }
-    specify { expect(info.galenic_group.description).to eq  'Injektion/Infusion' }
+    specify { expect(info.galenic_group.description).to eq  'unbekannt' }
     specify { expect(info.count).to eq  1 }
     specify { expect(info.multi).to eq  5 }
     specify { expect(info.measure).to eq  '100 ml' }
@@ -55,7 +55,7 @@ describe Oddb2xml::Galenic do
   end
 
   context 'convert mg/l into ml/mg for solutions' do
-    result = Galenic.new('50', 'g/l')
+    result = Calc.new('50', 'g/l')
     specify { expect(result).to eq  'xxx' }
   end if false
 

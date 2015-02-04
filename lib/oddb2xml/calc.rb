@@ -5,7 +5,7 @@ require 'yaml'
 # require 'pry'
 
 module Oddb2xml
- # Galenic is responsible for analysing the columns "Packungsgrösse" and "Einheit"
+ # Calc is responsible for analysing the columns "Packungsgrösse" and "Einheit"
  #
   GalenicGroup  = Struct.new("GalenicGroup", :oid, :descriptions)
   GalenicForm   = Struct.new("GalenicForm",  :oid, :descriptions, :galenic_group)
@@ -22,7 +22,7 @@ module Oddb2xml
     end
   end
 
-  class Galenic
+  class Calc
     UnknownGalenicForm = 140
     UnknownGalenicGroup = 1
     Data_dir = File.expand_path(File.join(File.dirname(__FILE__),'..','..', 'data'))
@@ -75,7 +75,7 @@ module Oddb2xml
       unless name = parts.first[/[^\d]{3,}/]
        name = parts.last[/[^\d]{3,}/]
       end
-      @galenic_form = Galenic.get_galenic_form(parts[1]) if parts.size > 1
+      @galenic_form = Calc.get_galenic_form(parts[1]) if parts.size > 1
       name.strip! if name
       @name = name
       res = @pkg_size ? @pkg_size.split(/x/i) : []
