@@ -63,10 +63,10 @@ module Oddb2xml
 
     # helper for generating csv
     def headers
-      ["name", "pkg_size", "count", "multi", "measure", "addition", "scale", "unit"]
+      ["name", "pkg_size", "count", "multi", "measure", "addition", "scale", "unit", "galenic_form", "galenic_group"]
     end
     def to_array
-      [ @name, @pkg_size, @count, @multi, @measure, @addition, @scale, @unit]
+      [ @name, @pkg_size, @count, @multi, @measure, @addition, @scale, @unit, galenic_form.description, galenic_group.description]
     end
   private
     def capitalize(string)

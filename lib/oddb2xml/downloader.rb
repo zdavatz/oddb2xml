@@ -277,8 +277,9 @@ XML
       if Oddb2xml.skip_download? and File.exists?(file) and (Time.now-File.ctime(file)).to_i < 24*60*60
         Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{file} #{File.size(file)}"
         return File.expand_path(file)
-      end if @options[:calc]
+      end if @options[:calc] and @options[:skip_download]
       begin
+        FileUtils.rm(File.expand_path(file), :verbose => true) if File.exists?(File.expand_path(file))
         page = @agent.get(@url)
         if link_node = page.search(@xpath).first
           link = Mechanize::Page::Link.new(link_node, @agent, page)
