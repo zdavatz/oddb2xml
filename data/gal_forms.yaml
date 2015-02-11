@@ -1075,7 +1075,7 @@
   oid: 30671654
   descriptions:
     de: Infusionslösung/Injektionslösung
-  galenic_group: 1
+  galenic_group: 3
 27750951: !ruby/struct:Struct::GalenicForm
   oid: 27750951
   descriptions:

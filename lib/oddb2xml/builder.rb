@@ -622,12 +622,12 @@ module Oddb2xml
               xml.GTIN          ean13
               xml.NAME          name
               xml.PKG_SIZE      package_size
-              xml.SELLING_UNITS (info.selling_units)
-              xml.COUNT         info.count
-              xml.MULTI         info.multi
-              xml.MEASURE       info.measure
-              xml.ADDITION      info.addition
-              xml.SCALE         info.scale
+              xml.SELLING_UNITS info.selling_units
+#              xml.COUNT         info.count
+#              xml.MULTI         info.multi
+              xml.MEASURE       info.measure # Nur wenn Lösung wen Spalte M ml, Spritze
+#              xml.ADDITION      info.addition
+#              xml.SCALE         info.scale
               if  info.galenic_form.is_a?(String)
                 xml.GALENIC_FORM  info.galenic_form
                 xml.GALENIC_GROUP "Unknown"
@@ -640,7 +640,7 @@ module Oddb2xml
         }
       end
       csv_name = File.join(WorkDir, 'oddb_calc.csv')
-      CSV.open(csv_name, "w+") do |csv|
+      CSV.open(csv_name, "w+", :col_sep => ';') do |csv|
         csv << ['gtin'] + items.values.first.headers
         items.each do |key, value|
           csv <<  [key] + value.to_array

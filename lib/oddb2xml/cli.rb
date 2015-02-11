@@ -327,6 +327,7 @@ module Oddb2xml
       if @options[:calc]
         lines << Calc.dump_new_galenic_forms
         lines << Calc.dump_names_without_galenic_forms
+        lines << Calc.report_conversion
       end
       unless @options[:address]
         LANGUAGES.each do |lang|
