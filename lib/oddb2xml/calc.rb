@@ -2,7 +2,6 @@
 
 require 'oddb2xml/util'
 require 'yaml'
-# require 'pry'
 
 module Oddb2xml
  # Calc is responsible for analysing the columns "Packungsgrösse" and "Einheit"
@@ -110,7 +109,6 @@ module Oddb2xml
       @@galenic_groups[1]
     end
 
-    require 'pry'
     def self.get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
       begin
         return 1 unless part_from_name_C
@@ -121,7 +119,6 @@ module Oddb2xml
                             update_rule('feste_form name_C')
                             return pkg_size_to_int(pkg_size_L)
                           end
-                          # binding.pry if einheit_M == 'Tablette(n)' and x ==  'Tablette(n)'
                           if einheit_M and x.eql?(einheit_M)
                             puts "feste_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('feste_form einheit_M')
