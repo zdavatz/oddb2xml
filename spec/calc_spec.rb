@@ -22,6 +22,15 @@ describe Oddb2xml::Calc do
   TestExample = Struct.new("TestExample", :test_description, :iksnr_A, :seqnr_B, :pack_K, :name_C, :package_size_L, :einheit_M, :composition_P  ,
                            :values_to_compare)
 
+  tst_bicaNova = TestExample.new('bicaNova',
+                                58277, 1, 1, "bicaNova 1,5 % Glucose, Peritonealdialyselösung",
+                                '1500 ml', '',
+                                'I) et II) corresp.: natrii chloridum 5.5 g, natrii hydrogenocarbonas 3.36 g, calcii chloridum dihydricum 184 mg, magnesii chloridum hexahydricum 102 mg, glucosum anhydricum 15 g ut glucosum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 1000 ml.',
+                                { :selling_units => 1500,
+                                  # TODO: :measure => '0',
+                                  # :count => 10, :multi => 1,  :dose => ''
+                                  }
+                            )
   tst_kamillin = TestExample.new('Kamillin Medipharm, Bad',
                                 43454, 1, 101, "Kamillin Medipharm, Bad",
                                 '25 x 40', 'ml',
@@ -244,6 +253,12 @@ describe Oddb2xml::Calc do
     info = Calc.new(tst_kamillin.name_C, tst_kamillin.package_size_L, tst_kamillin.einheit_M, tst_kamillin.composition_P)
     specify { expect(info.selling_units).to eq  25 }
   end
+
+  context 'find correct result for bicaNova' do
+    info = Calc.new(tst_bicaNova.name_C, tst_bicaNova.package_size_L, tst_bicaNova.einheit_M, tst_bicaNova.composition_P)
+    specify { expect(info.selling_units).to eq  1500 }
+  end
+
 end
 
   missing_tests = "

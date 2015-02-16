@@ -143,6 +143,11 @@ module Oddb2xml
                           end
                         }
         Mesurements.each{ |x|
+                          if pkg_size_L and pkg_size_L.split(' ').index(x)
+                            puts "measurement in pkg_size_L #{pkg_size_L} matched: #{x}" if $VERBOSE
+                            update_rule('measurement pkg_size_L')
+                            return pkg_size_to_int(pkg_size_L, true)
+                          end
                           if einheit_M and /^#{x}$/i.match(einheit_M)
                             puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('measurement einheit_M')
@@ -263,7 +268,6 @@ module Oddb2xml
       end
     end
     def search_galenic_info
-
       @substances = nil
       @substances = @composition.split(/\s*,(?!\d|[^(]+\))\s*/u).collect { |name| capitalize(name) }.uniq if @composition
 
