@@ -1,5 +1,6 @@
 === 1.9.5 /03.02.2015
 
+* Use https instead of http for www.swissmedic.ch
 * Added field CompositionSwissmedic to oddb_product.xml
 * Unittests for upcoming oddb_calc.xml
 

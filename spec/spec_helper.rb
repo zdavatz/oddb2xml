@@ -106,7 +106,7 @@ module ServerMockHelper
       :packages => {:html => '/arzneimittel/00156/00221/00222/00230/index.html?lang=de', :xls => '/download'},
     }.each_pair do |type, urls|
       # html (dummy)
-      stub_html_url = "http://#{host}" + urls[:html]
+      stub_html_url = "https://#{host}" + urls[:html]
       filename = File.join(Oddb2xml::SpecData, "swissmedic_#{type.to_s}.html")
       
       stub_response = File.read(filename)
@@ -122,10 +122,10 @@ module ServerMockHelper
           :body    => stub_response)
       # xls
       if type == :orphans
-        stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_orphan.xlsx"
+        stub_xls_url  = "https://#{host}" + urls[:xls] + "/swissmedic_orphan.xlsx"
         stub_response = File.read(File.join(Oddb2xml::SpecData, "swissmedic_orphan.xlsx"))
       else
-        stub_xls_url  = "http://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xlsx"
+        stub_xls_url  = "https://#{host}" + urls[:xls] + "/swissmedic_#{type.to_s}.xlsx"
         stub_response = 'no_such_file'
       end
       stub_request(:get, stub_xls_url).

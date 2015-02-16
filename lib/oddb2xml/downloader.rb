@@ -270,7 +270,7 @@ XML
         action = "arzneimittel/00156/00221/00222/00230/index.html?lang=de"
         @xpath = "//div[@id='sprungmarke10_7']//a[@title='Excel-Version Zugelassene Verpackungen*']"
       end
-      url = "http://www.swissmedic.ch/#{action}"
+      url = "https://www.swissmedic.ch/#{action}"
       super(@options, url)
     end
     def download
