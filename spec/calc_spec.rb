@@ -27,7 +27,7 @@ describe Oddb2xml::Calc do
                                 '1500 ml', '',
                                 'I) et II) corresp.: natrii chloridum 5.5 g, natrii hydrogenocarbonas 3.36 g, calcii chloridum dihydricum 184 mg, magnesii chloridum hexahydricum 102 mg, glucosum anhydricum 15 g ut glucosum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 1000 ml.',
                                 { :selling_units => 1500,
-                                  # TODO: :measure => '0',
+                                  :measure => 'ml',
                                   # :count => 10, :multi => 1,  :dose => ''
                                   }
                             )
@@ -36,7 +36,7 @@ describe Oddb2xml::Calc do
                                 '25 x 40', 'ml',
                                 'haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A) 15 µg, haemagglutininum influenzae A (H3N2) (Virus-Stamm A/Texas/50/2012 (H3N2)-like: reassortant virus NYMC X-223A) 15 µg, haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml.',
                                 { :selling_units => 25,
-                                  # TODO: :measure => '0',
+                                  :measure => 'ml',
                                   # :count => 10, :multi => 1,  :dose => ''
                                   }
                             )
@@ -45,7 +45,7 @@ describe Oddb2xml::Calc do
                                 '2x10', 'Kapsel(n)',
                                 'lactobacillus acidophilus cryodesiccatus min. 10^9 CFU, bifidobacterium infantis min. 10^9 CFU, color.: E 127, E 132, E 104, excipiens pro capsula.',
                                 { :selling_units => 20,
-                                  # TODO: :measure => '0',
+                                  :measure => 'Kapsel(n)',
                                   # :count => 10, :multi => 1,  :dose => ''
                                   }
                             )
@@ -54,7 +54,7 @@ describe Oddb2xml::Calc do
                                 '10 x 0.5 ml', 'Fertigspritze(n)',
                                 'ropivacaini hydrochloridum 2 mg, natrii chloridum, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.',
                                 { :selling_units => 10,
-                                  # TODO: :measure => '0.5 ml',
+                                  :measure => 'ml',
                                   # :count => 10, :multi => 1,  :dose => ''
                                   }
                             )
@@ -63,7 +63,8 @@ describe Oddb2xml::Calc do
                                 21191, 1, 19, 'Diamox, comprimés',
                                 '1 x 25', 'Tablette(n)',
                                 'haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A) 15 µg, haemagglutininum influenzae A (H3N2) (Virus-Stamm A/Texas/50/2012 (H3N2)-like: reassortant virus NYMC X-223A) 15 µg, haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml.',
-                                { :selling_units => 25,  # TODO: :measure => '250 mg',
+                                { :selling_units => 25,
+                                  :measure => 'mg',
                                   #:count => 25, :multi => 1
                                   }
                               )
@@ -72,7 +73,8 @@ describe Oddb2xml::Calc do
                              54015, 01, 100, "Naropin 0,2 %, Infusionslösung / Injektionslösung",
                              '1 x 5 x 100', 'ml',
                              'ropivacaini hydrochloridum 2 mg, natrii chloridum, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.',
-                             { :selling_units => 5,  # TODO: :measure => '100 ml',
+                             { :selling_units => 5,
+                               :measure => 'ml',
                                #:count => 5, :multi => 1
                                }
                             )
@@ -257,6 +259,7 @@ describe Oddb2xml::Calc do
   context 'find correct result for bicaNova' do
     info = Calc.new(tst_bicaNova.name_C, tst_bicaNova.package_size_L, tst_bicaNova.einheit_M, tst_bicaNova.composition_P)
     specify { expect(info.selling_units).to eq  1500 }
+    specify { expect(info.measure).to eq 'ml' }
   end
 
 end

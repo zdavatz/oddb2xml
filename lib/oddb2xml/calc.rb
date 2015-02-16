@@ -117,41 +117,41 @@ module Oddb2xml
                           if part_from_name_C and (x.gsub(/[()]/, '_')).match(part_from_name_C)
                             puts "feste_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
                             update_rule('feste_form name_C')
-                            return pkg_size_to_int(pkg_size_L)
+                            return pkg_size_to_int(pkg_size_L), x
                           end
                           if einheit_M and x.eql?(einheit_M)
                             puts "feste_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('feste_form einheit_M')
-                            return pkg_size_to_int(pkg_size_L)
+                            return pkg_size_to_int(pkg_size_L), x
                           end
                         }
         FluidForms.each{ |x|
                           if part_from_name_C and x.match(part_from_name_C)
                             puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
                             update_rule('liquid_form name_C')
-                            return pkg_size_to_int(pkg_size_L, true)
+                            return pkg_size_to_int(pkg_size_L, true), x
                           end
                           if part_from_name_C and x.match(part_from_name_C.split(' ')[0])
                             puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
                             update_rule('liquid_form first_part')
-                            return pkg_size_to_int(pkg_size_L, true)
+                            return pkg_size_to_int(pkg_size_L, true), x
                           end
                           if einheit_M and x.eql?(einheit_M)
                             puts "liquid_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('liquid_form einheit_M')
-                            return pkg_size_to_int(pkg_size_L, true)
+                            return pkg_size_to_int(pkg_size_L, true), x
                           end
                         }
         Mesurements.each{ |x|
                           if pkg_size_L and pkg_size_L.split(' ').index(x)
                             puts "measurement in pkg_size_L #{pkg_size_L} matched: #{x}" if $VERBOSE
                             update_rule('measurement pkg_size_L')
-                            return pkg_size_to_int(pkg_size_L, true)
+                            return pkg_size_to_int(pkg_size_L, true),x
                           end
                           if einheit_M and /^#{x}$/i.match(einheit_M)
                             puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('measurement einheit_M')
-                            return pkg_size_to_int(pkg_size_L, true)
+                            return pkg_size_to_int(pkg_size_L, true),x
                           end
                         }
         puts "Could not find anything for name_C #{part_from_name_C} pkg_size_L: #{pkg_size_L} einheit_M #{einheit_M}" if $VERBOSE
@@ -297,23 +297,18 @@ module Oddb2xml
         end
       end
       # check whether we find numerical and units
-      @measure = 0
       if res.size >= 2
         if (result = Calc.check_for_value_and_units(res[1].strip)) != nil
           @multi = result[1].to_f
-          @measure = result[1]
         else
           @multi = res[1].to_i
         end
       else
         @multi = 1
       end
-      if res.size >= 3
-        @measure = res[2].to_i.to_s + ' ' + (@unit ? @unit : '')
-      end
       @addition = 0
       @scale = 1
-      @selling_units =  Calc.get_selling_units(form_name, @pkg_size, @unit)
+      @selling_units, @measure =  Calc.get_selling_units(form_name, @pkg_size, @unit)
     end
   end
 end
