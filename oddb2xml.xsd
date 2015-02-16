@@ -25,7 +25,7 @@
       # https://www.medregbm.admin.ch/Publikation/CreateExcelListMedizinalPersons
       # (epha-)interactions https://download.epha.ch/cleaned/matrix.csv
 
-      For historical reasons the generated *.XML have not a common layout and some fields have different meanings in differen files.
+      For historical reasons the generated *.XML have not a common layout and some fields have different meanings in different files.
 
       The two files oddb_article and oddb_product are not normalized. There if for one swissmedic IKSNR several
       packages are available you will find an entry inside oddb_article and oddb_product for each of them.
@@ -45,6 +45,8 @@
       REF_DATA 1 in oddb_article if coming from a refdata source (migel, bag, swissmedic), else 0
 
       FIRST import all data from swissINDEX
+      * DSCRD  German name
+      * DSCRF  French name (Products/article only from ZurRose do not have a french name)
       * GTIN
       * PHAR
       * Status
@@ -73,6 +75,7 @@
         C   Abgabe nach Fachberatung durch Medizinalpersonen
         D   Abgabe nach Fachberatung
         E   Abgabe ohne Fachberatung
+      * IT  IT-Number aka Index Therapeuticus: column 'E' from packages.xlsx
       * ATC (if missing from swissINDEX) -> Field SubstanceSwissmedic in oddb_article.xml
       * Wirkstoff (column 'O') -> Field SubstanceSwissmedic in oddb_article.xml
       * Composition (column 'P') -> Field CompositionSwissmedic in oddb_product.xml
