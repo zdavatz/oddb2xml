@@ -75,6 +75,7 @@
         E   Abgabe ohne Fachberatung
       * ATC (if missing from swissINDEX) -> Field SubstanceSwissmedic in oddb_article.xml
       * Wirkstoff (column 'O') -> Field SubstanceSwissmedic in oddb_article.xml
+      * Composition (column 'P') -> Field CompositionSwissmedic in oddb_product.xml
       * Packungsgrösse (column 'L') -> Field PackGrSwissmedic in oddb_article.xml
       * Packungseinheit(column 'L') -> Field EinheitSwissmedic in oddb_article.xml
       
@@ -802,6 +803,7 @@
         <xs:element minOccurs="0" ref="ns1:PackGrSwissmedic"/>
         <xs:element minOccurs="0" ref="ns1:EinheitSwissmedic"/>
         <xs:element minOccurs="0" ref="ns1:SubstanceSwissmedic"/>
+        <xs:element minOccurs="0" ref="ns1:CompositionSwissmedic"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
     </xs:complexType>
@@ -842,6 +844,7 @@
   <xs:element name="PackGrSwissmedic" type="xs:string"/>
   <xs:element name="EinheitSwissmedic" type="xs:string"/>
   <xs:element name="SubstanceSwissmedic" type="xs:string"/>
+  <xs:element name="CompositionSwissmedic" type="xs:string"/>
   <xs:element name="PRODUCTMD">
     <xs:complexType>
       <xs:sequence>

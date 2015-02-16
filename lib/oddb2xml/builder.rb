@@ -251,6 +251,7 @@ module Oddb2xml
               :siz => '',
               :eht => '',
               :sub => '',
+              :comp => '',
             }
             if obj[:ean] # via EAN-Code
               obj[:no8] = obj[:ean][4..11]
@@ -269,6 +270,7 @@ module Oddb2xml
               obj[:siz] = ppac[:package_size]
               obj[:eht] = ppac[:einheit_swissmedic]
               obj[:sub] = ppac[:substance_swissmedic]
+              obj[:comp] = ppac[:composition_swissmedic]
             end
             if obj[:ean][0..3] == '7680'
               @products << obj
@@ -573,6 +575,7 @@ module Oddb2xml
               xml.PackGrSwissmedic    obj[:siz] unless obj[:siz].empty?
               xml.EinheitSwissmedic   obj[:eht] unless obj[:eht].empty?
               xml.SubstanceSwissmedic obj[:sub] unless obj[:sub].empty?
+              xml.CompositionSwissmedic obj[:comp] unless obj[:comp].empty?
             }
           end
           xml.RESULT {

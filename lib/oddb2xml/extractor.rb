@@ -277,6 +277,7 @@ module Oddb2xml
         siz       = 11   # :package_size
         eht       = 12   # :einheit_swissmedic
         sub       = 14   # :substance_swissmedic
+        comp      = 15   # :composition_swissmedic
         @sheet.each_with_index do |row, i|
 
           next if (i <= 1)
@@ -296,6 +297,7 @@ module Oddb2xml
               :package_size         => row[siz] ? row[siz].value.to_s : '',
               :einheit_swissmedic   => row[eht] ? row[eht].value.to_s : '',
               :substance_swissmedic => row[sub] ? row[sub].value.to_s : '',
+              :composition_swissmedic => row[comp] ? row[comp].value.to_s : '',
               :sequence_name        => row[seq_name] ? row[seq_name].value.to_s : '',
               :is_tier              => (row[typ] == 'Tierarzneimittel' ? true : false),
             }

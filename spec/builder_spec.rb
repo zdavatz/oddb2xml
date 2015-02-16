@@ -118,6 +118,8 @@ describe Oddb2xml::Builder do
         product_xml.match(/<GTIN>7680620690084/).should_not == nil
         product_xml.match(/<DSCRD>Levetiracetam DESITIN Filmtabl 250 mg/).should_not == nil
         product_xml.match(/<DSCRF>Levetiracetam DESITIN cpr pell 250 mg/).should_not == nil
+        product_xml.match(/<SubstanceSwissmedic>levetiracetamum</)
+        product_xml.match(/<CompositionSwissmedic>levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.</).should_not == nil
 
         article_xml.scan(/<ART DT=/).size.should eq(NrPharmaArticles)
         article_xml.should match(/<PHAR>5819012</)
