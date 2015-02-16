@@ -9,10 +9,64 @@ include Oddb2xml
 
 describe Oddb2xml::Calc do
 
+  after(:each) do
+    FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, '*.*')))
+    FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, 'downloads', '*')))
+  end
   before(:each) do
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, '*.xml')))
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, '*.csv')))
   end
+
+  # after each name you find the column of swissmedic_package.xlsx file
+  TestExample = Struct.new("TestExample", :test_description, :iksnr_A, :seqnr_B, :pack_K, :name_C, :package_size_L, :einheit_M, :composition_P  ,
+                           :values_to_compare)
+
+  tst_kamillin = TestExample.new('Kamillin Medipharm, Bad',
+                                43454, 1, 101, "Kamillin Medipharm, Bad",
+                                '25 x 40', 'ml',
+                                'haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A) 15 µg, haemagglutininum influenzae A (H3N2) (Virus-Stamm A/Texas/50/2012 (H3N2)-like: reassortant virus NYMC X-223A) 15 µg, haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml.',
+                                { :selling_units => 25,
+                                  # TODO: :measure => '0',
+                                  # :count => 10, :multi => 1,  :dose => ''
+                                  }
+                            )
+  tst_infloran = TestExample.new('Test Infloran, capsule',
+                                679, 2, 12, "Infloran, capsule",
+                                '2x10', 'Kapsel(n)',
+                                'lactobacillus acidophilus cryodesiccatus min. 10^9 CFU, bifidobacterium infantis min. 10^9 CFU, color.: E 127, E 132, E 104, excipiens pro capsula.',
+                                { :selling_units => 20,
+                                  # TODO: :measure => '0',
+                                  # :count => 10, :multi => 1,  :dose => ''
+                                  }
+                            )
+  tst_mutagrip = TestExample.new('Test Mutagrip (Fertigspritzen)',
+                                373, 23, 10, "Mutagrip, Suspension zur Injektion",
+                                '10 x 0.5 ml', 'Fertigspritze(n)',
+                                'ropivacaini hydrochloridum 2 mg, natrii chloridum, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.',
+                                { :selling_units => 10,
+                                  # TODO: :measure => '0.5 ml',
+                                  # :count => 10, :multi => 1,  :dose => ''
+                                  }
+                            )
+
+  tst_diamox = TestExample.new('Diamox. Tabletten',
+                                21191, 1, 19, 'Diamox, comprimés',
+                                '1 x 25', 'Tablette(n)',
+                                'haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A) 15 µg, haemagglutininum influenzae A (H3N2) (Virus-Stamm A/Texas/50/2012 (H3N2)-like: reassortant virus NYMC X-223A) 15 µg, haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml.',
+                                { :selling_units => 25,  # TODO: :measure => '250 mg',
+                                  #:count => 25, :multi => 1
+                                  }
+                              )
+
+  tst_naropin = TestExample.new('Das ist eine Injektionslösung von einer Packung mit 5 x 100 ml',
+                             54015, 01, 100, "Naropin 0,2 %, Infusionslösung / Injektionslösung",
+                             '1 x 5 x 100', 'ml',
+                             'ropivacaini hydrochloridum 2 mg, natrii chloridum, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.',
+                             { :selling_units => 5,  # TODO: :measure => '100 ml',
+                               #:count => 5, :multi => 1
+                               }
+                            )
 
   context 'should return correct value for liquid' do
     pkg_size_L = '1 x 5 x 200'
@@ -89,37 +143,6 @@ describe Oddb2xml::Calc do
     specify { expect(result.description).to eq 'unbekannt' }
   end
 
-  # after each name you find the column of swissmedic_package.xlsx file
-  TestExample = Struct.new("TestExample", :test_description, :iksnr_A, :seqnr_B, :pack_K, :name_C, :package_size_L, :einheit_M, :composition_P  ,
-                           :values_to_compare)
-
-  tst_mutagrip = TestExample.new('Test Mutagrip (Fertigspritzen)',
-                                373, 23, 10, "Mutagrip, Suspension zur Injektion",
-                                '10 x 0.5 ml', 'Fertigspritze(n)',
-                                'ropivacaini hydrochloridum 2 mg, natrii chloridum, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.',
-                                { :selling_units => 10,
-                                  :measure => '0.5 ml',
-                                  # :count => 10, :multi => 1,  :dose => ''
-                                  }
-                            )
-
-  tst_diamox = TestExample.new('Diamox. Tabletten',
-                                21191, 1, 19, 'Diamox, comprimés',
-                                '1 x 25', 'Tablette(n)',
-                                'haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A) 15 µg, haemagglutininum influenzae A (H3N2) (Virus-Stamm A/Texas/50/2012 (H3N2)-like: reassortant virus NYMC X-223A) 15 µg, haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml.',
-                                { :selling_units => 25, :measure => '250 mg',
-                                  #:count => 25, :multi => 1
-                                  }
-                              )
-
-  tst_naropin = TestExample.new('Das ist eine Injektionslösung von einer Packung mit 5 x 100 ml',
-                             54015, 01, 100, "Naropin 0,2 %, Infusionslösung / Injektionslösung",
-                             '1 x 5 x 100', 'ml',
-                             'ropivacaini hydrochloridum 2 mg, natrii chloridum, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.',
-                             { :selling_units => 5, :measure => '100 ml',
-                               #:count => 5, :multi => 1
-                               }
-                            )
 # 00372 1 Muscles lisses Sérocytol, suppositoire  Sérolab, société anonyme  08.07.  J06AA Blutprodukte  26.04.10  26.04.10  25.04.15  001 3 Suppositorien B globulina equina (immunisé avec muscles lisses porcins) globulina equina (immunisé avec muscles lisses porcins) 8 mg, propylenglycolum, conserv.: E 216, E 218, excipiens pro suppositorio. "Traitement immunomodulant  selon le Dr Thomas
 # Possibilités d'emploi voir information professionnelle"
   # measure 8 mg
@@ -132,7 +155,8 @@ describe Oddb2xml::Calc do
       "http://ch.oddb.org/de/gcc/drug/reg/#{sprintf('%05d' % iksnr_A)}/seq/#{sprintf('%02d' % seqnr_B)}/pack/#{sprintf('%03d' % pack_K)}"
     end
   end
-  [tst_naropin,
+  [tst_kamillin,
+   tst_naropin,
    tst_diamox,
    tst_mutagrip,
   ].each {
@@ -155,7 +179,21 @@ describe Oddb2xml::Calc do
     specify { expect(info.galenic_form.description).to eq  'Infusionslösung/Injektionslösung' }
     specify { expect(info.galenic_group.description).to eq  'Injektion/Infusion' }
     specify { expect(info.pkg_size).to eq '1 x 5 x 100' }
-    specify { expect(info.measure).to eq  '100 ml' }
+    skip    { expect(info.measure).to eq  '100 ml' }
+    # specify { expect(info.count).to eq  5 }
+    # specify { expect(info.multi).to eq  1 }
+    # specify { expect(info.addition).to eq 0 }
+    # specify { expect(info.scale).to eq  1 }
+  end
+
+  context 'find correct result for Inflora, capsule' do
+    info = Calc.new(tst_infloran.name_C, tst_infloran.package_size_L, tst_infloran.einheit_M, tst_infloran.composition_P)
+    specify { expect(tst_infloran.url).to eq 'http://ch.oddb.org/de/gcc/drug/reg/00679/seq/02/pack/012' }
+    specify { expect(info.galenic_form.description).to eq 'capsule' }
+    skip { expect(info.galenic_group.description).to eq  'Injektion/Infusion' }
+    specify { expect(info.pkg_size).to eq '2x10' }
+    specify { expect(info.selling_units).to eq  20 }
+    skip { expect(info.measure).to eq  '0' }
     # specify { expect(info.count).to eq  5 }
     # specify { expect(info.multi).to eq  1 }
     # specify { expect(info.addition).to eq 0 }
@@ -164,7 +202,7 @@ describe Oddb2xml::Calc do
 
   context 'convert mg/l into ml/mg for solutions' do
     result = Calc.new('50', 'g/l')
-    specify { expect(result.measure).to eq  50 }
+    skip { expect(result.measure).to eq  50 }
   end
 
   run_time_options = '--calc --skip-download'
@@ -174,17 +212,20 @@ describe Oddb2xml::Calc do
       options.parser.parse!(run_time_options.split(' '))
       Oddb2xml::Cli.new(options.opts)
     end
-    src = File.expand_path(File.join(File.dirname(__FILE__), 'data', 'swissmedic_package-galenic.xlsx'))
-    specify { expect(File.exists?(src)).to eq true }
-    dest =  File.join(Oddb2xml::WorkDir, 'swissmedic_package.xlsx')
-    FileUtils.cp(src, dest, { :verbose => true, :preserve => true})
-    specify { expect(File.exists?(dest)).to eq true }
     it 'should create a correct xml and a csv file' do
+      src = File.expand_path(File.join(File.dirname(__FILE__), 'data', 'swissmedic_package-galenic.xlsx'))
+      dest =  File.join(Oddb2xml::WorkDir, 'swissmedic_package.xlsx')
+      FileUtils.makedirs(Oddb2xml::WorkDir)
+      FileUtils.cp(src, dest, { :verbose => true, :preserve => true})
+      FileUtils.cp(File.expand_path(File.join(File.dirname(__FILE__), 'data', 'XMLPublications.zip')),
+                  File.join(Oddb2xml::WorkDir, 'downloads'),
+                  { :verbose => true, :preserve => true})
       cli.run
       expected = [
         'oddb_calc.xml',
         'oddb_calc.csv',
-      ].each { |file| full = File.join(Oddb2xml::WorkDir, file)
+      ].each { |file|
+              full = File.join(Oddb2xml::WorkDir, file)
               expect(File.exists?(full)).to eq true
              }
       xml = File.read(File.join(Oddb2xml::WorkDir, 'oddb_calc.xml'))
@@ -197,6 +238,11 @@ describe Oddb2xml::Calc do
           result.should eq value.to_s
       }
    end
+  end
+
+  context 'find correct result for Kamillin' do
+    info = Calc.new(tst_kamillin.name_C, tst_kamillin.package_size_L, tst_kamillin.einheit_M, tst_kamillin.composition_P)
+    specify { expect(info.selling_units).to eq  25 }
   end
 end
 

@@ -111,7 +111,7 @@ module Oddb2xml
 
     def self.get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
       begin
-        return 1 unless part_from_name_C
+        return pkg_size_to_int(pkg_size_L) unless part_from_name_C
         part_from_name_C = part_from_name_C.gsub(/[()]/, '_')
         FesteFormen.each{ |x|
                           if part_from_name_C and (x.gsub(/[()]/, '_')).match(part_from_name_C)
@@ -146,7 +146,7 @@ module Oddb2xml
                           if einheit_M and /^#{x}$/i.match(einheit_M)
                             puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('measurement einheit_M')
-                            return pkg_size_to_int(pkg_size_L)
+                            return pkg_size_to_int(pkg_size_L, true)
                           end
                         }
         puts "Could not find anything for name_C #{part_from_name_C} pkg_size_L: #{pkg_size_L} einheit_M #{einheit_M}" if $VERBOSE
@@ -240,10 +240,11 @@ module Oddb2xml
       @@rules_counter[rulename] += 1
     end
 
-    def self.pkg_size_to_int(pkg_size, is_liquid = false)
+    def self.pkg_size_to_int(pkg_size, skip_last_part = false)
+      return pkg_size if pkg_size.is_a?(Fixnum)
       return 1 unless pkg_size
-      parts = pkg_size.split(/ x /i)
-      parts = parts[0..-2] if is_liquid and parts.size > 1
+      parts = pkg_size.split(/\s*x\s*/i)
+      parts = parts[0..-2] if skip_last_part and parts.size > 1
       if parts.size == 3
         return parts[0].to_i * parts[1].to_i * parts[2].to_i
       elsif parts.size == 2
@@ -280,11 +281,16 @@ module Oddb2xml
         end
       end
       @name = name.strip
-      res = @pkg_size ? @pkg_size.split(/x/i) : []
-      if res.size >= 1
-        @count = res[0].to_i
+      if @pkg_size.is_a?(Fixnum)
+        @count = @pkg_size
+        res = [@pkg_size]
       else
-        @count = 1
+        res = @pkg_size ? @pkg_size.split(/x/i) : []
+        if res.size >= 1
+          @count = res[0].to_i
+        else
+          @count = 1
+        end
       end
       # check whether we find numerical and units
       @measure = 0
