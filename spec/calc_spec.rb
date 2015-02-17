@@ -22,6 +22,15 @@ describe Oddb2xml::Calc do
   TestExample = Struct.new("TestExample", :test_description, :iksnr_A, :seqnr_B, :pack_K, :name_C, :package_size_L, :einheit_M, :composition_P  ,
                            :values_to_compare)
 
+  tst_fluorglukose = TestExample.new('Fluorglukose',
+                                51908, 2, 16, "2-Fluorglukose (18-F), Injektionslösung",
+                                '0,1 - 80', 'GBq',
+                                'fludeoxyglucosum(18-F) zum Kalibrierungszeitpunkt 0.1-8 GBq, dinatrii phosphas dihydricus, natrii dihydrogenophosphas dihydricus, natrii chloridum, antiox.: natrii thiosulfas 1.3-1.9 mg, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.',
+                                { :selling_units => 1,
+                                  :measure => 'GBq',
+                                  # :count => 10, :multi => 1,  :dose => ''
+                                  }
+                            )
   tst_bicaNova = TestExample.new('bicaNova',
                                 58277, 1, 1, "bicaNova 1,5 % Glucose, Peritonealdialyselösung",
                                 '1500 ml', '',
@@ -54,7 +63,7 @@ describe Oddb2xml::Calc do
                                 '10 x 0.5 ml', 'Fertigspritze(n)',
                                 'ropivacaini hydrochloridum 2 mg, natrii chloridum, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.',
                                 { :selling_units => 10,
-                                  :measure => 'ml',
+                                  :measure => 'Fertigspritze(n)',
                                   # :count => 10, :multi => 1,  :dose => ''
                                   }
                             )
@@ -64,7 +73,7 @@ describe Oddb2xml::Calc do
                                 '1 x 25', 'Tablette(n)',
                                 'haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A) 15 µg, haemagglutininum influenzae A (H3N2) (Virus-Stamm A/Texas/50/2012 (H3N2)-like: reassortant virus NYMC X-223A) 15 µg, haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml.',
                                 { :selling_units => 25,
-                                  :measure => 'mg',
+                                  :measure => 'Tablette(n)',
                                   #:count => 25, :multi => 1
                                   }
                               )
@@ -82,56 +91,50 @@ describe Oddb2xml::Calc do
   context 'should return correct value for liquid' do
     pkg_size_L = '1 x 5 x 200'
     einheit_M  = 'ml'
-    part_from_name_C = 'Infusionslösung / Injektionslösung'
-
-    result = Calc.get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
-    specify { expect(result).to eq 5 }
+    name_C = 'Naropin 0,2 %, Infusionslösung / Injektionslösung'
+    result = Calc.new(name_C, pkg_size_L, einheit_M, nil)
+    specify { expect(result.selling_units).to eq 5 }
+    specify { expect(result.measure).to eq 'ml' }
   end
 
   context 'should return correct value for W-Tropfen' do
     pkg_size_L = '10'
     einheit_M  = 'ml'
-    part_from_name_C = nil
-    result = Calc.get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
-    specify { expect(result).to eq 10 }
+    name_C = 'W-Tropfen'
+    result = Calc.new(name_C, pkg_size_L, einheit_M, nil)
+    specify { expect(result.selling_units).to eq 10 }
+    specify { expect(result.measure).to eq 'ml' }
   end
 
-  context 'should return correct value for tablet' do
+
+  context 'should return correct value for Diamox, comprimés' do
     pkg_size_L = '1 x 25'
     einheit_M  = 'Tablette(n)'
-    part_from_name_C = 'comprimés'
+    name_C = 'Diamox, comprimés'
 
-    result = Calc.get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
+    result = Calc.new(name_C, pkg_size_L, einheit_M, nil)
+    specify { expect(result.selling_units).to eq 25 }
+    specify { expect(result.measure).to eq 'Tablette(n)' }
+
     res = Calc.report_conversion
     specify { expect(res.class).to eq Array }
     specify { expect(res.first.class).to eq String }
-    specify { expect(result).to eq 25 }
   end
 
   context 'should return correct value for Perindopril' do
     pkg_size_L = '90'
     einheit_M  = 'Tablette(n)'
-    part_from_name_C = 'comprimés pelliculés'
+    name_C = 'comprimés pelliculés'
 
-    result = Calc.get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
+    result = Calc.new(name_C, pkg_size_L, einheit_M, nil)
+    specify { expect(result.selling_units).to eq 90 }
+    specify { expect(result.measure).to eq einheit_M }
+
     res = Calc.report_conversion
     specify { expect(res.class).to eq Array }
     specify { expect(res.first.class).to eq String }
-    specify { expect(result).to eq 90 }
   end
 
-
-  context 'should return correct value for mutagrip' do
-    pkg_size_L = '10 x 0.5 ml'
-    einheit_M  = 'Fertigspritze(n)'
-    part_from_name_C = 'Suspension zur Injektion'
-
-    result = Calc.get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
-    res = Calc.report_conversion
-    specify { expect(res.class).to eq Array }
-    specify { expect(res.first.class).to eq String }
-    specify { expect(result).to eq 10 }
-  end
 
   context 'should find galenic_group for Kaugummi' do
     result = Calc.get_galenic_group('Kaugummi')
@@ -154,25 +157,19 @@ describe Oddb2xml::Calc do
     specify { expect(result.description).to eq 'unbekannt' }
   end
 
-# 00372 1 Muscles lisses Sérocytol, suppositoire  Sérolab, société anonyme  08.07.  J06AA Blutprodukte  26.04.10  26.04.10  25.04.15  001 3 Suppositorien B globulina equina (immunisé avec muscles lisses porcins) globulina equina (immunisé avec muscles lisses porcins) 8 mg, propylenglycolum, conserv.: E 216, E 218, excipiens pro suppositorio. "Traitement immunomodulant  selon le Dr Thomas
-# Possibilités d'emploi voir information professionnelle"
-  # measure 8 mg
-  # nur ampullen
-
-# 00638 1 Infanrix DTPa-IPV, Injektionssuspension GlaxoSmithKline AG  08.08.  J07CA02 Impfstoffe  20.08.99  20.08.99  19.08.19  001 1 Spritze(n)  B toxoidum diphtheriae, toxoidum tetani, toxoidum pertussis, haemagglutininum filamentosum (B. pertussis), pertactinum (B. pertussis), virus poliomyelitis typus 1 inactivatum (Mahoney), virus poliomyelitis typus 2 inactivatum (MEF1), virus poliomyelitis typus 3 inactivatum (Saukett) toxoidum diphtheriae min. 30 U.I., toxoidum tetani min. 40 U.I., toxoidum pertussis 25 µg, haemagglutininum filamentosum (B. pertussis) 25 µg, pertactinum (B. pertussis) 8 µg, virus poliomyelitis typus 1 inactivatum (Mahoney) 40 U.I., virus poliomyelitis typus 2 inactivatum (MEF1) 8 U.I., virus poliomyelitis typus 3 inactivatum (Saukett) 32 U.I., aluminium ut aluminii hydroxidum hydricum ad adsorptionem, natrii chloridum, medium199, residui: kalii chloridum et dinatrii phosphas anhydricus et kalii phosphates et polysorbatum 80 et glycinum et formaldehydum et neomycini sulfas et polymyxini B sulfas nihil, aqua ad iniectabilia ad suspensionem pro 0.5 ml.  Grundimmunisierung und Auffrischimpfung, gegen Diphtherie, Tetanus, Pertussis und Poliomyelitis, ab dem vollendeten 2. Lebensmonat
-# mehrere
   class TestExample
     def url
       "http://ch.oddb.org/de/gcc/drug/reg/#{sprintf('%05d' % iksnr_A)}/seq/#{sprintf('%02d' % seqnr_B)}/pack/#{sprintf('%03d' % pack_K)}"
     end
   end
-  [tst_kamillin,
+  [tst_fluorglukose,
+   tst_kamillin,
    tst_naropin,
    tst_diamox,
    tst_mutagrip,
   ].each {
     |tst|
-      context "verify #{tst.iksnr_A}: #{tst.url}" do
+      context "verify #{tst.iksnr_A} #{tst.name_C}: #{tst.url}" do
         info = Calc.new(tst.name_C, tst.package_size_L, tst.einheit_M, tst.composition_P)
         tst.values_to_compare.each do
           |key, value|
@@ -250,7 +247,6 @@ describe Oddb2xml::Calc do
       }
    end
   end
-
   context 'find correct result for Kamillin' do
     info = Calc.new(tst_kamillin.name_C, tst_kamillin.package_size_L, tst_kamillin.einheit_M, tst_kamillin.composition_P)
     specify { expect(info.selling_units).to eq  25 }
@@ -260,6 +256,20 @@ describe Oddb2xml::Calc do
     info = Calc.new(tst_bicaNova.name_C, tst_bicaNova.package_size_L, tst_bicaNova.einheit_M, tst_bicaNova.composition_P)
     specify { expect(info.selling_units).to eq  1500 }
     specify { expect(info.measure).to eq 'ml' }
+  end
+
+  context 'should return correct value for mutagrip' do
+    pkg_size_L = '10 x 0.5 ml'
+    einheit_M  = 'Fertigspritze(n)'
+    name_C = 'Suspension zur Injektion'
+
+    result = Calc.new(name_C, pkg_size_L, einheit_M, nil)
+    specify { expect(result.selling_units).to eq 10 }
+    specify { expect(result.measure).to eq einheit_M }
+
+    res = Calc.report_conversion
+    specify { expect(res.class).to eq Array }
+    specify { expect(res.first.class).to eq String }
   end
 
 end

@@ -78,6 +78,7 @@ module Oddb2xml
       'Suppositorien',
       'Tablette(n)',
       'Tüchlein',
+      'Urethrastab',
       'Vaginalzäpfchen',
       'comprimé',
       'comprimé pelliculé',
@@ -89,7 +90,7 @@ module Oddb2xml
       'ovale Körper',
       'tube(s)',
     ]
-    Mesurements = [ 'g', 'kg', 'l', 'mg', 'ml', 'cm']
+    Mesurements = [ 'g', 'kg', 'l', 'mg', 'ml', 'cm', 'GBq']
     Others = ['Kombipackung', 'emballage combiné' ]
     UnknownGalenicForm = 140
     UnknownGalenicGroup = 1
@@ -107,61 +108,6 @@ module Oddb2xml
         return galenic_group if galenic_group.descriptions[lang].eql?(name)
       }
       @@galenic_groups[1]
-    end
-
-    def self.get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
-      begin
-        return pkg_size_to_int(pkg_size_L) unless part_from_name_C
-        part_from_name_C = part_from_name_C.gsub(/[()]/, '_')
-        FesteFormen.each{ |x|
-                          if part_from_name_C and (x.gsub(/[()]/, '_')).match(part_from_name_C)
-                            puts "feste_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
-                            update_rule('feste_form name_C')
-                            return pkg_size_to_int(pkg_size_L), x
-                          end
-                          if einheit_M and x.eql?(einheit_M)
-                            puts "feste_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
-                            update_rule('feste_form einheit_M')
-                            return pkg_size_to_int(pkg_size_L), x
-                          end
-                        }
-        FluidForms.each{ |x|
-                          if part_from_name_C and x.match(part_from_name_C)
-                            puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
-                            update_rule('liquid_form name_C')
-                            return pkg_size_to_int(pkg_size_L, true), x
-                          end
-                          if part_from_name_C and x.match(part_from_name_C.split(' ')[0])
-                            puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
-                            update_rule('liquid_form first_part')
-                            return pkg_size_to_int(pkg_size_L, true), x
-                          end
-                          if einheit_M and x.eql?(einheit_M)
-                            puts "liquid_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
-                            update_rule('liquid_form einheit_M')
-                            return pkg_size_to_int(pkg_size_L, true), x
-                          end
-                        }
-        Mesurements.each{ |x|
-                          if pkg_size_L and pkg_size_L.split(' ').index(x)
-                            puts "measurement in pkg_size_L #{pkg_size_L} matched: #{x}" if $VERBOSE
-                            update_rule('measurement pkg_size_L')
-                            return pkg_size_to_int(pkg_size_L, true),x
-                          end
-                          if einheit_M and /^#{x}$/i.match(einheit_M)
-                            puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
-                            update_rule('measurement einheit_M')
-                            return pkg_size_to_int(pkg_size_L, true),x
-                          end
-                        }
-        puts "Could not find anything for name_C #{part_from_name_C} pkg_size_L: #{pkg_size_L} einheit_M #{einheit_M}" if $VERBOSE
-        update_rule('unbekannt')
-        return 'unbekannt'
-      rescue RegexpError => e
-        puts "RegexpError for M: #{einheit_M} pkg_size_L #{pkg_size_L} C: #{part_from_name_C}"
-        update_rule('RegexpError')
-        return 'error'
-      end
     end
 
     def self.report_conversion
@@ -211,8 +157,11 @@ module Oddb2xml
       # @pkg_size, @galenic_group, @galenic_form =
       search_galenic_info
       @composition = composition
+      @measure = unit if unit and not @measure
+      @measure = @galenic_form.description if @galenic_form and not @measure
       @galenic_form  ||= @@galenic_forms[UnknownGalenicForm]
     end
+
     def galenic_group
       @@galenic_groups[@galenic_form.galenic_group]
     end
@@ -240,22 +189,86 @@ module Oddb2xml
       string.split(/\s+/u).collect { |word| word.capitalize }.join(' ')
     end
 
-    def self.update_rule(rulename)
+    def update_rule(rulename)
       @@rules_counter[rulename] ||= 0
       @@rules_counter[rulename] += 1
     end
 
-    def self.pkg_size_to_int(pkg_size, skip_last_part = false)
+    def get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
+      begin
+        return pkg_size_to_int(pkg_size_L) unless part_from_name_C
+        part_from_name_C = part_from_name_C.gsub(/[()]/, '_')
+        FesteFormen.each{ |x|
+                          if part_from_name_C and (x.gsub(/[()]/, '_')).match(part_from_name_C)
+                            puts "feste_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
+                            update_rule('feste_form name_C')
+                            @measure = x
+                            return pkg_size_to_int(pkg_size_L)
+                          end
+                          if einheit_M and x.eql?(einheit_M)
+                            puts "feste_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
+                            update_rule('feste_form einheit_M')
+                            @measure = x
+                            return pkg_size_to_int(pkg_size_L)
+                          end
+                        }
+        FluidForms.each{ |x|
+                          if part_from_name_C and x.match(part_from_name_C)
+                            puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
+                            update_rule('liquid_form name_C')
+                            @measure = x
+                            return pkg_size_to_int(pkg_size_L, true)
+                          end
+                          if part_from_name_C and x.match(part_from_name_C.split(' ')[0])
+                            puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
+                            update_rule('liquid_form first_part')
+                            return pkg_size_to_int(pkg_size_L, true)
+                          end
+                          if einheit_M and x.eql?(einheit_M)
+                            puts "liquid_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
+                            update_rule('liquid_form einheit_M')
+                            @measure = x
+                            return pkg_size_to_int(pkg_size_L, true)
+                          end
+                        }
+        Mesurements.each{ |x|
+                          if pkg_size_L and pkg_size_L.split(' ').index(x)
+                            puts "measurement in pkg_size_L #{pkg_size_L} matched: #{x}" if $VERBOSE
+                            update_rule('measurement pkg_size_L')
+                            @measure = x
+                            return pkg_size_to_int(pkg_size_L, true)
+                          end
+                          if einheit_M and /^#{x}$/i.match(einheit_M)
+                            puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
+                            update_rule('measurement einheit_M')
+                            @measure = x
+                            return pkg_size_to_int(pkg_size_L, true)
+                          end
+                        }
+        puts "Could not find anything for name_C #{part_from_name_C} pkg_size_L: #{pkg_size_L} einheit_M #{einheit_M}" if $VERBOSE
+        update_rule('unbekannt')
+        return 'unbekannt'
+      rescue RegexpError => e
+        puts "RegexpError for M: #{einheit_M} pkg_size_L #{pkg_size_L} C: #{part_from_name_C}"
+        update_rule('RegexpError')
+        return 'error'
+      end
+    end
+
+    def pkg_size_to_int(pkg_size, skip_last_part = false)
       return pkg_size if pkg_size.is_a?(Fixnum)
       return 1 unless pkg_size
       parts = pkg_size.split(/\s*x\s*/i)
       parts = parts[0..-2] if skip_last_part and parts.size > 1
+      last_multiplier = parts[-1].to_i > 0 ? parts[-1].to_i : 1
       if parts.size == 3
-        return parts[0].to_i * parts[1].to_i * parts[2].to_i
+        return parts[0].to_i * parts[1].to_i * last_multiplier
       elsif parts.size == 2
-        return parts[0].to_i * parts[1].to_i
+        return parts[0].to_i * last_multiplier
+      elsif parts.size == 1
+        return last_multiplier
       else
-        return parts[0].to_i
+        return 1
       end
     end
     # Parse a string for a numerical value and unit, e.g. 1.5 ml
@@ -308,7 +321,7 @@ module Oddb2xml
       end
       @addition = 0
       @scale = 1
-      @selling_units, @measure =  Calc.get_selling_units(form_name, @pkg_size, @unit)
+      @selling_units = get_selling_units(form_name, @pkg_size, @unit)
     end
   end
 end
