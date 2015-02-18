@@ -444,14 +444,18 @@ module Oddb2xml
         |obj|
         ean13_to_product[obj[:ean].to_s] = obj
       }
+      ausgabe = File.open(File.join(WorkDir, 'missing_in_refdata.txt'), 'w+')
       size_old = ean13_to_product.size
       @missing = []
       Oddb2xml.log "build_product add_missing_products_from_swissmedic. Imported #{size_old} ean13_to_product from @products. Checking #{@packs.size} @packs"
       @packs.each_with_index {
         |de_idx, i|
           next if ean13_to_product[de_idx[1][:ean]]
+          list_code = de_idx[1][:list_code]
+          next if list_code and /Tierarzneimittel/.match(list_code)
           ean13_to_product[de_idx[1][:ean].to_s] = de_idx[1]
           @missing << de_idx[1]
+          ausgabe.puts "#{de_idx[1][:ean]},#{de_idx[1][:sequence_name]}"
       }
       corrected_size = ean13_to_product.size
       Oddb2xml.log "build_product add_missing_products_from_swissmedic. Added #{(corrected_size - size_old)} corrected_size #{corrected_size} size_old #{size_old} ean13_to_product."
@@ -474,7 +478,6 @@ module Oddb2xml
             next if /^Q/i.match(obj[:atc])
             length += 1
             xml.PRD('DT' => '') {
-            seq = obj[:seq]
             ean = obj[:ean].to_s
             xml.GTIN ean
             xml.PRODNO obj[:prodno]                                 if obj[:prodno] and obj[:prodno].empty?
@@ -707,9 +710,11 @@ module Oddb2xml
               pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
               pack_info = nil
               pack_info = @packs[no8.intern] if no8 # info from Packungen.xlsx from swissmedic_info
-              next if pack_info and pack_info[:list_code].match(/Tierarzneimittel/) if no8 and no8.match(/47066/)
               ppac = nil                        # Packungen
               ean = de_idx[:ean]
+              next if pack_info and /Tierarzneimittel/.match(pack_info[:list_code])
+              next if de_idx[:desc] and /ad us vet/i.match(de_idx[:desc])
+
               pharma_code = de_idx[:pharmacode]
               ean = nil if ean.match(/^000000/)
               if obj[:seq]
