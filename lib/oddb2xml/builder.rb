@@ -463,7 +463,7 @@ module Oddb2xml
       prepare_interactions
       prepare_codes
       add_missing_products_from_swissmedic
-      Oddb2xml.log "build_product #{@products.size} products"
+      Oddb2xml.log "build_product #{@products.size+@missing.size} products"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -472,6 +472,7 @@ module Oddb2xml
           length = 0
           @missing.each do |obj|
             next if /^Q/i.match(obj[:atc])
+            length += 1
             xml.PRD('DT' => '') {
             seq = obj[:seq]
             ean = obj[:ean].to_s
