@@ -437,11 +437,32 @@ module Oddb2xml
       end
       _builder.to_xml
     end
+    def add_missing_products_from_swissmedic
+      Oddb2xml.log "build_product add_missing_products_from_swissmedic. Starting"
+      ean13_to_product = {}
+      @products.each{
+        |obj|
+        ean13_to_product[obj[:ean].to_s] = obj
+      }
+      size_old = ean13_to_product.size
+      @missing = []
+      Oddb2xml.log "build_product add_missing_products_from_swissmedic. Imported #{size_old} ean13_to_product from @products. Checking #{@packs.size} @packs"
+      @packs.each_with_index {
+        |de_idx, i|
+          next if ean13_to_product[de_idx[1][:ean]]
+          ean13_to_product[de_idx[1][:ean].to_s] = de_idx[1]
+          @missing << de_idx[1]
+      }
+      corrected_size = ean13_to_product.size
+      Oddb2xml.log "build_product add_missing_products_from_swissmedic. Added #{(corrected_size - size_old)} corrected_size #{corrected_size} size_old #{size_old} ean13_to_product."
+    end
+
     def build_product
       prepare_substances
       prepare_products
       prepare_interactions
       prepare_codes
+      add_missing_products_from_swissmedic
       Oddb2xml.log "build_product #{@products.size} products"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
@@ -449,6 +470,24 @@ module Oddb2xml
         xml.PRODUCT(XML_OPTIONS) {
           list = []
           length = 0
+          @missing.each do |obj|
+            next if /^Q/i.match(obj[:atc])
+            xml.PRD('DT' => '') {
+            seq = obj[:seq]
+            ean = obj[:ean].to_s
+            xml.GTIN ean
+            xml.PRODNO obj[:prodno]                                 if obj[:prodno] and obj[:prodno].empty?
+            xml.DSCRD  obj[:sequence_name]                          if obj[:sequence_name]
+            xml.DSCRF  obj[:sequence_name]                          if obj[:sequence_name]
+            xml.ATC obj[:atc_code]                                  if obj[:atc_code]
+            xml.IT  obj[:ith_swissmedic]                            if obj[:ith_swissmedic]
+            xml.CPT
+            xml.PackGrSwissmedic      obj[:package_size]            if obj[:package_size]
+            xml.EinheitSwissmedic     obj[:einheit_swissmedic]      if obj[:einheit_swissmedic]
+            xml.SubstanceSwissmedic   obj[:substance_swissmedic]    if obj[:substance_swissmedic]
+            xml.CompositionSwissmedic obj[:composition_swissmedic]  if obj[:composition_swissmedic]
+                               }
+          end
           @products.each do |obj|
             next if /^Q/i.match(obj[:atc])
             seq = obj[:seq]
@@ -463,7 +502,6 @@ module Oddb2xml
               xml.PRODNO ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
               if seq
                 %w[de fr].each do |l|
-
                   name = "name_#{l}".intern
                   desc = "desc_#{l}".intern
                   elem = "DSCR" + l[0].chr.upcase
@@ -654,7 +692,6 @@ module Oddb2xml
     def build_article
       prepare_limitations
       prepare_articles
-
       idx = 0
       Oddb2xml.log "build_article #{idx} of #{@articles.size} articles"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|

@@ -402,8 +402,8 @@ describe Oddb2xml::Builder do
         product_xml.should_not match(/ZYVOXID/i)
       end
       doc = REXML::Document.new File.new(product_filename)
-      XPath.match( doc, "//PRD" ).find_all{|x| true}.size.should == 4
-      XPath.match( doc, "//GTIN" ).find_all{|x| true}.size.should == 4
+      XPath.match( doc, "//PRD" ).find_all{|x| true}.size.should == 19
+      XPath.match( doc, "//GTIN" ).find_all{|x| true}.size.should == 19
       XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should == 1
     end
 
