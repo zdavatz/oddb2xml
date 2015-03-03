@@ -1,15 +1,23 @@
-=== 1.9.6 /18.02.2015
+=== 1.9.7 / 03.03.2015
+
+* Emit qty as floats
+* Emit compositions for --calc
+* Fix Infusionsemulsion for Nutriflex
+* Added missing_in_refdata.txt. Skip veterinary
+* Show correct number of created item in oddb_product.xml
+
+=== 1.9.6 / 18.02.2015
 
 * Add all products defined in Packungen.xlsx from SwissMedic to oddb_products.xml
 
-=== 1.9.5 /16.02.2015
+=== 1.9.5 / 16.02.2015
 
 * Option --calc produces oddb_calc.xml with field SELLING_UNITS
 * Use https instead of http for www.swissmedic.ch
 * Added field CompositionSwissmedic to oddb_product.xml
 * Unittests for upcoming oddb_calc.xml
 
-=== 1.9.4 /21.01.2015
+=== 1.9.4 / 21.01.2015
 
 * Create additional field resellerpub in oddb_article.xml
 * Adapted xsd for this change
