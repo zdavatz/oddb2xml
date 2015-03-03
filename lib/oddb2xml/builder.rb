@@ -659,7 +659,7 @@ module Oddb2xml
             next if atc_code  and /^Q/i.match(atc_code)
             next if list_code and /Tierarzneimittel/.match(list_code)
 
-            info = Calc.new(name, package_size, unit, composition)
+            info = Calc.new(name, package_size, unit, active_substance, composition)
             ean12 = '7680' + no8
             ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
             items[ean13] = info
@@ -680,7 +680,17 @@ module Oddb2xml
                 xml.GALENIC_FORM  info.galenic_form.description
                 xml.GALENIC_GROUP info.galenic_group ? info.galenic_group.description : "Unknown"
               end
-            }
+              xml.COMPOSITIONS {
+                info.compositions.each {
+                  |composition|
+                  xml.COMPOSITION {
+                                    xml.NAME composition.name
+                                    xml.QTY composition.qty
+                                    xml.UNIT composition.unit
+                                  }
+                  }
+              }
+            } if info.compositions
           end
         }
       end

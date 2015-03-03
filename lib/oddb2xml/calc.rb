@@ -6,6 +6,7 @@ require 'yaml'
 module Oddb2xml
  # Calc is responsible for analysing the columns "Packungsgrösse" and "Einheit"
  #
+  Composition   = Struct.new("Composition",  :name, :qty, :unit)
   GalenicGroup  = Struct.new("GalenicGroup", :oid, :descriptions)
   GalenicForm   = Struct.new("GalenicForm",  :oid, :descriptions, :galenic_group)
 
@@ -102,7 +103,7 @@ module Oddb2xml
     @@names_without_galenic_forms = []
     @@rules_counter = {}
     attr_accessor   :galenic_form, :unit, :pkg_size
-    attr_reader     :name, :substances, :composition
+    attr_reader     :name, :substances, :composition, :compositions
     attr_reader     :selling_units, :count, :multi, :measure, :addition, :scale # s.a. commercial_form in oddb.org/src/model/part.rb
     def self.get_galenic_group(name, lang = 'de')
       @@galenic_groups.values.collect { |galenic_group|
@@ -150,8 +151,39 @@ module Oddb2xml
         "\n\n\nColumn Präparateliste has everywhere a name\n"
       end
     end
-
-    def initialize(name = nil, size = nil, unit = nil, composition= nil)
+public
+    SCALE_P = %r{pro\s+(?<scale>(?<qty>[\d.,]+)\s*(?<unit>[kcmuµn]?[glh]))}u
+    def self.update_active_agent(name, part)
+      units = 'U\.\s*Ph\.\s*Eur\.'
+      ptrn = %r{(?ix)
+                (^|[[:punct:]]|\bet|\bex)\s*#{Regexp.escape name}(?![:\-])
+                (\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(#{units}|[^\s,]+))
+                                     (\s*[mv]/[mv])?)))?
+                (\s*(?:ut|corresp\.?)\s+(?<chemical>[^\d,]+)
+                      \s*(?<cdose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(#{units}|[^\s,]+))
+                                           (\s*[mv]/[mv])?))?)?
+               }u
+      if(match = ptrn.match(part.sub(/\.$/, '')))
+        dose = match[:dose].split(/\b\s*(?![.,\d\-]|Mio\.?)/u, 2) if match[:dose]
+        cdose = match[:cdose].split(/\b\s*(?![.,\d\-]|Mio\.?)/u, 2) if match[:cdose]
+        if dose && (scale = SCALE_P.match(part)) && !dose[1].include?('/')
+          unit = dose[1] << '/'
+          num = scale[:qty].to_f
+          if num <= 1
+            unit << scale[:unit]
+          else
+            unit << scale[:scale]
+          end
+        end
+        if(chemical = match[:chemical])
+          chemical = capitalize(chemical)
+          chemical = nil if chemical.empty?
+        end if false # TODO:
+        [name, dose ? [dose[0], dose[1]] : [nil, nil] ].flatten
+      end
+    end
+public
+    def initialize(name = nil, size = nil, unit = nil, active_substance = nil, composition= nil)
       @name = name
       @pkg_size = size
       @unit = unit
@@ -161,6 +193,39 @@ module Oddb2xml
       @measure = unit if unit and not @measure
       @measure = @galenic_form.description if @galenic_form and not @measure
       @galenic_form  ||= @@galenic_forms[UnknownGalenicForm]
+
+      unless active_substance
+        @compositions = []
+        @active_substances = []
+      else
+        # Update of active substances, etc picked up from oddb.org/src/plugin/swissmedic.rb update_compositions
+        @active_substances = active_substance.split(/\s*,(?!\d|[^(]+\))\s*/u).collect { |name| capitalize(name) }.uniq
+
+        res = []
+        numbers = [ "A|I", "B|II", "C|III", "D|IV", "E|V", "F|VI" ]
+        current = numbers.shift
+        labels = []
+        composition_text = composition.gsub(/\r\n?/u, "\n")
+        compositions = composition_text.split(/\n/u).select do |line|
+          if match = /^(#{current})\)/.match(line)
+            labels.push match[1]
+            current = numbers.shift
+          end
+        end
+        if compositions.empty?
+          compositions.push composition_text.gsub(/\n/u, ' ')
+        end
+        agents = []
+        comps = []
+        compositions.each_with_index do |composition, idx|
+          composition.gsub!(/'/, '')
+          @active_substances.each { |name|
+            name, qty, unit = Calc.update_active_agent(name, composition)
+            res << Composition.new(name, qty.to_i, unit) if name
+          }
+        end
+        @compositions = res
+      end
     end
 
     def galenic_group
@@ -199,6 +264,14 @@ module Oddb2xml
       begin
         return pkg_size_to_int(pkg_size_L) unless part_from_name_C
         part_from_name_C = part_from_name_C.gsub(/[()]/, '_')
+        Mesurements.each{ |x|
+                          if einheit_M and /^#{x}$/i.match(einheit_M)
+                            puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
+                            update_rule('measurement einheit_M')
+                            @measure = x
+                            return pkg_size_to_int(pkg_size_L, true)
+                          end
+                        }
         FesteFormen.each{ |x|
                           if part_from_name_C and (x.gsub(/[()]/, '_')).match(part_from_name_C)
                             puts "feste_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
@@ -236,12 +309,6 @@ module Oddb2xml
                           if pkg_size_L and pkg_size_L.split(' ').index(x)
                             puts "measurement in pkg_size_L #{pkg_size_L} matched: #{x}" if $VERBOSE
                             update_rule('measurement pkg_size_L')
-                            @measure = x
-                            return pkg_size_to_int(pkg_size_L, true)
-                          end
-                          if einheit_M and /^#{x}$/i.match(einheit_M)
-                            puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
-                            update_rule('measurement einheit_M')
                             @measure = x
                             return pkg_size_to_int(pkg_size_L, true)
                           end
@@ -285,10 +352,11 @@ module Oddb2xml
       @substances = nil
       @substances = @composition.split(/\s*,(?!\d|[^(]+\))\s*/u).collect { |name| capitalize(name) }.uniq if @composition
 
-      name = @name.clone
+      name = @name ? @name.clone : ''
       parts = name.split(',')
       form_name = nil
-      if parts.size == 1
+      if parts.size == 0
+      elsif parts.size == 1
         @@names_without_galenic_forms << name
       else
         parts[1..-1].each{
