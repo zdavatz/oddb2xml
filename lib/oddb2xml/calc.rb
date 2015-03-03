@@ -37,6 +37,7 @@ module Oddb2xml
       'I.E.',
       'Infusionskonzentrat',
       'Infusionslösung',
+      'Infusionsemulsion',
       'Inhalationen',
       'Inhalator',
       'Injektions-Set',
@@ -286,16 +287,21 @@ module Oddb2xml
 
       name = @name.clone
       parts = name.split(',')
+      form_name = nil
       if parts.size == 1
         @@names_without_galenic_forms << name
       else
-        form_name = parts[-1].strip
-        @galenic_form = Calc.get_galenic_form(form_name)
-        # puts "oid #{UnknownGalenicForm} #{@galenic_form.oid} for #{name}"
-        if @galenic_form.oid == UnknownGalenicForm
-          @galenic_form =  GalenicForm.new(0, {'de' => form_name}, @@galenic_forms[UnknownGalenicForm] )
-          @@new_galenic_forms << form_name
-        end
+        parts[1..-1].each{
+          |part|
+          form_name = part.strip
+          @galenic_form = Calc.get_galenic_form(form_name)
+          # puts "oid #{UnknownGalenicForm} #{@galenic_form.oid} for #{name}"
+          break unless @galenic_form.oid == UnknownGalenicForm
+          if @galenic_form.oid == UnknownGalenicForm
+            @galenic_form =  GalenicForm.new(0, {'de' => form_name}, @@galenic_forms[UnknownGalenicForm] )
+            @@new_galenic_forms << form_name
+          end
+        }
       end
       @name = name.strip
       if @pkg_size.is_a?(Fixnum)

@@ -1,5 +1,9 @@
 # encoding: utf-8
 
+begin
+require 'pry'
+rescue LoadError
+end
 require 'pp'
 require 'spec_helper'
 require "rexml/document"
@@ -67,7 +71,15 @@ describe Oddb2xml::Calc do
                                   # :count => 10, :multi => 1,  :dose => ''
                                   }
                             )
-
+  tst_nutriflex = TestExample.new('Nutriflex Lipid plus, Infusionsemulsion, 1250ml',
+                                55594, 1, 1, 'Nutriflex Lipid plus, Infusionsemulsion, 1250ml',
+                                '5 x 1250', 'ml',
+                                'I) Glucoselösung: glucosum anhydricum 150 g ut glucosum monohydricum, natrii dihydrogenophosphas dihydricus 2.34 g, zinci acetas dihydricus 6.58 mg, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.',
+                                { :selling_units => 5,
+                                  :measure => 'Infusionsemulsion',
+                                  #:count => 25, :multi => 1
+                                  }
+                              )
   tst_diamox = TestExample.new('Diamox. Tabletten',
                                 21191, 1, 19, 'Diamox, comprimés',
                                 '1 x 25', 'Tablette(n)',
@@ -87,7 +99,6 @@ describe Oddb2xml::Calc do
                                #:count => 5, :multi => 1
                                }
                             )
-
   context 'should return correct value for liquid' do
     pkg_size_L = '1 x 5 x 200'
     einheit_M  = 'ml'
@@ -105,7 +116,6 @@ describe Oddb2xml::Calc do
     specify { expect(result.selling_units).to eq 10 }
     specify { expect(result.measure).to eq 'ml' }
   end
-
 
   context 'should return correct value for Diamox, comprimés' do
     pkg_size_L = '1 x 25'
@@ -245,8 +255,16 @@ describe Oddb2xml::Calc do
           puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
           result.should eq value.to_s
       }
+      gtin = '7680555940018'
+      tst_nutriflex.values_to_compare.each{
+        | key, value |
+          result = XPath.match( doc, "//ARTICLE[GTIN='#{gtin}']/#{key.to_s.upcase}").first.text
+          puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
+          result.should eq value.to_s
+      }
    end
   end
+
   context 'find correct result for Kamillin' do
     info = Calc.new(tst_kamillin.name_C, tst_kamillin.package_size_L, tst_kamillin.einheit_M, tst_kamillin.composition_P)
     specify { expect(info.selling_units).to eq  25 }
@@ -272,53 +290,10 @@ describe Oddb2xml::Calc do
     specify { expect(res.first.class).to eq String }
   end
 
+  context 'find correct result for Nutriflex' do
+    info = Calc.new(tst_nutriflex.name_C, tst_nutriflex.package_size_L, tst_nutriflex.einheit_M, tst_nutriflex.composition_P)
+    specify { expect(info.selling_units).to eq  5 }
+    specify { expect(info.galenic_form.description).to eq  "Infusionsemulsion" }
+  end
+
 end
-
-  missing_tests = "
-1. Das ist eine Injektionslösung von einer Packung mit 5 x 100 ml
-1 x 5 x 100
-
-2. Hier muss man schauen ob es sich um ein Injektionspräparat handelt
-oder um ein Tabletten, Kapseln, etc.
-2 x 100
-
-a) Beim Injektionspräparat sind es wohl 2 Ampullen à 100 ml
-b) Bei den Tabletten sind es wohl total 200 Stück.
-
-3. Das ist ein klarer Fall von einer Lösung, idR wohl Ampullen:
-10 x 2 mL
-
-4. Das sind 10 Teebeutel à 1.5g
-10 x 1.5g
-
-5. Das sind 20 mg Wirkstoff  in einer 10 ml Lösung. 'ml' steht dann in
-der Spalte M
-20 mg / 10. Könnte auch so geschrieben sein: 1000mg/50ml oder auch so:
-1 x 50mg/100ml
-
-6. 1x1 Urethrastab ist einmal ein Stab. ;)
-
-7. 30 (3x10) sind Total 30 Tabletten verteilt auf 3 Blister à 10
-Tabletten. Könnte auch so geschrieben sein: 84 (4 x 21)
-
-8. 10 + 10 Das sind zehn Ampullen mit einer Trockensubstanz und
-nochmals zehn Ampullen mit der Lösung. Das ist ein Kombipräparat.
-
-9. 20 x 0.5 g sind zwanzig Einzeldosen à 0.5g.
-
-10. Das ist eine Gaze: 1 x 7,5 x 10 cm
-
-11. 100 (2 x 50) das sind total 100 Beutel, d.h. zweimal fünfzig Stück.
-
-12. 0,1 - 80 GBq Das ist eine Injektionslösung.
-
-13. 10 cm x 10 cm imprägnierter Verband. Das ist eine Salbengaze.
-
-14. Das ist ein Sauerstofftank: 9000-10000 l
-
-15. 360x1 Das ist eine Packung mit 360 Durchstechflaschen.
-
-16. 5 + 5 Das sind 10 Durchstechflaschen à 1 Stück.
-"
-
-
