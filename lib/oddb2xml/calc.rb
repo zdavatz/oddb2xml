@@ -221,7 +221,7 @@ public
           composition.gsub!(/'/, '')
           @active_substances.each { |name|
             name, qty, unit = Calc.update_active_agent(name, composition)
-            res << Composition.new(name, qty.to_i, unit) if name
+            res << Composition.new(name, qty.to_f, unit) if name
           }
         end
         @compositions = res

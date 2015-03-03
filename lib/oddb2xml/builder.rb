@@ -685,8 +685,10 @@ module Oddb2xml
                   |composition|
                   xml.COMPOSITION {
                                     xml.NAME composition.name
-                                    xml.QTY composition.qty
-                                    xml.UNIT composition.unit
+                                    if composition.unit
+                                      xml.QTY  composition.qty
+                                      xml.UNIT composition.unit
+                                    end
                                   }
                   }
               }

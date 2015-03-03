@@ -112,7 +112,6 @@ Corresp. 5300 kJ.",
                                #:count => 5, :multi => 1
                                }
                             )
-if true
   context 'should return correct value for liquid' do
     pkg_size_L = '1 x 5 x 200'
     einheit_M  = 'ml'
@@ -321,7 +320,7 @@ if true
     skip "Nutriflex Infusionsemulsion"
     # specify { expect(info.galenic_form.description).to eq  "Infusionsemulsion" }
   end
-end
+
   context 'find correct result compositions' do
     result = Calc.new(nil, nil, nil, 'rutosidum trihydricum, aescinum', 'rutosidum trihydricum 20 mg, aescinum 25 mg, aromatica, excipiens pro compresso.')
     specify { expect(result.compositions.first.name).to eq  'Rutosidum Trihydricum' }
