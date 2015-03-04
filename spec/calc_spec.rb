@@ -260,7 +260,6 @@ Corresp. 5300 kJ.",
               expect(File.exists?(full)).to eq true
              }
       xml = File.read(File.join(Oddb2xml::WorkDir, 'oddb_calc.xml'))
-      puts xml
       doc = REXML::Document.new xml
       gtin = '7680540151009'
       ean12 = '7680' + sprintf('%05d',tst_naropin.iksnr_A) + sprintf('%03d',tst_naropin.pack_K)
@@ -284,9 +283,8 @@ Corresp. 5300 kJ.",
           puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
           result.should eq value.to_s
       }
-      XPath.match( doc, "//ARTICLE[GTIN='7680006790124']/COMPOSITIONS/COMPOSITION/NAME").last.text.should eq 'Bifidobacterium Infantis'
-      XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPOSITION/NAME").last.text.should eq 'Alprostadilum'
-#      I) Glucoselösung: glucosum anhydricum 150 g ut glucosum monohydricum, natrii dihydrogenophosphas dihydricus 2.34 g, zinci acetas dihydricus 6.58 mg, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.
+      XPath.match( doc, "//ARTICLE[GTIN='7680006790124']/COMPOSITIONS/COMPONENT/NAME").last.text.should eq 'Bifidobacterium Infantis'
+      XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPONENT/NAME").last.text.should eq 'Alprostadilum'
    end
   end
 
@@ -337,4 +335,27 @@ Corresp. 5300 kJ.",
     skip "Infloran, capsule mit cryodesiccatus min. 10^9 CFU"
   end
 
+  context 'find correct result compositions' do
+    result = Calc.new('Nutriflex Lipid peri, Infusionsemulsion, 1250ml', nil, nil,
+                      'glucosum anhydricum, zinci acetas dihydricus, isoleucinum, leucinum, lysinum anhydricum, methioninum, phenylalaninum, threoninum, tryptophanum, valinum, argininum, histidinum, alaninum, acidum asparticum, acidum glutamicum, glycinum, prolinum, serinum, magnesii acetas tetrahydricus, chloridum, phosphas, acetas, sojae oleum, triglycerida saturata media',
+                      'I) Glucoselösung: glucosum anhydricum 80 g ut glucosum monohydricum, natrii dihydrogenophosphas dihydricus 1.17 g, zinci acetas dihydricus 6.625 mg, acidum citricum q.s. ad pH, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.
+II) Fettemulsion: sojae oleum 25 g, triglycerida saturata media 25 g, lecithinum ex ovo 3 g, glycerolum, natrii oleas, aqua q.s. ad emulsionem pro 250 ml.
+III) Aminosäurenlösung: isoleucinum 2.34 g, leucinum 3.13 g, lysinum anhydricum 2.26 g ut lysini hydrochloridum, methioninum 1.96 g, phenylalaninum 3.51 g, threoninum 1.82 g, tryptophanum 0.57 g, valinum 2.6 g, argininum 2.7 g, histidinum 1.25 g ut histidini hydrochloridum monohydricum, alaninum 4.85 g, acidum asparticum 1.5 g, acidum glutamicum 3.5 g, glycinum 1.65 g, prolinum 3.4 g, serinum 3 g, natrii hydroxidum 0.8 g, natrii chloridum 1.081 g, natrii acetas trihydricus 0.544 g, kalii acetas 2.943 g, magnesii acetas tetrahydricus 0.644 g, calcii chloridum dihydricum 0.441 g, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.
+.
+I) et II) et III) corresp.: aminoacida 32 g/l, carbohydrata 64 g/l, materia crassa 40 g/l, natrium 40 mmol/l, kalium 24 mmol/l, calcium 2.4 mmol/l, magnesium 2.4 mmol, zincum 0.024 mmol/l, chloridum 38.4 mmol/l, phosphas 6 mmol/l, acetas 32 mmol/l, acidum citricum monohydricum, in emulsione recenter mixta 1250 ml.
+Corresp. 4000 kJ.')
+    specify { expect(result.compositions.first.name).to eq  'Glucosum Anhydricum' }
+    specify { expect(result.compositions.first.qty).to eq  80.0}
+    specify { expect(result.compositions.first.unit).to eq  'g/500 ml'}
+    zinci =  result.compositions.find{ |x| x.name == 'Zinci Acetas Dihydricus' }
+    specify { expect(zinci.name).to eq  'Zinci Acetas Dihydricus' }
+    specify { expect(zinci.qty).to eq  6.625}
+    specify { expect(zinci.unit).to eq  'mg/500 ml'}
+    zinci =  result.compositions.find{ |x| x.name == 'Zinci Acetas Dihydricus' }
+    natrii =  result.compositions.find{ |x| x.name == 'Natrii Dihydrogenophosphas Dihydricus' }
+    specify { expect(zinci).not_to eq nil}
+    skip 'Is Natrii Dihydrogenophosphas Dihydricus a real error or not?'
+    # specify { expect(natrii).not_to eq nil }
+
+  end
 end

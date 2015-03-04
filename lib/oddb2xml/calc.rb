@@ -6,7 +6,7 @@ require 'yaml'
 module Oddb2xml
  # Calc is responsible for analysing the columns "Packungsgrösse" and "Einheit"
  #
-  Composition   = Struct.new("Composition",  :name, :qty, :unit)
+  Composition   = Struct.new("Composition",  :name, :qty, :unit, :label)
   GalenicGroup  = Struct.new("GalenicGroup", :oid, :descriptions)
   GalenicForm   = Struct.new("GalenicForm",  :oid, :descriptions, :galenic_group)
 
@@ -103,7 +103,7 @@ module Oddb2xml
     @@names_without_galenic_forms = []
     @@rules_counter = {}
     attr_accessor   :galenic_form, :unit, :pkg_size
-    attr_reader     :name, :substances, :composition, :compositions
+    attr_reader     :name, :substances, :composition, :compositions, :composition_comment
     attr_reader     :selling_units, :count, :multi, :measure, :addition, :scale # s.a. commercial_form in oddb.org/src/model/part.rb
     def self.get_galenic_group(name, lang = 'de')
       @@galenic_groups.values.collect { |galenic_group|
@@ -206,11 +206,19 @@ public
         current = numbers.shift
         labels = []
         composition_text = composition.gsub(/\r\n?/u, "\n")
+        puts "composition_text for #{name}: #{composition_text}" if composition_text.split(/\n/u).size > 1 and $VERBOSE
         compositions = composition_text.split(/\n/u).select do |line|
-          if match = /^(#{current})\)/.match(line)
-            labels.push match[1]
+          if match = /^(#{current})\)([^:]+)/.match(line)
+            labels.push [match[1], match[2]]
             current = numbers.shift
           end
+        end
+        puts "labels for #{name}: #{labels}" if labels.size > 0 and $VERBOSE
+        if  composition_text.split(/\n/u).size > 1
+          last_line = composition_text.split(/\n/u)[-1]
+          @composition_comment = last_line
+        else
+          @composition_comment = nil
         end
         if compositions.empty?
           compositions.push composition_text.gsub(/\n/u, ' ')
@@ -221,7 +229,7 @@ public
           composition.gsub!(/'/, '')
           @active_substances.each { |name|
             name, qty, unit = Calc.update_active_agent(name, composition)
-            res << Composition.new(name, qty.to_f, unit) if name
+            res << Composition.new(name, qty.to_f, unit, labels[idx] ? labels[idx].join('') : nil) if name
           }
         end
         @compositions = res
@@ -366,7 +374,7 @@ public
           # puts "oid #{UnknownGalenicForm} #{@galenic_form.oid} for #{name}"
           break unless @galenic_form.oid == UnknownGalenicForm
           if @galenic_form.oid == UnknownGalenicForm
-            @galenic_form =  GalenicForm.new(0, {'de' => form_name}, @@galenic_forms[UnknownGalenicForm] )
+            @galenic_form =  GalenicForm.new(0, {'de' => form_name.gsub(' +', ' ')}, @@galenic_forms[UnknownGalenicForm] )
             @@new_galenic_forms << form_name
           end
         }

@@ -683,14 +683,16 @@ module Oddb2xml
               xml.COMPOSITIONS {
                 info.compositions.each {
                   |composition|
-                  xml.COMPOSITION {
+                  xml.COMPONENT {
                                     xml.NAME composition.name
                                     if composition.unit
                                       xml.QTY  composition.qty
                                       xml.UNIT composition.unit
                                     end
+                                    xml.LABEL composition.label if composition.label
                                   }
                   }
+                xml.COMMENT info.composition_comment if info.composition_comment
               }
             } if info.compositions
           end
