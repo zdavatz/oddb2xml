@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (1.9.6)
+    oddb2xml (1.9.8)
       archive-tar-minitar (~> 0.5.2)
       mechanize (~> 2.5.1)
       nokogiri (~> 1.5.10)
@@ -76,11 +76,11 @@ GEM
       rspec-support (~> 3.1.0)
     rspec-support (3.1.2)
     ruby-ole (1.2.11.8)
-    rubyXL (3.3.3)
+    rubyXL (3.3.6)
       nokogiri (>= 1.4.4)
       rubyzip (>= 1.1.6)
     rubyntlm (0.3.4)
-    rubyzip (1.1.6)
+    rubyzip (1.1.7)
     safe_yaml (1.0.4)
     savon (2.4.0)
       akami (~> 1.2.0)

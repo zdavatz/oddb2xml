@@ -1,3 +1,8 @@
+=== 1.9.8 / 04.03.2015
+
+* Emit comment for compositions, eg. 'Solvens: aqua ad iniectabilia.'
+* Renamed COMPOSITION to COMPONENT in COMPOSITIONS
+
 === 1.9.7 / 03.03.2015
 
 * Emit qty as floats
