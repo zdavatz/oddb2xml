@@ -285,6 +285,7 @@ Corresp. 5300 kJ.",
       }
       XPath.match( doc, "//ARTICLE[GTIN='7680006790124']/COMPOSITIONS/COMPONENT/NAME").last.text.should eq 'Bifidobacterium Infantis'
       XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPONENT/NAME").last.text.should eq 'Alprostadilum'
+      XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
    end
   end
 
