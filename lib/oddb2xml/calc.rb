@@ -182,10 +182,14 @@ public
         [name, dose ? [dose[0], dose[1]] : [nil, nil] ].flatten
       end
     end
+private
+    def remove_duplicated_spaces(string)
+      string ? string.to_s.gsub(/\s\s+/, ' ') : nil
+    end
 public
     def initialize(name = nil, size = nil, unit = nil, active_substance = nil, composition= nil)
-      @name = name ?  name.gsub(/\s\s+/, ' ') : name
-      @pkg_size = size ? size.to_s.gsub(/\s\s+/, ' ') : nil
+      @name = remove_duplicated_spaces(name)
+      @pkg_size = remove_duplicated_spaces(size)
       @unit = unit
       # @pkg_size, @galenic_group, @galenic_form =
       search_galenic_info
@@ -374,7 +378,7 @@ public
           # puts "oid #{UnknownGalenicForm} #{@galenic_form.oid} for #{name}"
           break unless @galenic_form.oid == UnknownGalenicForm
           if @galenic_form.oid == UnknownGalenicForm
-            @galenic_form =  GalenicForm.new(0, {'de' => form_name.gsub(' +', ' ')}, @@galenic_forms[UnknownGalenicForm] )
+            @galenic_form =  GalenicForm.new(0, {'de' => remove_duplicated_spaces(form_name.gsub(' +', ' '))}, @@galenic_forms[UnknownGalenicForm] )
             @@new_galenic_forms << form_name
           end
         }
