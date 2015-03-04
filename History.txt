@@ -1,5 +1,6 @@
 === 1.9.8 / 04.03.2015
 
+* Remove unnecessary spaces from ARTICLE.PKG_SIZE in oddb_calc.xml
 * Remove unnecessary spaces from ARTICLE.NAME in oddb_calc.xml
 * Emit comment for compositions, eg. 'Solvens: aqua ad iniectabilia.'
 * Renamed COMPOSITION to COMPONENT in COMPOSITIONS

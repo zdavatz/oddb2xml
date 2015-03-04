@@ -260,6 +260,8 @@ Corresp. 5300 kJ.",
               expect(File.exists?(full)).to eq true
              }
       xml = File.read(File.join(Oddb2xml::WorkDir, 'oddb_calc.xml'))
+      m = />.*  /.match(xml)
+      m.should eq nil
       doc = REXML::Document.new xml
       gtin = '7680540151009'
       ean12 = '7680' + sprintf('%05d',tst_naropin.iksnr_A) + sprintf('%03d',tst_naropin.pack_K)

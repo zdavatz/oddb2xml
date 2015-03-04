@@ -185,7 +185,7 @@ public
 public
     def initialize(name = nil, size = nil, unit = nil, active_substance = nil, composition= nil)
       @name = name ?  name.gsub(/\s\s+/, ' ') : name
-      @pkg_size = size
+      @pkg_size = size ? size.to_s.gsub(/\s\s+/, ' ') : nil
       @unit = unit
       # @pkg_size, @galenic_group, @galenic_form =
       search_galenic_info

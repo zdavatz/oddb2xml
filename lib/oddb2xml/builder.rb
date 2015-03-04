@@ -666,7 +666,7 @@ module Oddb2xml
             xml.ARTICLE {
               xml.GTIN          ean13
               xml.NAME          info.name
-              xml.PKG_SIZE      package_size
+              xml.PKG_SIZE      info.pkg_size
               xml.SELLING_UNITS info.selling_units
 #              xml.COUNT         info.count
 #              xml.MULTI         info.multi
