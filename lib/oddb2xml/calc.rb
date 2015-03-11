@@ -92,7 +92,7 @@ module Oddb2xml
       'ovale Körper',
       'tube(s)',
     ]
-    Mesurements = [ 'g', 'kg', 'l', 'mg', 'ml', 'cm', 'GBq']
+    Measurements = [ 'g', 'kg', 'l', 'mg', 'ml', 'cm', 'GBq']
     Others = ['Kombipackung', 'emballage combiné' ]
     UnknownGalenicForm = 140
     UnknownGalenicGroup = 1
@@ -153,35 +153,6 @@ module Oddb2xml
     end
 public
     SCALE_P = %r{pro\s+(?<scale>(?<qty>[\d.,]+)\s*(?<unit>[kcmuµn]?[glh]))}u
-    def self.update_active_agent(name, part)
-      units = 'U\.\s*Ph\.\s*Eur\.'
-      ptrn = %r{(?ix)
-                (^|[[:punct:]]|\bet|\bex)\s*#{Regexp.escape name}(?![:\-])
-                (\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(#{units}|[^\s,]+))
-                                     (\s*[mv]/[mv])?)))?
-                (\s*(?:ut|corresp\.?)\s+(?<chemical>[^\d,]+)
-                      \s*(?<cdose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(#{units}|[^\s,]+))
-                                           (\s*[mv]/[mv])?))?)?
-               }u
-      if(match = ptrn.match(part.sub(/\.$/, '')))
-        dose = match[:dose].split(/\b\s*(?![.,\d\-]|Mio\.?)/u, 2) if match[:dose]
-        cdose = match[:cdose].split(/\b\s*(?![.,\d\-]|Mio\.?)/u, 2) if match[:cdose]
-        if dose && (scale = SCALE_P.match(part)) && !dose[1].include?('/')
-          unit = dose[1] << '/'
-          num = scale[:qty].to_f
-          if num <= 1
-            unit << scale[:unit]
-          else
-            unit << scale[:scale]
-          end
-        end
-        if(chemical = match[:chemical])
-          chemical = capitalize(chemical)
-          chemical = nil if chemical.empty?
-        end if false # TODO:
-        [name, dose ? [dose[0], dose[1]] : [nil, nil] ].flatten
-      end
-    end
 private
     def remove_duplicated_spaces(string)
       string ? string.to_s.gsub(/\s\s+/, ' ') : nil
@@ -229,11 +200,50 @@ public
         end
         agents = []
         comps = []
+        units = 'U\.\s*Ph\.\s*Eur\.'
+        name = 'dummy'
+        ptrn = %r{(?ix)
+                  (^|[[:punct:]]|\bet|\bex)\s*#{Regexp.escape name}(?![:\-])
+                  (\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(#{units}|[^\s,]+))
+                                      (\s*[mv]/[mv])?)))?
+                  (\s*(?:ut|corresp\.?)\s+(?<chemical>[^\d,]+)
+                        \s*(?<cdose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(#{units}|[^\s,]+))
+                                            (\s*[mv]/[mv])?))?)?
+                }u
         compositions.each_with_index do |composition, idx|
           composition.gsub!(/'/, '')
-          @active_substances.each { |name|
-            name, qty, unit = Calc.update_active_agent(name, composition)
-            res << Composition.new(name, qty.to_f, unit, labels[idx] ? labels[idx].join('') : nil) if name
+          label = nil
+          composition_text.split(/\n/u).each {
+            |line|
+            if m = /^(?<part_id>A|I|B|II|C|III|D|IV|E|V|F|VI)\)\s+(?<part_name>[^\s:, ]+):/.match(line)
+              label = "#{m[:part_id]} #{m[:part_name]}"
+            end
+            filler = line.split(',')[-1].sub(/\.$/, '')
+            filler_match = /^(?<name>[^,\d]+)\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/.match(filler)
+            components = line.split(',').each {
+              |component|
+              to_consider = component.strip.split(':')[-1] # remove label
+              m = /^(?<name>[^,\d]+)\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/.match(to_consider)
+              if m
+                dose = nil
+                unit = nil
+                name = m[:name].split(/\s/).collect{ |x| x.capitalize }
+                dose = m[:dose].split(/\b\s*(?![.,\d\-]|Mio\.?)/u, 2) if m[:dose]
+                if dose && (scale = SCALE_P.match(filler)) && !dose[1].include?('/')
+                  unit = dose[1] << '/'
+                  num = scale[:qty].to_f
+                  if num <= 1
+                    unit << scale[:unit]
+                  else
+                    unit << scale[:scale]
+                  end
+                elsif dose.size == 2
+                  unit = dose[1]
+                end
+                to_add = Composition.new(name.join(' ').strip, dose ? dose[0].to_f : nil, unit, label)
+                res << to_add
+              end
+            }
           }
         end
         @compositions = res
@@ -276,7 +286,7 @@ public
       begin
         return pkg_size_to_int(pkg_size_L) unless part_from_name_C
         part_from_name_C = part_from_name_C.gsub(/[()]/, '_')
-        Mesurements.each{ |x|
+        Measurements.each{ |x|
                           if einheit_M and /^#{x}$/i.match(einheit_M)
                             puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('measurement einheit_M')
@@ -317,7 +327,7 @@ public
                             return pkg_size_to_int(pkg_size_L, true)
                           end
                         }
-        Mesurements.each{ |x|
+        Measurements.each{ |x|
                           if pkg_size_L and pkg_size_L.split(' ').index(x)
                             puts "measurement in pkg_size_L #{pkg_size_L} matched: #{x}" if $VERBOSE
                             update_rule('measurement pkg_size_L')
