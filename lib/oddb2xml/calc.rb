@@ -210,6 +210,9 @@ public
                         \s*(?<cdose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(#{units}|[^\s,]+))
                                             (\s*[mv]/[mv])?))?)?
                 }u
+        rep_1 = '----';   to_1 = '('
+        rep_2 = '-----';  to_2 = ')'
+        rep_3 = '------'; to_3 = ','
         compositions.each_with_index do |composition, idx|
           composition.gsub!(/'/, '')
           label = nil
@@ -220,16 +223,22 @@ public
             end
             filler = line.split(',')[-1].sub(/\.$/, '')
             filler_match = /^(?<name>[^,\d]+)\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/.match(filler)
-            components = line.split(',').each {
+            components = line.split(/([^\(]+\([^)]+\)[^,]+|),/).each {
               |component|
+              next unless component.size > 0
               to_consider = component.strip.split(':')[-1] # remove label
-              m = /^(?<name>[^,\d]+)\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/.match(to_consider)
-              if m
+              # very ugly hack to ignore ,()
+              m = /^(?<name>[^,\d()]+)\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/.match(to_consider
+                                                                .gsub(to_1, rep_1).gsub(to_2, rep_2).gsub(to_3, rep_3))
+              if m2 = /^(|[^:]+:\s)(E\s+\d+)$/.match(component.strip)
+                to_add = Composition.new(m2[2], '', '', nil)
+                res << to_add
+              elsif m
                 dose = nil
                 unit = nil
-                name = m[:name].split(/\s/).collect{ |x| x.capitalize }
+                name = m[:name].split(/\s/).collect{ |x| x.capitalize }.join(' ').strip.gsub(rep_3, to_3).gsub(rep_2, to_2).gsub(rep_1, to_1)
                 dose = m[:dose].split(/\b\s*(?![.,\d\-]|Mio\.?)/u, 2) if m[:dose]
-                if dose && (scale = SCALE_P.match(filler)) && !dose[1].include?('/')
+                if dose && (scale = SCALE_P.match(filler)) && dose[1] && !dose[1].include?('/')
                   unit = dose[1] << '/'
                   num = scale[:qty].to_f
                   if num <= 1
@@ -240,7 +249,7 @@ public
                 elsif dose.size == 2
                   unit = dose[1]
                 end
-                to_add = Composition.new(name.join(' ').strip, dose ? dose[0].to_f : nil, unit, label)
+                to_add = Composition.new(name, dose ? dose[0].to_f : nil, unit ? unit.gsub(rep_3, to_3).gsub(rep_2, to_2).gsub(rep_1, to_1) : nil, label)
                 res << to_add
               end
             }

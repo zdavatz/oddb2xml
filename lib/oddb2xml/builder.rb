@@ -684,7 +684,7 @@ module Oddb2xml
                 info.compositions.each {
                   |composition|
                   xml.COMPONENT {
-                                    xml.NAME composition.name
+                                    xml.COMPOSITION_NAME composition.name
                                     if composition.unit
                                       xml.QTY  composition.qty
                                       xml.UNIT composition.unit

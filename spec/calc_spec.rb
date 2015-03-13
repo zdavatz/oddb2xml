@@ -26,6 +26,17 @@ describe Oddb2xml::Calc do
   TestExample = Struct.new("TestExample", :test_description, :iksnr_A, :seqnr_B, :pack_K, :name_C, :package_size_L, :einheit_M, :active_substance_0, :composition_P,
                            :values_to_compare)
 
+  tst_cardio_pumal = TestExample.new('Cardio-Pulmo-Rénal Sérocytol',
+                                274, 1, 1, "Cardio-Pulmo-Rénal Sérocytol, suppositoire",
+                                '3', 'Suppositorien',
+                                'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins)',
+                                'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg, propylenglycolum, conserv.: E 216, E 218, excipiens pro suppositorio.',
+                                { :selling_units => 3,
+                                  :measure => 'Suppositorien',
+                                  # :count => 10, :multi => 1,  :dose => ''
+                                  }
+                            )
+
   tst_fluorglukose = TestExample.new('Fluorglukose',
                                 51908, 2, 16, "2-Fluorglukose (18-F), Injektionslösung",
                                 '0,1 - 80', 'GBq',
@@ -380,7 +391,7 @@ Corresp. 4000 kJ.'
 
   context 'find correct result for Inflora, capsule' do
     info = Calc.new(tst_infloran.name_C, tst_infloran.package_size_L, tst_infloran.einheit_M, tst_infloran.active_substance_0, tst_infloran.composition_P)
-    specify { expect(tst_infloran.url).to eq 'http://ch.oddb.org/de/gcc/drug/reg/00679/seq/02/pack/012' }
+    # specify { expect(tst_infloran.url).to eq 'http://ch.oddb.org/de/gcc/drug/reg/00679/seq/02/pack/012' }
     specify { expect(info.galenic_form.description).to eq 'capsule' }
     skip { expect(info.galenic_group.description).to eq  'Injektion/Infusion' }
     specify { expect(info.pkg_size).to eq '2x10' }
@@ -400,4 +411,30 @@ Corresp. 4000 kJ.'
       specify { expect(e_127.unit).to eq  ''}
     end
   end
+
+  context 'find correct result for Cardio-Pulmo-Rénal Sérocytol, suppositoire' do
+    info = Calc.new(tst_cardio_pumal.name_C, tst_cardio_pumal.package_size_L, tst_cardio_pumal.einheit_M, tst_cardio_pumal.active_substance_0, tst_cardio_pumal.composition_P)
+    specify { expect(info.galenic_form.description).to eq 'suppositoire' }
+    specify { expect(info.galenic_group.description).to eq  'unbekannt' }
+    specify { expect(info.pkg_size).to eq '3' }
+    specify { expect(info.selling_units).to eq  3 }
+    specify { expect(info.name).to eq 'Cardio-Pulmo-Rénal Sérocytol, suppositoire'}
+    specify { expect(info.measure).to eq  'Suppositorien' }
+    globulina =  info.compositions.find{ |x| x.name.match(/porcins|globulina/i) }
+    specify { expect(globulina).not_to eq nil}
+    if globulina
+      specify { expect(globulina.name).to eq  'Globulina Equina (immunisé Avec Coeur, Tissu Pulmonaire, Reins De Porcins)' }
+      specify { expect(globulina.qty).to eq  8.0}
+      specify { expect(globulina.unit).to eq  'mg'}
+    end
+    e_216 =  info.compositions.find{ |x| x.name.match(/E 216/i) }
+    specify { expect(e_216).not_to eq nil}
+    if e_216
+      specify { expect(e_216.name).to eq  'E 216' }
+      specify { expect(e_216.unit).to eq  ''}
+    end
+    e_218 =  info.compositions.find{ |x| x.name.match(/E 218/i) }
+    specify { expect(e_218).not_to eq nil}
+  end
+
 end
