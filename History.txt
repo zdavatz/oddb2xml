@@ -1,3 +1,9 @@
+=== 1.9.9 / 11.03.2015
+
+* Rename NAME -> COMPOSITION_NAME in calc.xml for composition
+* Handle Handle ( in compostion names
+* Emit all components mentioned in column_M Zusammensetzung
+
 === 1.9.8 / 04.03.2015
 
 * Remove unnecessary spaces from ARTICLE.GALENIC_FORM in oddb_calc.xml
