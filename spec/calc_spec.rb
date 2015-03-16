@@ -296,7 +296,7 @@ Corresp. 5300 kJ.",
           puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
           result.should eq value.to_s
       }
-      XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPONENT/NAME").last.text.should eq 'Alprostadilum'
+      XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPONENT/COMPOSITION_NAME").last.text.should eq 'Alprostadilum'
       XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
    end
   end
