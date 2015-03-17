@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 require 'oddb2xml/util'
+require 'oddb2xml/parse_compositions'
 require 'yaml'
 
 module Oddb2xml
@@ -150,78 +151,11 @@ module Oddb2xml
         "\n\n\nColumn Präparateliste has everywhere a name\n"
       end
     end
-public
-    SCALE_P = %r{pro\s+(?<scale>(?<qty>[\d.,]+)\s*(?<unit>[kcmuµn]?[glh]))}u
 private
     def remove_duplicated_spaces(string)
       string ? string.to_s.gsub(/\s\s+/, ' ') : nil
     end
 public
-    # Update of active substances, etc picked up from oddb.org/src/plugin/swissmedic.rb update_compositions
-    Composition   = Struct.new("Composition",  :source, :label, :substances, :galenic_form, :route_of_administration)
-    Substance     = Struct.new("Substance",  :name, :qty, :unit, :chemical_substance, :chemical_dose)
-    def update_compositions(active_substance)
-      rep_1 = '----';   to_1 = '('
-      rep_2 = '-----';  to_2 = ')'
-      rep_3 = '------'; to_3 = ','
-
-      comps = []
-      label_pattern = /^(?<label>A|I|B|II|C|III|D|IV|E|V|F|VI)[)]\s*(?<designation>[^)]+):/
-      composition_text = composition.gsub(/\r\n?/u, "\n")
-      puts "composition_text for #{name}: #{composition_text}" if composition_text.split(/\n/u).size > 1 and $VERBOSE
-      lines = composition_text.split(/\n/u)
-      idx = 0
-      compositions = lines.select do |line|
-        if match = label_pattern.match(line)
-          label = match[:label]
-        else
-          label = nil
-        end
-        idx += 1
-        next if idx > 1 and not label # avoid lines like 'I) et II)'
-        substances = []
-        filler = line.split(',')[-1].sub(/\.$/, '')
-        filler_match = /^(?<name>[^,\d]+)\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/.match(filler)
-        components = line.split(/([^\(]+\([^)]+\)[^,]+|),/).each {
-          |component|
-          next unless component.size > 0
-          to_consider = component.strip.split(':')[-1] # remove label
-          # very ugly hack to ignore ,()
-          m = /^(?<name>[^,\d()]+)\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/.match(to_consider
-                                                            .gsub(to_1, rep_1).gsub(to_2, rep_2).gsub(to_3, rep_3))
-          if m2 = /^(|[^:]+:\s)(E\s+\d+)$/.match(component.strip)
-            to_add = Substance.new(m2[2], '', '')
-            substances << to_add
-          elsif m
-            ptrn = /(\s*(?:ut|corresp\.?)\s+(?<chemical>[^\d,]+)\s*(?<cdose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))(\s*[mv]\/[mv])?))?)/
-            m3 = ptrn.match(component.strip)
-            dose = nil
-            unit = nil
-            name = m[:name].split(/\s/).collect{ |x| x.capitalize }.join(' ').strip.gsub(rep_3, to_3).gsub(rep_2, to_2).gsub(rep_1, to_1)
-            dose = m[:dose].split(/\b\s*(?![.,\d\-]|Mio\.?)/u, 2) if m[:dose]
-            if dose && (scale = SCALE_P.match(filler)) && dose[1] && !dose[1].include?('/')
-              unit = dose[1] << '/'
-              num = scale[:qty].to_f
-              if num <= 1
-                unit << scale[:unit]
-              else
-                unit << scale[:scale]
-              end
-            elsif dose.size == 2
-              unit = dose[1]
-            end
-            next if /\s+pro($|\s+)|emulsion|solution/i.match(name)
-            chemical = m3 ? capitalize(m3[:chemical]) : nil
-            cdose    = m3 ? m3[:cdose] : nil
-            substances << Substance.new(name, dose ? dose[0].to_f : nil, unit ? unit.gsub(rep_3, to_3).gsub(rep_2, to_2).gsub(rep_1, to_1) : nil,
-                                        chemical, cdose)
-          end
-        }
-        comps << Composition.new(line, label, substances) if substances.size > 0
-      end
-      comps
-    end
-
     def initialize(name = nil, size = nil, unit = nil, active_substance = nil, composition= nil)
       @name = remove_duplicated_spaces(name)
       @pkg_size = remove_duplicated_spaces(size)
@@ -233,10 +167,10 @@ public
       @measure = @galenic_form.description if @galenic_form and not @measure
       @galenic_form  ||= @@galenic_forms[UnknownGalenicForm]
 
-      unless active_substance
+      unless composition
         @compositions = []
       else
-        @compositions = update_compositions(active_substance)
+        @compositions = ParseUtil.parse_compositions(composition)
       end
     end
 
@@ -263,9 +197,6 @@ public
       @galenic_form.description
     end
   private
-    def capitalize(string)
-      string.split(/\s+/u).collect { |word| word.capitalize }.join(' ')
-    end
 
     def update_rule(rulename)
       @@rules_counter[rulename] ||= 0
@@ -362,7 +293,7 @@ public
     end
     def search_galenic_info
       @substances = nil
-      @substances = @composition.split(/\s*,(?!\d|[^(]+\))\s*/u).collect { |name| capitalize(name) }.uniq if @composition
+      @substances = @composition.split(/\s*,(?!\d|[^(]+\))\s*/u).collect { |name| ParseUtil.capitalize(name) }.uniq if @composition
 
       name = @name ? @name.clone : ''
       parts = name.split(',')

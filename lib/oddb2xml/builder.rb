@@ -681,6 +681,7 @@ module Oddb2xml
                   xml.COMPOSITION {
                     # xml.SOURCE composition.source # emit this if you want to debug the results
                     xml.LABEL composition.label if composition.label
+                    xml.LABEL_DESCRIPTION composition.label_description if composition.label_description
                     xml.SUBSTANCES {
                       composition.substances.each { |substance|
                         xml.SUBSTANCE {
