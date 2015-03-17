@@ -1,3 +1,7 @@
+=== 2.0.1 / 17.03.2015
+
+* Readded description for label
+
 === 2.0.0 / 17.03.2015
 
 * Adding CHEMICAL_SUBSTANCE/DOSE for ut|corresponding
