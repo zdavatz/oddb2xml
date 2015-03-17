@@ -8,7 +8,7 @@
 
 module ParseUtil
   SCALE_P = %r{pro\s+(?<scale>(?<qty>[\d.,]+)\s*(?<unit>[kcmuµn]?[glh]))}u
-  ParseComposition   = Struct.new("ParseComposition",  :source, :label, :substances, :galenic_form, :route_of_administration)
+  ParseComposition   = Struct.new("ParseComposition",  :source, :label, :label_description, :substances, :galenic_form, :route_of_administration)
   ParseSubstance     = Struct.new("ParseSubstance",    :name, :qty, :unit, :chemical_substance, :chemical_dose)
   def ParseUtil.capitalize(string)
     string.split(/\s+/u).collect { |word| word.capitalize }.join(' ')
@@ -20,7 +20,7 @@ module ParseUtil
     rep_3 = '------'; to_3 = ','
 
     comps = []
-    label_pattern = /^(?<label>A|I|B|II|C|III|D|IV|E|V|F|VI)[)]\s*(?<designation>[^)]+):/
+    label_pattern = /^(?<label>A|I|B|II|C|III|D|IV|E|V|F|VI)[)]\s*(?<description>[^)]+):/
     composition_text = composition.gsub(/\r\n?/u, "\n")
     puts "composition_text for #{name}: #{composition_text}" if composition_text.split(/\n/u).size > 1 and $VERBOSE
     lines = composition_text.split(/\n/u)
@@ -28,8 +28,10 @@ module ParseUtil
     compositions = lines.select do |line|
       if match = label_pattern.match(line)
         label = match[:label]
+        label_description = match[:description]
       else
         label = nil
+        label_description = nil
       end
       idx += 1
       next if idx > 1 and not label # avoid lines like 'I) et II)'
@@ -71,7 +73,7 @@ module ParseUtil
                                       chemical, cdose)
         end
       }
-      comps << ParseComposition.new(line, label, substances) if substances.size > 0
+      comps << ParseComposition.new(line, label, label_description, substances) if substances.size > 0
     end
     comps
   end

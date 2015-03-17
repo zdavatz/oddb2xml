@@ -314,6 +314,7 @@ Corresp. 5300 kJ.",
       XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").last.text.should eq 'Alprostadilum'
       XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
       XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").first.text.should eq 'I'
+      XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL_DESCRIPTION").first.text.should eq 'Glucoselösung'
       XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").last.text.should eq 'III'
    end
   end
@@ -423,6 +424,7 @@ Corresp. 5300 kJ.",
 
     specify { expect(result.compositions[0].source).to eq Line_1}
     specify { expect(result.compositions[0].label).to eq 'I'}
+    specify { expect(result.compositions[0].label_description).to eq 'Glucoselösung'}
     specify { expect(result.compositions[1].label).to eq 'II' }
     specify { expect(result.compositions[2].label).to eq 'III' }
     glucosum = result.compositions.first.substances.first
