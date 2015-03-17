@@ -22,10 +22,25 @@ describe Oddb2xml::Calc do
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, '*.csv')))
   end
 
+  Line_1 = 'I) Glucoselösung: glucosum anhydricum 150 g ut glucosum monohydricum, natrii dihydrogenophosphas dihydricus 2.34 g, zinci acetas dihydricus 6.58 mg, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.'
+  Line_2 = 'II) Fettemulsion: sojae oleum 25 g, triglycerida saturata media 25 g, lecithinum ex ovo 3 g, glycerolum, natrii oleas, aqua q.s. ad emulsionem pro 250 ml.'
+  Line_3 = 'III) Aminosäurenlösung: isoleucinum 2.34 g, leucinum 3.13 g, lysinum anhydricum 2.26 g ut lysini hydrochloridum, methioninum 1.96 g, aqua ad iniectabilia q.s. ad solutionem pro 400 ml.'
+  Line_4 = 'I) et II) et III) corresp.: aminoacida 32 g/l, acetas 32 mmol/l, acidum citricum monohydricum, in emulsione recenter mixta 1250 ml.'
+  Line_5 = 'Corresp. 4000 kJ.'
+
   # after each name you find the column of swissmedic_package.xlsx file
   TestExample = Struct.new("TestExample", :test_description, :iksnr_A, :seqnr_B, :pack_K, :name_C, :package_size_L, :einheit_M, :active_substance_0, :composition_P,
                            :values_to_compare)
 
+  tst_grains_de_valse = TestExample.new('Grains de Vals',
+                                55491, 1, 1, "Grains de Vals, comprimés ",
+                                '20', 'Tablette(n)',
+                                'sennae folii extractum methanolicum siccum',
+                                'sennae folii extractum methanolicum siccum 78-104 mg corresp. sennosidum B 12.5 mg, DER: 18:1, excipiens pro compresso.',
+                                { :selling_units => 20,
+                                  :measure => 'Tablette(n)',
+                                  }
+                            )
   tst_cardio_pumal = TestExample.new('Cardio-Pulmo-Rénal Sérocytol',
                                 274, 1, 1, "Cardio-Pulmo-Rénal Sérocytol, suppositoire",
                                 '3', 'Suppositorien',
@@ -88,7 +103,7 @@ describe Oddb2xml::Calc do
                                   }
                             )
   tst_nutriflex = TestExample.new('Nutriflex Lipid plus ohne Elektrolyte, Infusionsemulsion 1250ml',
-                                56089, 1, 1, 'Nutriflex Lipid plus ohne Elektrolyte, Infusionsemulsion 1250ml',
+                                56089, 1, 1, 'Nutriflex Lipid plus, Infusionsemulsion, 1250ml',
                                 '5 x 1250', 'ml',
                                 'glucosum anhydricum, isoleucinum, leucinum, lysinum anhydricum, methioninum, phenylalaninum, threoninum, tryptophanum, valinum, argininum, histidinum, alaninum, acidum asparticum, acidum glutamicum, glycinum, prolinum, serinum, aminoacida, carbohydrata, materia crassa, sojae oleum, triglycerida saturata media',
                                 "I) Glucoselösung: glucosum anhydricum 150 g ut glucosum monohydricum, acidum citricum anhydricum, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.
@@ -296,8 +311,10 @@ Corresp. 5300 kJ.",
           puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
           result.should eq value.to_s
       }
-      XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPONENT/COMPOSITION_NAME").last.text.should eq 'Alprostadilum'
+      XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").last.text.should eq 'Alprostadilum'
       XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
+      XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").first.text.should eq 'I'
+      XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").last.text.should eq 'III'
    end
   end
 
@@ -328,8 +345,7 @@ Corresp. 5300 kJ.",
   context 'find correct result for Nutriflex' do
     info = Calc.new(tst_nutriflex.name_C, tst_nutriflex.package_size_L, tst_nutriflex.einheit_M, tst_nutriflex.active_substance_0, tst_nutriflex.composition_P)
     specify { expect(info.selling_units).to eq  5 }
-    skip "Nutriflex Infusionsemulsion"
-    # specify { expect(info.galenic_form.description).to eq  "Infusionsemulsion" }
+    specify { expect(info.galenic_form.description).to eq  "Infusionsemulsion" }
   end
 
   context 'should handle CFU' do
@@ -337,56 +353,14 @@ Corresp. 5300 kJ.",
                       'lactobacillus acidophilus cryodesiccatus min. 10^9 CFU, bifidobacterium infantis min. 10^9 CFU, color.: E 127, E 132, E 104, excipiens pro capsula.')
     skip "Infloran, capsule mit cryodesiccatus min. 10^9 CFU"
   end
-
-  context 'find correct result compositions' do
-    text = 'I) Glucoselösung: glucosum anhydricum 80 g ut glucosum monohydricum, natrii dihydrogenophosphas dihydricus 1.17 g glycerolum, zinci acetas dihydricus 6.625 mg, natrii oleas, aqua q.s. ad emulsionem pro 250 ml.
-II) Fettemulsion: sojae oleum 25 g, triglycerida saturata media 25 g, lecithinum ex ovo 3 g, glycerolum, natrii oleas, aqua q.s. ad emulsionem pro 250 ml.
-III) Aminosäurenlösung: isoleucinum 2.34 g, leucinum 3.13 g, lysinum anhydricum 2.26 g ut lysini hydrochloridum, methioninum 1.96 g, aqua ad iniectabilia q.s. ad solutionem pro 400 ml.
-.
-I) et II) et III) corresp.: aminoacida 32 g/l, acetas 32 mmol/l, acidum citricum monohydricum, in emulsione recenter mixta 1250 ml.
-Corresp. 4000 kJ.'
-    result = Calc.new('Nutriflex Lipid peri, Infusionsemulsion, 1250ml', nil, nil,
-                      'glucosum anhydricum, zinci acetas dihydricus, isoleucinum, leucinum',
-                      text
-                      )
-    specify { expect(result.compositions.first.name).to eq  'Glucosum Anhydricum' }
-    specify { expect(result.compositions.first.qty).to eq  80.0}
-    specify { expect(result.compositions.first.unit).to eq  'g/250 ml'}
-    specify { expect(result.compositions.first.label).to eq 'I Glucoselösung' }
-
-    # from II)
-    lecithinum =  result.compositions.find{ |x| x.name.match(/lecithinum/i) }
-    specify { expect(lecithinum).not_to eq nil}
-    if lecithinum
-      specify { expect(lecithinum.name).to eq  'Lecithinum Ex Ovo' }
-      specify { expect(lecithinum.qty).to eq   3.0}
-      specify { expect(lecithinum.unit).to eq  'g/250 ml'}
-      specify { expect(lecithinum.label).to eq 'II Fettemulsion' }
-    end
-
-    # From III
-    leucinum =  result.compositions.find{ |x| x.name.eql?('Leucinum') and x.label.match(/^III /) }
-    specify { expect(leucinum).not_to eq nil}
-    if leucinum
-      specify { expect(leucinum.name).to eq  'Leucinum' }
-      specify { expect(leucinum.qty).to eq  3.13}
-      specify { expect(leucinum.unit).to eq  'g/400 ml'}
-      specify { expect(leucinum.label).to eq 'III Aminosäurenlösung' }
-    end
-    leucinum_I =  result.compositions.find{ |x| x.name.eql?('Leucinum') and x.label.match(/^I /) }
-    specify { expect(leucinum_I).to eq nil}
-    leucinum_II =  result.compositions.find{ |x| x.name.eql?('Leucinum') and x.label.match(/^II /) }
-    specify { expect(leucinum_II).to eq nil}
-  end
-
   context 'find correct result compositions' do
     result = Calc.new(nil, nil, nil, 'rutosidum trihydricum, aescinum', 'rutosidum trihydricum 20 mg, aescinum 25 mg, aromatica, excipiens pro compresso.')
-    specify { expect(result.compositions.first.name).to eq  'Rutosidum Trihydricum' }
-    specify { expect(result.compositions.first.qty).to eq  20}
-    specify { expect(result.compositions.first.unit).to eq  'mg'}
-    specify { expect(result.compositions[1].name).to eq  'Aescinum' }
-    specify { expect(result.compositions[1].qty).to eq  25}
-    specify { expect(result.compositions[1].unit).to eq  'mg'}
+    specify { expect(result.compositions.first.substances.first.name).to eq  'Rutosidum Trihydricum' }
+    specify { expect(result.compositions.first.substances.first.qty).to eq  20}
+    specify { expect(result.compositions.first.substances.first.unit).to eq  'mg'}
+    specify { expect(result.compositions.first.substances[1].name).to eq  'Aescinum' }
+    specify { expect(result.compositions.first.substances[1].qty).to eq  25}
+    specify { expect(result.compositions.first.substances[1].unit).to eq  'mg'}
   end
 
   context 'find correct result for Inflora, capsule' do
@@ -397,14 +371,14 @@ Corresp. 4000 kJ.'
     specify { expect(info.pkg_size).to eq '2x10' }
     specify { expect(info.selling_units).to eq  20 }
     skip { expect(info.measure).to eq  '0' }
-    bifidobacterium =  info.compositions.find{ |x| x.name.match(/Bifidobacterium/i) }
+    bifidobacterium =  info.compositions.first.substances.find{ |x| x.name.match(/Bifidobacterium/i) }
     specify { expect(bifidobacterium).not_to eq nil}
     if bifidobacterium
       specify { expect(bifidobacterium.name).to eq  'Bifidobacterium Infantis Min.' }
       skip { expect(bifidobacterium.qty).to eq  '10^9'}
       skip { expect(bifidobacterium.unit).to eq  'CFU'}
     end
-    e_127 =  info.compositions.find{ |x| x.name.match(/E 127/i) }
+    e_127 =  info.compositions.first.substances.find{ |x| x.name.match(/E 127/i) }
     skip { expect(e_127).not_to eq nil}
     if e_127
       specify { expect(e_127.name).to eq  'E 127' }
@@ -420,21 +394,84 @@ Corresp. 4000 kJ.'
     specify { expect(info.selling_units).to eq  3 }
     specify { expect(info.name).to eq 'Cardio-Pulmo-Rénal Sérocytol, suppositoire'}
     specify { expect(info.measure).to eq  'Suppositorien' }
-    globulina =  info.compositions.find{ |x| x.name.match(/porcins|globulina/i) }
+    globulina =  info.compositions.first.substances.find{ |x| x.name.match(/porcins|globulina/i) }
     specify { expect(globulina).not_to eq nil}
     if globulina
       specify { expect(globulina.name).to eq  'Globulina Equina (immunisé Avec Coeur, Tissu Pulmonaire, Reins De Porcins)' }
       specify { expect(globulina.qty).to eq  8.0}
       specify { expect(globulina.unit).to eq  'mg'}
     end
-    e_216 =  info.compositions.find{ |x| x.name.match(/E 216/i) }
+    e_216 =  info.compositions.first.substances.find{ |x| x.name.match(/E 216/i) }
     specify { expect(e_216).not_to eq nil}
     if e_216
       specify { expect(e_216.name).to eq  'E 216' }
       specify { expect(e_216.unit).to eq  ''}
     end
-    e_218 =  info.compositions.find{ |x| x.name.match(/E 218/i) }
+    e_218 =  info.compositions.first.substances.find{ |x| x.name.match(/E 218/i) }
     specify { expect(e_218).not_to eq nil}
+  end
+
+  context 'find correct result compositions for nutriflex' do
+    text = "#{Line_1}\n#{Line_2}\n#{Line_3}\n#{Line_4}\n#{Line_5}"
+    result = Calc.new('Nutriflex Lipid peri, Infusionsemulsion, 1250ml', nil, nil,
+                      'glucosum anhydricum, zinci acetas dihydricus, isoleucinum, leucinum',
+                      text
+                      )
+    specify { expect(result.compositions.first.substances.first.name).to eq 'Glucosum Anhydricum'}
+    specify { expect(result.compositions.first.substances.first.chemical_substance).to eq 'Glucosum Monohydricum'}
+    specify { expect(result.compositions.first.substances.first.chemical_dose).to eq nil}
+
+    specify { expect(result.compositions[0].source).to eq Line_1}
+    specify { expect(result.compositions[0].label).to eq 'I'}
+    specify { expect(result.compositions[1].label).to eq 'II' }
+    specify { expect(result.compositions[2].label).to eq 'III' }
+    glucosum = result.compositions.first.substances.first
+    specify { expect(glucosum.name).to eq  'Glucosum Anhydricum' }
+    specify { expect(glucosum.qty).to eq  150.0}
+    specify { expect(glucosum.unit).to eq  'g/500 ml'}
+    specify { expect(result.compositions.size).to eq 3}
+    specify { expect(result.compositions[0].substances.size).to eq 3}
+    specify { expect(result.compositions[1].substances.size).to eq 3}
+    specify { expect(result.compositions[2].substances.size).to eq 4}
+    specify { expect(result.compositions[1].source).to eq Line_2}
+    specify { expect(result.compositions[2].source).to eq Line_3}
+
+    # from II)
+    lecithinum =  result.compositions[1].substances.find{ |x| x.name.match(/lecithinum/i) }
+    specify { expect(lecithinum).not_to eq nil}
+    if lecithinum
+      specify { expect(lecithinum.name).to eq  'Lecithinum Ex Ovo' }
+      specify { expect(lecithinum.qty).to eq   3.0}
+      specify { expect(lecithinum.unit).to eq  'g/250 ml'}
+    end
+
+    # From III
+    leucinum =  result.compositions[2].substances.find{ |x| x.name.eql?('Leucinum') }
+    specify { expect(leucinum).not_to eq nil}
+    if leucinum
+      specify { expect(leucinum.name).to eq  'Leucinum' }
+      specify { expect(leucinum.qty).to eq  3.13}
+      specify { expect(leucinum.unit).to eq  'g/400 ml'}
+    end
+    leucinum_I =  result.compositions[0].substances.find{ |x| x.name.eql?('Leucinum') }
+    specify { expect(leucinum_I).to eq nil}
+    leucinum_II =  result.compositions[1].substances.find{ |x| x.name.eql?('Leucinum') }
+    specify { expect(leucinum_II).to eq nil}
+    aqua =  result.compositions[2].substances.find{ |x| /aqua ad/i.match(x.name) }
+    specify { expect(aqua).to eq nil}
+  end
+
+  context 'find correct result compositions for tst_grains_de_valse with chemical_dose' do
+    info = Calc.new(tst_grains_de_valse.name_C, tst_grains_de_valse.package_size_L, tst_grains_de_valse.einheit_M, tst_grains_de_valse.active_substance_0, tst_grains_de_valse.composition_P)
+    sennosidum =  info.compositions.first.substances.find{ |x| x.name.match(/Sennae/i) }
+    specify { expect(sennosidum).not_to eq nil}
+    if sennosidum
+      specify { expect(sennosidum.name).to eq  'Sennae Folii Extractum Methanolicum Siccum' }
+      specify { expect(sennosidum.chemical_substance).to eq  'Sennosidum B' }
+      specify { expect(sennosidum.chemical_dose).to eq  '12.5 mg' }
+      specify { expect(sennosidum.qty).to eq  78.0}
+      specify { expect(sennosidum.unit).to eq  'mg'}
+    end
   end
 
 end
