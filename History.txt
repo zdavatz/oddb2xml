@@ -1,3 +1,8 @@
+=== 2.0.0 / 17.03.2015
+
+* Adding CHEMICAL_SUBSTANCE/DOSE for ut|corresponding
+* Added COMPOSITION containing array of SUBSTANCES
+
 === 1.9.9 / 13.03.2015
 
 * Rename NAME -> COMPOSITION_NAME in calc.xml for composition

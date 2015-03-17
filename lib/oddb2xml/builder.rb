@@ -668,11 +668,7 @@ module Oddb2xml
               xml.NAME          info.name
               xml.PKG_SIZE      info.pkg_size
               xml.SELLING_UNITS info.selling_units
-#              xml.COUNT         info.count
-#              xml.MULTI         info.multi
               xml.MEASURE       info.measure # Nur wenn Lösung wen Spalte M ml, Spritze
-#              xml.ADDITION      info.addition
-#              xml.SCALE         info.scale
               if  info.galenic_form.is_a?(String)
                 xml.GALENIC_FORM  info.galenic_form
                 xml.GALENIC_GROUP "Unknown"
@@ -681,18 +677,23 @@ module Oddb2xml
                 xml.GALENIC_GROUP info.galenic_group ? info.galenic_group.description : "Unknown"
               end
               xml.COMPOSITIONS {
-                info.compositions.each {
-                  |composition|
-                  xml.COMPONENT {
-                                    xml.COMPOSITION_NAME composition.name
-                                    if composition.unit
-                                      xml.QTY  composition.qty
-                                      xml.UNIT composition.unit
-                                    end
-                                    xml.LABEL composition.label if composition.label
-                                  }
+                info.compositions.each { |composition|
+                  xml.COMPOSITION {
+                    # xml.SOURCE composition.source # emit this if you want to debug the results
+                    xml.LABEL composition.label if composition.label
+                    xml.SUBSTANCES {
+                      composition.substances.each { |substance|
+                        xml.SUBSTANCE {
+                          xml.SUBSTANCE_NAME substance.name
+                          if substance.unit
+                            xml.QTY  substance.qty
+                            xml.UNIT substance.unit
+                          end
+                        }
+                      }
+                    } if composition.substances
                   }
-                xml.COMMENT info.composition_comment if info.composition_comment
+                }
               }
             } if info.compositions
           end
