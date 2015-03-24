@@ -468,12 +468,45 @@ Corresp. 5300 kJ.",
     sennosidum =  info.compositions.first.substances.find{ |x| x.name.match(/Sennae/i) }
     specify { expect(sennosidum).not_to eq nil}
     if sennosidum
-      specify { expect(sennosidum.name).to eq  'Sennae Folii Extractum Methanolicum Siccum' }
+      specify { expect(sennosidum.name).to eq  'Sennae Folii Extractum Methanolicum Siccum 78-104 Mg Corresp. Sennosidum B' }
       specify { expect(sennosidum.chemical_substance).to eq  'Sennosidum B' }
       specify { expect(sennosidum.chemical_dose).to eq  '12.5 mg' }
-      specify { expect(sennosidum.qty).to eq  78.0}
+      specify { expect(sennosidum.qty).to eq  12.5}
       specify { expect(sennosidum.unit).to eq  'mg'}
     end
   end
 
+  context 'find correct result compositions for fluticasoni with chemical_dose' do
+    info = ParseUtil.parse_compositions('fluticasoni-17 propionas 100 µg, lactosum monohydricum q.s. ad pulverem pro 25 mg.')
+    specify { expect(info.size).to eq  1 }
+    specify { expect(info.first.substances.size).to eq  1 }
+    fluticasoni =  info.first.substances.find{ |x| x.name.match(/Fluticasoni/i) }
+    specify { expect(fluticasoni.name).to eq  'Fluticasoni-17 Propionas' }
+    specify { expect(fluticasoni.qty).to eq  100.0 }
+    specify { expect(fluticasoni.unit).to eq  'µg/25 mg' }
+    lactosum =  info.first.substances.find{ |x| x.name.match(/Lactosum/i) }
+    specify { expect(lactosum).to eq nil }
+  end
+
+  context 'find correct result compositions for stuff with percents' do
+    txt = 'calcium carbonicum hahnemanni C7 5 %, chamomilla recutita D5 22.5 %, magnesii hydrogenophosphas trihydricus C5 50 %, passiflora incarnata D5 22.5 %, xylitolum, excipiens ad globulos.'
+    info = ParseUtil.parse_compositions(txt)
+    specify { expect(info.size).to eq  1 }
+    specify { expect(info.first.substances.size).to eq  4 }
+    recutita =  info.first.substances.find{ |x| x.name.match(/recutita/i) }
+    specify { expect(recutita.name).to eq  'Chamomilla Recutita D5' }
+    specify { expect(recutita.qty).to eq  22.5 }
+    specify { expect(recutita.unit).to eq  '%' }
+  end
+
+  context 'find correct result compositions for procainum with chemical_dose' do
+    txt = 'procainum 10 mg ut procaini hydrochloridum, phenazonum 50 mg, Antiox.: E 320, glycerolum q.s. ad solutionem pro 1 g.'
+    info = ParseUtil.parse_compositions(txt)
+    specify { expect(info.size).to eq  1 }
+    specify { expect(info.first.substances.size).to eq  3 }
+    procainum =  info.first.substances.find{ |x| x.name.match(/procainum/i) }
+    specify { expect(procainum.name).to eq  'Procainum' }
+    specify { expect(procainum.qty).to eq  10.0 }
+    specify { expect(procainum.unit).to eq  'mg/g' }
+  end
 end

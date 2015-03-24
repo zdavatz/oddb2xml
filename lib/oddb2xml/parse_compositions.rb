@@ -41,16 +41,16 @@ module ParseUtil
       components = line.split(/([^\(]+\([^)]+\)[^,]+|),/).each {
         |component|
         next unless component.size > 0
-        to_consider = component.strip.split(':')[-1] # remove label
+        to_consider = component.strip.split(':')[-1].gsub(to_1, rep_1).gsub(to_2, rep_2).gsub(to_3, rep_3) # remove label
         # very ugly hack to ignore ,()
-        m = /^(?<name>[^,\d()]+)\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/.match(to_consider
-                                                          .gsub(to_1, rep_1).gsub(to_2, rep_2).gsub(to_3, rep_3))
+        ptrn1 = /^(?<name>.+)\s+(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/
+        m = ptrn1.match(to_consider)
         if m2 = /^(|[^:]+:\s)(E\s+\d+)$/.match(component.strip)
           to_add = ParseSubstance.new(m2[2], '', '')
           substances << to_add
         elsif m
           ptrn = /(\s*(?:ut|corresp\.?)\s+(?<chemical>[^\d,]+)\s*(?<cdose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))(\s*[mv]\/[mv])?))?)/
-          m3 = ptrn.match(component.strip)
+          m3 = ptrn.match(to_consider)
           dose = nil
           unit = nil
           name = m[:name].split(/\s/).collect{ |x| x.capitalize }.join(' ').strip.gsub(rep_3, to_3).gsub(rep_2, to_2).gsub(rep_1, to_1)
