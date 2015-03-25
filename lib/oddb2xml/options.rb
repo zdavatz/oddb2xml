@@ -31,7 +31,9 @@ Usage:
     produced files are found under data
     -a,   --append       Additional target nonpharma
     -c F, --compress=F   Compress format F. {tar.gz|zip}
-    -e    --extended     pharma, non-pharma plus prices and non-pharma from zurrose. Products without EAN-Code will also be listed.
+    -e    --extended     pharma, non-pharma plus prices and non-pharma from zurrose.
+                         Products without EAN-Code will also be listed.
+                         File oddb_calc.xml will also be generated
     -f F, --format=F     File format F, default is xml. {xml|dat}
                          If F is given, -o option is ignored.
     -I x, --increment=x  Increment price by x percent. Forces -f dat -p zurrose.
@@ -63,6 +65,7 @@ EOS
       @parser.on('-e', '--extended')                       {|v| @opts[:extended] = true
                                                               @opts[:nonpharma] = true
                                                               @opts[:price] = :zurrose
+                                                              @opts[:calc] = true
                                                             }
       @parser.on('-f v', '--format v',     /^xml|dat$/)    {|v| @opts[:format] = v.intern }
       @parser.on('--calc')                                 {|v| @opts[:calc] = true }

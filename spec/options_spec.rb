@@ -92,16 +92,7 @@ describe Oddb2xml::Options do
     expected = Default_opts.clone
     expected[:extended]  =  true
     expected[:nonpharma] =  true
-    expected[:price]      = :zurrose
-    specify { expect(options.opts).to eq expected }
-  end
-
-  context 'when -e is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-e'.split(' '))
-    expected = Default_opts.clone
-    expected[:extended]  =  true
-    expected[:nonpharma] =  true
+    expected[:calc]      =  true
     expected[:price]      = :zurrose
     specify { expect(options.opts).to eq expected }
   end
@@ -112,6 +103,7 @@ describe Oddb2xml::Options do
     expected = Default_opts.clone
     expected[:extended]  =  true
     expected[:nonpharma] =  true
+    expected[:calc]      =  true
     expected[:price]      = :zurrose
     expected[:percent]    = 80
     specify { expect(options.opts).to eq expected }

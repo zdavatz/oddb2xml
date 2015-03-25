@@ -43,7 +43,7 @@ module Oddb2xml
     end
     def run
       threads = []
-      if @options[:calc]
+      if @options[:calc] and not @options[:extended]
         threads << download(:package) # swissmedic
       elsif @options[:address]
         [:company, :person].each do |type|
@@ -94,10 +94,11 @@ module Oddb2xml
     def build
       Oddb2xml.log("Start build")
       begin
-        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc]
+        # require 'pry'; binding.pry
+        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not @options[:extended]
         files.each_pair do |sbj, file|
           builder = Builder.new(@options) do |builder|
-            if @options[:calc]
+            if @options[:calc] and not @options[:extended]
               builder.packs = @packs
               builder.subject = sbj
             elsif @options[:address]
@@ -222,7 +223,7 @@ module Oddb2xml
             @packs = SwissmedicExtractor.new(bin, :package).to_hash
             Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs from #{bin}")
             @packs
-          end unless @options[:calc]
+          end
         end
       when :bm_update
         Thread.new do
@@ -296,6 +297,7 @@ module Oddb2xml
     def files
       unless @_files
         @_files = {}
+        @_files[:calc] = "oddb_calc.xml" if @options[:calc]
         if @options[:address]
           @_files[:company] = "#{prefix}_betrieb.xml"
           @_files[:person]  = "#{prefix}_medizinalperson.xml"
