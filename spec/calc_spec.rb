@@ -315,6 +315,7 @@ Corresp. 5300 kJ.",
       XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
       XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").first.text.should eq 'I'
       XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL_DESCRIPTION").first.text.should eq 'Glucoselösung'
+      XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").each{ |x| puts x.text }
       XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").last.text.should eq 'III'
    end
   end
@@ -433,7 +434,7 @@ Corresp. 5300 kJ.",
     specify { expect(glucosum.unit).to eq  'g/500 ml'}
     specify { expect(result.compositions.size).to eq 3}
     specify { expect(result.compositions[0].substances.size).to eq 3}
-    specify { expect(result.compositions[1].substances.size).to eq 3}
+    specify { expect(result.compositions[1].substances.size).to eq 3} # should have  glycerolum, natrii oleas, aqua
     specify { expect(result.compositions[2].substances.size).to eq 4}
     specify { expect(result.compositions[1].source).to eq Line_2}
     specify { expect(result.compositions[2].source).to eq Line_3}
@@ -509,4 +510,47 @@ Corresp. 5300 kJ.",
     specify { expect(procainum.qty).to eq  10.0 }
     specify { expect(procainum.unit).to eq  'mg/g' }
   end
+
+  context 'find correct result compositions for 00613 Pentavac' do
+    line_1 = "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum tetani 40 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg, virus poliomyelitis typus 1 inactivatum (D-Antigen) 40 U., virus poliomyelitis typus 2 inactivatum (D-Antigen) 8 U., virus poliomyelitis typus 3 inactivatum (D-Antigen) 32 U., aluminium ut aluminii hydroxidum hydricum ad adsorptionem, formaldehydum 10 µg, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum, streptomycinum, polymyxini B sulfas, medium199, aqua q.s. ad suspensionem pro 0.5 ml."
+    line_2 = "II) Hib-Komponente (Lyophilisat): haemophilus influenzae Typ B polysaccharida T-conjugatum 10 µg, trometamolum, saccharum, pro praeparatione."
+    txt = "#{line_1}\n#{line_2}"
+    info = ParseUtil.parse_compositions(txt)
+    specify { expect(info.first.label).to eq  'I' }
+    specify { expect(info.size).to eq  2 }
+    specify { expect(info.first.substances.size).to eq  6 }
+    toxoidum =  info.first.substances.find{ |x| x.name.match(/Toxoidum Diphtheriae/i) }
+    specify { expect(toxoidum.name).to eq  'Toxoidum Diphtheriae' }
+    specify { expect(toxoidum.qty).to eq  30.0 }
+    specify { expect(toxoidum.unit).to eq  'U.I./ml' }
+  end
+
+  context 'find correct result compositions for poloxamerum' do
+    line_1 = "I): albuminum humanum colloidale 0.5 mg, stanni(II) chloridum dihydricum 0.2 mg, glucosum anhydricum, dinatrii phosphas monohydricus, natrii fytas (9:1), poloxamerum 238, q.s. ad pulverem pro vitro."
+    line_2 = "II): pro usu: I) recenter radioactivatum 99m-technetio ut natrii pertechnetas."
+    text = "#{line_1}\n#{line_2}"
+    info = Calc.new('Nanocoll, Markierungsbesteck', nil, nil,
+                      'albuminum humanum colloidale, stanni(II) chloridum dihydricum',
+                      text
+                      )
+    # pp info; binding.pry
+    specify { expect(info.compositions.size).to eq  2 }
+    specify { expect(info.compositions.first.substances.size).to eq  2 }
+    poloxamerum =  info.compositions.first.substances.find{ |x| x.name.match(/poloxamerum/i) }
+    skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
+    skip { expect(poloxamerum.qty).to eq  "" }
+    specify { expect(poloxamerum.unit).to eq  "" }
+  end
+
+  context 'find correct result for 61676 Phostal 3-Bäume A): ' do
+    text = "A): pollinis allergeni extractum 0.01 U.: betula pendula Roth 25 % et alnus glutinosa 25 % et corylus avellana 25 % et fraxinus excelsior 25 %, natrii chloridum, glycerolum, tricalcii phosphas, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml"
+    info = Calc.new('Phostal 3-Bäume', nil, nil,
+                      'pollinis allergeni extractum',
+                      text
+                      )
+    # pp info; binding.pry
+    specify { expect(info.compositions.size).to eq  1 }
+    specify { expect(info.compositions.first.label).to eq  'A' }
+  end
+
 end
