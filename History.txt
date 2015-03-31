@@ -1,6 +1,6 @@
 === 2.0.4 / 30.03.2015
 
-* --calc recognizes now correctl labels, like 'A):' and stop when seeing first ':' in label-description
+* --calc now recognizes correct labels, like 'A):' and stops when seeing first ':' in label-description
 
 === 2.0.3 / 25.03.2015
 
