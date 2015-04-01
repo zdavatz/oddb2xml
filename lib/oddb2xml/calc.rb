@@ -170,7 +170,7 @@ public
       unless composition
         @compositions = []
       else
-        @compositions = ParseUtil.parse_compositions(composition)
+        @compositions = ParseUtil.parse_compositions(composition, active_substance)
       end
     end
 
@@ -245,7 +245,7 @@ public
                             puts "liquid_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('liquid_form einheit_M')
                             @measure = x
-                            return pkg_size_to_int(pkg_size_L, true)
+                            return pkg_size_to_int(pkg_size_L, false)
                           end
                         }
         Measurements.each{ |x|

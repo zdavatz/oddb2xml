@@ -634,6 +634,7 @@ module Oddb2xml
     def build_calc
       packungen_xlsx = File.join(Oddb2xml::WorkDir, "swissmedic_package.xlsx")
       idx = 0
+      return unless File.exists?(packungen_xlsx)
       workbook = RubyXL::Parser.parse(packungen_xlsx)
       items = {}
       row_nr = 0
@@ -686,9 +687,15 @@ module Oddb2xml
                       composition.substances.each { |substance|
                         xml.SUBSTANCE {
                           xml.SUBSTANCE_NAME substance.name
+                          xml.IS_ACTIVE_AGENT substance.is_active_agent
                           if substance.unit
                             xml.QTY  substance.qty
                             xml.UNIT substance.unit
+                          end
+                          if substance.chemical_substance
+                            xml.CHEMICAL_SUBSTANCE  substance.chemical_substance
+                            xml.CHEMICAL_QTY  substance.chemical_qty
+                            xml.CHEMICAL_UNIT substance.chemical_unit
                           end
                         }
                       }

@@ -280,7 +280,7 @@ XML
         return File.expand_path(file)
       end
       begin
-        FileUtils.rm(File.expand_path(file), :verbose => true) if File.exists?(File.expand_path(file))
+        FileUtils.rm(File.expand_path(file), :verbose => !defined?(RSpec)) if File.exists?(File.expand_path(file))
         page = @agent.get(@url)
         if link_node = page.search(@xpath).first
           link = Mechanize::Page::Link.new(link_node, @agent, page)

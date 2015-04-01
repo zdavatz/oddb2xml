@@ -1,3 +1,9 @@
+=== 2.0.5 / 31.03.2015
+
+* --calc adds boolean flag is_active_agent
+* --calc fixes recognition of some substances
+* --calc fixes recognition of dose/unit/qty
+
 === 2.0.4 / 30.03.2015
 
 * --calc now recognizes correct labels, like 'A):' and stops when seeing first ':' in label-description

@@ -18,6 +18,16 @@ module Kernel
   end
 end
 
+def setup_package_xlsx_for_calc
+  src = File.expand_path(File.join(File.dirname(__FILE__), 'data', 'swissmedic_package-galenic.xlsx'))
+  dest =  File.join(Oddb2xml::WorkDir, 'swissmedic_package.xlsx')
+  FileUtils.makedirs(Oddb2xml::WorkDir)
+  FileUtils.cp(src, dest, { :verbose => false, :preserve => true})
+  FileUtils.cp(File.expand_path(File.join(File.dirname(__FILE__), 'data', 'XMLPublications.zip')),
+              File.join(Oddb2xml::WorkDir, 'downloads'),
+              { :verbose => false, :preserve => true})
+end
+
 def check_validation_via_xsd
   @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
   File.exists?(@oddb2xml_xsd).should eq true
@@ -181,6 +191,7 @@ describe Oddb2xml::Builder do
     let(:cli) do
       options = Oddb2xml::Options.new
       options.parser.parse!('--append -I 80 -e'.split(' '))
+      setup_package_xlsx_for_calc
       Oddb2xml::Cli.new(options.opts)
     end
 
@@ -208,11 +219,12 @@ describe Oddb2xml::Builder do
     let(:cli) do
       options = Oddb2xml::Options.new
       options.parser.parse!('-e'.split(' '))
+      cleanup_directories_before_run
+      setup_package_xlsx_for_calc
       Oddb2xml::Cli.new(options.opts)
     end
 
     it 'should contain the correct prices' do
-      cleanup_directories_before_run
       res = buildr_capture(:stdout){ cli.run }
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
       File.exists?(@article_xml).should eq true
@@ -229,7 +241,6 @@ describe Oddb2xml::Builder do
         price_reseller_pub.size.should eq 0
       end
     end
-
 
     def checkItemForRefdata(doc, pharmacode, isRefdata)
       article = XPath.match( doc, "//ART[PHAR=#{pharmacode.to_s}]").first
@@ -434,12 +445,14 @@ describe Oddb2xml::Builder do
     let(:cli) do
       options = Oddb2xml::Options.new
       options.parser.parse!('-e --skip-download'.split(' '))
+      setup_package_xlsx_for_calc
       Oddb2xml::Cli.new(options.opts)
     end
 
     let(:cli_I80) do
       options = Oddb2xml::Options.new
       options.parser.parse!('-e -I 80 --skip-download'.split(' '))
+      setup_package_xlsx_for_calc
       Oddb2xml::Cli.new(options.opts)
     end
     search_path_reseller = "//ART[PHAR=0023722]/ARTPRI[PTYP='RESELLERPUB']/PRICE"
@@ -567,5 +580,4 @@ describe Oddb2xml::Builder do
       IO.readlines(dat_filename).each{ |line| check_article(line, true, true) }
     end
   end
-
 end

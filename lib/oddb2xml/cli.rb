@@ -152,7 +152,7 @@ module Oddb2xml
           end
           File.open(File.join(WorkDir, file), 'w:utf-8'){ |fh| fh << output }
           if @options[:calc]
-            FileUtils.cp(File.join(WorkDir, file), File.join(WorkDir, file.sub('.xml', '_'+Time.now.strftime("%d.%m.%Y_%H.%M")+'.xml')), :verbose => true)
+            FileUtils.cp(File.join(WorkDir, file), File.join(WorkDir, file.sub('.xml', '_'+Time.now.strftime("%d.%m.%Y_%H.%M")+'.xml')), :verbose => false)
           end
         end
       rescue Interrupt
