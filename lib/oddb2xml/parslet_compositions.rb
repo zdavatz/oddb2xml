@@ -33,17 +33,21 @@ class DoseParser < Parslet::Parser
       ).maybe
     )
   }
-  rule(:identifier) {
-    (match('[a-zA-Z]') >> match('[a-zA-Z_]').repeat) >> space?
+  #  poliomyelitis typus 1 inactivatum (D-Antigen)
+  rule(:name_with_parenthesis) {
+    (match('[a-zA-Z]') >> ((match('[0-9]') >> space >> match('[a-zA-Z]')).maybe >>match('[a-zA-Z_\- \(\)]')).repeat) >> space?
   }
   # dose
   rule(:dose_unit)      { (
+                           str('µg') |
                            str('mg') |
                            str('g') |
                            str('l') |
                            str('ml') |
                            str('mg/ml') |
-                           str('U.I.')
+                           str('U.I.') |
+                           str('U.') |
+                           str('Mia. U.')
                           ).as(:unit) }
   rule(:qty_unit)       { dose_qty >> space? >> dose_unit }
   rule(:dose_qty)       { number.as(:qty) }
@@ -102,12 +106,17 @@ class SubstanceParser < DoseParser
 #  rule(:funcall)    {
 #    identifier.as(:funcall) >> lparen >> arglist.as(:arglist) >> rparen }
 
-  rule(:substance) { (identifier >> space.maybe).repeat.as(:substance) >> str('.').maybe >> dose.repeat(0,1) }
+  rule(:substance) { (name_with_parenthesis >> space.maybe).repeat.as(:substance) >> str('.').maybe >> dose.repeat(0,1)
+                     }
   rule(:excipiens) { str('excipiens') >> space >> (str('pro') >> space).maybe >> substance }
-  rule(:substances) { substance.repeat(0, 1) >> additional_substance.repeat(0) }
-  rule(:additional_substance) { str(',') >> space >> substance }
+  rule(:additional_substance) { str(',') >> space >> one_substance }
+ # toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg
+  rule(:substance_et) { substance >> space >> str('et') >> space >> substance }
+  rule(:substances) { one_substance.repeat(0, 1) >> additional_substance.repeat(0) }
+  rule(:one_substance) { excipiens| substance_et | substance }
+  rule(:all_substances) { one_substance.repeat(0, 1) >> additional_substance.repeat(0) }
 
-  rule(:expression) { excipiens | substances }
+  rule(:expression) { all_substances }
   #rule(:expression) { dose | funcall | sum | integer }
   root :expression
 end
@@ -122,11 +131,33 @@ end
 class CompositionParser < SubstanceParser
 
   rule(:composition) { (substances >> str('.').repeat(0,2)) }
-  rule(:expression) { composition }
+  # "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I."
+
+#  rule(:label) { (match(/[^:]/).repeat(1)).as(:label2) >> str(':') >> space }
+
+  rule(:label) {
+     (
+                           str('V') |
+                           str('IV') |
+                           str('III') |
+                           str('II') |
+                           str('I') |
+                           str('A') |
+                           str('B') |
+                           str('C') |
+                           str('D') |
+                           str('E')
+                          ).as(:label) >> str(')').maybe >> space >>
+    (match(/[^:]/).repeat(1)).as(:label_description)  >> str(':') >> space
+  }
+
+  rule(:expression) { label.maybe >> composition }
+#  rule(:expression) { label }
   root :expression
 end
 
 class CompositionTransformer < DoseTransformer
+  @@curSubstance = nil
   rule( :substance => simple(:substance) )  {
     |dictionary|
     @@curSubstance = ParseSubstance.new(dictionary[:substance])
@@ -136,7 +167,8 @@ class CompositionTransformer < DoseTransformer
     :qty    => simple(:qty),
     :unit   => simple(:unit))  {
     |dictionary|
-      @@curSubstance.dose = ParseDose.new(dictionary[:qty], dictionary[:unit])
+      dose = ParseDose.new(dictionary[:qty], dictionary[:unit])
+      @@curSubstance.dose = dose if @@curSubstance
       nil
     }
 end
@@ -220,11 +252,16 @@ class ParseComposition
   end
   def ParseComposition.from_string(string)
     value = nil
+    puts "ParseComposition.from_string #{string}" if VERBOSE_MESSAGES
     result = ParseComposition.new(string)
     parser3 = CompositionParser.new
     transf3 = CompositionTransformer.new
     ast = transf3.apply(parser3.parse(string))
     ast.find_all{|x| x.is_a?(ParseSubstance)}.each{ |x| result.substances << x }
+    if ast.is_a?(Array) and  ast.first.is_a?(Hash)
+      result.label              = ast.first[:label].to_s
+      result.label_description  = ast.first[:label_description].to_s
+    end
     return result
   end
 end
