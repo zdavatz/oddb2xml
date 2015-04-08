@@ -23,21 +23,38 @@ class CompositionsParser < Parslet::Parser
   rule(:space?)     { space.maybe }
 
   # Things
-  rule(:integer)    { match('[0-9]').repeat(1) >> space? }
+  rule(:digit) { match('[0-9]') }
+  rule(:number) {
+    (
+      str('-').maybe >> (
+        str('0') | (match('[1-9]') >> digit.repeat)
+      ) >> (
+        str('.') >> digit.repeat(1)
+      ).maybe >> (
+        match('[eE]') >> (str('+') | str('-')).maybe >> digit.repeat(1)
+      ).maybe
+    )
+  }
+
   rule(:identifier) { match['a-z'].repeat(1) }
   rule(:operator)   { match('[+]') >> space? }
 
   # Grammar parts
   rule(:sum)        {
-    integer.as(:left) >> operator.as(:op) >> expression.as(:right) }
+    number.as(:left) >> operator.as(:op) >> expression.as(:right) }
   rule(:arglist)    { expression >> (comma >> expression).repeat }
 #  rule(:funcall)    {
 #    identifier.as(:funcall) >> lparen >> arglist.as(:arglist) >> rparen }
 
   # dose
-  rule(:dose_unit)      { str('mg').as(:unit) }
-  rule(:qty_unit)       { dose_qty >> dose_unit }
-  rule(:dose_qty)       { integer.as(:qty) }
+  rule(:dose_unit)      { (
+                           str('mg') |
+                           str('g') |
+                           str('l') |
+                           str('ml') |
+                           str('mg/ml')).as(:unit) }
+  rule(:qty_unit)       { dose_qty >> space? >> dose_unit }
+  rule(:dose_qty)       { number.as(:qty) }
   rule(:dose)           { qty_unit | dose_qty |dose_unit}
 
   rule(:expression) { dose }
@@ -62,6 +79,9 @@ end
 
 class CompositionsTransformer < Parslet::Transform
   rule(:int => simple(:int))        { IntLit.new(int) }
+    rule(:number => simple(:nb)) {
+      nb.match(/[eE\.]/) ? Float(nb) : Integer(nb)
+    }
   rule(
     :left => simple(:left),
     :right => simple(:right),
@@ -82,7 +102,7 @@ class ParseDose
   attr_reader :qty, :unit
   def initialize(qty=nil, unit=nil)
     if qty and (qty.is_a?(String) || qty.is_a?(Parslet::Slice))
-      @qty  = qty.to_s.to_i
+      @qty  = qty.to_s.index('.') ? qty.to_s.to_f : qty.to_s.to_i
     elsif qty
       @qty  = qty.eval
     else
