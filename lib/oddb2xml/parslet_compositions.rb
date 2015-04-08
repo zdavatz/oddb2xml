@@ -23,7 +23,7 @@ class CompositionsParser < Parslet::Parser
   rule(:space?)     { space.maybe }
 
   # Things
-  rule(:integer)    { match('[0-9]').repeat(1).as(:int) >> space? }
+  rule(:integer)    { match('[0-9]').repeat(1) >> space? }
   rule(:identifier) { match['a-z'].repeat(1) }
   rule(:operator)   { match('[+]') >> space? }
 
@@ -31,12 +31,14 @@ class CompositionsParser < Parslet::Parser
   rule(:sum)        {
     integer.as(:left) >> operator.as(:op) >> expression.as(:right) }
   rule(:arglist)    { expression >> (comma >> expression).repeat }
-  rule(:funcall)    {
-    identifier.as(:funcall) >> lparen >> arglist.as(:arglist) >> rparen }
+#  rule(:funcall)    {
+#    identifier.as(:funcall) >> lparen >> arglist.as(:arglist) >> rparen }
 
   # dose
-  # rule(:qty) { integer }
-  rule(:dose) { integer.as(:qty) >> str('mg').as(:unit) }
+  rule(:dose_unit)      { str('mg').as(:unit) }
+  rule(:qty_unit)       { dose_qty >> dose_unit }
+  rule(:dose_qty)       { integer.as(:qty) }
+  rule(:dose)           { qty_unit | dose_qty |dose_unit}
 
   rule(:expression) { dose }
   #rule(:expression) { dose | funcall | sum | integer }
@@ -70,22 +72,32 @@ class CompositionsTransformer < Parslet::Transform
   rule(
     :qty    => simple(:qty),
     :unit   => simple(:unit))  { ParseDose.new(qty, unit) }
+  rule(
+    :unit    => simple(:unit))  { ParseDose.new(nil, unit) }
+  rule(
+    :qty    => simple(:qty))  { ParseDose.new(qty, nil) }
 end
 
 class ParseDose
   attr_reader :qty, :unit
-  def initialize(qty, unit)
-    @qty = qty.eval
-    @unit = unit.to_s
+  def initialize(qty=nil, unit=nil)
+    if qty and (qty.is_a?(String) || qty.is_a?(Parslet::Slice))
+      @qty  = qty.to_s.to_i
+    elsif qty
+      @qty  = qty.eval
+    else
+      @qty = 1
+    end
+    @unit = unit ? unit.to_s : nil
   end
   def eval
     self
   end
   def ParseDose.from_string(string)
+    value = nil
     parser = CompositionsParser.new
     transf = CompositionsTransformer.new
-    res = parser.parse(string)
-    transf.apply(parser.parse(string))
+    result = transf.apply(parser.parse(string))
   end
 end
 
