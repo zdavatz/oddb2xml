@@ -9,8 +9,8 @@ require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
 
+RunAllTests = true
 describe ParseDose do
-  RunAllTests = true
 
   context "should return correct dose for 'mg'" do
     dose = ParseDose.from_string('mg')
@@ -69,4 +69,33 @@ describe ParseDose do
     specify { expect(dose.unit).to eq 'g' }
          }
   end
+end if RunAllTests
+
+describe ParseSubstance do
+# ParseSubstance     = Struct.new("ParseSubstance",    :name, :qty, :unit, :chemical_substance, :chemical_qty, :chemical_unit, :is_active_agent, :dose, :cdose)
+
+  context "should return correct substance for 'pyrazinamidum'" do
+    string = "pyrazinamidum"
+    substance = ParseSubstance.from_string(string)
+    specify { expect(substance.name).to eq 'Pyrazinamidum' }
+    specify { expect(substance.qty).to eq nil }
+    specify { expect(substance.unit).to eq nil }
+  end
+
+  context "should return correct substance for 'E 120'" do
+    string = "E 120"
+    substance = ParseSubstance.from_string(string)
+    specify { expect(substance.name).to eq string }
+    specify { expect(substance.qty).to eq nil }
+    specify { expect(substance.unit).to eq nil }
+  end
+
+  context "should return correct substance for 'pyrazinamidum 500 mg'" do
+    string = "pyrazinamidum 500 mg"
+    substance = ParseSubstance.from_string(string)
+    specify { expect(substance.name).to eq 'Pyrazinamidum' }
+    specify { expect(substance.qty).to eq 500.0 }
+    specify { expect(substance.unit).to eq 'mg' }
+  end
+
 end
