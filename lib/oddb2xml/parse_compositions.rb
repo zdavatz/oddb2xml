@@ -38,7 +38,9 @@ module ParseUtil
     rep_3 = '------'; to_3 = ','
     active_agents = active_agents_string ? active_agents_string.downcase.split(/,\s+/) : []
     comps = []
-    label_pattern = /^(?<label>A|I|B|II|C|III|D|IV|E|V|F|VI)(\):|\))\s*(?<description>[^:]+)/
+    label_pattern = /^(?<label>A|I|B|II|C|III|D|IV|E|V|F|VI)(\):|\))\s*(?<description>[^:]+):\s+(?<content>.+)/
+    label_pattern = /^(?<label>A|I|B|II|C|III|D|IV|E|V|F|VI)(\):|\))\s*(?<description>[^:]+):\s+(?<content>.+)(?<conserv>(conserv.:).+|)(?<residui>(residui:).+|)/
+    label_pattern = /^(?<preparation>Praeparatio[^:]+|(?<label>A|I|B|II|C|III|D|IV|E|V|F|VI|)(\):|\))\s*(?<description>[^:]+)):\s+(?<content>.+)(?<conserv>(conserv.:).+|)(?<residui>(residui:).+|)/
     composition_text = composition.gsub(/\r\n?/u, "\n")
     puts "composition_text for #{name}: #{composition_text}" if composition_text.split(/\n/u).size > 1 and $VERBOSE
     lines = composition_text.split(/\n/u)
@@ -47,17 +49,20 @@ module ParseUtil
       if match = label_pattern.match(line)
         label = match[:label]
         label_description = match[:description]
+        content  = match[:content].strip.sub(/,$/, '')
       else
         label = nil
         label_description = nil
+        content = line
       end
       idx += 1
       next if idx > 1 and /^(?<label>A|I|B|II|C|III|D|IV|E|V|F|VI)[)]\s*(et)/.match(line) # avoid lines like 'I) et II)'
       next if idx > 1 and /^Corresp\./i.match(line) # avoid lines like 'Corresp. mineralia: '
       substances = []
-      filler = line.split(',')[-1].sub(/\.$/, '')
+      filler = content.split(',')[-1].sub(/\.$/, '')
       filler_match = /^(?<name>[^,\d]+)\s*(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))/.match(filler)
-      components = line.gsub(/(\d),(\d+)/, "\\1.\\2").split(/([^\(]+\([^)]+\)[^,]+|),/).each {
+      # content.gsub(/(\d),(\d+)/, "\\1.\\2").split(/([^\(]+\([^)]+\)[^,]+|),/).each {
+      content.gsub(/(\d),(\d+)/, "\\1.\\2").split(/,/).each {
         |component|
         next unless component.size > 0
         next if /^ratio:/i.match(component.strip)
@@ -74,25 +79,48 @@ module ParseUtil
           ptrn = /(?<name>.+)\s+(?<dose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))))(\s*(?:ut|corresp\.?)\s+(?<chemical>[^\d,]+)\s*(?<cdose>[\d\-.]+(\s*(?:(Mio\.?\s*)?(U\.\s*Ph\.\s*Eur\.|[^\s,]+))(\s*[mv]\/[mv])?))?)/
           m_with_chemical = ptrn.match(to_consider)
           m = m_with_chemical if m_with_chemical
-          name      = m[:name].strip
+          name      = m[:name].strip.gsub(rep_3, to_3).gsub(rep_2, to_2).gsub(rep_1, to_1)
           chemical  = m_with_chemical ? m[:chemical] : nil
           cdose     = m_with_chemical ? m[:cdose] : nil
-          dose      = m_with_dose     ? m[:dose]  : nil
+          dose      = m_with_dose     ? m[:dose].sub(/\.$/, '')  : nil
           if m_with_chemical and active_agents.index(m_with_chemical[:chemical].strip)
             is_active_agent = true
-            name            = m[:chemical].strip
+            name            = m[:chemical].strip.gsub(rep_3, to_3).gsub(rep_2, to_2).gsub(rep_1, to_1)
             dose            = m[:cdose]
             chemical        = m[:name].strip
-            cdose           = m[:dose]
+            cdose           = m[:dose].sub(/\.$/, '')
           else
-            is_active_agent =  active_agents.index(m[:name].strip) != nil
+            if active_agent = active_agents.find{|x| name.index(x) } and name.index(' ex ')
+              is_active_agent = true
+              name = active_agent
+              # binding.pry if /viscum/i.match(name)
+            else
+              is_active_agent =  active_agents.index(m[:name].strip) != nil
+            end
           end
           unit = nil
-          name = name.gsub(rep_3, to_3).gsub(rep_2, to_2).gsub(rep_1, to_1)
+          parts_in_parentesis = /([^()]+)\(([^()]+)\)/.match(component.strip)
           emulsion_pattern = /\s+pro($|\s+)|emulsion|solution/i
-          next if emulsion_pattern.match(name)
+          next if parts_in_parentesis and emulsion_pattern.match(parts_in_parentesis[1])
           name = name.split(/\s/).collect{ |x| x.capitalize }.join(' ').strip
+#          binding.pry if /toxoidum diphtheriae/i.match(line)
+          # binding.pry if /globulina equina/i.match(name.to_s) or name.is_a?(MatchData)
+          if not parts_in_parentesis
+            name = name.split(/\s/).collect{ |x| x.capitalize }.join(' ').strip
+          elsif parts_in_parentesis.size == 1
+            name = parts_in_parentesis and parts_in_parentesis[1].to_s.split(/\s/).collect{ |x| x.capitalize }.join(' ').strip
+          else
+            if /\bex|\bet/.match(component.strip)
+              name = name.split(/\s/).collect{ |x| x.capitalize }.join(' ').strip
+            elsif /\(/.match(component.strip)
+              puts "c #{component.strip} consider #{to_consider}"
+              name = parts_in_parentesis[1].split(/\s/).collect{ |x| x.capitalize }.join(' ').strip + ' (' + parts_in_parentesis[2] +')'
+            else
+              name = name.split(/\s/).collect{ |x| x.capitalize }.join(' ').strip
+            end
+          end
           chemical = chemical.split(/\s/).collect{ |x| x.capitalize }.join(' ').strip if chemical
+          filler = nil if filler.downcase.index(name.downcase)
           qty,  unit  = ParseUtil.dose_to_qty_unit(dose, filler)
           cqty, cunit = ParseUtil.dose_to_qty_unit(cdose, filler)
           dose = "#{qty} #{unit}" if unit and unit.match(/\//)
