@@ -26,15 +26,18 @@ class DoseParser < Parslet::Parser
   rule(:number) {
     (
       str('-').maybe >> (
-        str('0') | (match('[1-9]') >> digit.repeat)
+        str('0') | (match('[1-9]') >> match('[0-9\']').repeat)
       ) >> (
-        str('.') >> digit.repeat(1)
+            str('.') >> digit.repeat(1)
       ).maybe >> (
         match('[eE]') >> (str('+') | str('-')).maybe >> digit.repeat(1)
       ).maybe
     )
   }
-  rule(:identifier) { match['a-zA-Zéàèèçïöäüâ'] >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.:%'].repeat(0) }
+  rule(:radio_isotop) { match['a-zA-Z'].repeat(1) >> str('(') >> digits >> str('-') >> match['a-zA-Z'].repeat(1-3) >> str(')') >>
+                        ((space? >> match['a-zA-Z']).repeat(1)).repeat(0)
+                        } # e.g. Xenonum (133-Xe) or yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt
+  rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.:%,'].repeat(0) }
   #  poliomyelitis typus 1 inactivatum (D-Antigen)
   rule(:name_with_parenthesis) {
     (match('[a-zA-Z]') >> ((match('[0-9]') >> space >> match('[a-zA-Z]')).maybe >>match('[a-zA-Z_\- \(\)]')).repeat) >> space?
@@ -44,23 +47,26 @@ class DoseParser < Parslet::Parser
                            str('% V/V') |
                            str('µg') |
                            str('guttae') |
+                           str('mg/ml') |
+                           str('MBq') |
                            str('mg') |
                            str('Mg') |
                            str('g') |
                            str('l') |
                            str('µl') |
                            str('ml') |
-                           str('mg/ml') |
                            str('U.I.') |
                            str('U.') |
                            str('Mia. U.') |
-                           str('% ad pulverem') | # only one occurrence  pimpinellae radix 15 % ad pulverem
                            str('%')
                           ).as(:unit) }
-  rule(:qty_range)       { (number >> space? >> str('-') >> number).as(:qty_range) }
+  rule(:qty_range)       { (number >> space? >> str('-') >> space? >> number).as(:qty_range) }
   rule(:qty_unit)       { (qty_range | dose_qty) >> space? >> dose_unit }
   rule(:dose_qty)       { number.as(:qty) }
-  rule(:dose)           { qty_unit | dose_qty |dose_unit}
+  rule(:dose)           { (qty_unit | dose_qty |dose_unit) >>
+#                          (space >> (str('ad pulverem') | str('pro charta') | str('pro dosi'))).repeat(0,1)
+                          (space >> (str('ad pulverem') | str('pro charta') | str('pro dosi') )).repeat(0)
+                        }
   root :dose
 
 end
@@ -109,40 +115,89 @@ class SubstanceParser < DoseParser
   rule(:sum)        {
     number.as(:left) >> operator.as(:op) >> expression.as(:right) }
 
-#  rule(:farbstoff) { (str('E').as(:farbstoff) >> space >> digits.as(:digits) >> match['(a-z)'].repeat(0,3)) } # Match Wirkstoffe like E 270
-#  rule(:farbstoff) { ((str('antiox.:') | str('color:')) >> space) |  (str('E').as(:farbstoff) >> space >> digits.as(:digits) >> match['(a-z)'].repeat(0,3)) } # Match Wirkstoffe like E 270
   rule(:farbstoff) { ((str('antiox.:') | str('color.:'))  >> space).maybe >>  (str('E').as(:farbstoff) >> space >> digits.as(:digits) >> match['(a-z)'].repeat(0,3)) } # Match Wirkstoffe like E 270
   rule(:name_simple_part) { identifier | identifier >> (space >> identifier).repeat(1) }
   rule(:substance_in_parenthesis) { (name_complex_part >>  space?).repeat(1) >> (comma >> (name_simple_part >> space?).repeat(0)).repeat(0) }
   rule(:name_complex_part) { identifier |
                              str('>') |
                            digit.repeat >> space >> dose_unit.absent? >> any.repeat | # match stuff like typus 1 inactivatum
-#                           lparen >> name_simple_part.maybe >> (space? >> name_simple_part).repeat(0) >> rparen       # Match name_with_parenthesis like  (D-Antigen)
-#                           lparen >> (name_simple_part >>  space?).repeat(1) >> (comma >> name_simple_part >> space?).maybe >> rparen       # Match name_with_parenthesis like  (D-Antigen)
-#                           lparen >> substance_in_parenthesis >> rparen       # Match name_with_parenthesis like  (D-Antigen)
                             str('(') >> substance_in_parenthesis >> str(')') >> digit.repeat(0,1) >> str('-like:').maybe      # Match name_with_parenthesis like  (D-Antigen)
-#                           lparen >>  match['a-zA-Z\-éàèçïöäü\''].repeat(1) >> rparen       # Match name_with_parenthesis like  (D-Antigen)
                            }
-#  rule(:substance_name) { identifier >> (space >> (identifier|digit >> space >> identifier|lparen >> substance_name >> rparen)).repeat(0) }
   rule(:der) { (str('DER:')  >> space >> (digit >> match['\.-']).maybe >> digit >> str(':') >> digit).as(:der) } # DER: 1:4 or DER: 3.5:1 or DER: 6-8:1
   rule(:substance_name) { (name_simple_part >> (space? >> name_complex_part).repeat(0)).as(:substance_name) }
-  rule(:substance) { (farbstoff |  substance_name >> space? >> dose.maybe.as(:dose)).as(:substance) }
-  rule(:excipiens) { ( str('excipiens ad pulverem') >> space? >> (str('pro charta') |str('pro') >> space? >> dose.as(:dose)).maybe |
-                      (str('excipiens') >> space >> ((str('ad solutionem pro') |
-                                                      str('pro'))>> space).maybe >> substance).as(:excipiens))
-                      .as(:excipiens) }
-  #  excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V.
+  rule(:substance) { (farbstoff | (radio_isotop.as(:substance_name) | substance_name) >> space? >> dose.maybe.as(:dose)).as(:substance) }
+  # excipiens ad pulverem pro 1000 mg
+  # excipiens ad solutionem pro 2 ml
+  # excipiens ad solutionem pro 3 ml corresp. 50 µg
+  # excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V
+
+  rule(:excipiens) { (str('excipiens') >> space >>
+                      (
+#                      str('ad solutionem pro') >> space >> str('3 ml corresp. 50 µg')
+                        str('ad solutionem pro').as(:ad_solutionem) >> space >> dose.as(:dose) >> space >>
+                        str('corresp.') >>
+                        (space >> substance_name.as(:substance_corresp)).maybe >>
+                        (space >> dose.as(:dose_corresp))
+                       ) |
+                      (str('pro compresso').as(:pro_compresso)) |
+                      (str('ad pulverem').as(:ad_pulverem) >>
+                          (space >> str('corresp. suspensio reconstituta').as(:name_corresp)  >> space? >> dose.maybe).maybe >>
+                          (space >> str('pro charta').as(:pro_charta)).maybe >>
+                          (space >> str('pro').as(:pro) >> space >> dose).maybe
+                      )
+                     ).as(:excipiens)
+                     }
+  rule(:excipiensx) { ((str('excipiens') >> space >>
+                       (str('ad solutionem pro').as(:pro) >>
+                        space >> dose >>
+                        (space >> str('corresp.')).maybe >>
+                        (space >> dose.as(:dose_corresp1)).maybe >>
+#                        (space >> substance_name.as(:substance_name)).maybe >>
+#                        (space >> dose.as(:dose_corresp)).maybe >>
+                       str('xxxx').maybe
+                       ).maybe |
+                      (
+                       str('pro compresso').as(:pro).maybe |
+                        (
+                          str('ad pulverem').as(:pro).maybe >>
+                          (space >> str('pro charta')).maybe >>
+                          (space >> str('pro').as(:pro2) >> space >> dose).maybe
+                        )
+                      ).maybe # >> any.repeat(0).as(:filler)
+                      # (str('ad pulverem') >> space? >> str('pro charta').maybe).maybe.as(:ad_pulverem)
+#                      (
+#                       ((str('ad pulverem') >> space? >> str('pro charta')).maybe.as(:ad_pulverem) >> space?)|
+#                        (str('ad solutionem pro').as(:pro)  >> space >> dose)
+#                      )>>
+#                      ((space? >> (str('corresp. suspensio reconstituta') |
+#                                   str('corresp.'))
+#                                  .as(:name_corresp) >>
+#                        (space >> substance_name.as(:substance_name)).maybe) >>
+#                        (space >> dose).as(:dose_corresp).maybe
+#                       ).maybe # >> any.repeat(0).as(:must_be_parsed)
+                      )
+                     ).as(:excipiens)
+                   }
   rule(:additional_substance) { str(',') >> space >> one_substance }
-  rule(:substance_residui) { str('residui:')    >> space >> substance }
+#  rule(:named_substance) { (identifier >> space?).repeat(1).as(:substance_name) >> dose.as(:dose) >> str(':')} # worked for first line
+  rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
+  rule(:named_substance) { (identifier >> space?).repeat(1).as(:substance_name) >> dose.as(:dose) >> str(':') >>
+                           (space >> (identifier >> space? >> dose.maybe >> (space? >> str('et') >> space?).maybe).repeat(1)).maybe}
   rule(:substance_residui) { str('residui:')    >> space >> substance }
   rule(:substance_conserv) { str('conserv.:')   >> space >> substance }
-  rule(:substance_corresp) { substance.as(:substance) >> space >> str('corresp.') >> space >> substance.as(:substance_corresp) }
+  #rule(:substance_corresp) { substance.as(:substance) >> space >> str('corresp.') >> space >> substance.as(:substance_corresp) }
+  rule(:substance_corresp) { substance.as(:substance) >> space >> str('corresp.') >> space >>  (str('suspensio reconstituta') >> space).maybe >>
+                             (substance_et | substance).as(:substance_corresp)  }
   rule(:substance_ut) { substance.as(:substance_ut) >> space >> str('ut') >> space >> substance }
   rule(:substance_et) { (substance.as(:substance_et) >> space >> str('et') >> space).repeat(1) >> (substance_corresp | substance) }
-  rule(:substances) { one_substance.repeat(0, 1) >> additional_substance.repeat(0) }
-  rule(:one_substance) { (der | excipiens | substance_residui | substance_conserv | substance_et | substance_ut | substance_corresp | substance) }
-  rule(:all_substances) { (one_substance.repeat(0, 1) >> additional_substance.repeat(0)) }
+  # rule(:substances)     { one_substance.repeat(0, 1) >> additional_substance.repeat(0) }
+  rule(:all_substances) { one_substance.repeat(0, 1) >> additional_substance.repeat(0) }
+  rule(:one_substance) { (der  | excipiens | histamin | named_substance | substance_residui | substance_conserv | substance_et | substance_ut | substance_corresp | substance ) }
+#  rule(:one_substance) { (excipiens  ) }
+#  rule(:one_substance) { str('excipiens ad pulverem pro') >> space >> dose  }
+#  rule(:one_substance) { str('excipiens ad pulverem') >> space >> substance_corresp >> str('. suspensio reconstituta') >> space >> dose  }
   root :all_substances
+  # root :excipiens
 end
 
 class SubstanceTransformer < DoseTransformer
@@ -156,31 +211,52 @@ class SubstanceTransformer < DoseTransformer
   def SubstanceTransformer.add_substance(substance)
     @@substances << substance
   end
+#  ==>  [{:excipiens=>{:dose=>{:qty=>"1"@28, :unit=>"ml"@30}, :substance_corresp=>{:substance_name=>"ethanolum"@42}, :dose_corresp=>{:qty=>"59.5"@52, :unit=>"% V/V"@57}}}]
+
   rule(:farbstoff => simple(:farbstoff),
        :digits => simple(:digits)) {
     |dictionary|
        puts "#{__LINE__}: dictionary #{dictionary}"
       ParseSubstance.new("#{dictionary[:farbstoff]} #{dictionary[:digits]}")
   }
+  rule(:ad_solutionem => simple(:ad_solutionem),
+       :dose => simple(:dose),
+       :substance_corresp => simple(:substance_corresp)) {
+    |dictionary|
+    puts "#{__LINE__}: dictionary #{dictionary}"
+       binding.pry
+    dictionary[:substance]
+  }
   rule(:substance => simple(:substance)) {
     |dictionary|
     puts "#{__LINE__}: dictionary #{dictionary}"
     dictionary[:substance]
-    # binding.pry
-    # ParseSubstance.new(dictionary[:substance])
   }
   rule(:substance_name => simple(:substance_name),
        :dose => simple(:dose),
        ) {
     |dictionary|
       puts "#{__LINE__}: dictionary #{dictionary}"
-      ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
+      ParseSubstance.new(dictionary[:substance_name].to_s.sub(/^excipiens /i, ''), dictionary[:dose])
+  }
+  rule(:substance_name => simple(:substance_name),
+       :dose_corresp => simple(:dose_corresp),
+       ) {
+    |dictionary|
+      puts "#{__LINE__}: dictionary #{dictionary}"
+      ParseSubstance.new(dictionary[:substance_name].to_s.sub(/^excipiens /i, ''), dictionary[:dose_corresp])
   }
   rule(:der => simple(:der),
        ) {
     |dictionary|
       puts "#{__LINE__}: dictionary #{dictionary}"
       ParseSubstance.new(dictionary[:der].to_s)
+  }
+  rule(:histamin => simple(:histamin),
+       ) {
+    |dictionary|
+      puts "#{__LINE__}: histamin dictionary #{dictionary}"
+      ParseSubstance.new(dictionary[:histamin].to_s)
   }
   rule(:substance => simple(:substance),
        :substance_name => simple(:substance_name),
@@ -198,6 +274,7 @@ class SubstanceTransformer < DoseTransformer
   rule(:excipiens => sequence(:excipiens)) {
     |dictionary|
        puts "#{__LINE__}: dictionary #{dictionary}"
+  binding.pry
     ParseSubstance.new(dictionary[:excipiens])
   }
   rule(:substance_name => sequence(:substance_name)) {
@@ -234,8 +311,9 @@ class CompositionParser < SubstanceParser
                            str('C') |
                            str('D') |
                            str('E')
-                          ).as(:label) >> str(')').maybe >> space >>
-    (match(/[^:]/).repeat(1)).as(:label_description)  >> str(':') >> space
+                          ).as(:label) >> #  >> space?>> str('):').maybe >> space >>
+    (  (str('):')  | str(')')) >> (space? >> (match(/[^:]/).repeat(1)).as(:label_description)  >> str(':')).maybe
+      ) >> space
   }
 
   rule(:expression_comp) { label.maybe >> composition.as(:composition) }
@@ -295,10 +373,11 @@ class ParseDose
     "#{@qty} #{@unit}"
   end
   def ParseDose.from_string(string)
+    puts "ParseDose.from_string #{string}" if VERBOSE_MESSAGES
     value = nil
     parser = DoseParser.new
     transf = DoseTransformer.new
-    puts " ==>  #{parser.parse(string)}" if VERBOSE_MESSAGES
+    puts "#{__LINE__}: ==>  #{parser.parse(string)}" if VERBOSE_MESSAGES
     result = transf.apply(parser.parse(string))
   end
 end
@@ -330,7 +409,7 @@ class ParseSubstance
     puts "ParseSubstance for string #{string}" if VERBOSE_MESSAGES
     parser = SubstanceParser.new
     transf = SubstanceTransformer.new
-    puts " ==>  #{parser.parse(string)}" if VERBOSE_MESSAGES
+    puts "#{__LINE__}: ==>  #{parser.parse(string)}" if VERBOSE_MESSAGES
     result = transf.apply(parser.parse(string))
     return ParseSubstance.new(string) if /^E/.match(string) # Handle Farbstoffe
     if result.is_a?(Array)
@@ -340,6 +419,11 @@ class ParseSubstance
           substance = ParseSubstance.new(string)
           substance.is_excipiens = true
           substance.dose = result.first[:excipiens][:dose]
+          if result.first[:excipiens][:substance_corresp]
+            chemical_name = result.first[:excipiens][:substance_corresp][:substance_name].to_s
+            substance.chemical_substance = ParseSubstance.new(chemical_name)
+            substance.cdose = result.first[:excipiens][:dose_corresp] if result.first[:excipiens][:dose_corresp]
+          end
           return substance
         end
         return ParseSubstance.new(result.first[:excipiens].to_s) if result.first[:excipiens].is_a?(Parslet::Slice)
@@ -348,14 +432,28 @@ class ParseSubstance
         else
           substance = result.first[:excipiens][:excipiens] if result.first[:excipiens][:excipiens].is_a?(ParseSubstance)
         end
-        substance.is_excipiens = true
+        if val = result.first[:excipiens]
+          name = val[:pro] ? val[:pro].to_s + ' ' : ''
+          name += val[:dose_corresp].to_s  + ' ' if val[:dose_corresp]
+          name += val[:ad_pulverem].to_s   + ' ' if val[:ad_pulverem]
+          name  = name.sub(/^excipiens /i, '')
+          substance = ParseSubstance.new(name, ParseDose.new(val[:qty].to_s, val[:unit].to_s))
+          substance.is_excipiens = true
+        end
         return substance
       end
-      substance = result.first[:substance]
-      substance = result.first[:substance_et] if result.first[:substance_et] and not substance
+      substance = result.first[:substance] if result.first[:substance]
+      substance ||= result.first[:substance_et] if result.first[:substance_et]
+      substance ||= result.first[:substance_corresp] if result.first[:substance_corresp]
+      # pp result; pp substance; binding.pry
       substance.dose = ParseDose.new(result.first[:substance].qty.to_s, result.first[:substance].unit) if result.first[:substance]
       if result.first[:substance_corresp]
-        substance.chemical_substance = result.first[:substance_corresp]
+        if result.first[:substance_corresp].is_a?(Array)
+          substance.chemical_substance = result.first[:substance_corresp].first[:substance_et]
+        else
+          # pp result;  binding.pry
+          substance.chemical_substance = result.first[:substance_corresp] if result.first[:substance_corresp]
+        end
         substance.cdose = ParseDose.new(substance.chemical_substance.qty.to_s, substance.chemical_substance.unit)
         substance.chemical_substance.dose =  substance.cdose
       elsif result.first[:substance_et]
@@ -385,7 +483,7 @@ class ParseComposition
     self
   end
   def ParseComposition.from_string(string)
-    cleaned = string.gsub(/^"|[\n\.]+$/, '')
+    cleaned = string.gsub(/^"|["\n\.]+$/, '')
     value = nil
     puts "ParseComposition.from_string #{string}" if VERBOSE_MESSAGES
     SubstanceTransformer.clear_substances

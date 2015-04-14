@@ -13,10 +13,68 @@ RunAllTests = true
 RunFailingSpec = true
 RunAllCompositionsTests = true
 
+def run_composition_tests(strings)
+  strings.each {
+    |source|
+    context "should parse #{source}" do
+      composition = ParseComposition.from_string(source)
+      # pp composition; binding.pry
+      specify { expect(composition.source).to eq source }
+    end
+  }
+end
+
+def run_substance_tests(hash_string_to_name)
+  hash_string_to_name.each{ |string, name|
+    context "should consume #{string}" do
+      substance = ParseSubstance.from_string(string)
+      pp substance
+      # pp substance; binding.pry
+      puts "SOLL: "+ substance.name unless name.eql? substance.name
+      specify { expect(substance.class).to eq ParseSubstance }
+      specify { expect(substance.name).to eq name } if substance.is_a?(ParseSubstance)
+    end
+  }
+end
+
 describe ParseDose do
 
+   excipiens_tests = {
+
+    'excipiens pro compresso' => 'Pro Compresso',
+    'excipiens ad pulverem' => 'Ad Pulverem',
+    'excipiens ad pulverem pro charta' => 'Ad Pulverem Pro Charta',
+    'excipiens ad pulverem pro 1000 mg' => 'Ad Pulverem Pro',
+    'excipiens ad solutionem pro 2 ml' => 'Ad Solutionem Pro',
+    'excipiens ad pulverem corresp. suspensio reconstituta' => 'Ad Pulverem Corresp. Suspensio Reconstituta',
+    'excipiens ad pulverem corresp. suspensio reconstituta 1 ml' => 'Ad Pulverem Corresp. Suspensio Reconstituta',
+
+    'excipiens ad solutionem pro 3 ml corresp. 50 µg' => 'Excipiens Ad Solutionem Pro 3 Ml Corresp. 50 µg',
+    'excipiens ad solutionem pro 4 ml corresp. 50 µg pro dosi' => 'Excipiens Ad Solutionem Pro 4 Ml Corresp. 50 µg Pro Dosi',
+    'excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V' => 'Excipiens Ad Solutionem Pro 1 Ml Corresp. Ethanolum 59.5 % V/v',
+
+    }
+#  excipiens_tests = {'excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V' => 'Excipiens Ad Solutionem Pro'}
   tests = {
-#    "osseinum-hydroxyapatit 200 mg corresp. collagena 52 mg et calcium 43 mg" => "Osseinum-Hydroxyapatit",
+#    xylometazolini hydrochloridum 0.5 mg, natrii hyaluronas, conserv.: E 217, E 219, natrii dehydroacetas, excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi
+#    'excipiens ad solutionem pro 1 ml' => 'Excip',
+    'ginseng extractum corresp. ginsenosidea 3.4 mg' => 'Ginseng Extractum Corresp. Ginsenosidea',
+    'yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt' => 'Yttrii(90-y) Chloridum Zum Kalibrierungszeitpunkt',
+    'yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt 1850 MBq' => 'Yttrii(90-y) Chloridum Zum Kalibrierungszeitpunkt',
+    # "50'000" => 'Acari Allergeni Extractum'
+    # 'silybum marianum D3 0.3 ml ad solutionem pro 1 ml' => 'xxx',
+    # 'silybum marianum D3 0.3 ml ad solutionem pro 1 ml corresp. ethanolum 30 % V/V' => 'xxx',
+    "U = Histamin Equivalent Prick" => 'U = Histamin Equivalent Prick',
+    "acari allergeni extractum 50'000 U.:" => 'Acari Allergeni Extractum',
+    "acari allergeni extractum (acarus siro) 50'000 U." => 'Acari Allergeni Extractum (acarus Siro)',
+    'acari allergeni extractum 5000 U.:' => 'Acari Allergeni Extractum',
+    'acari allergeni extractum 5000 U.: dermatophagoides farinae' => 'Acari Allergeni Extractum',
+    'acari allergeni extractum 5000 U.: dermatophagoides farinae 50 %' => 'Acari Allergeni Extractum',
+    'acari allergeni extractum 5000 U.: dermatophagoides farinae 50 %  et dermatophagoides pteronyssinus 50 %' => 'Acari Allergeni Extractum',
+    'absinthii herba 1.2 g pro charta' => "Absinthii Herba",
+    '1-Chloro-2,2,5,5-tetramethyl-4-oxoimidazolidine 75 mg' => '1-chloro-2,2,5,5-tetramethyl-4-oxoimidazolidine',
+    'xenonum(133-Xe) 74 -740 MBq' => 'Xenonum(133-xe)',
+    "osseinum-hydroxyapatit 200 mg corresp. collagena 52 mg et calcium 43 mg" => "Osseinum-hydroxyapatit",
     "calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg corresp. calcium 100 mg" => 'Calcii Lactas Pentahydricus',
     "calcii hydrogenophosphas anhydricus 300 mg corresp. calcium 100 mg" => 'Calcii Hydrogenophosphas Anhydricus',
     "calcii gluconas 100 mg et calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg corresp. calcium 100 mg" => 'Calcii Gluconas',
@@ -24,16 +82,11 @@ describe ParseDose do
     "calcii gluconas 100 mg corresp. calcium 100 mg" => 'Calcii Gluconas',
     "calcii gluconas 100 mg et calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg" => 'Calcii Gluconas',
     'pimpinellae radix 15 % ad pulverem' => 'Pimpinellae Radix',
-    'excipiens ad pulverem pro 1000 mg' => 'Excipiens Ad Pulverem Pro 1000 Mg',
-    'excipiens ad pulverem pro charta' => 'Excipiens Ad Pulverem Pro Charta',
-    'excipiens ad pulverem' => 'Excipiens Ad Pulverem',
     'antiox.: E 321' => 'E 321',
     'color.: E 160(a)' => 'E 160', # TODO: or E 160(a) ??
     'E 160(a)' => 'E 160(a)',
     'ethanolum 70-78 % V/V' => "Ethanolum",
-    'excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V' => 'Excipiens Ad Solutionem Pro',
     'procainum 10 mg ut procaini hydrochloridum' => 'Procaini Hydrochloridum',
-    'excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V' => 'Excipiens Ad Solutionem Pro',
     'DER: 6-8:1' => 'Der: 6-8:1',
     'DER: 1:4' => 'Der: 1:4',
     'DER: 3.5:1' => 'Der: 3.5:1',
@@ -81,7 +134,6 @@ describe ParseDose do
 #    'retinoli 7900' => 'Retinoli 7900',
     'retinoli 7900 U.I.' => 'Retinoli',
     'retinoli palmitas 7900 U.I.' => 'Retinoli Palmitas',
-    'excipiens pro compresso' => 'Compresso',
     'virus' => 'Virus',
     'E 270' => 'E 270',
     'moelle épinière' => 'Moelle épinière',
@@ -95,16 +147,10 @@ describe ParseDose do
     'virus poliomyelitis typus 1 inactivatum (D-Antigen) 2 mg' => 'Virus Poliomyelitis Typus 1 Inactivatum (d-antigen)',
     'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg' => 'Globulina Equina (immunisé Avec Coeur, Tissu Pulmonaire, Reins De Porcins)',
    }
-#   tests = { 'sennae folium 75 % corresp. hydroxyanthracenae 2.7 %' => 'Sennae Folium', }
-    tests.each{ | string, name|
-      context "should consume #{string}" do
-        substance = ParseSubstance.from_string(string)
-        # pp substance; binding.pry
-        puts "SOLL: "+ substance.name unless name.eql? substance.name
-        specify { expect(substance.class).to eq ParseSubstance }
-        specify { expect(substance.name).to eq name } if substance.is_a?(ParseSubstance)
-      end
-    } if true
+
+
+  run_substance_tests(excipiens_tests)
+  run_substance_tests(tests)
 
 if RunAllTests
 
@@ -205,7 +251,48 @@ end
 
 describe ParseSubstance do
 # ParseSubstance     = Struct.new("ParseSubstance",    :name, :qty, :unit, :chemical_substance, :chemical_qty, :chemical_unit, :is_active_agent, :dose, :cdose)
+  context "should return correct substance for 'excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V'" do
+    string = "excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V"
+    substance = ParseSubstance.from_string(string)
+    specify { expect(substance.name).to eq 'Excipiens Ad Solutionem Pro 1 Ml Corresp. Ethanolum 59.5 % V/v' }
+    specify { expect(substance.chemical_substance.name).to eq 'Ethanolum' }
+    specify { expect(substance.cdose.to_s).to eq ParseDose.new('59.5', '% V/V').to_s }
+    specify { expect(substance.qty).to eq 1.0}
+    specify { expect(substance.unit).to eq 'ml' }
+  end
+
  if RunAllTests
+
+  context "should return correct substance for 'excipiens pro compresso'" do
+    string = "excipiens pro compresso"
+    substance = ParseSubstance.from_string(string)
+    specify { expect(substance.name).to eq 'Pro Compresso' }
+    specify { expect(substance.qty).to eq nil}
+    specify { expect(substance.unit).to eq nil }
+  end
+  context "should return correct substance for 'excipiens ad solutionem pro 3 ml corresp. 50 µg'" do
+    string = "excipiens ad solutionem pro 3 ml corresp. 50 µg"
+    substance = ParseSubstance.from_string(string)
+    specify { expect(substance.name).to eq 'Excipiens Ad Solutionem Pro 3 Ml Corresp. 50 µg' }
+    specify { expect(substance.qty).to eq 3.0}
+    specify { expect(substance.unit).to eq 'ml' }
+  end
+
+  context "should return correct substance for 'excipiens ad pulverem pro 1000 mg'" do
+    string = "excipiens ad pulverem pro 1000 mg"
+    substance = ParseSubstance.from_string(string)
+    specify { expect(substance.name).to eq 'Ad Pulverem Pro' }
+    specify { expect(substance.qty).to eq 1000.0 }
+    specify { expect(substance.unit).to eq 'mg' }
+  end
+
+  context "should return correct substance for 'Xenonum(133-xe) 74 -740 Mb'" do
+    string = "Xenonum(133-Xe) 74 -740 MBq"
+    substance = ParseSubstance.from_string(string)
+    specify { expect(substance.name).to eq 'Xenonum(133-xe)' }
+    specify { expect(substance.qty).to eq 74 }
+    specify { expect(substance.unit).to eq 'MBq' }
+  end
 
   context "should return correct substance for 'pyrazinamidum'" do
     string = "pyrazinamidum"
@@ -234,7 +321,7 @@ describe ParseSubstance do
   context "should return correct substance for 'excipiens pro compresso'" do
     string = "excipiens pro compresso"
     substance = ParseSubstance.from_string(string)
-    specify { expect(substance.name).to eq 'Compresso' }
+    specify { expect(substance.name).to eq 'Pro Compresso' }
     specify { expect(substance.qty).to eq nil}
     specify { expect(substance.unit).to eq nil }
   end
@@ -261,12 +348,12 @@ describe ParseSubstance do
     specify { expect(substance.name).to eq 'Aqua Q.s. Ad Suspensionem Pro' }
     specify { expect(substance.qty).to eq 0.5}
     specify { expect(substance.unit).to eq 'ml' }
-  end if RunFailingSpec and false
+  end
+
   context "should parse a complex composition" do
     source = 'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg'
     composition = ParseSubstance.from_string(source)
-  end if RunFailingSpec
- end
+  end
   context "should return correct substance for 'toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg'" do
     string = "toxoidum pertussis 25 µg et haemagglutininum filamentosum 15 µg"
     substance = ParseSubstance.from_string(string)
@@ -275,12 +362,13 @@ describe ParseSubstance do
     specify { expect(substance.name).to eq 'Toxoidum Pertussis' }
     specify { expect(substance.qty).to eq 25.0}
     specify { expect(substance.unit).to eq 'µg' }
-    specify { expect(substance.chemical_substance).to eq 'Haemagglutininum Filamentosum' }
+    specify { expect(substance.chemical_substance.name).to eq 'Haemagglutininum Filamentosum' }
     specify { expect(substance.cdose.qty).to eq 15.0}
     specify { expect(substance.cdose.unit).to eq 'µg' }
     specify { expect(substance.chemical_qty).to eq '15'}
     specify { expect(substance.chemical_unit).to eq 'µg' }
-  end if false
+  end
+ end
 end
 
 describe ParseComposition do
@@ -366,12 +454,6 @@ describe ParseComposition do
     skip 'what is the correct name for excipiens?'# { expect(composition.substances.last.name).to eq 'Excipiens Pro Compresso' }
   end
 
-  context "should parse more toxoidum et haemagglutininum " do
-    source = 'toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg'
-    composition = ParseComposition.from_string(source)
-    specify { expect(composition.source).to eq source }
-  end
-
   context "should parse more complicated example" do
     source =
 "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg"
@@ -395,93 +477,34 @@ describe ParseComposition do
     specify { expect(haema.qty).to eq 25 }
     specify { expect(haema.unit).to eq 'µg' }
   end
+  composition_examples = [
+    # 'acari allergeni extractum 5000 U.: dermatophagoides farinae 50 % et dermatophagoides pteronyssinus 50 %, aluminium, aluminii hydroxidum hydricum ad adsorptionem, natrii chloridum, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml.',
+    "color.: E 160(a)\n",
+    'toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg',
+    "haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg",
+    'acari allergeni extractum 5000 U.: dermatophagoides farinae 50 %',
+    "A): acari allergeni extractum 50 U.: dermatophagoides farinae 50",
+    'V): mannitolum 40 mg pro dosi.',
+    'gasum inhalationis, pro vitro',
+    'A): acari allergeni extractum 50 U.: dermatophagoides farinae 50 %',
+    'xenonum 74 -740 MBq',
+    'xenonum(133-Xe) 74 -740 MBq',
+    'xenonum(133-Xe) 74 -740 MBq, gasum inhalationis, pro vitro',
+    "sennae folium 75 % corresp. hydroxyanthracenae 2.7 %",
+    'excipiens ad pulverem corresp. suspensio reconstituta 1 ml.',
+    "viperis antitoxinum equis F(ab')2 corresp. Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50 mus et Vipera ammodytes > 1000 LD50 mus, natrii chloridum, polysorbatum 80, aqua ad iniectabilia q.s. ad solutionem pro 4 ml.",
+    "I) DTPa-IPV-Komponente: toxoidum diphtheriae, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum",
+    'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg, propylenglycolum, conserv.: E 216, E 218, excipiens pro suppositorio.',
+    "extractum ethanolicum et glycerolicum liquidum ex absinthii herba 0.7 mg, cinnamomi cortex 3.8 mg, guaiaci lignum 14.3 mg, millefolii herba 7 mg, rhoeados flos 11 mg, tormentillae rhizoma 9.5 mg, balsamum tolutanum 0.3 mg, benzoe tonkinensis 4.8 mg, myrrha 2.4 mg, olibanum 0.9 mg, excipiens ad solutionem pro 1 ml, corresp. 40 guttae, corresp. ethanolum 37 % V/V",
+    "rhei extractum ethanolicum siccum 50 mg corresp. glycosida anthrachinoni 5 mg, acidum salicylicum 10 mg, excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V",
+    "berberidis corticis extractum ethanolicum liquidum 35 mg, DER: 6:1, combreti extractum aquosum liquidum 18 mg, DER: 1:4, cynarae extractum ethanolicum liquidum 36 mg, DER: 1:1, orthosiphonis folii extractum ethanolicum liquidum 18 mg, DER: 3.5:1, excipiens ad solutionem pro 1 ml, corresp. ethanolum 74 % V/V\n",
+    "cholecalciferolum 250 U.I., acidum ascorbicum 20 mg, calcii gluconas 100 mg et calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg corresp. calcium 100 mg, arom.: saccharinum natricum, natrii cyclamas, vanillinum et alia, excipiens pro compresso obducto.",
+    "osseinum-hydroxyapatit 200 mg corresp. collagena 52 mg et calcium 43 mg",
+  ]
+  run_composition_tests(composition_examples)
  end
-  context "should parse a complex composition 2" do
-    puts "xxx\n\n\n"
-    source =
-#  "haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A) 15 µg, haemagglutininum influenzae A (H3N2) (Virus-Stamm A/Texas/50/2012 (H3N2)-like: reassortant virus NYMC X-223A) 15 µg, haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml."
-#  "haemagglutininum influenzae A (H3N2) (Virus-Stamm A/Texas/50/2012 (H3N2)-like: reassortant virus NYMC X-223A) 15 µg, haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml."
-#  oky "natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml."
-#  "haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml."
-  "haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg"
-    composition = ParseComposition.from_string(source)
-  end
-
-  context "should parse a complex composition 1" do
-    source =
-"viperis antitoxinum equis F(ab')2 corresp. Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50 mus et Vipera ammodytes > 1000 LD50 mus, natrii chloridum, polysorbatum 80, aqua ad iniectabilia q.s. ad solutionem pro 4 ml."
-    composition = ParseComposition.from_string(source)
-  end
-
-  context "should parse a complex composition 3" do
-    source =
-# "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum pertussis 25 µg, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum, streptomycinum, polymyxini B sulfas, medium199, aqua q.s. ad suspensionem pro 0.5 ml."
-"I) DTPa-IPV-Komponente: toxoidum diphtheriae, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum"
-    composition = ParseComposition.from_string(source)
-  end  if RunFailingSpec
-
-  context "should parse a complex composition" do
-    source = 'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg, propylenglycolum, conserv.: E 216, E 218, excipiens pro suppositorio.'
-    composition = ParseComposition.from_string(source)
-  end  if RunFailingSpec
-
-  context "should parse a complex composition 4" do
-    source = "extractum ethanolicum et glycerolicum liquidum ex absinthii herba 0.7 mg, cinnamomi cortex 3.8 mg, guaiaci lignum 14.3 mg, millefolii herba 7 mg, rhoeados flos 11 mg, tormentillae rhizoma 9.5 mg, balsamum tolutanum 0.3 mg, benzoe tonkinensis 4.8 mg, myrrha 2.4 mg, olibanum 0.9 mg, excipiens ad solutionem pro 1 ml, corresp. 40 guttae, corresp. ethanolum 37 % V/V"
-    composition = ParseComposition.from_string(source)
-  end  if RunFailingSpec
-
-  context "should parse a complex composition 5" do
-    source =
-#  "malvae flos 1 %, calcatrippae flos 1 %, menthae piperitae folium 7 %, sennae folium 75 % corresp. hydroxyanthracenae 2.7 %, carvi fructus 10 %, liquiritiae radix 6 %"
-#  "sennae folium 75 % corresp. hydroxyanthracenae 2.7 %, carvi fructus 10 %, liquiritiae radix 6 %"
-  "sennae folium 75 % corresp. hydroxyanthracenae 2.7 %"
-#  "liquiritiae radix 6 %"
-    composition = ParseComposition.from_string(source)
-  end  if RunFailingSpec
-  context "should parse a complex composition 6" do
-    source =
-# "rhei extractum ethanolicum siccum 50 mg corresp. glycosida anthrachinoni 5 mg, DER: 6-8:1, acidum salicylicum 10 mg, excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V"
-# "rhei extractum ethanolicum siccum 50 mg corresp. glycosida anthrachinoni 5 mg, acidum salicylicum 10 mg, excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V"
-#"rhei extractum ethanolicum siccum 50 mg corresp. glycosida anthrachinoni 5 mg, acidum salicylicum 10 mg, excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V"
-# "corresp. ethanolum 59.5 % V/V"
-"rhei extractum ethanolicum siccum 50 mg corresp. glycosida anthrachinoni 5 mg, acidum salicylicum 10 mg, excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V"
-    composition = ParseComposition.from_string(source)
-  end  if RunFailingSpec
-
-  context "should parse a complex composition 7" do
-    source =
-"berberidis corticis extractum ethanolicum liquidum 35 mg, DER: 6:1, combreti extractum aquosum liquidum 18 mg, DER: 1:4, cynarae extractum ethanolicum liquidum 36 mg, DER: 1:1, orthosiphonis folii extractum ethanolicum liquidum 18 mg, DER: 3.5:1, excipiens ad solutionem pro 1 ml, corresp. ethanolum 74 % V/V\n"
-#"cynarae extractum ethanolicum liquidum 36 mg, DER: 1:1, orthosiphonis folii extractum ethanolicum liquidum 18 mg, DER: 3.5:1, excipiens ad solutionem pro 1 ml, corresp. ethanolum 74 % V/V\n"
-#"excipiens ad solutionem pro 1 ml, corresp. ethanolum 74 % V/V\n"
-#"corresp. ethanolum 74 % V/V\n"
-    composition = ParseComposition.from_string(source)
-  end  if RunFailingSpec
-
-  context "should parse a complex composition 7" do
-    source =
-#"Tela cum unguento: acidum salicylicum 19.25 mg, acidum lacticum 671 µg, adeps lanae, color.: E 141, excipiens ad praeparationem pro 105.911 mg.\n"
-#"acidum salicylicum 19.25 mg, acidum lacticum 671 µg, adeps lanae, color.: E 141, excipiens ad praeparationem pro 105.911 mg.\n"
-#"thylis salicylas 100 mg, acidum salicylicum 20 mg, camphora racemica 4 mg, acidum formicicum concentratum 3 mg, spicae aetheroleum 10 mg, adeps lanae, color.: E 160(a), excipiens ad unguentum pro 1 g.\n"
-#"color.: E 160(a), excipiens ad unguentum pro 1 g.\n"
-"color.: E 160(a)\n"
-    composition = ParseComposition.from_string(source)
-  end  if RunFailingSpec
-
-  context "should parse a complex composition 8" do
-    source =
-"cholecalciferolum 250 U.I., acidum ascorbicum 20 mg, calcii gluconas 100 mg et calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg corresp. calcium 100 mg, arom.: saccharinum natricum, natrii cyclamas, vanillinum et alia, excipiens pro compresso obducto."
-#"calcii gluconas 100 mg et calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg corresp. calcium 100 mg"
-    composition = ParseComposition.from_string(source)
-  end  if RunFailingSpec
-  context "should parse a complex composition 8" do
-    source =
-# "osseinum-hydroxyapatit 200 mg corresp. collagena 52 mg et calcium 43 mg et phosphorus ruber 20 mg et proteina 18 mg, excipiens pro compresso obducto"
-#"osseinum-hydroxyapatit 200 mg corresp. collagena 52 mg"
-# "osseinum-hydroxyapatit 200 mg corresp. collagena 52 mg et calcium 43 mg et phosphorus ruber 20 mg et proteina 18 mg"
- "osseinum-hydroxyapatit 200 mg corresp. collagena 52 mg et calcium 43 mg"
-    composition = ParseComposition.from_string(source)
-  end  if RunFailingSpec and false
 end
+
 describe ParseComposition do
   context "should parse a complex composition" do
     filename = File.expand_path("#{__FILE__}/../data/compositions.txt")
@@ -492,13 +515,15 @@ describe ParseComposition do
     inhalt.each{
       |line|
       nr += 1
+      next if line.length < 5
       puts "#{File.basename(filename)}:#{nr} #{@nrErrors} errors: #{line}"
       begin
         composition = ParseComposition.from_string line
     rescue Parslet::ParseFailed
       @nrErrors += 1
-      puts "  error #{@nrErrors} in line #{File.basename(filename)}:#{nr}"
+      puts "  error #{@nrErrors} in line #{File.basename(filename)}:#{nr} XX: #{line}"
       puts line
+      # binding.pry if /mannitolum 40 mg pro dosi/.match(line)
 #      binding.pry if nr > 300
     end
     }
