@@ -9,12 +9,12 @@ require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
 
+RunAllCompositionsTests = false # takes over a minute!
 RunAllTests = false
 RunFailingSpec = false
 RunMostImportantParserTests = true
-RunAllCompositionsTests = false
 RunExcipiensTest = true
-TryRun = false
+TryRun = true
 
 def run_composition_tests(strings)
   strings.each {
@@ -151,10 +151,10 @@ describe ParseSubstance do
     'excipiens ad pulverem' => 'Ad Pulverem',
     'excipiens ad pulverem pro charta' => 'Ad Pulverem Pro Charta',
     'excipiens ad pulverem pro 1000 mg' => 'Ad Pulverem Pro',
-    'excipiens ad solutionem pro 2 ml' => 'Ad Solutionem Pro',
     'excipiens ad pulverem corresp. suspensio reconstituta' => 'Ad Pulverem Corresp. Suspensio Reconstituta',
     'excipiens ad pulverem corresp. suspensio reconstituta 1 ml' => 'Ad Pulverem Corresp. Suspensio Reconstituta',
 
+    'excipiens ad solutionem pro 2 ml' => 'Ad Solutionem Pro',
     'excipiens ad solutionem pro 3 ml corresp. 50 µg' => 'Excipiens Ad Solutionem Pro 3 Ml Corresp. 50 µg',
     'excipiens ad solutionem pro 4 ml corresp. 50 µg pro dosi' => 'Excipiens Ad Solutionem Pro 4 Ml Corresp. 50 µg Pro Dosi',
     'excipiens ad solutionem pro 5 ml corresp. ethanolum 59.5 % V/V' => 'Excipiens Ad Solutionem Pro 5 Ml Corresp. Ethanolum 59.5 % V/v',
@@ -274,11 +274,18 @@ describe ParseSubstance do
   # run_substance_tests(tests)           if RunAllTests
   # run_substance_tests( {   "acari allergeni extractum 50'000 U.:" => 'Acari Allergeni Extractum', })
   if RunMostImportantParserTests
+    context "should return correct substance for 'pyrazinamidum 500 mg'" do
+      string = "pyrazinamidum 500 mg"
+      substance = ParseSubstance.from_string(string)
+      specify { expect(substance.name).to eq 'Pyrazinamidum' }
+      specify { expect(substance.qty).to eq 500.0 }
+      specify { expect(substance.unit).to eq 'mg' }
+    end
+
     context "should return correct substance for 9,11-linolicum " do
       string = "acidum 9,11-linolicum"
       string = "acidum 9,11-linolicum 3.25 mg"
       substance = ParseSubstance.from_string(string)
-      pp substance
 
       composition = ParseComposition.from_string(string)
       specify { expect(substance.to_s.eql?(composition.substances.first.to_s)).to eq true }
@@ -377,14 +384,6 @@ describe ParseSubstance do
     specify { expect(substance.unit).to eq nil }
   end
 
-  context "should return correct substance for 'pyrazinamidum 500 mg'" do
-    string = "pyrazinamidum 500 mg"
-    substance = ParseSubstance.from_string(string)
-    specify { expect(substance.name).to eq 'Pyrazinamidum' }
-    specify { expect(substance.qty).to eq 500.0 }
-    specify { expect(substance.unit).to eq 'mg' }
-  end
-
   context "should return correct substance for 'retinoli palmitas 7900 U.I.'" do
     string = "retinoli palmitas 7900 U.I."
     substance = ParseSubstance.from_string(string)
@@ -446,6 +445,30 @@ end
 
 describe ParseComposition do
 # ParseComposition   = Struct.new("ParseComposition",  :source, :label, :label_description, :substances, :galenic_form, :route_of_administration)
+  context "should parse more complicated example" do
+    source =
+"I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg"
+    composition = ParseComposition.from_string(source)
+    pp composition
+    binding.pry
+    specify { expect(composition.source).to eq source }
+
+    specify { expect(composition.label).to eq 'I' }
+    specify { expect(composition.label_description).to eq 'DTPa-IPV-Komponente (Suspension)' }
+
+    specify { expect(composition.galenic_form).to eq nil }
+    specify { expect(composition.route_of_administration).to eq nil }
+
+    toxoidum = composition.substances.find{|x| /toxoidum diphther/i.match(x.name)}
+    specify { expect(toxoidum.name).to eq 'Toxoidum Diphtheriae' }
+    specify { expect(toxoidum.qty).to eq 30 }
+    specify { expect(toxoidum.unit).to eq 'U.I.' }
+
+    haema = composition.substances.find{|x| /Haemagglutininum/i.match(x.name)}
+    specify { expect(haema.name).to eq 'Haemagglutininum Filamentosum' }
+    specify { expect(haema.qty).to eq 25 }
+    specify { expect(haema.unit).to eq 'µg' }
+  end
  if RunAllTests
   context "should return correct composition for 'minoxidilum'" do
     source = 'minoxidilum 2.5 mg, pyrazinamidum 500 mg'
@@ -527,29 +550,6 @@ describe ParseComposition do
     skip 'what is the correct name for excipiens?'# { expect(composition.substances.last.name).to eq 'Excipiens Pro Compresso' }
   end
 
-  context "should parse more complicated example" do
-    source =
-"I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg"
-    composition = ParseComposition.from_string(source)
-
-    specify { expect(composition.source).to eq source }
-
-    specify { expect(composition.label).to eq 'I' }
-    specify { expect(composition.label_description).to eq 'DTPa-IPV-Komponente (Suspension)' }
-
-    specify { expect(composition.galenic_form).to eq nil }
-    specify { expect(composition.route_of_administration).to eq nil }
-
-    toxoidum = composition.substances.find{|x| /toxoidum diphther/i.match(x.name)}
-    specify { expect(toxoidum.name).to eq 'Toxoidum Diphtheriae' }
-    specify { expect(toxoidum.qty).to eq 30 }
-    specify { expect(toxoidum.unit).to eq 'U.I.' }
-
-    haema = composition.substances.find{|x| /Haemagglutininum/i.match(x.name)}
-    specify { expect(haema.name).to eq 'Haemagglutininum Filamentosum' }
-    specify { expect(haema.qty).to eq 25 }
-    specify { expect(haema.unit).to eq 'µg' }
-  end
   end
   composition_examples = [
     "acidum 9,11-linolicum 3.25 mg",
