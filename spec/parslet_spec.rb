@@ -16,6 +16,35 @@ RunMostImportantParserTests = true
 RunExcipiensTest = true
 TryRun = true
 
+describe HandleSwissmedicErrors do
+  context 'should handle fixes' do
+    replacement = '\1, \2'
+    pattern_replacement  = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => replacement }
+    test_string = 'sulfuris D6 2,2 mg hypericum perforatum D2 0,66'
+    expected    = 'sulfuris D6 2,2 mg, hypericum perforatum D2 0,66'
+    handler = HandleSwissmedicErrors.new(pattern_replacement )
+    result = handler.apply_fixes(test_string)
+    specify { expect(result).to eq expected }
+    specify { expect(handler.report.size).to eq 2 }
+    specify { expect(/report/i.match(handler.report[0]).class).to eq MatchData }
+    specify { expect(handler.report[1].index(replacement).class).to eq Fixnum }
+  end
+
+  context 'should be used when calling ParseComposition' do
+    replacement = '\1, \2'
+    test_string = 'sulfuris D6 2,2 mg hypericum perforatum D2 0,66'
+    composition = ParseComposition.from_string(test_string)
+    specify { expect(composition.substances.size).to eq 2 }
+    specify { expect(composition.substances.first.name).to eq 'Sulfuris D6' }
+    specify { expect(composition.substances.last.name).to eq 'Hypericum Perforatum D2' }
+    report = ParseComposition.report
+    specify { expect(/report/i.match(report[0]).class).to eq MatchData }
+    specify { expect(report[1].index(replacement).class).to eq Fixnum }
+  end
+
+
+end
+
 def run_composition_tests(strings)
   strings.each {
     |source|

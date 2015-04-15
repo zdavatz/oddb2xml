@@ -423,12 +423,59 @@ class ParseSubstance
   end
 end
 
+# this class is responsible to patch errors in swissmedic entries after
+# oddb.org detected them, as it takes sometimes a few days (or more) till they get corrected
+# Reports the number of occurrences of each entry
+class HandleSwissmedicErrors
+
+  class ErrorEntry   < Struct.new('ErrorEntry', :pattern, :replacement, :nr_occurrences)
+  end
+
+  def reset_errors
+    @errors = []
+  end
+
+  # error_entries should be a hash of  pattern, replacement
+  def initialize(error_entries)
+    reset_errors
+    error_entries.each{ |pattern, replacement| @errors << ErrorEntry.new(pattern, replacement, 0) }
+  end
+
+  def report
+    s = ["Report of changed compositions" ]
+    @errors.each {
+      |entry|
+    s << "  replaced #{entry.nr_occurrences} times '#{entry.pattern}'  by '#{entry.replacement}'"
+    }
+    s
+  end
+
+  def apply_fixes(string)
+    result = string.clone
+    @errors.each{
+      |entry|
+      intermediate = result.clone
+      result = result.gsub(entry.pattern,  entry.replacement)
+      entry.nr_occurrences += 1 unless intermediate.eql?(intermediate)
+    }
+    result
+  end
+  #  hepar sulfuris D6 2,2 mg hypericum perforatum D2 0,66 mg where itlacks a comma and should be hepar sulfuris D6 2,2 mg, hypericum perforatum D2 0,66 mg
+end
+
 class ParseComposition
   attr_accessor   :source, :label, :label_description, :substances, :galenic_form, :route_of_administration
+
+  ErrorsToFix = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => '\1, \2' }
+  @@errorHandler = HandleSwissmedicErrors.new( ErrorsToFix )
+
   def initialize(source)
     @substances ||= []
     puts "ParseComposition.new from #{source.inspect} @substances #{@substances.inspect}" if VERBOSE_MESSAGES
     @source = source.to_s
+  end
+  def ParseComposition.report
+    @@errorHandler.report
   end
   def eval
     self
