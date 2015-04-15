@@ -38,7 +38,7 @@ class DoseParser < Parslet::Parser
   rule(:radio_isotop) { match['a-zA-Z'].repeat(1) >> lparen >> digits >> str('-') >> match['a-zA-Z'].repeat(1-3) >> rparen >>
                         ((space? >> match['a-zA-Z']).repeat(1)).repeat(0)
                         } # e.g. Xenonum (133-Xe) or yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt
-  rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.:%'].repeat(0) }
+  rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.%'].repeat(0) }
   # handle stuff like acidum 9,11-linolicum specially. it must contain at least one a-z
   rule(:identifier_with_comma) { match['0-9,\-'].repeat(0) >> match['a-zA-Z'].repeat(1)  >> match['0-9a-zA-Z,\-\(\)'].repeat(0) }
   rule(:one_word) { match(['a-zA-Zé,']).repeat(1) >> match(['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.:%']).repeat(0) >> space? }
@@ -161,16 +161,21 @@ class SubstanceParser < DoseParser
                            (space >> (identifier >> space? >> dose.maybe >> (space? >> str('et') >> space?).maybe).repeat(1)).maybe}
   rule(:substance_residui) { str('residui:')    >> space >> substance }
   rule(:substance_conserv) { str('conserv.:')   >> space >> substance }
-  rule(:substance_corresp) { substance.as(:substance) >> space >> str('corresp.') >> space >>  (str('suspensio reconstituta') >> space).maybe >>
+  rule(:substance_corresp) { substance.as(:substance) >>str('corresp.') >> space >>  (str('suspensio reconstituta') >> space).maybe >>
                              (substance_et | substance).as(:substance_corresp)  }
   rule(:substance_ut) { substance.as(:substance_ut) >> space >> str('ut') >> space >> substance }
-  rule(:substance_et) { (substance.as(:substance_et) >> space >> str('et') >> space).repeat(1) >> (substance_corresp | substance) }
+  rule(:substance_et) { (substance.as(:substance) >> str('et') >> space).repeat(1) >> (substance_corresp | substance).as(:substance) }
+  rule(:praeparatio) { ((identifier >> space?).repeat(1).as(:description) >> str(':') >> space).maybe>>
+                       (identifier >> space?).repeat(1).as(:substance_name) >>
+                        number.as(:qty) >> space >> str('U.:') >> space >>
+                        (identifier >> space?).repeat(1).as(:more_info) >>
+                        space?
+                       }
 
   #rule(:one_substance) { (str(',') >> space).maybe >> (excipiens) } # Sometimes it is handy for debugging to be able to debug just one the different variants
-  rule(:one_substance) { (str(',') >> space).maybe >> (der | excipiens |  histamin | named_substance | substance_residui | substance_conserv | substance_et | substance_ut | substance_corresp | substance ) }
+  rule(:one_substance) { (str(',') >> space).maybe >> (der | excipiens | praeparatio | histamin | named_substance | substance_residui | substance_conserv | substance_et | substance_ut | substance_corresp | substance ) }
 #  rule(:one_substance) { (str(',') >> space).maybe >> ( substance | excipiens) }
-  rule(:one_substance) { ( excipiens | substance ) >> (str(',') >> space).maybe  }
-  rule(:one_substance) { ( substance ) >> (str(',') >> space).maybe  }
+  rule(:one_substance) { ( substance_et | praeparatio | substance | excipiens) >> (str(',') >> space).maybe  }
   rule(:all_substances) { one_substance.repeat(1) }
   root :all_substances
 end
@@ -181,7 +186,7 @@ class SubstanceTransformer < DoseTransformer
     @@substances = []
   end
   def SubstanceTransformer.substances
-    @@substances
+    @@substances.clone
   end
   def SubstanceTransformer.add_substance(substance)
     @@substances << substance
@@ -211,6 +216,18 @@ class SubstanceTransformer < DoseTransformer
     |dictionary|
       puts "#{__LINE__}: dictionary #{dictionary}"
       ParseSubstance.new(dictionary[:substance_name].to_s.sub(/^excipiens /i, ''), dictionary[:dose_corresp])
+  }
+  rule(:description => simple(:description),
+       :substance_name => simple(:substance_name),
+       :qty => simple(:qty),
+       :more_info => simple(:more_info),
+       ) {
+    |dictionary|
+      puts "#{__LINE__}: dictionary #{dictionary}"
+      substance = ParseSubstance.new(dictionary[:substance_name], ParseDose.new(dictionary[:qty].to_s))
+      substance.more_info =  dictionary[:more_info].to_s
+      substance.description =  dictionary[:description].to_s
+      substance
   }
   rule(:der => simple(:der),
        ) {
@@ -275,7 +292,8 @@ class ParseDose
   def initialize(qty=nil, unit=nil)
     puts "ParseDose.new from #{qty.inspect} #{unit.inspect} #{unit.inspect}" if VERBOSE_MESSAGES
     if qty and (qty.is_a?(String) || qty.is_a?(Parslet::Slice))
-      @qty  = qty.to_s.index('.') ? qty.to_s.to_f : qty.to_s.to_i
+      string = qty.to_s.gsub("'", '')
+      @qty  = string.index('.') ? string.to_f : string.to_i
     elsif qty
       @qty  = qty.eval
     else
@@ -303,6 +321,7 @@ end
 
 class ParseSubstance
   attr_accessor  :name, :qty, :unit, :chemical_substance, :chemical_qty, :chemical_unit, :is_active_agent, :dose, :cdose, :is_excipiens
+  attr_accessor  :description, :more_info
   def initialize(name, dose=nil)
     puts "ParseSubstance.new from #{name.inspect} #{dose.inspect}" if VERBOSE_MESSAGES
     @name = name.to_s.split(/\s/).collect{ |x| x.capitalize }.join(' ').strip
@@ -474,6 +493,9 @@ class ParseComposition
     puts "ParseComposition.new from #{source.inspect} @substances #{@substances.inspect}" if VERBOSE_MESSAGES
     @source = source.to_s
   end
+  def ParseComposition.reset
+    @@errorHandler = HandleSwissmedicErrors.new( ErrorsToFix )
+  end
   def ParseComposition.report
     @@errorHandler.report
   end
@@ -484,6 +506,9 @@ class ParseComposition
     cleaned = string.gsub(/^"|["\n\.]+$/, '')
     value = nil
     puts "ParseComposition.from_string #{string}" if VERBOSE_MESSAGES
+    cleaned = @@errorHandler.apply_fixes(cleaned)
+    puts "ParseComposition.new cleaned #{cleaned}" if VERBOSE_MESSAGES and not cleaned.eql?(string)
+
     SubstanceTransformer.clear_substances
     result = ParseComposition.new(cleaned)
     parser3 = CompositionParser.new
