@@ -10,7 +10,7 @@ require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
 
 RunAllCompositionsTests = false # takes over a minute!
-RunAllTests = false
+RunAllTests = true
 RunFailingSpec = false
 RunMostImportantParserTests = true
 RunExcipiensTest = true
@@ -274,6 +274,28 @@ describe ParseSubstance do
   # run_substance_tests(tests)           if RunAllTests
   # run_substance_tests( {   "acari allergeni extractum 50'000 U.:" => 'Acari Allergeni Extractum', })
   if RunMostImportantParserTests
+    context "should parse a complex composition" do
+      source = 'globulina equina (immunisé avec coeur) 8 mg'
+      source = 'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg'
+      composition = ParseSubstance.from_string(source)
+    end
+
+    context "should return correct substance for 9,11-linolicum " do
+      substance = nil; composition = nil
+      [ "9,11-linolicum",
+      #  "9,11-linolicum 3.25 mg"
+      ].each {
+          |string|
+          substance = ParseSubstance.from_string(string)
+          specify { expect(substance.name).to eq '9,11-linolicum' }
+          specify { expect(substance.chemical_substance).to eq nil }
+          composition = ParseComposition.from_string(string)
+        }
+
+      specify { expect(substance.qty).to eq 3.25}
+      specify { expect(substance.unit).to eq 'mg' }
+    end if TryRun
+
     context "should return correct substance for 'pyrazinamidum 500 mg'" do
       string = "pyrazinamidum 500 mg"
       substance = ParseSubstance.from_string(string)
@@ -281,19 +303,6 @@ describe ParseSubstance do
       specify { expect(substance.qty).to eq 500.0 }
       specify { expect(substance.unit).to eq 'mg' }
     end
-
-    context "should return correct substance for 9,11-linolicum " do
-      string = "acidum 9,11-linolicum"
-      string = "acidum 9,11-linolicum 3.25 mg"
-      substance = ParseSubstance.from_string(string)
-
-      composition = ParseComposition.from_string(string)
-      specify { expect(substance.to_s.eql?(composition.substances.first.to_s)).to eq true }
-      specify { expect(substance.name).to eq 'Acidum 9,11-linolicum' }
-      specify { expect(substance.qty).to eq 3.25}
-      specify { expect(substance.unit).to eq 'mg' }
-      specify { expect(substance.chemical_substance).to eq nil }
-    end if TryRun
 
     context "should return correct substance for 'Xenonum(133-xe) 74 -740 Mb'" do
       string = "Xenonum(133-Xe) 74 -740 MBq"
@@ -334,8 +343,6 @@ describe ParseSubstance do
       pp substance
 
       composition = ParseComposition.from_string(string)
-      pp composition
-      binding.pry
       specify { expect(substance.name).to eq 'Calcii Lactas Pentahydricus' }
       specify { expect(substance.qty).to eq 25.0}
       specify { expect(substance.unit).to eq 'mg' }
@@ -408,15 +415,10 @@ describe ParseSubstance do
     specify { expect(substance.unit).to eq 'ml' }
   end
 
-  context "should parse a complex composition" do
-    source = 'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg'
-    composition = ParseSubstance.from_string(source)
-  end
  end
   context "should return correct substance for 'toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg'" do
     string = "toxoidum pertussis 25 µg et haemagglutininum filamentosum 15 µg"
     substance = ParseSubstance.from_string(string)
-    pp substance;    binding.pry
     specify { expect(substance.name).to eq 'Toxoidum Pertussis' }
     specify { expect(substance.qty).to eq 25.0}
     specify { expect(substance.unit).to eq 'µg' }
@@ -430,7 +432,6 @@ describe ParseSubstance do
   context "should return correct substance for corresp with two et substances" do
     string = "viperis antitoxinum equis F(ab')2 corresp. Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50 mus et Vipera ammodytes > 1000 LD50 mus"
     substance = ParseSubstance.from_string(string)
-    pp substance;    binding.pry
     specify { expect(substance.name).to eq 'Toxoidum Pertussis' }
     specify { expect(substance.qty).to eq 25.0}
     specify { expect(substance.unit).to eq 'µg' }
@@ -450,7 +451,7 @@ describe ParseComposition do
 "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg"
     composition = ParseComposition.from_string(source)
     pp composition
-    binding.pry
+    # binding.pry
     specify { expect(composition.source).to eq source }
 
     specify { expect(composition.label).to eq 'I' }
