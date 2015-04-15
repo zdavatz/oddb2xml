@@ -162,9 +162,8 @@ class SubstanceParser < DoseParser
   rule(:substance_residui) { str('residui:')    >> space >> substance }
   rule(:substance_conserv) { str('conserv.:')   >> space >> substance }
   rule(:substance_corresp) { substance.as(:substance) >>str('corresp.') >> space >>  (str('suspensio reconstituta') >> space).maybe >>
-                             (substance_et | substance).as(:substance_corresp)  }
+                             (substance).as(:substance_corresp)  }
   rule(:substance_ut) { substance.as(:substance_ut) >> space >> str('ut') >> space >> substance }
-  rule(:substance_et) { (substance.as(:substance) >> str('et') >> space).repeat(1) >> (substance_corresp | substance).as(:substance) }
   rule(:praeparatio) { ((identifier >> space?).repeat(1).as(:description) >> str(':') >> space).maybe>>
                        (identifier >> space?).repeat(1).as(:substance_name) >>
                         number.as(:qty) >> space >> str('U.:') >> space >>
@@ -172,11 +171,11 @@ class SubstanceParser < DoseParser
                         space?
                        }
 
-  #rule(:one_substance) { (str(',') >> space).maybe >> (excipiens) } # Sometimes it is handy for debugging to be able to debug just one the different variants
-  rule(:one_substance) { (str(',') >> space).maybe >> (der | excipiens | praeparatio | histamin | named_substance | substance_residui | substance_conserv | substance_et | substance_ut | substance_corresp | substance ) }
-#  rule(:one_substance) { (str(',') >> space).maybe >> ( substance | excipiens) }
-  rule(:one_substance) { ( substance_et | praeparatio | substance | excipiens) >> (str(',') >> space).maybe  }
-  rule(:all_substances) { one_substance.repeat(1) }
+  rule(:substance_separator) { (comma | str('et')) >> space? }
+# rule(:one_substance) { (der | excipiens | praeparatio | histamin | named_substance | substance_residui | substance_conserv | substance_ut | substance_corresp | substance ) >> substance_separator }
+# rule(:one_substance) { excipiens >> substance_separator.maybe} # Sometimes it is handy for debugging to be able to debug just one the different variants
+  rule(:one_substance) { praeparatio | substance_corresp | substance }
+  rule(:all_substances) { (one_substance >> substance_separator.maybe).repeat(1) }
   root :all_substances
 end
 

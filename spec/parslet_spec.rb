@@ -9,7 +9,7 @@ require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
 
-RunAllCompositionsTests = false # takes over a minute!
+RunAllCompositionsTests = false # takes over two minutes!
 RunFailingSpec = false
 RunExcipiensTest = true
 RunDoseTests = true
@@ -307,9 +307,9 @@ describe ParseSubstance do
     }
   run_substance_tests(failing_tests)   if RunFailingSpec
   run_substance_tests(excipiens_tests) if RunExcipiensTest
-  # run_substance_tests(tests)           if RunAllTests
+  run_substance_tests(tests)           if RunFailingSpec
   run_composition_tests( ["acari allergeni extractum 50'000 U.",
-                          "pollinis allergeni extractum 50'000 U.: fraxinus excelsior, conserv.: phenolum, excipiens ad solutionem pro 1 ml."]) if false
+                          "pollinis allergeni extractum 50'000 U.: fraxinus excelsior, conserv.: phenolum, excipiens ad solutionem pro 1 ml."])
   if RunMostImportantParserTests
     context "should return correct substance for given with et (IKSNR 11879)" do
       string = "calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg"
@@ -329,6 +329,7 @@ describe ParseSubstance do
       string = "calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg corresp. calcium 100 mg"
 
       composition = ParseComposition.from_string(string)
+      # pp composition.substances; binding.pry
       specify { expect(composition.substances.size).to eq 3 }
       calcium = composition.substances.find{ |x| /calcium/i.match(x.name) }
       pentahydricus = composition.substances.find{ |x| /pentahydricus/i.match(x.name) }
@@ -499,8 +500,6 @@ describe ParseComposition do
     source =
 "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg"
     composition = ParseComposition.from_string(source)
-    pp composition
-    # binding.pry
     specify { expect(composition.source).to eq source }
 
     specify { expect(composition.label).to eq 'I' }
