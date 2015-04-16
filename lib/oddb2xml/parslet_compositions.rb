@@ -38,16 +38,13 @@ class DoseParser < Parslet::Parser
   rule(:radio_isotop) { match['a-zA-Z'].repeat(1) >> lparen >> digits >> str('-') >> match['a-zA-Z'].repeat(1-3) >> rparen >>
                         ((space? >> match['a-zA-Z']).repeat(1)).repeat(0)
                         } # e.g. Xenonum (133-Xe) or yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt
-  rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.%'].repeat(0) }
+  rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.'].repeat(0) }
   # handle stuff like acidum 9,11-linolicum specially. it must contain at least one a-z
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
-  rule(:identifier_with_comma) { match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_,\(']).maybe >> (match['0-9a-zA-Z\-\)'] | umlaut)).repeat(0) }
+  rule(:identifier_with_comma) { match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_,']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0) }
   rule(:one_word) { identifier_with_comma }
   rule(:in_parent) { lparen >> one_word.repeat(1) >> rparen }
   rule(:words_nested) { one_word.repeat(1) >> in_parent.maybe >> space? >> one_word.repeat(0) }
-  rule(:name_with_parenthesis) {
-    (match('[a-zA-Z]') >> ((match('[0-9]') >> space >> match('[a-zA-Z]')).maybe >>match('[a-zA-Z_\- \(\)]')).repeat) >> space?
-  }
   # dose
   rule(:dose_unit)      { (
                            str('% V/V') |
@@ -64,7 +61,6 @@ class DoseParser < Parslet::Parser
                            str('ml') |
                            str('mmol') |
                            str('U.I.') |
-#                           str('U.I') |
                            str('U.') |
                            str('Mia. U.') |
                            str('%')
@@ -72,9 +68,7 @@ class DoseParser < Parslet::Parser
   rule(:qty_range)       { (number >> space? >> str('-') >> space? >> number).as(:qty_range) }
   rule(:qty_unit)       { (qty_range | dose_qty) >> space? >> dose_unit }
   rule(:dose_qty)       { number.as(:qty) }
-  rule(:dose)           { (qty_unit | dose_qty |dose_unit) >>
-                          space?
-#                          (space >> (str('ad pulverem') | str('pro charta') | str('pro dosi') )).repeat(0)
+  rule(:dose)           { (qty_unit | dose_qty |dose_unit) >> space?
                         }
   root :dose
 
@@ -114,161 +108,132 @@ class SubstanceParser < DoseParser
   rule(:operator)   { match('[+]') >> space? }
 
   # Grammar parts
-  rule(:farbstoff) { ((str('antiox.:') | str('color.:'))  >> space).maybe >>  (str('E').as(:farbstoff) >> space >> digits.as(:digits) >> match['(a-z)'].repeat(0,3)) } # Match Wirkstoffe like E 270
+  rule(:farbstoff) { ((str('antiox.:') | str('color.:') | str('conserv.:'))  >> space).maybe >>
+                     (str('E').as(:farbstoff) >>
+                      space >> digits.as(:digits) >> match['(a-z)'].repeat(0,3)) >>
+                      space? >> dose.maybe >> space?
+
+                   } # Match Wirkstoffe like E 270
   # rule(:name_simple_part) { ((identifier_with_comma) >> space?).repeat(1) }
   rule(:name_simple_part) { ((identifier_with_comma | identifier) >> space?).repeat(1) }
   rule(:substance_in_parenthesis) { (name_complex_part >>  space?).repeat(1) >> (comma >> (name_simple_part >> space?).repeat(0)).repeat(0) }
   rule(:name_complex_part) { identifier |
-#                             str('>') |
-                            # digit.repeat >> space >> dose_unit.absent? >> any.repeat | # match stuff like typus 1 inactivatum
                             space? >> lparen >> substance_in_parenthesis >> space? >> rparen >> digit.repeat(0,1) >> str('-like:').maybe      # Match name_with_parenthesis like  (D-Antigen)
                            }
   rule(:der) { (str('DER:')  >> space >> (digit >> match['\.-']).maybe >> digit >> str(':') >> digit).as(:der) } # DER: 1:4 or DER: 3.5:1 or DER: 6-8:1
-  rule(:substance_name) { ( # first come the strings which may not be part of a substance name
-                           (str('corresp.') |
-#                            str('aqua ad iniectabilia q.s. ad solutionem pro')
-                            str('et') |
-                            str('ad') |
-                            str('ut') |
-                            str('ad pulverem') |
+  rule(:forbidden_in_substance_name) {
+                           str(', corresp.') |
+                           str('corresp.') |
+                            str('et ') |
+                            str('ut ') |
+                            str('aqua q.s. ad') |
+                            (digits.repeat(1) >> space >> str(':')) | # match 50 %
+                            str('ad globulos') |
+#                            str('ana') |
+#                            str('partes') |
                             str('ad pulverem') |
                             str('ad suspensionem') |
-                            str('ad solutionem pro') |
+                            str('q.s. ad solutionem') |
+                            str('ad solutionem') |
+                            str('ad emulsionem') |
                             str('excipiens')
-                           ).absent? >> one_word >> space?).repeat(1)
-                        }
-# excipiens ad solutionem pro 3 ml corresp. 50 µg
-#                                  34
-# aqua ad iniectabilia q.s. ad solutionem pro 5 ml
-#                                                 49
-# excipiens ad pulverem corresp. suspensio reconstituta
-#                      22                              54
-# ginseng extractum 40 mg corresp. ginsenosidea 1.6 mg
-#                         25
+    }
+  rule(:name_without_parenthesis) { ((str('(') | forbidden_in_substance_name).absent? >> (str('> 1000') | str('> 500') | one_word) >> space?).repeat(1) }
 
-#  rule(:simple_substance) { substance_name >> (space >> dose >> space?).as(:dose).maybe }
-# calcium 10 mg
-#            12
-#  rule(:simple_substance) { (substance_name.as(:substance_name) >> (space >> dose).maybe).as(:substance)}
-# excipiens ad solutionem pro 2 ml
-#                         25
+  rule(:name_with_parenthesis) {
+    ((str('(') | forbidden_in_substance_name).absent? >> (one_word|digit) >> space?).repeat(1) >> # match typus 1 s, too
+    str('(') >> one_word >> str(')') >> space?
+  }
+  rule(:name_with_parenthesis_neu) {
+    (str('(').absent? >> any).repeat(1) >> str('(') >>
+    (str(')').absent? >> any).repeat(1) >>
+     str(')')
+  }
+  rule(:substance_name) { der | name_with_parenthesis | name_without_parenthesis }
+  rule(:substance_name) { name_with_parenthesis | name_without_parenthesis }
   rule(:simple_substance) { (substance_name.as(:substance_name) >> (space? >> dose.as(:dose)).maybe)}
-  rule(:substance3) { identifier }
+
   rule(:ad_pulverem_pro) {
                      str('excipiens ad pulverem pro').as(:excipiens) >> space >> dose.as(:dose_pro).maybe
     }
   rule(:ad_pulverem) {
                      str('excipiens ad pulverem corresp. suspensio reconstituta') >> space? >> dose.as(:dose_pro) |
-                     str('excipiens ad pulverem')
+                     str('excipiens ad pulverem') |
+                     str('ad pulverem') |
+                     str('excipiens ad globulos')
   }
-# excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V
-#                                  34
+# excipiens ad emulsionem pro 1 g
   rule(:ad_solutionem) {
-                     str('excipiens ad solutionem pro') >> space >> dose.as(:ad_solutionem).maybe >>
-                        (space? >> str('corresp.') >> space >> dose.as(:dose_corresp).maybe).maybe
+#                        str('ana partes') >> space >> dose.as(:dose_corresp) >> space? |
+                        str('q.s. ad solutionem') |
+#                        ((str('ad solutionem') | str('ana partes ad') | str('aqua q.s. ad') | str('excipiens ad')) >>
+                        ((str('ad solutionem') | str('aqua q.s. ad') | str('excipiens ad')) >>
+                         space  >> match(['a-z']).repeat(1) >> space >>
+                          (str('pro') >>  space >> dose.as(:dose_corresp)).maybe >>
+                          ( (str(', corresp.') | str('corresp.')) >> space >>
+                            (
+                             dose.as(:dose_corresp) |
+                             simple_substance.as(:substance_corresp)
+                            )
+                          ).maybe >>
+                        space?
+                        )
     }
   rule(:substance_corresp) {
-                    simple_substance >> space? >> str('corresp.') >> space >> simple_substance
+                    simple_substance >> space? >> ( str('corresp.') | str(', corresp.')) >> space >> simple_substance.as(:substance_corresp)
     }
-# aqua q.s. ad suspensionem
+
   rule(:aqua) { (str('aqua q.s. ad suspensionem pro') | str('aqua ad iniectabilia q.s. ad solutionem pro')).as(:substance_name) >>
                 space?  >> dose.as(:dose).maybe
               }
-  rule(:substance) {  aqua |
+  rule(:substance_ut) {
+                    simple_substance.as(:substance_ut) >> space? >> str('ut ') >> space? >> simple_substance >> space?
+    }
+
+  rule(:substance) {  ((one_word >> space?).repeat(1).as(:description) >> str(':') >> space).maybe >>
+                      simple_substance
+                   }
+  rule(:substance_more_info) { # e.g. "acari allergeni extractum 5000 U.:
+      ((identifier|digits) >> space?).repeat(1).as(:more_info) >> space? >> (str('U.:') | str(':')) >> space?
+    }
+  rule(:substance_more_info) { str('substance_more_info deactivated') }
+
+  rule(:substance_lead) {
+                      str('conserv.:').as(:conserv) >> space? |
+                      str('color.:').as(:color) >> space? |
+                      str('arom.:').as(:arom) >> space? |
+                      str('residui:').as(:residui) >> space? |
+                      substance_more_info
+    }
+  rule(:substance) { farbstoff |
+                     ((der.absent? >> substance_lead).maybe  >> space? >>
+                    ( aqua |
+                      substance_ut |
+                      substance_name >> space >> ad_solutionem |
                       ad_solutionem.as(:excipiens) |
                       substance_corresp |
+                      str('conserv.:').as(:conserv).maybe >> space? >>
+                      str('residui:').as(:residui).maybe >> space? >>
                       simple_substance  |
                       ad_pulverem_pro.as(:excipiens) |
                       ad_pulverem.as(:excipiens) |
-# is okay                     str('excipiens ad pulverem pro 1000 mg')
-                     str('excipiens pro compresso')
-# excipiens ad solutionem pro 3 ml corresp. 50 µg
-
+                      str('excipiens pro compresso')
+                    ) )
                    }
-  rule(:substance3) { str('excipiens').as(:excipiens).maybe >> space? >>
-                     str('ad pulverem').as(:ad_pulverem).maybe >> space? >>
-                     str('ad solutionem pro 2 ml').maybe >>
-                     str('ad solutionem').as(:ad_solutionem).maybe >> space? >>
-#                     str('ad solutionem pro').as(:ad_solutionem) >> space? >> # >> dose.as(:ad_dose)).maybe >>
-#                     str('ad suspensionem').as(:ad_suspensionem).maybe >> space? >>
-#                        str('ad suspensionem').as(:ad_suspensionem).maybe >> space? >>
-#                      (str('corresp.') >> space).maybe >> # simple_substance.as(:substance_corresp) ).maybe >>
-#                      (str('corresp.') >> space >> dose.maybe >> space?).maybe >> # simple_substance.as(:substance_corresp) ).maybe >>
-#                      (str('corresp.') >> space >> dose.maybe).maybe >> # simple_substance.as(:substance_corresp) ).maybe >>
-#                      str('corresp. 50 µg') >>
-                    space?
-#                      simple_substance.maybe
-#  >> (space? >> str('corresp.')>> space? >> simple_substance.as(:substance_corresp)).maybe >>
-#                      substance_name >> space? >>
-#      (str('ad solutionem pro').as(:ad_solutionem) >> space >> str('1 ml')).maybe >>
-#      space >> dose.maybe.as(:dose)
-  }
-  rule(:substanceSome) { simple_substance }
-  rule(:substanceALT) {  aqua |
-                      farbstoff |
-                      ((str('ut').as(:ut) >> space).maybe >>
-#                       (str('ad solutionem pro').as(:ad_solutionem) >> space).maybe >>
-                       handle_excipiens.maybe >>
-                       (
-                        radio_isotop |
-                        substance_name
-                       ).as(:substance_name) >>
-                      (space? >> dose.maybe.as(:dose))) >>
-                      (space >> (str('ad solutionem pro') ).maybe >> space? >> dose.as(:ad_solutionem).maybe).maybe >>
-                   space?
-                     }
-
-  rule(:handle_excipiens) { (str('excipiens') |  str('excipiens ad solutionem pro'))>>  space }
-
-  rule(:excipiens) { (str('excipiens') >> space >>
-                      (str('pro compresso').as(:pro_compresso)).maybe |
-                      (str('ad pulverem').as(:ad_pulverem) >>
-                          (space >> str('corresp. suspensio reconstituta').as(:name_corresp)  >> space? >> dose.as(:dose_x1).maybe).maybe >>
-                          (space >> str('pro charta').as(:pro_charta)).maybe >>
-                          (space >> str('pro').as(:pro) >> space >> dose.as(:dose3)).maybe
-                      ) |
-                      ((
-                        ((str('ad emulsionem').as(:ad_emulsionem) |
-                          str('aqua q.s. ad suspensionem pro').as(:ad_suspensionem) |
-                          str('ad solutionem pro').as(:ad_solutionem_pro) |
-                          str('pro dosi') |
-                          str('corresp.') # | (space >> name_simple_part)
-                         ) >>
-                          (space >> dose.as(:dose4).maybe  ).maybe >>
-                        space?
-                        )
-                       ) >> ( space? >> str('corresp.') >>
-                             (space  >> dose.as(:dose_corresp)).maybe >>
-                             (space >> str('pro dosi')).maybe).maybe
-                      ) #|
-#                          space? >> (substance_name >> space >> dose)
-#                          space? >> (match(['a-zA-Z']).repeat(1)).as(:substance_name) >>  (space >> dose.as(:dose) ) >> str('impossible')
-                     ).as(:excipiens)
-                     }
+  # rule(:substance) { substance_name >> space? >> ad_solutionem }
   rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
-  rule(:named_substance) { (identifier >> space?).repeat(1).as(:substance_name) >> dose.as(:dose).maybe >> str(':') >>
-                           (space >> (identifier >> space? >> dose.as(:dose).maybe >> (space? >> str('et') >> space?).maybe).repeat(1)).maybe}
-#  rule(:substance_residui) { str('residui:')    >> space >> simple_substance.as(:residui) }
-#  rule(:substance_conserv) { str('conserv.:')   >> space >> simple_substance.as(:conserv) }
-#  rule(:substance_corresp) { substance >>str('corresp.') >> space >>  (str('suspensio reconstituta') >> space).maybe >>
-#                             (simple_substance).as(:substance_corresp)  }
-#  rule(:substance_ut) { substance.as(:substance_before_ut) >> space >> str('ut') >> space >> simple_substance.as(:substance_ut) }
-# acari allergeni extractum 50'000 U.:
-#                                     37
-  rule(:praeparatio) { ((identifier >> space?).repeat(1).as(:description) >> str(':') >> space).maybe>>
-                       (identifier >> space?).repeat(1).as(:substance_name) >>
-                        number.as(:qty) >> space >> str('U.:') >> space? >>
-                        (identifier.as(:more_info) >> space?).maybe
-                       }
+  rule(:praeparatio){ ((one_word >> space?).repeat(1).as(:description) >> str(':') >> space).maybe >>
+# rule(:praeparatio){ substance_more_info.maybe >>
+                      (identifier >> space?).repeat(1).as(:substance_name) >>
+                      number.as(:qty) >> space >> str('U.:') >> space? >>
+                      ((identifier >> space?).repeat(1).as(:more_info) >> space?).maybe
+                    }
 
-  rule(:substance_separator) { (comma | str('et')) >> space? }
-# rule(:one_substance) { (der | excipiens | praeparatio | histamin | named_substance | substance_residui | substance_conserv | substance_ut | substance_corresp | substance ) >> substance_separator }
-# rule(:one_substance) { excipiens >> substance_separator.maybe} # Sometimes it is handy for debugging to be able to debug just one the different variants
-#  rule(:one_substance) { praeparatio | substance_corresp | substance | excipiens}
-  rule(:one_substance) { (praeparatio | substance).as(:substance) }
-#  rule(:all_substances) { (one_substance >> substance_separator.maybe).repeat(1) }
-  rule(:all_substances) { (one_substance >> substance_separator.maybe).repeat(1) }
- # rule(:all_substances) { substance.as(:substance) }
+  rule(:substance_separator) { (comma | str('et ')) >> space? }
+  rule(:one_substance)       { (praeparatio | histamin | substance) }
+  rule(:one_substance)       { (substance) }
+  rule(:one_substance)       { (histamin | substance | praeparatio).as(:substance) }
+  rule(:all_substances)      { (one_substance >> substance_separator.maybe).repeat(1) }
   root :all_substances
 end
 
@@ -300,21 +265,32 @@ class SubstanceTransformer < DoseTransformer
       @@substances << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
   }
   rule(:substance_name => simple(:substance_name),
+       :conserv => simple(:conserv),
+       :dose => simple(:dose),
+       ) {
+    |dictionary|
+      puts "#{__LINE__}: dictionary #{dictionary}"
+      substance = ParseSubstance.new(dictionary[:substance_name], ParseDose.new(dictionary[:dose].to_s))
+      @@substances <<  substance
+      substance.more_info =  dictionary[:conserv].to_s.sub(/:$/, '')
+  }
+  rule(:substance_name => simple(:substance_name),
+       :residui => simple(:residui),
+       ) {
+    |dictionary|
+      puts "#{__LINE__}: dictionary #{dictionary}"
+      substance = ParseSubstance.new(dictionary[:substance_name])
+      @@substances <<  substance
+      substance.more_info =  dictionary[:residui].to_s.sub(/:$/, '')
+  }
+  rule(:substance_name => simple(:substance_name),
        :qty => simple(:qty),
        ) {
     |dictionary|
       puts "#{__LINE__}: dictionary #{dictionary}"
       @@substances << ParseSubstance.new(dictionary[:substance_name].to_s.strip, ParseDose.new(dictionary[:qty].to_s))
   }
-  rule(:substance_name => simple(:substance_name),
-       :ut => simple(:ut),
-       :dose => simple(:dose),
-       ) {
-    |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}"
-      @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
-      nil
-  }
+
   rule(:substance_name => simple(:substance_name),
        :dose_corresp => simple(:dose_corresp),
        ) {
@@ -370,11 +346,42 @@ class SubstanceTransformer < DoseTransformer
        binding.pry
     @@substances << ParseSubstance.new(dictionary[:substance_name])
   }
+
+  rule(:substance_name => simple(:substance_name),
+       :substance_ut => sequence(:substance_ut),
+       :dose => simple(:dose),
+       ) {
+    |dictionary|
+      puts "#{__LINE__}: dictionary #{dictionary}"
+ #      binding.pry
+      @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
+      nil
+  }
+
+  rule(:substance_name => simple(:substance_name),
+       :substance_ut => sequence(:substance_ut),
+       ) {
+    |dictionary|
+      puts "#{__LINE__}: dictionary #{dictionary}"
+#         binding.pry
+      @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, nil)
+      nil
+  }
+
+  rule(:substance_name => simple(:substance_name),
+       :dose => simple(:dose),
+       :more_info => simple(:more_info)) {
+    |dictionary|
+        puts "#{__LINE__}: dictionary #{dictionary}"
+        substance = ParseSubstance.new(dictionary[:substance_name], ParseDose.new(dictionary[:dose].to_s))
+        substance.more_info = dictionary[:more_info].to_s
+        @@substances <<  substance
+  }
 end
 
 class CompositionParser < SubstanceParser
 
-  rule(:composition) { (all_substances.as(:all_substances) ) }
+  rule(:composition) { all_substances }
   rule(:label) {
      (
                            str('V') |
@@ -391,7 +398,7 @@ class CompositionParser < SubstanceParser
     (  (str('):')  | str(')')) >> (space? >> (match(/[^:]/).repeat(1)).as(:label_description)  >> str(':')).maybe
       ) >> space
   }
-  rule(:expression_comp) { label.maybe >> composition.as(:composition) }
+  rule(:expression_comp) { label.maybe >>  composition.as(:composition) }
   root :expression_comp
 end
 
@@ -447,8 +454,9 @@ class ParseSubstance
     @name.sub!(/\bad suspensionem\b/i, 'ad suspensionem')
     @name.sub!(/\bad solutionem\b/i, 'ad solutionem')
     @name.sub!(/\bpro compresso\b/i, 'pro compresso')
-    @name.sub!(/\bq.s.\b/i, 'q.s.')
     @name.sub!(/\bpro\b/i, 'pro')
+    @name.sub!(/ Q\.S\. /i, ' q.s. ')
+    @name.sub!(/\s+\bpro$/i, '')
     if dose
       @qty = dose.qty
       @unit = dose.unit
@@ -487,7 +495,6 @@ class ParseSubstance
     name = result.first.to_s if result.is_a?(Array) and result.first.is_a?(Parslet::Slice)
     return ParseSubstance.new(name) if name
     # result = result.first if result.is_a?(Array) and result.first.is_a?(Array)
-    # binding.pry
     if result.is_a?(Array)
       if result.first.is_a?(ParseSubstance)
         substance = result.first
@@ -504,13 +511,14 @@ class ParseSubstance
       end
       if result.first.is_a?(Hash) and result.first[:excipiens]
         if result.first[:excipiens].is_a?(Hash) and result.first[:excipiens]
-          substance = ParseSubstance.new(string)
+          # substance = ParseSubstance.new(string) TODO: should we use a long name for excipiens?
+          substance = ParseSubstance.new('Excipiens')
           substance.is_excipiens = true
           substance.dose  = result.first[:excipiens][:dose]         if result.first[:excipiens][:dose]
+          substance.dose  = result.first[:excipiens][:dose_pro]     if substance.dose == nil and result.first[:excipiens][:dose_pro]
           substance.cdose = result.first[:excipiens][:dose_corresp] if result.first[:excipiens][:dose_corresp]
           if result.first[:excipiens][:substance_corresp]
             chemical_name = result.first[:excipiens][:substance_corresp][:substance_name].to_s
-        binding.pry
             substance.chemical_substance = ParseSubstance.new(chemical_name)
           end
           return substance
@@ -523,27 +531,37 @@ class ParseSubstance
         end
         if val = result.first[:excipiens]
           binding.pry unless /excipiens/i.match(string)
-          name = val[:pro] ? val[:pro].to_s + ' ' : ''
-          name += val[:dose_corresp].to_s  + ' ' if val[:dose_corresp]
-          name += val[:ad_pulverem].to_s   + ' ' if val[:ad_pulverem]
+          # TODO: Should we use long or short names for excipiens?
+          # name = val[:dose_pro] ? val[:dose_pro].to_s + ' ' : ''
+          # name += val[:dose_corresp].to_s  + ' ' if val[:dose_corresp]
+          # name += val[:ad_pulverem].to_s   + ' ' if val[:ad_pulverem]
           name  = name.sub(/^excipiens /i, '')
           substance = ParseSubstance.new(name, ParseDose.new(val[:qty].to_s, val[:unit].to_s))
+          binding.pry
           substance.is_excipiens = true
         end unless substance.is_a?(ParseSubstance)
         return substance
       end
-      substance = result.first[:substance] if result.first[:substance]
-      substance = substance[:substance] if substance.is_a?(Hash) and substance[:substance]
-      substance = substance.first if substance.is_a?(Array)
-      substance ||= result.first[:substance_et] if result.first[:substance_et]
-      substance ||= result.first[:substance_corresp] if result.first[:substance_corresp]
+#      binding.pry
+      result = result.first if result.is_a?(Array) and result.size == 1
+      substance = nil
+      substance ||= result.first if result.is_a?(Array) and result.first.is_a?(ParseSubstance)
+      substance ||= result.first[:substance] if result.first.is_a?(Hash) and result.first[:substance]
+      substance ||= result.first.first if result.first.is_a?(Array) and result.first.first.is_a?(ParseSubstance)
+      substance ||= substance[:substance] if substance.is_a?(Hash) and substance[:substance]
+      return substance
+      substance ||= substance.first if substance.is_a?(Array)
+      substance ||= result.first[:substance_et] if result.first.is_a?(Hash) and result.first[:substance_et]
+      substance ||= result.first[:substance_corresp] if result.first.is_a?(Hash) and result.first[:substance_corresp]
       if result.first[:substance].is_a?(Hash) and result.first[:substance][:excipiens].is_a?(Parslet::Slice)
         name =  result.first[:substance][:excipiens].to_s
         substance = ParseSubstance.new(name, nil)
+          binding.pry
         substance.is_excipiens = true
       elsif result.first[:substance].is_a?(Hash) and result.first[:substance][:excipiens].is_a?(Hash)
         name = 'excipiens'
         substance = ParseSubstance.new(name, result.first[:substance][:excipiens][:ad_solutionem])
+          binding.pry
         substance.is_excipiens = true
         return substance
       end
@@ -560,7 +578,6 @@ class ParseSubstance
         substance.dose = new_dose
       end
       if result.first[:substance_corresp]
-        binding.pry
         if result.first[:substance_corresp].is_a?(Array)
           substance.chemical_substance = result.first[:substance_corresp].find{ |x| x.is_a?(Hash) and x[:substance_et] }[:substance_et]
           # substance.chemical_substance = result.first[:substance_corresp].first[:substance_et]
@@ -632,7 +649,11 @@ end
 class ParseComposition
   attr_accessor   :source, :label, :label_description, :substances, :galenic_form, :route_of_administration
 
-  ErrorsToFix = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => '\1, \2' }
+  ErrorsToFix = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => '\1, \2',
+                  /(excipiens ad solutionem pro \d+ ml), corresp\./ => '\1 corresp.',
+                  # excipiens ad solutionem pro 1 ml
+                  "F(ab')2" => "F_ab_2",
+                }
   @@errorHandler = HandleSwissmedicErrors.new( ErrorsToFix )
 
   def initialize(source)
@@ -650,8 +671,11 @@ class ParseComposition
     self
   end
   def ParseComposition.from_string(string)
-    return nil if string.eql?('.') or string.eql?('')
-    cleaned = string.gsub(/^"|["\n\.]+$/, '')
+    return nil if string == nil or  string.eql?('.') or string.eql?('')
+    # cleaned = string.gsub(/^"|[^IU]["\n\.]+$/, '')
+    cleaned = string.gsub(/^"|["\n]+$/, '')
+    return nil unless cleaned
+    cleaned = cleaned.sub(/[\.]+$/, '') unless /(U\.I\.|U\.)$/.match(cleaned)
     value = nil
     puts "ParseComposition.from_string #{string}" if VERBOSE_MESSAGES
     cleaned = @@errorHandler.apply_fixes(cleaned)
@@ -663,9 +687,11 @@ class ParseComposition
     transf3 = SubstanceTransformer.new
     puts "#{__LINE__}: ==>  #{parser3.parse_with_debug(cleaned)}" if VERBOSE_MESSAGES
     ast = transf3.apply(parser3.parse(cleaned))
+    # pp ast; binding.pry
     result.source = string
     result.label              = ast[:label].to_s             if ast[:label]
     result.label_description  = ast[:label_description].to_s if ast[:label_description]
+
     if ast.is_a?(Parslet::Slice)
     else
       ast.find_all{|x| x.is_a?(ParseSubstance)}.each{ |x| result.substances << x }
