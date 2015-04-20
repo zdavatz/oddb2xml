@@ -14,6 +14,7 @@ include Oddb2xml
 describe Oddb2xml::Calc do
   RunAllTests = true
 
+
   after(:each) do
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, '*.*')))
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, 'downloads', '*')))
@@ -292,6 +293,7 @@ if RunAllTests
       m = />.*  /.match(xml)
       m.should eq nil
       doc = REXML::Document.new xml
+      puts xml; binding.pry
       gtin = '7680540151009'
       ean12 = '7680' + sprintf('%05d',tst_naropin.iksnr_A) + sprintf('%03d',tst_naropin.pack_K)
       ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
@@ -397,7 +399,7 @@ if RunAllTests
     bifidobacterium =  info.compositions.first.substances.find{ |x| x.name.match(/Bifidobacterium/i) }
     specify { expect(bifidobacterium).not_to eq nil}
     if bifidobacterium
-      specify { expect(bifidobacterium.name).to eq  'Bifidobacterium Infantis Min.' }
+      specify { expect(bifidobacterium.name).to eq  'Bifidobacterium Infantis' }
       skip { expect(bifidobacterium.qty.to_f).to eq  '10^9'}
       skip { expect(bifidobacterium.unit).to eq  'CFU'}
     end
@@ -513,10 +515,10 @@ if RunAllTests
     specify { expect(fluticasoni.name).to eq  'Fluticasoni-17 Propionas' }
     specify { expect(fluticasoni.qty.to_f).to eq  100.0 }
     specify { expect(fluticasoni.unit).to eq  'µg/25 mg' }
-    specify { expect(fluticasoni.dose).to eq  "100 µg/25 mg" }
+    specify { expect(fluticasoni.dose.to_s).to eq  "100 µg/25 mg" }
     lactosum =  info.first.substances.find{ |x| x.name.match(/Lactosum/i) }
     specify { expect(lactosum.name).to eq "Lactosum Monohydricum Q.s. Ad Pulverem Pro" }
-    specify { expect(lactosum.dose).to eq  "25 mg" }
+    specify { expect(lactosum.dose.to_s).to eq  "25 mg" }
   end
 
   context 'find correct result compositions for stuff with percents' do
@@ -582,7 +584,7 @@ if RunAllTests
     if substance3
       specify { expect(substance3.name).to eq                            'Amiloridi Hydrochloridum Dihydricum' }
       specify { expect(substance3.chemical_substance.name).to eq         'Amiloridi Hydrochloridum Anhydricum' }
-      specify { expect(substance3.qty.to_f).to eq  5 }
+      specify { expect(substance3.qty.to_f).to eq  5.67 }
       specify { expect(substance3.unit).to eq  'mg' }
       specify { expect(substance3.chemical_substance.qty.to_f).to eq  5.67 }
       specify { expect(substance3.chemical_substance.unit).to eq  'mg' }
@@ -622,7 +624,7 @@ Solvens: aqua ad iniectabilia q.s. ad suspensionem pro 1 ml."
     substance1 =  info.compositions.first.substances.find{ |x| x.name.match(/virus rabiei inactivatu/i) }
     specify { expect(substance1).should_not be  nil }
     if substance1
-      specify { expect(substance1.name).to eq  'Virus Rabiei Inactivatum (Stamm: Wistar Rabies PM/WI 38-1503-3M)' }
+      specify { expect(substance1.name).to eq  'Virus Rabiei Inactivatum (stamm: Wistar Rabies Pm/wi 38-1503-3m)' }
     end
     substance2 =  info.compositions.first.substances.find{ |x| x.name.match(/albuminum humanu/i) }
     if substance2
@@ -636,13 +638,13 @@ Solvens: aqua ad iniectabilia q.s. ad suspensionem pro 1 ml."
     end
   end
 
-  context 'find correct result compositions for tst_grains_de_valse with chemical_dose' do
+  context "find correct result compositions for #{tst_grains_de_valse.composition_P} with chemical_dose" do
     info = Calc.new(tst_grains_de_valse.name_C, tst_grains_de_valse.package_size_L, tst_grains_de_valse.einheit_M, tst_grains_de_valse.active_substance_0, tst_grains_de_valse.composition_P)
     sennosidum =  info.compositions.first.substances.find{ |x| x.name.match(/Senn/i) }
     specify { expect(sennosidum).not_to eq nil}
     if sennosidum
       specify { expect(sennosidum.name).to eq  'Sennae Folii Extractum Methanolicum Siccum' }
-      specify { expect(sennosidum.dose).to eq  '78-104 mg' }
+      specify { expect(sennosidum.dose.to_s).to eq  '78-104 mg' }
       specify { expect(sennosidum.qty.to_f).to eq  78.0}
       specify { expect(sennosidum.unit).to eq  'mg'}
       specify { expect(sennosidum.chemical_substance.name).to eq  'Sennosidum B' }
@@ -672,7 +674,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
     if viscum
       specify { expect(viscum.name).to eq  'Viscum Album (mali) Recens' }
       specify { expect(viscum.is_active_agent).to eq  true }
-      specify { expect(viscum.dose).to eq  '0.01 mg/ml' }
+      specify { expect(viscum.dose.to_s).to eq  '0.01 mg/ml' }
       specify { expect(viscum.qty.to_f).to eq  0.01}
       specify { expect(viscum.unit).to eq  'mg/ml'}
       specify { expect(viscum.chemical_substance.name).to eq  nil }
@@ -692,7 +694,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
     specify { expect(viscum).not_to eq nil}
     if viscum
       specify { expect(viscum.name).to eq  'Viscum Album (mali) Recens' }
-      specify { expect(viscum.dose).to eq  '0.01 mg/ml' }
+      specify { expect(viscum.dose.to_s).to eq  '0.01 mg/ml' }
       specify { expect(viscum.qty.to_f).to eq  0.01}
       specify { expect(viscum.unit).to eq  'mg/ml'}
       specify { expect(viscum.chemical_substance.name).to eq  nil }
@@ -703,7 +705,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
     specify { expect(argenti).not_to eq nil}
     if argenti
       specify { expect(argenti.name).to eq  'Argenti Carbonas' }
-      skip  { expect(argenti.dose).to eq  '0.01 mg/ml' } # 100 mg/ml
+      skip  { expect(argenti.dose.to_s).to eq  '0.01 mg/ml' } # 100 mg/ml
       skip  { expect(argenti.qty.to_f).to eq  0.01}
       skip  { expect(argenti.unit).to eq  'mg/ml'}
       specify { expect(argenti.chemical_substance.name).to eq  nil }

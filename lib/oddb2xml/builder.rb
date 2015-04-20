@@ -647,6 +647,7 @@ module Oddb2xml
             next unless row and row.cells[0] and row.cells[0].value and row.cells[0].value.to_i > 0
             iksnr               = "%05i" % row.cells[0].value.to_i
             seqnr               = "%02d" % row.cells[1].value.to_i
+            puts "#{Time.now}: At row #{row_nr} iksnr #{iksnr}" if row_nr % 250 == 0
             no8                 = sprintf('%05d',row.cells[0].value.to_i) + sprintf('%03d',row.cells[10].value.to_i)
             name                = row.cells[2].value
             atc_code            = row.cells[5]  ? row.cells[5].value  : nil

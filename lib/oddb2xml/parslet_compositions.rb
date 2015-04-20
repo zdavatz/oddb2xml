@@ -24,8 +24,7 @@ module ParseUtil
       |line|
       composition =  ParseComposition.from_string(line)
       if composition and composition.substances.size > 0
-        composition.substances.
-    each {
+        composition.substances.each {
           |substance_item|
           substance_item.is_active_agent = (active_agents.find {|x| x.downcase.eql?(substance_item.name.downcase) } != nil)
           substance_item.is_active_agent = true if substance_item.chemical_substance and active_agents.find {|x| x.downcase.eql?(substance_item.chemical_substance.name.downcase) }
@@ -56,7 +55,7 @@ class DoseParser < Parslet::Parser
       str('-').maybe >> (
         str('0') | (match('[1-9]') >> match('[0-9\']').repeat)
       ) >> (
-            match(['.,']) >> digit.repeat(1)
+            match(['.,^']) >> digit.repeat(1)
       ).maybe >> (
         match('[eE]') >> (str('+') | str('-')).maybe >> digit.repeat(1)
       ).maybe
@@ -82,6 +81,7 @@ class DoseParser < Parslet::Parser
                            str('guttae') |
                            str('mg/ml') |
                            str('MBq') |
+                           str('CFU') |
                            str('mg') |
                            str('Mg') |
                            str('kJ') |
@@ -100,7 +100,8 @@ class DoseParser < Parslet::Parser
   rule(:qty_range)       { (number >> space? >> str('-') >> space? >> number).as(:qty_range) }
   rule(:qty_unit)       { dose_qty >> space? >> dose_unit.maybe }
   rule(:dose_qty)       { number.as(:qty) }
-  rule(:dose)           { ( (qty_range >> space? >> dose_unit.maybe) | (qty_unit | dose_qty |dose_unit)) >> space?
+  rule(:dose)           { (str('min.') >> space?).maybe >>
+                          ( (qty_range >> space? >> dose_unit.maybe) | (qty_unit | dose_qty |dose_unit)) >> space?
                         }
   root :dose
 
@@ -152,7 +153,7 @@ class SubstanceParser < DoseParser
                      (str('E').as(:farbstoff) >>
                       space >> (digits >> match['(a-z)'].repeat(0,3)).as(:digits)
                      ) >>
-                      space? >> dose.maybe >> space?
+                      space? >> dose.as(:dose_farbstoff).maybe >> space?
 
                    } # Match Wirkstoffe like E 270
   rule(:der) { (str('DER:')  >> space >> digit >> match['0-9\.\-:'].repeat).as(:der)
@@ -161,9 +162,11 @@ class SubstanceParser < DoseParser
                            str(', corresp.') |
                            str('corresp.') |
                             str('et ') |
+                            str('min. ') |
                             str('ut ') |
                             str('ut alia: ') |
                             str('ut alia: ') |
+                            str('pro dosi') |
                             str('pro capsula') |
                             (digits.repeat(1) >> space >> str(':')) | # match 50 %
                             str('ad globulos') |
@@ -187,13 +190,16 @@ class SubstanceParser < DoseParser
                                               one_word) >> space?).repeat(1)
   }
 
+  rule(:part_with_parenthesis) { lparen >> ( (lparen | rparen).absent? >> any).repeat(1) >>
+                                 (part_with_parenthesis | rparen >> str('-like:') | rparen  ) >> space?
+                               }
   rule(:name_with_parenthesis) {
-    (str('(').absent? >> any).repeat(1) >> str('(') >>
-    (str(')').absent? >> any).repeat(1) >>
-     str(')')
+    forbidden_in_substance_name.absent? >>
+    (lparen.absent? >> any).repeat(0) >> part_with_parenthesis >>
+    (forbidden_in_substance_name.absent? >> (one_word | part_with_parenthesis|rparen) >> space?).repeat(0)
   }
   rule(:substance_name) { der | farbstoff | name_with_parenthesis | name_without_parenthesis >> str('.').maybe }
-  rule(:simple_substance) { (substance_name.as(:substance_name) >> (space? >> dose.as(:dose)).maybe)}
+  rule(:simple_substance) { (substance_name.as(:substance_name) >> (space? >> dose.as(:dose )).maybe) >> str('pro dosi').maybe}
 
   rule(:pro_dose) { str('pro') >>  space >> dose.as(:dose_corresp) }
 
@@ -203,7 +209,7 @@ class SubstanceParser < DoseParser
 
     # TODO: what does ut alia: impl?
   rule(:substance_ut) {
-    simple_substance.as(:substance_ut) >>
+    (substance_lead.maybe >> simple_substance).as(:substance_ut) >>
   (space? >> str('ut ')  >>
    space? >> str('alia:').absent? >>simple_substance.as(:for_ut)
   ).repeat(1) >>
@@ -241,7 +247,7 @@ class SubstanceParser < DoseParser
 
   rule(:substance_lead) {
                       str('residui:').as(:residui) >> space? |
-                      str('mineralia:').as(:mineralia) >> space? |
+                      str('mineralia').as(:mineralia) >> str(':') >> space? |
                       str('Solvens:').as(:solvens) >> space? |
                       substance_more_info
     }
@@ -260,17 +266,14 @@ class SubstanceParser < DoseParser
   rule(:substance) {
     solvens |
     der |
-    substance_lead.maybe >>
-    (
-      excipiens.as(:excipiens) |
-      farbstoff |
-      substance_ut |
-      substance_more_info.maybe >> simple_substance >> corresp_substance.maybe >> space?
-    )
+    excipiens.as(:excipiens) |
+    farbstoff |
+    substance_ut |
+    substance_more_info.maybe >> simple_substance >> corresp_substance.maybe >> space?
                      }
   rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
   rule(:praeparatio){ ((one_word >> space?).repeat(1).as(:description) >> str(':') >> space?).maybe >>
-                      (identifier >> space?).repeat(1).as(:substance_name) >>
+                      (name_with_parenthesis | name_without_parenthesis).repeat(1).as(:substance_name) >>
                       number.as(:qty) >> space >> str('U.:') >> space? >>
                       ((identifier >> space?).repeat(1).as(:more_info) >> space?).maybe
                     }
@@ -334,6 +337,7 @@ class SubstanceTransformer < DoseTransformer
        ) {
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+#      @@substances << ParseSubstance.new(dictionary[:substance_ut].to_s)
       nil
   }
   rule(:for_ut => sequence(:for_ut),
@@ -389,14 +393,23 @@ class SubstanceTransformer < DoseTransformer
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
       substance = ParseSubstance.new(dictionary[:substance_name])
       substance.more_info =  dictionary[:mineralia].to_s.sub(/:$/, '')
-      pp substance; binding.pry
       @@substances <<  substance
+  }
+  rule(:substance_name => simple(:substance_name),
+       :more_info => simple(:more_info),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      substance = ParseSubstance.new(dictionary[:substance_name])
+      @@substances <<  substance
+      substance.more_info =  dictionary[:more_info].to_s.sub(/:$/, '')
   }
   rule(:substance_name => simple(:substance_name),
        :residui => simple(:residui),
        ) {
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+       binding.pry
       substance = ParseSubstance.new(dictionary[:substance_name])
       @@substances <<  substance
       substance.more_info =  dictionary[:residui].to_s.sub(/:$/, '')
@@ -469,10 +482,39 @@ class SubstanceTransformer < DoseTransformer
   }
 
   rule(:mineralia => simple(:mineralia),
+       :dose => simple(:dose),
+       :substance_name => simple(:substance_name),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
+      dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : ParseDose.new(dictionary[:dose].to_s)
+      substance = ParseSubstance.new(dictionary[:substance_name], dose)
+      substance.more_info = dictionary[:mineralia].to_s
+      @@substances <<  substance
+      # @@substances << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
+  }
+
+  rule(:mineralia => simple(:mineralia),
+       :dose => simple(:dose),
        :substance_ut => simple(:substance_ut),
        ) {
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
+      dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : ParseDose.new(dictionary[:dose].to_s)
+      substance = ParseSubstance.new(dictionary[:substance_ut], dose)
+      substance.more_info = dictionary[:mineralia].to_s
+       binding.pry
+      @@substances <<  substance
+      nil
+  }
+
+
+  rule(:mineralia => simple(:mineralia),
+       :substance_ut => simple(:substance_ut),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
+       binding.pry
       @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
       nil
   }
@@ -482,7 +524,8 @@ class SubstanceTransformer < DoseTransformer
        :more_info => simple(:more_info)) {
     |dictionary|
         puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-        substance = ParseSubstance.new(dictionary[:substance_name], ParseDose.new(dictionary[:dose].to_s))
+        dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : ParseDose.new(dictionary[:dose].to_s)
+        substance = ParseSubstance.new(dictionary[:substance_name], dose)
         substance.more_info = dictionary[:more_info].to_s
         @@substances <<  substance
   }
@@ -506,7 +549,7 @@ end
 class CompositionParser < SubstanceParser
 
   rule(:composition) { all_substances }
-  rule(:label) {
+  rule(:label_id) {
      (
                            str('V') |
                            str('IV') |
@@ -518,11 +561,19 @@ class CompositionParser < SubstanceParser
                            str('C') |
                            str('D') |
                            str('E')
-                          ).as(:label) >>
-    (  (str('):')  | str(')')) >> (space? >> (match(/[^:]/).repeat(1)).as(:label_description)  >> str(':')).maybe
+     )
+  }
+  rule(:label_separator) {  (str('):')  | str(')')) }
+  rule(:label) { label_id.as(:label) >>
+    (label_separator >> (space? >>
+                                    (match(/[^:]/).repeat(1)).as(:label_description)  >> str(':')
+                                  ).maybe
       ) >> space
   }
-  rule(:expression_comp) { label.maybe >>  composition.as(:composition) }
+  rule(:expression_comp) {  label_id >> label_separator >> (str(' et ') | str(' pro usu: ')) >>
+                            label_id >> label_separator >> any.repeat(1) |
+                            label.maybe >>  composition.as(:composition)
+                          }
   root :expression_comp
 end
 
@@ -533,7 +584,9 @@ class ParseDose
     if qty and (qty.is_a?(String) || qty.is_a?(Parslet::Slice))
       string = qty.to_s.gsub("'", '')
       if string.index('-') and (string.index('-') > 0)
-        @qty_range = qty
+        @qty_range = string
+      elsif string.index('^')
+        @qty  = string
       else
         @qty  = string.index('.') ? string.to_f : string.to_i
       end
@@ -548,9 +601,10 @@ class ParseDose
     self
   end
   def to_s
-    return @unit unless qty or qty_range
-    res = "#{@qty}#{qty_range}"
+    return @unit unless @qty or @qty_range
+    res = "#{@qty}#{@qty_range}"
     res = "#{res} #{@unit}" if @unit
+    res
   end
   def ParseDose.from_string(string)
     cleaned = string.sub(',', '.')
@@ -579,16 +633,15 @@ class ParseSubstance
     @name.sub!(/\bpro\b/i, 'pro')
     @name.sub!(/ Q\.S\. /i, ' q.s. ')
     @name.sub!(/\s+\bpro$/i, '')
-    if dose
-      @qty = dose.qty
-      @unit = dose.unit
-    end
+    @dose = dose if dose
     @salts = []
   end
   def qty
+    return @dose.qty_range if @dose and @dose.qty_range
     @dose ? @dose.qty : @qty
   end
   def unit
+    return @unit if @unit
     @dose ? @dose.unit : @unit
   end
   def to_string
@@ -680,7 +733,7 @@ class ParseComposition
     transf3 = SubstanceTransformer.new
     begin
       if defined?(RSpec)
-        ast = transf3.apply(parser3.parse(cleaned))
+        ast = transf3.apply(parser3.parse_with_debug(cleaned))
         puts "#{File.basename(__FILE__)}:#{__LINE__}: ==>  #{ast}" if VERBOSE_MESSAGES
       else
         ast = transf3.apply(parser3.parse(cleaned))
@@ -689,23 +742,26 @@ class ParseComposition
       puts "#{File.basename(__FILE__)}:#{__LINE__}: failed parsing ==>  #{cleaned}"
       return nil
     end
+    # pp ast; binding.pry
     result.source = string
-    result.label              = ast[:label].to_s             if ast[:label]
+    return result unless ast
+    return result if ast.is_a?(Parslet::Slice)
+    label = (ast and ast[:label]) ? ast[:label].to_s : nil
+    if label and not /((A|B|C|D|E|I|II|III|IV|\)+)\s+et\s+(A|B|C|D|E|I|II|III|IV|\))+)/.match(label)
+      result.label  = label if label
+    end
     result.label_description  = ast[:label_description].to_s if ast[:label_description]
 
-    if ast.is_a?(Parslet::Slice)
-    else
-      result.substances = SubstanceTransformer.substances
-      excipiens = SubstanceTransformer.excipiens
-      result.substances.each {
-        |substance|
-          substance.unit                    = "#{substance.unit}/#{excipiens.qty} #{excipiens.unit}"     if substance.unit
-          substance.chemical_substance.unit = "#{substance.unit}/#{excipiens.qty} #{excipiens.unit}"     if substance.chemical_substance
-      } if excipiens and excipiens.unit
-      if ast.is_a?(Array) and  ast.first.is_a?(Hash)
-        result.label              = ast.first[:label].to_s
-        result.label_description  = ast.first[:label_description].to_s
-      end
+    result.substances = SubstanceTransformer.substances
+    excipiens = SubstanceTransformer.excipiens
+    result.substances.each {
+      |substance|
+        substance.chemical_substance.unit = "#{substance.chemical_substance.unit}/#{excipiens.qty} #{excipiens.unit}"     if substance.chemical_substance
+        substance.unit                    = "#{substance.unit}/#{excipiens.qty} #{excipiens.unit}"     if substance.unit
+    } if excipiens and excipiens.unit
+    if ast.is_a?(Array) and  ast.first.is_a?(Hash)
+      result.label              = ast.first[:label].to_s
+      result.label_description  = ast.first[:label_description].to_s
     end
     return result
   end
