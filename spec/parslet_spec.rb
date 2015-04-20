@@ -532,6 +532,14 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+    context "should emit correct unit when excipiens contains pro X ml" do
+      string = 'glatiramerum acetas 20 mg corresp. glatiramerum 18 mg, mannitolum, aqua ad iniectabilia q.s. ad solutionem pro 0.5 ml.'
+      composition = ParseComposition.from_string(string)
+      specify { expect(composition.substances.first.name).to eq 'Glatiramerum Acetas' }
+      specify { expect(composition.substances.first.qty).to eq 20 }
+      specify { expect(composition.substances.first.unit).to eq 'mg/0.5 ml' }
+    end
+
     context "should handle substance with a range" do
       string = 'glyceroli monostearas 40-55'
       composition = ParseComposition.from_string(string)
@@ -908,7 +916,7 @@ Corresp. 5190 kJ pro 1 l."
       specify { expect(dihydricum.name).to eq 'Calcii Chloridum Dihydricum' }
       specify { expect(dihydricum.chemical_substance).to eq  nil }
       specify { expect(dihydricum.qty).to eq 600.0}
-      specify { expect(dihydricum.unit).to eq 'mg' }
+      specify { expect(dihydricum.unit).to eq 'mg/500 ml' }
 
       specify { expect(monohydricum.name).to eq 'Acidum Citricum Monohydricum' }
       specify { expect(monohydricum.chemical_substance).to eq nil }

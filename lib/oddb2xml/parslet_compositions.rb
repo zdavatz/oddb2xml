@@ -201,10 +201,6 @@ class SubstanceParser < DoseParser
                     simple_substance >> space? >> ( str('corresp.') | str(', corresp.')) >> space >> simple_substance.as(:substance_corresp)
     }
 
-  rule(:aqua) { (str('aqua q.s. ad suspensionem pro') | str('aqua ad iniectabilia q.s. ad solutionem pro')).as(:substance_name) >>
-                space?  >> dose.as(:dose).maybe
-              }
-
     # TODO: what does ut alia: impl?
   rule(:substance_ut) {
     simple_substance.as(:substance_ut) >>
@@ -218,9 +214,20 @@ class SubstanceParser < DoseParser
       ((identifier|digits) >> space?).repeat(1).as(:more_info) >> space? >> (str('U.:') | str(':')) >> space?
     }
 
-  rule(:excipiens)  { (str('excipiens') |
+  rule(:dose_pro) { (
+                       str('excipiens ad solutionem pro ') |
+                       str('aqua q.s. ad suspensionem pro ') |
+                       str('excipiens ad emulsionem pro ') |
+                       str('excipiens ad pulverem pro ') |
+                       str('aqua ad iniectabilia q.s. ad solutionem pro ')
+                    )  >> dose
+  }
+# aqua ad iniectabilia q.s. ad solutionem pro 0.5 ml.
+  rule(:excipiens)  { (dose_pro.as(:dose_pro) |
+                       str('excipiens') |
                        str('ad pulverem') |
                        str('pro charta') |
+                       str('aqua ad iniectabilia q.s. ad solutionem') |
                        str('ad solutionem') |
                        str('q.s. ad') |
                        str('aqua q.s. ad') |
@@ -228,7 +235,8 @@ class SubstanceParser < DoseParser
                        str('aether q.s.') |
                        str('aqua ad iniectabilia') |
                        str('ana partes')
-                      ) >> space? >> any.repeat(0)
+                      ) >> space? >>
+                      ( any.repeat(0) )
                       }
 
   rule(:substance_lead) {
@@ -276,16 +284,21 @@ end
 
 class SubstanceTransformer < DoseTransformer
   @@substances ||= []
+  @@excipiens  = nil
   def SubstanceTransformer.clear_substances
     @@substances = []
+    @@excipiens  = nil
   end
   def SubstanceTransformer.substances
     @@substances.clone
   end
+  def SubstanceTransformer.excipiens
+    @@excipiens ? @@excipiens.clone : nil
+  end
 
   rule(:solvens => simple(:solvens) ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       substance =  ParseSubstance.new(dictionary[:solvens].to_s)
       substance.more_info =  'Solvens'
       @@substances <<  substance
@@ -294,7 +307,7 @@ class SubstanceTransformer < DoseTransformer
        :more_info => simple(:more_info),
        :digits => simple(:digits)) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       substance =  ParseSubstance.new("#{dictionary[:farbstoff]} #{dictionary[:digits]}")
       substance.more_info =  dictionary[:more_info].to_s.sub(/:$/, '')
       @@substances <<  substance
@@ -302,31 +315,31 @@ class SubstanceTransformer < DoseTransformer
   rule(:farbstoff => simple(:farbstoff),
        :digits => simple(:digits)) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
       @@substances << ParseSubstance.new("#{dictionary[:farbstoff]} #{dictionary[:digits]}")
   }
   rule(:substance => simple(:substance)) {
     |dictionary|
-    puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+    puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
     dictionary[:substance]
   }
   rule(:substance_name => simple(:substance_name),
        :dose => simple(:dose),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       @@substances << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
   }
   rule(:substance_ut => sequence(:substance_ut),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       nil
   }
   rule(:for_ut => sequence(:for_ut),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       if dictionary[:for_ut].size > 1
         @@substances[-2].salts << dictionary[:for_ut].last.clone
         @@substances.delete(dictionary[:for_ut].last)
@@ -339,7 +352,7 @@ class SubstanceTransformer < DoseTransformer
        :substance_corresp => sequence(:substance_corresp),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       substance = ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
       substance.chemical_substance = @@substances.last
       @@substances.delete_at(-1)
@@ -352,7 +365,7 @@ class SubstanceTransformer < DoseTransformer
        :dose => simple(:dose),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       substance = ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
       substance.more_info = dictionary[:mineralia].to_s + ' ' + dictionary[:more_info].to_s
        # TODO: fix alia
@@ -363,7 +376,7 @@ class SubstanceTransformer < DoseTransformer
        :dose => simple(:dose),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
       substance = ParseSubstance.new(dictionary[:substance_name], ParseDose.new(dictionary[:dose].to_s))
       @@substances <<  substance
       substance.more_info =  dictionary[:conserv].to_s.sub(/:$/, '')
@@ -373,7 +386,7 @@ class SubstanceTransformer < DoseTransformer
        :mineralia => simple(:mineralia),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
       substance = ParseSubstance.new(dictionary[:substance_name])
       substance.more_info =  dictionary[:mineralia].to_s.sub(/:$/, '')
       pp substance; binding.pry
@@ -383,7 +396,7 @@ class SubstanceTransformer < DoseTransformer
        :residui => simple(:residui),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       substance = ParseSubstance.new(dictionary[:substance_name])
       @@substances <<  substance
       substance.more_info =  dictionary[:residui].to_s.sub(/:$/, '')
@@ -392,7 +405,7 @@ class SubstanceTransformer < DoseTransformer
        :qty => simple(:qty),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
       @@substances << ParseSubstance.new(dictionary[:substance_name].to_s.strip, ParseDose.new(dictionary[:qty].to_s))
   }
 
@@ -400,7 +413,7 @@ class SubstanceTransformer < DoseTransformer
        :dose_corresp => simple(:dose_corresp),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
       @@substances << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose_corresp])
   }
   rule(:description => simple(:description),
@@ -409,7 +422,7 @@ class SubstanceTransformer < DoseTransformer
        :more_info => simple(:more_info),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       substance = ParseSubstance.new(dictionary[:substance_name], ParseDose.new(dictionary[:qty].to_s))
       @@substances <<  substance
       substance.more_info =  dictionary[:more_info].to_s
@@ -419,29 +432,29 @@ class SubstanceTransformer < DoseTransformer
   rule(:der => simple(:der),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       @@substances << ParseSubstance.new(dictionary[:der].to_s)
   }
   rule(:histamin => simple(:histamin),
        ) {
     |dictionary|
-      puts "#{__LINE__}: histamin dictionary #{dictionary}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: histamin dictionary #{dictionary}"
       @@substances << ParseSubstance.new(dictionary[:histamin].to_s)
   }
   rule(:substance_name => simple(:substance_name),
        ) {
     |dictionary|
-       puts "#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
+       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
       @@substances << ParseSubstance.new(dictionary[:substance_name])
   }
   rule(:one_substance => sequence(:one_substance)) {
     |dictionary|
-       puts "#{__LINE__}: dictionary #{dictionary}"
+       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
       @@substances << ParseSubstance.new(dictionary[:one_substance])
   }
   rule(:one_substance => sequence(:one_substance)) {
     |dictionary|
-       puts "#{__LINE__}: dictionary #{dictionary}"
+       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
       @@substances << ParseSubstance.new(dictionary[:one_substance])
   }
 
@@ -450,7 +463,7 @@ class SubstanceTransformer < DoseTransformer
        :dose => simple(:dose),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
       @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
       nil
   }
@@ -459,17 +472,8 @@ class SubstanceTransformer < DoseTransformer
        :substance_ut => simple(:substance_ut),
        ) {
     |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
       @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
-      nil
-  }
-
-  rule(:substance_name => simple(:substance_name),
-       :substance_ut => sequence(:substance_ut),
-       ) {
-    |dictionary|
-      puts "#{__LINE__}: dictionary #{dictionary}"
-      @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, nil)
       nil
   }
 
@@ -477,11 +481,26 @@ class SubstanceTransformer < DoseTransformer
        :dose => simple(:dose),
        :more_info => simple(:more_info)) {
     |dictionary|
-        puts "#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+        puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
         substance = ParseSubstance.new(dictionary[:substance_name], ParseDose.new(dictionary[:dose].to_s))
         substance.more_info = dictionary[:more_info].to_s
         @@substances <<  substance
   }
+
+  rule(:excipiens => simple(:excipiens),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      @@excipiens = dictionary[:excipiens].is_a?(ParseDose) ? ParseSubstance.new('excipiens', dictionary[:excipiens]) : nil
+  }
+
+  rule(:dose_pro => simple(:dose_pro),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      dictionary[:dose_pro]
+  }
+
 end
 
 class CompositionParser < SubstanceParser
@@ -539,7 +558,7 @@ class ParseDose
     value = nil
     parser = DoseParser.new
     transf = DoseTransformer.new
-    puts "#{__LINE__}: ==>  #{parser.parse_with_debug(cleaned)}" if VERBOSE_MESSAGES
+    puts "#{File.basename(__FILE__)}:#{__LINE__}: ==>  #{parser.parse_with_debug(cleaned)}" if VERBOSE_MESSAGES
     result = transf.apply(parser.parse(cleaned))
   end
 end
@@ -662,12 +681,12 @@ class ParseComposition
     begin
       if defined?(RSpec)
         ast = transf3.apply(parser3.parse(cleaned))
-        puts "#{__LINE__}: ==>  #{ast}" if VERBOSE_MESSAGES
+        puts "#{File.basename(__FILE__)}:#{__LINE__}: ==>  #{ast}" if VERBOSE_MESSAGES
       else
         ast = transf3.apply(parser3.parse(cleaned))
       end
     rescue Parslet::ParseFailed => error
-      puts "#{__LINE__}: failed parsing ==>  #{cleaned}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: failed parsing ==>  #{cleaned}"
       return nil
     end
     result.source = string
@@ -677,8 +696,12 @@ class ParseComposition
     if ast.is_a?(Parslet::Slice)
     else
       result.substances = SubstanceTransformer.substances
-      tst3 = SubstanceTransformer.substances
-      # pp tst3; pp ast; binding.pry
+      excipiens = SubstanceTransformer.excipiens
+      result.substances.each {
+        |substance|
+          substance.unit                    = "#{substance.unit}/#{excipiens.qty} #{excipiens.unit}"     if substance.unit
+          substance.chemical_substance.unit = "#{substance.unit}/#{excipiens.qty} #{excipiens.unit}"     if substance.chemical_substance
+      } if excipiens and excipiens.unit
       if ast.is_a?(Array) and  ast.first.is_a?(Hash)
         result.label              = ast.first[:label].to_s
         result.label_description  = ast.first[:label_description].to_s
