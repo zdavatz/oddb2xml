@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'oddb2xml/util'
-require 'oddb2xml/parse_compositions'
+require 'oddb2xml/parslet_compositions'
 require 'yaml'
 
 module Oddb2xml

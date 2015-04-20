@@ -693,9 +693,9 @@ module Oddb2xml
                             xml.UNIT substance.unit
                           end
                           if substance.chemical_substance
-                            xml.CHEMICAL_SUBSTANCE  substance.chemical_substance
-                            xml.CHEMICAL_QTY  substance.chemical_qty
-                            xml.CHEMICAL_UNIT substance.chemical_unit
+                            xml.CHEMICAL_SUBSTANCE  substance.chemical_substance.name
+                            xml.CHEMICAL_QTY        substance.chemical_substance.qty
+                            xml.CHEMICAL_UNIT       substance.chemical_substance.unit
                           end
                         }
                       }

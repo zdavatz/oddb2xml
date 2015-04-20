@@ -9,7 +9,7 @@ require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
 
-RunAllCompositionsTests = true # takes about five minutes to run!
+RunAllCompositionsTests = false # takes about five minutes to run!
 # Testing whether 8937 composition lines can be parsed. Found 380 errors in 293 seconds
 # 520 examples, 20 failures, 1 pending
 

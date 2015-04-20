@@ -11,6 +11,33 @@ require 'parslet/convenience'
 include Parslet
 VERBOSE_MESSAGES = false
 
+module ParseUtil
+  def ParseUtil.capitalize(string)
+    string.split(/\s+/u).collect { |word| word.capitalize }.join(' ').strip
+  end
+
+  def ParseUtil.parse_compositions(composition_text, active_agents_string = '')
+    active_agents = active_agents_string ? active_agents_string.downcase.split(/,\s+/) : []
+    comps = []
+    lines = composition_text.gsub(/\r\n?/u, "\n").split(/\n/u)
+    lines.select {
+      |line|
+      composition =  ParseComposition.from_string(line)
+      if composition and composition.substances.size > 0
+        composition.substances.
+    each {
+          |substance_item|
+          substance_item.is_active_agent = (active_agents.find {|x| x.downcase.eql?(substance_item.name.downcase) } != nil)
+          substance_item.is_active_agent = true if substance_item.chemical_substance and active_agents.find {|x| x.downcase.eql?(substance_item.chemical_substance.name.downcase) }
+         }
+        comps << composition
+      end
+    }
+    comps << ParseComposition.new(composition_text.split(/,|:|\(/)[0]) if comps.size == 0
+    comps
+  end
+end
+
 class DoseParser < Parslet::Parser
 
   # Single character rules
@@ -522,7 +549,7 @@ class ParseSubstance
   attr_accessor  :description, :more_info, :salts
   def initialize(name, dose=nil)
     puts "ParseSubstance.new from #{name.inspect} #{dose.inspect}" if VERBOSE_MESSAGES
-    @name = name.to_s.split(/\s/).collect{ |x| x.capitalize }.join(' ').strip
+    @name = ParseUtil.capitalize(name.to_s)
     @name.sub!(/\baqua\b/i, 'aqua')
     @name.sub!(/\DER\b/i, 'DER')
     @name.sub!(/\bad pulverem\b/i, 'ad pulverem')
@@ -632,8 +659,17 @@ class ParseComposition
     result = ParseComposition.new(cleaned)
     parser3 = CompositionParser.new
     transf3 = SubstanceTransformer.new
-    puts "#{__LINE__}: ==>  #{parser3.parse_with_debug(cleaned)}" if VERBOSE_MESSAGES
-    ast = transf3.apply(parser3.parse(cleaned))
+    begin
+      if defined?(RSpec)
+        ast = transf3.apply(parser3.parse(cleaned))
+        puts "#{__LINE__}: ==>  #{ast}" if VERBOSE_MESSAGES
+      else
+        ast = transf3.apply(parser3.parse(cleaned))
+      end
+    rescue Parslet::ParseFailed => error
+      puts "#{__LINE__}: failed parsing ==>  #{cleaned}"
+      return nil
+    end
     result.source = string
     result.label              = ast[:label].to_s             if ast[:label]
     result.label_description  = ast[:label_description].to_s if ast[:label_description]
