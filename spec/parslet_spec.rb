@@ -573,6 +573,19 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+  context 'find correct result compositions for fluticasoni with chemical_dose' do
+    composition = ParseComposition.from_string('fluticasoni-17 propionas 100 µg, lactosum monohydricum q.s. ad pulverem pro 25 mg.')
+    specify { expect(composition.substances.size).to eq  2 }
+    fluticasoni =  composition.substances.find{ |x| x.name.match(/Fluticasoni/i) }
+    specify { expect(fluticasoni.name).to eq  'Fluticasoni-17 Propionas' }
+    specify { expect(fluticasoni.qty.to_f).to eq  100.0 }
+    specify { expect(fluticasoni.unit).to eq  'µg/25 mg' }
+    specify { expect(fluticasoni.dose.to_s).to eq  "100 µg/25 mg" }
+    lactosum =  composition.substances.find{ |x| x.name.match(/Lactosum/i) }
+    specify { expect(lactosum.name).to eq "Lactosum Monohydricum Q.s. Ad Pulverem Pro" }
+    specify { expect(lactosum.dose.to_s).to eq  "25 mg" }
+  end
+
     context 'find correct result Solvens (i.m.)' do
       string = "Solvens (i.m.): aqua ad iniectabilia 2 ml pro vitro"
       composition = ParseComposition.from_string(string)

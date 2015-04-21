@@ -184,6 +184,7 @@ class SubstanceParser < DoseParser
                             str('partes') |
                             str('ad pulverem') |
                             str('ad suspensionem') |
+                            str('q.s. ad pulverem') |
                             str('q.s. ad solutionem') |
                             str('ad solutionem') |
                             str('ad emulsionem') |
@@ -234,6 +235,7 @@ class SubstanceParser < DoseParser
                        str('aqua q.s. ad solutionem pro ') |
                        str('aqua q.s. ad suspensionem pro ') |
                        str('excipiens ad emulsionem pro ') |
+                       str('q.s. ad pulverem pro ') |
                        str('excipiens ad pulverem pro ') |
                        str('aqua ad iniectabilia q.s. ad solutionem pro ')
                     )  >> dose
