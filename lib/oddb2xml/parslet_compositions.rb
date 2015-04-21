@@ -288,7 +288,7 @@ class SubstanceParser < DoseParser
     excipiens.as(:excipiens) |
     farbstoff |
     substance_ut |
-    (substance_more_info.maybe >> simple_substance >> corresp_substance.maybe >> space? >> dose_pro.maybe) >> str('pro dosi').maybe
+    substance_more_info.maybe >> simple_substance >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
     # TODO: Fix this problem
     # substance_with_digits_at_end_and_dose for unknown reasons adding this as last alternative disables parsing for simple stuff like 'glyceroli monostearas 40-55'
   }
@@ -582,6 +582,7 @@ class SubstanceTransformer < DoseTransformer
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       dose = dictionary[:dose_pro].is_a?(ParseDose) ? dictionary[:dose_pro] : ParseDose.new(dictionary[:dose_pro].to_s)
       substance = ParseSubstance.new(dictionary[:substance_name], dose)
+      @@excipiens = dose
       @@substances <<  substance
   }
 
