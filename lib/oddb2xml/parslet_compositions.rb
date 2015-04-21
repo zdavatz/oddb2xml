@@ -155,6 +155,7 @@ class SubstanceParser < DoseParser
 
   # Grammar parts
   rule(:farbstoff) { (( str('antiox.:').as(:more_info) |
+                        str('Überzug:').as(:more_info) |
                         str('arom.:').as(:more_info) |
                         str('color.:').as(:more_info) |
                         str('conserv.:').as(:more_info)

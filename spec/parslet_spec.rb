@@ -582,6 +582,16 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+  context 'find correct result Überzug: E 132' do
+    # 16863 1   Salvia Wild, Tropfen
+    string  = "olanzapinum 15 mg, Überzug: E 132, excipiens pro compresso obducto."
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  2 }
+    specify { expect(composition.substances.first.name).to eq  'Olanzapinum' }
+    specify { expect(composition.substances.last.name).to eq  'E 132' }
+    binding.pry
+  end
+
   context "should handle ut followed by corresp. " do
     # 65302 1   Exviera 250 mg, Filmtabletten
     string = 'dasabuvirum 250 mg ut dasabuvirum natricum corresp. dasabuvirum natricum monohydricum 270.26 mg, excipiens pro compresso obducto'
