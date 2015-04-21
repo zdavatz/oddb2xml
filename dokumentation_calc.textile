@@ -1,0 +1,15 @@
+h1. Dokumentation für oddb2xml --calc
+
+Wenn man oddb2xml mit der Option @--calc@ aufruft, wird eine Datei @oddb_calc.xml@ erstellt, welche aufgrund diverser offener Datenquellen, (u.a. "Excel-Version Zugelassene Verpackungen":https://www.swissmedic.ch/arzneimittel/00156/00221/00222/00230/index.html?lang=de ) die Zusammensetzung aller in der Schweiz öffentlich zugelassener Medikamente im XML-Format erstellt.
+
+h2. Ziel
+
+Die Swissmedic verpackt in der Excel-Datei für die Packungsbsbeschreibung in den Spalte Q @Zusammensetzung@, eine Menge an Informationen, aus welchen Bestandteilen ein Medikament besteht. Zu einem grossen Teil folgt dies einer Syntax, für welche keine öffentlich zugängliche Dokumention zu bestehen scheint. Deshalb wurde für das Projekt ODDB.org anfangs 2015 beschlossen, die Analyse dieses Feldes von einem auf (was SW-Ingenieure) regulären Ausdrücken basierenden Algorithum auf einen echten Parser umzustellen.
+
+In diesem Dokument versuchen wir die dabei erkannten Elemente kurz zu dokumentieren und Grenzfälle und Entscheide anhand von Beispielen (mit IKSNR und Name identifiert) zu begründen.
+
+
+h2. Syntax
+
+* ratio:	Falls eine Zeile in der Zusammensetzung sow was wie @ratio: 1:10@ oder @ratio: 1:1.5-2.4@ enthält, wird das Feld "more_info" entsprechend gesetzt.
+

@@ -28,16 +28,18 @@ describe ParseComposition do
 
   context "should pass debugging" do
       # 56015 Perskindol Cool avec consoude, gel
+    string = 'thymi herbae recentis extractum aquosum liquidum, ratio: 1:1.5-2.4.'
       string = 'symphyti radicis recentis tinctura 941 mg, ratio: 1:4, levomentholum 20 mg, excipiens ad gelatum pro 1 g.'
       string = 'allii sativi maceratum oleosum 270 mg, ratio: 1:1, excipiens pro capsula'
 'allium cepa D4 85 %, allium cepa D10 10 %, allium cepa D15 5 %, calcii carbonas et xylitolum ad globulos'
       string = 'alimenti allergeni extractum 5000 U.: ovum gallinae (albumen ovi), conserv.: phenolum, excipiens ad solutionem pro 1 ml.'
+    string = 'allii sativi maceratum oleosum 270 mg, ratio: 1:1, excipiens pro capsula.'
       composition = ParseComposition.from_string(string)
       pp composition
       pp composition.substances.first
-#      binding.pry
+      # binding.pry
     end
-end if true
+end if false
 
 excipiens_tests = {
   'aether q.s. ad solutionem pro 1 g' => 'aether q.s. ad solutionem',
@@ -532,6 +534,25 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+    context "should able to handle a simple ratio" do
+      string = 'allii sativi maceratum oleosum 270 mg, ratio: 1:1, excipiens pro capsula.'
+      composition = ParseComposition.from_string(string)
+      specify { expect(composition.source).to eq string }
+      specify { expect(composition.substances.size).to eq 1 }
+      specify { expect(composition.substances.first.name).to eq 'Allii Sativi Maceratum Oleosum' }
+      specify { expect(composition.substances.first.more_info).to eq 'ratio: 1:1' }
+    end
+
+    context "should able to handle multiple ratio" do
+      # 25273   1   Schoenenberger naturreiner Heilpflanzensaft, Thymian
+      string = 'thymi herbae recentis extractum aquosum liquidum, ratio: 1:1.5-2.4.'
+      composition = ParseComposition.from_string(string)
+      specify { expect(composition.source).to eq string }
+      specify { expect(composition.substances.size).to eq 1 }
+      specify { expect(composition.substances.first.name).to eq 'Thymi Herbae Recentis Extractum Aquosum Liquidum' }
+      specify { expect(composition.substances.first.more_info).to eq 'ratio: 1:1.5-2.4' }
+    end
+
     context "should skip lines containing I) et II)" do
       string = 'V): mannitolum 40 mg pro dosi'
       composition = ParseComposition.from_string(string)

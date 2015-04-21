@@ -64,6 +64,7 @@ class DoseParser < Parslet::Parser
   rule(:radio_isotop) { match['a-zA-Z'].repeat(1) >> lparen >> digits >> str('-') >> match['a-zA-Z'].repeat(1-3) >> rparen >>
                         ((space? >> match['a-zA-Z']).repeat(1)).repeat(0)
                         } # e.g. Xenonum (133-Xe) or yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt
+  rule(:ratio_value) { match['1-9:\-\.'].repeat(1)  >> space?}  # eg. ratio: 1:1, ratio: 1:1.5-2.4.
   rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.'].repeat(0) }
   # handle stuff like acidum 9,11-linolicum specially. it must contain at least one a-z
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
@@ -259,11 +260,14 @@ class SubstanceParser < DoseParser
                             )
   }
 
+  rule(:ratio) { str('ratio:') >>  space >> ratio_value }
+
   rule(:solvens) { str('Solvens:') >> space >> (any.repeat).as(:solvens) >> space? >>
                    (substance.as(:substance) >> str('/L').maybe).maybe  >>
                     any.maybe
                 }
   rule(:substance) {
+    ratio.as(:ratio) |
     solvens |
     der |
     excipiens.as(:excipiens) |
@@ -298,6 +302,12 @@ class SubstanceTransformer < DoseTransformer
   def SubstanceTransformer.excipiens
     @@excipiens ? @@excipiens.clone : nil
   end
+
+  rule(:ratio => simple(:ratio) ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      @@substances.last.more_info = dictionary[:ratio].to_s
+  }
 
   rule(:solvens => simple(:solvens) ) {
     |dictionary|
