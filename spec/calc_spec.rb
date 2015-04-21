@@ -293,7 +293,7 @@ if RunAllTests
       m = />.*  /.match(xml)
       m.should eq nil
       doc = REXML::Document.new xml
-      puts xml; binding.pry
+#      puts xml; binding.pry
       gtin = '7680540151009'
       ean12 = '7680' + sprintf('%05d',tst_naropin.iksnr_A) + sprintf('%03d',tst_naropin.pack_K)
       ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))

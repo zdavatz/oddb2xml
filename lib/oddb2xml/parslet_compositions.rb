@@ -72,6 +72,9 @@ class DoseParser < Parslet::Parser
   rule(:identifier_with_comma) {
     match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_,']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0)
   }
+  rule(:identifier_without_comma) {
+    match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0)
+  }
   rule(:one_word) { identifier_with_comma }
   rule(:in_parent) { lparen >> one_word.repeat(1) >> rparen }
   rule(:words_nested) { one_word.repeat(1) >> in_parent.maybe >> space? >> one_word.repeat(0) }
@@ -228,6 +231,7 @@ class SubstanceParser < DoseParser
 
   rule(:dose_pro) { (
                        str('excipiens ad solutionem pro ') |
+                       str('aqua q.s. ad solutionem pro ') |
                        str('aqua q.s. ad suspensionem pro ') |
                        str('excipiens ad emulsionem pro ') |
                        str('excipiens ad pulverem pro ') |
@@ -267,7 +271,7 @@ class SubstanceParser < DoseParser
 
   rule(:ratio) { str('ratio:') >>  space >> ratio_value }
 
-  rule(:solvens) { str('Solvens:') >> space >> (any.repeat).as(:solvens) >> space? >>
+  rule(:solvens) { (str('Solvens:') | str('Solvens (i.m.):'))>> space >> (any.repeat).as(:solvens) >> space? >>
                    (substance.as(:substance) >> str('/L').maybe).maybe  >>
                     any.maybe
                 }
@@ -610,7 +614,8 @@ class CompositionParser < SubstanceParser
 end
 
 class ParseDose
-  attr_reader :qty, :unit, :qty_range
+  attr_reader :qty, :qty_range
+  attr_accessor :unit
   def initialize(qty=nil, unit=nil)
     puts "ParseDose.new from #{qty.inspect} #{unit.inspect} #{unit.inspect}" if VERBOSE_MESSAGES
     if qty and (qty.is_a?(String) || qty.is_a?(Parslet::Slice))
@@ -786,11 +791,14 @@ class ParseComposition
 
     result.substances = SubstanceTransformer.substances
     excipiens = SubstanceTransformer.excipiens
-    result.substances.each {
-      |substance|
-        substance.chemical_substance.unit = "#{substance.chemical_substance.unit}/#{excipiens.qty} #{excipiens.unit}"     if substance.chemical_substance
-        substance.unit                    = "#{substance.unit}/#{excipiens.qty} #{excipiens.unit}"     if substance.unit
-    } if excipiens and excipiens.unit
+    if excipiens and excipiens.unit
+      pro_qty = "/#{excipiens.qty} #{excipiens.unit}".sub(/\/1\s+/, '/')
+      result.substances.each {
+        |substance|
+          substance.chemical_substance.unit = "#{substance.chemical_substance.unit}#{pro_qty}"    if substance.chemical_substance
+          substance.dose.unit               = "#{substance.dose.unit}#{pro_qty}"                  if substance.unit
+      }
+    end
     if ast.is_a?(Array) and  ast.first.is_a?(Hash)
       result.label              = ast.first[:label].to_s
       result.label_description  = ast.first[:label_description].to_s

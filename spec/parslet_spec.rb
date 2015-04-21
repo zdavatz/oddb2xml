@@ -25,6 +25,50 @@ RunMostImportantParserTests = true
 ExcipiensIs_a_Substance = false #  might change later
 
 describe ParseComposition do
+
+context 'find correct result compositions for poloxamerum' do
+    string = "I): albuminum humanum colloidale 0.5 mg, stanni(II) chloridum dihydricum 0.2 mg, glucosum anhydricum, dinatrii phosphas monohydricus, natrii fytas (9:1), poloxamerum 238, q.s. ad pulverem pro vitro."
+    string = "albuminum humanum colloidale 0.5 mg, stanni(II) chloridum dihydricum 0.2 mg"
+    string = "albuminum humanum colloidale, stanni(II) chloridum dihydricum"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.first.name).to eq  'Albuminum Humanum Colloidale' }
+    pp composition.substances
+    binding.pry
+    specify { expect(composition.substances.size).to eq  7 }
+    poloxamerum =  composition.substances.find{ |x| x.name.match(/poloxamerum/i) }
+    skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
+    skip { expect(poloxamerum.qty.to_f).to eq  "" }
+    specify { expect(poloxamerum.unit).to eq  "" }
+  end
+    context "should pass several () inside a name" do
+    composition = nil
+      strings = [
+        'a(eine klammer) und nachher',
+        '(eine klammer) und nachher',
+                  'haemagglutininum influenzae A (eine klammer)' ,
+                  'haemagglutininum influenzae A (eine klammer) und nachher' ,
+                  'haemagglutininum influenzae A (H1N1) (in Klammer)' ,
+                  'haemagglutininum influenzae A (H1N1) (in, Klammer)' ,
+                  'haemagglutininum influenzae A (H1N1) or (H5N3) (in Klammer) more' ,
+                  'haemagglutininum influenzae A (H1N1) eins (second) even more' ,
+                  'ab (H1N1)-like: dummy',
+                  'Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A',
+                  'haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A)',
+                  ].each { |string|
+        composition = ParseComposition.from_string(string)
+        specify { expect(composition.substances.size).to eq 1 }
+    pp composition.substances
+    binding.pry
+      }
+      composition = ParseComposition.from_string(strings.last + ' 15 µg')
+      specify { expect(composition.substances.first.name.downcase).to eq strings.last.downcase }
+      specify { expect(composition.substances.first.qty).to eq 15 }
+      specify { expect(composition.substances.first.unit).to eq 'µg' }
+    pp composition.substances
+    binding.pry
+    end
+
+
   context "should handle WHAT???" do
     # 57900 1   Moviprep, Pulver
     string = 'macrogolum 3350 100 g, natrii sulfas anhydricus 7.5 g'
@@ -44,7 +88,6 @@ end if false
 excipiens_tests = {
   'aether q.s. ad solutionem pro 1 g' => 'aether q.s. ad solutionem',
   'saccharum ad globulos pro 1 g'  => 'saccarum',
-  "ledum palustre D3 0.2 ml ad solutionem pro 1 ml, corresp. ethanolum 35 % V/V."  => 'xx',
   'q.s. ad solutionem pro 5 ml' => 'q.s. ad solutionem pro 5 ml',
   'excipiens ad solutionem pro 1 g, corresp. ethanolum  31 % V/V.' => 'zzz',
   'excipiens ad emulsionem pro 1 1' =>  'aether q.s. ad solutionem',
@@ -140,10 +183,8 @@ substance_tests = {
 
 
 composition_tests = [
-  "A): acari allergeni extractum 50 U.: dermatophagoides farinae 50",
   "E 160(a)",
   "E 160(a), adeps lanae",
-  "I) DTPa-IPV-Komponente: toxoidum diphtheriae, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum",
   "achillea millefolium D3 2,2 mg",
   "achillea millefolium D3 2,2 mg, aconitum napellus D2 1,32 mg, arnica montana D2 2,2 mg",
   "achillea millefolium D3 2,2 mg, aconitum napellus D2 1,32 mg, arnica montana D2 2,2 mg, atropa belladonna D2 2,2 mg, bellis perennis D2 1,1 mg, calendula officinalis D2 2,2 mg, chamomilla recutita D3 2,2 mg, echinacea D2 0,55 mg, echinacea purpurea D2 0,55 mg, hamamelis virginiana D1 0,22 mg, hepar sulfuris D6 2,2 mg hypericum perforatum D2 0,66 mg, mercurius solubilis hahnemanni D8 1,1 mg, symphytum officinale D6 2,2 mg, aqua ad iniectabilia, natrii chloridum q.s. ad solutionem pro 2,2 ml.\n",
@@ -180,8 +221,6 @@ composition_tests = [
   "sennae folium 75 % corresp. hydroxyanthracenae 2.7 %",
   "viperis antitoxinum equis F(ab')2 corresp. Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50 mus et Vipera ammodytes > 1000 LD50 mus, natrii chloridum, polysorbatum 80, aqua ad iniectabilia q.s. ad solutionem pro 4 ml.",
   "xylometazolini hydrochloridum 0.5 mg, natrii hyaluronas, conserv.: E 217, E 219, natrii dehydroacetas, excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi.",
-  'A): acari allergeni extractum 50 U.: dermatophagoides farinae 50 %',
-  'V): mannitolum 40 mg pro dosi.',
   'excipiens ad pulverem corresp. suspensio reconstituta 1 ml',
   'gasum inhalationis, pro vitro',
   'toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg',
@@ -249,7 +288,6 @@ describe CompositionParser do
       'calcium 10 mg',
       'pollinis allergeni extractum (Phleum pratense) 10 U.',
       'retinoli palmitas 7900 U.I.',
-      "Praeparatio cryodesiccata: pollinis allergeni extractum 25'000 U.: urtica dioica"
       ].each {
         |id|
         it "parses substance #{id}" do
@@ -306,6 +344,7 @@ describe CompositionParser do
       'virus poliomyelitis typus inactivatum',
       'virus poliomyelitis typus inactivatum (D-Antigen)',
       'virus poliomyelitis typus 1 inactivatum (D-Antigen)',
+      'stanni(II) chloridum dihydricum',
       'DER: 1:4',
       'DER: 3-5:1',
       'DER: 6-8:1',
@@ -328,6 +367,7 @@ describe CompositionParser do
       'calcium,',
       'calcium9,',
       'excipiens pro',
+      'albuminum humanum colloidale, stanni(II) chloridum dihydricum',
       ].each {
         |id|
         let(:substance_name_parser) { parser.substance_name }
@@ -346,8 +386,6 @@ describe CompositionParser do
       'virus poliomyelitis typus inactivatum (D-Antigen)',
       'virus poliomyelitis typus 1 inactivatum (D-Antigen)',
       'toxoidum pertussis 25 µg et haemagglutininum filamentosum 15 µg',
-      'A) Rote Filmtablette: estradiolum 1 mg ut estradiolum hemihydricum, excipiens pro compresso obducto',
-      'I) Fibrinogen-Konzentrat: fibrinogenum humanum 45 mg, factor XIII 30 U.I., albuminum humanum, arginini hydrochloridum, isoleucinum, natrii hydrogenoglutamas monohydricus, natrii chloridum, natrii citras dihydricus, pro vitro'
       ].each {
         |id|
         it "parses composition #{id}" do
@@ -535,6 +573,36 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+    context 'find correct result Solvens (i.m.)' do
+      string = "Solvens (i.m.): aqua ad iniectabilia 2 ml pro vitro"
+      composition = ParseComposition.from_string(string)
+      specify { expect(composition.substances.first.name).to eq  'aqua ad iniectabilia 2 Ml pro Vitro' }
+    end
+
+    context "should handle Iscador" do
+      # 56829 sequence 3 Iscador M
+      string = 'extractum aquosum liquidum fermentatum 0.05 mg ex viscum album (mali) recens 0.01 mg, natrii chloridum, aqua q.s. ad solutionem pro 1 ml.'
+      composition = ParseComposition.from_string(string)
+      viscum =  composition.substances.find{ |x| x.name.match(/viscum/i) }
+      specify { expect(viscum.name).to eq 'Extractum Aquosum Liquidum Fermentatum 0.05 Mg Ex Viscum Album (mali) Recens' }
+      specify { expect(viscum.qty).to eq 0.01 } # 0.0001 mg/ml
+      specify { expect(viscum.unit).to eq 'mg/ml' } # 0.0001 mg/ml
+      specify { expect(viscum.dose.qty).to eq 0.01 } # 0.0001 mg/ml
+      specify { expect(viscum.dose.unit).to eq 'mg/ml' } # 0.0001 mg/ml
+      specify { expect(viscum.dose.to_s).to eq '0.01 mg/ml' } # 0.0001 mg/ml
+      specify { expect(composition.source).to eq string }
+    end
+
+  context 'find correct result compositions for poloxamerum' do
+    string = "I): albuminum humanum colloidale 0.5 mg, stanni(II) chloridum dihydricum 0.2 mg, glucosum anhydricum, dinatrii phosphas monohydricus, natrii fytas (9:1), poloxamerum 238, q.s. ad pulverem pro vitro."
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  7 }
+    poloxamerum =  composition.substances.find{ |x| x.name.match(/poloxamerum/i) }
+    skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
+    skip { expect(poloxamerum.qty.to_f).to eq  "" }
+    specify { expect(poloxamerum.unit).to eq  "" }
+  end
+
     context "should handle DER followed by corresp" do
       # 54024 1   Nieren- und Blasendragées S
       string = 'DER: 4-5:1, corresp. arbutinum 24-30 mg'
