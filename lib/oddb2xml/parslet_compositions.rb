@@ -81,6 +81,7 @@ class DoseParser < Parslet::Parser
   rule(:words_nested) { one_word.repeat(1) >> in_parent.maybe >> space? >> one_word.repeat(0) }
   # dose
   rule(:dose_unit)      { (
+                           str('g/dm²') |
                            str('% V/V') |
                            str('µg') |
                            str('guttae') |

@@ -595,8 +595,14 @@ end if RunDoseTests
 
 
 describe ParseComposition do
-  context 'handle dose followed by ratio' do
-    # 43996 1   Keppur, Salbe
+  context 'handle dose dose with g/dm²' do
+    string = 'Tela cum unguento 14 g/dm²'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq 1 }
+    specify { expect(composition.substances.first.dose.to_s).to eq  '14 g/dm²' }
+    specify { expect(composition.substances.first.name).to eq  'Tela Cum Unguento' }
+  end
+  context 'handle dose  2*10^9 CFU,' do
     string = 'saccharomyces boulardii cryodesiccatus 250 mg corresp. cellulae vivae 2*10^9 CFU, excipiens pro capsula'
     composition = ParseComposition.from_string(string)
     specify { expect(composition.substances.size).to eq 1 }
