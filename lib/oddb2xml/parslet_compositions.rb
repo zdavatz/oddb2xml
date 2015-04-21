@@ -55,6 +55,7 @@ class DoseParser < Parslet::Parser
       str('-').maybe >> (
         str('0') | (match('[1-9]') >> match('[0-9\']').repeat)
       ) >> (
+            (str('*') >>  digit.repeat(1)).maybe >>
             match(['.,^']) >> digit.repeat(1)
       ).maybe >> (
         match('[eE]') >> (str('+') | str('-')).maybe >> digit.repeat(1)
@@ -641,6 +642,8 @@ class ParseDose
       if string.index('-') and (string.index('-') > 0)
         @qty_range = string
       elsif string.index('^')
+        @qty  = string
+      elsif string.index('*')
         @qty  = string
       else
         @qty  = string.index('.') ? string.to_f : string.to_i

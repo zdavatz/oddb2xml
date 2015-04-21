@@ -224,6 +224,19 @@ end
 describe CompositionParser do
   let(:parser) { CompositionParser.new }
 
+  context "should return correct dose for 2*10^9 CFU.'" do
+    let(:dose_parse) { parser.dose }
+
+    should_pass = [
+      '2*10^9 CFU',
+      ].each {
+        |id|
+        it "parses dose #{id}" do
+          expect(dose_parse).to     parse(id)
+        end
+      }
+  end
+
   context "identifier parsing" do
     let(:identifier_parser) { parser.identifier }
 
@@ -582,6 +595,15 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+  context 'handle dose followed by ratio' do
+    # 43996 1   Keppur, Salbe
+    string = 'saccharomyces boulardii cryodesiccatus 250 mg corresp. cellulae vivae 2*10^9 CFU, excipiens pro capsula'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq 1 }
+    specify { expect(composition.substances.first.chemical_substance.dose.to_s).to eq  '2*10^9 CFU' }
+    specify { expect(composition.substances.first.name).to eq  'Saccharomyces Boulardii Cryodesiccatus' }
+  end
+
   context 'handle dose followed by ratio' do
     # 43996 1   Keppur, Salbe
     string = "symphyti radicis recentis extractum ethanolicum liquidum 280 mg ratio: 1:3-4"
