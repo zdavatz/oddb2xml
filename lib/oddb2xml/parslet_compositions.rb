@@ -9,7 +9,7 @@
 require 'parslet'
 require 'parslet/convenience'
 include Parslet
-VERBOSE_MESSAGES = true
+VERBOSE_MESSAGES = false
 
 module ParseUtil
   def ParseUtil.capitalize(string)
@@ -220,7 +220,7 @@ class SubstanceParser < DoseParser
   rule(:substance_ut) {
     (substance_lead.maybe >> simple_substance).as(:substance_ut) >>
   (space? >> str('ut ')  >>
-   space? >> str('alia:').absent? >>simple_substance.as(:for_ut)
+    space? >> str('alia:').absent? >>(excipiens | simple_substance).as(:for_ut)
   ).repeat(1) >>
     space? # >> str('alia:').maybe >> space?
   }
@@ -239,7 +239,7 @@ class SubstanceParser < DoseParser
                        str('aqua ad iniectabilia q.s. ad solutionem pro ')
                     )  >> dose.as(:dose_pro)
   }
-# aqua ad iniectabilia q.s. ad solutionem pro 0.5 ml.
+
   rule(:excipiens)  { (dose_pro |
                        str('excipiens') |
                        str('ad pulverem') |

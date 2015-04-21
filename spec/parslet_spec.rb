@@ -582,6 +582,14 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+  context 'find correct result for ut excipiens' do
+    # 16863 1   Salvia Wild, Tropfen
+    string  = "drospirenonum 3 mg, ethinylestradiolum 20 µg ut excipiens pro compresso obducto"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  2 }
+    specify { expect(composition.substances.last.name).to eq  'Ethinylestradiolum' }
+  end
+
   context 'find correct result compositions for DER: followed by corresp.' do
     # 16863 1   Salvia Wild, Tropfen
     string  = "salviae extractum ethanolicum liquidum, DER: 1:4.2-5.0 corresp. ethanolum 40 % V/V"
