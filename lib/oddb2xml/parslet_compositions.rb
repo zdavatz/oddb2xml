@@ -204,7 +204,7 @@ class SubstanceParser < DoseParser
     (lparen.absent? >> any).repeat(0) >> part_with_parenthesis >>
     (forbidden_in_substance_name.absent? >> (one_word | part_with_parenthesis | rparen) >> space?).repeat(0)
   }
-  rule(:substance_name) { der | farbstoff | name_with_parenthesis | name_without_parenthesis >> str('.').maybe >> str('pro dosi').maybe }
+  rule(:substance_name) { (der | farbstoff | name_with_parenthesis | name_without_parenthesis) >> str('.').maybe >> str('pro dosi').maybe }
   rule(:simple_substance) { (substance_name.as(:substance_name) >> (space? >> dose.as(:dose )).maybe)}
 
   rule(:pro_dose) { str('pro') >>  space >> dose.as(:dose_corresp) }
@@ -279,7 +279,7 @@ class SubstanceParser < DoseParser
   rule(:substance) {
     ratio.as(:ratio) |
     solvens |
-    der |
+    der  >> corresp_substance.maybe |
     excipiens.as(:excipiens) |
     farbstoff |
     substance_ut |
@@ -469,6 +469,16 @@ class SubstanceTransformer < DoseTransformer
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       @@substances << ParseSubstance.new(dictionary[:der].to_s)
+  }
+  rule(:der => simple(:der),
+       :substance_corresp => sequence(:substance_corresp),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      substance = ParseSubstance.new(dictionary[:der].to_s)
+      substance.chemical_substance = @@substances.last
+      @@substances.delete_at(-1)
+      @@substances <<  substance
   }
   rule(:histamin => simple(:histamin),
        ) {

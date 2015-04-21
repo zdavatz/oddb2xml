@@ -25,22 +25,6 @@ RunMostImportantParserTests = true
 ExcipiensIs_a_Substance = false #  might change later
 
 describe ParseComposition do
-  context "should handle DEF followed by corresp" do
-    # 57900 1   Moviprep, Pulver
-    string =
-'uvae ursi folii extractum aquosum siccum 108-120 mg, DER: 4-5:1, corresp. arbutinum 24-30 mg, betulae folii extractum aquosum siccum 46.25 mg, DER: 4.5-5.5:1, solidaginis herbae extractum ethanolicum siccum 40 mg, DER: 4-6:1, excipiens pro compresso obducto'
-    string = 'DER: 4-5:1, corresp. arbutinum 24-30 mg'
-      composition = ParseComposition.from_string(string)
-      pp composition
-      pp composition.substances.first
-      specify { expect(composition.source).to eq string }
-      specify { expect(composition.label).to eq 'A' }
-      specify { expect(composition.label_description).to eq nil }
-      specify { expect(composition.substances.size).to eq 2 }
-      specify { expect(composition.substances.first.name).to eq 'zzz' }
-      specify { expect(composition.substances.first.more_info).to eq 'xx' }
-      binding.pry
-    end
   context "should handle WHAT???" do
     # 57900 1   Moviprep, Pulver
     string = 'macrogolum 3350 100 g, natrii sulfas anhydricus 7.5 g'
@@ -551,12 +535,22 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+    context "should handle DER followed by corresp" do
+      # 54024 1   Nieren- und Blasendragées S
+      string = 'DER: 4-5:1, corresp. arbutinum 24-30 mg'
+      composition = ParseComposition.from_string(string)
+      specify { expect(composition.source).to eq string }
+      specify { expect(composition.label).to eq nil }
+      specify { expect(composition.label_description).to eq nil }
+      specify { expect(composition.substances.size).to eq 1 }
+      specify { expect(composition.substances.first.name).to eq 'DER: 4-5:1' }
+      specify { expect(composition.substances.first.chemical_substance.name).to eq 'Arbutinum' }
+    end
+
     context "should handle 'A): macrogolum 3350 100 g'" do
       # 57900 1   Moviprep, Pulver
       string = 'A): macrogolum 3350 100 g, natrii sulfas anhydricus 7.5 g'
       composition = ParseComposition.from_string(string)
-      pp composition
-      pp composition.substances.first
       specify { expect(composition.source).to eq string }
       specify { expect(composition.label).to eq 'A' }
       specify { expect(composition.label_description).to eq nil }
@@ -762,7 +756,6 @@ describe ParseComposition do
       if   ExcipiensIs_a_Substance
         # TODO: what should we report here? dose = pro 1 ml or 59.5 % V/V, chemical_substance = ethanolum?
         # or does it only make sense as part of a composition?
-        # pp substance; binding.pry
         specify { expect(substance.name).to eq 'Ethanolum' }
         specify { expect(substance.cdose).to eq nil }
         specify { expect(substance.qty).to eq 59.5}
