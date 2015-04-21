@@ -589,7 +589,6 @@ describe ParseComposition do
     specify { expect(composition.substances.size).to eq  2 }
     specify { expect(composition.substances.first.name).to eq  'Olanzapinum' }
     specify { expect(composition.substances.last.name).to eq  'E 132' }
-    binding.pry
   end
 
   context "should handle ut followed by corresp. " do
@@ -711,12 +710,12 @@ describe ParseComposition do
     end if RunFailingSpec
 
     context "should able to handle a simple ratio" do
-      string = 'allii sativi maceratum oleosum 270 mg, ratio: 1:1, excipiens pro capsula.'
+      string = 'allii sativi maceratum oleosum 270 mg, ratio: 1:10, excipiens pro capsula.'
       composition = ParseComposition.from_string(string)
       specify { expect(composition.source).to eq string }
       specify { expect(composition.substances.size).to eq 1 }
       specify { expect(composition.substances.first.name).to eq 'Allii Sativi Maceratum Oleosum' }
-      specify { expect(composition.substances.first.more_info).to eq 'ratio: 1:1' }
+      specify { expect(composition.substances.first.more_info).to eq 'ratio: 1:10' }
     end
 
     context "should able to handle multiple ratio" do

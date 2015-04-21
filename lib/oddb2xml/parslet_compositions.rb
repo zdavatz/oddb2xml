@@ -64,7 +64,7 @@ class DoseParser < Parslet::Parser
   rule(:radio_isotop) { match['a-zA-Z'].repeat(1) >> lparen >> digits >> str('-') >> match['a-zA-Z'].repeat(1-3) >> rparen >>
                         ((space? >> match['a-zA-Z']).repeat(1)).repeat(0)
                         } # e.g. Xenonum (133-Xe) or yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt
-  rule(:ratio_value) { match['1-9:\-\.'].repeat(1)  >> space?}  # eg. ratio: 1:1, ratio: 1:1.5-2.4.
+  rule(:ratio_value) { match['0-9:\-\.'].repeat(1)  >> space?}  # eg. ratio: 1:1, ratio: 1:1.5-2.4.
   rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.'].repeat(0) }
   # handle stuff like acidum 9,11-linolicum specially. it must contain at least one a-z
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
@@ -236,6 +236,7 @@ class SubstanceParser < DoseParser
 
   rule(:dose_pro) { (
                        str('excipiens ad solutionem pro ') |
+                       str('aqua q.s. ad gelatume pro ') |
                        str('aqua q.s. ad solutionem pro ') |
                        str('aqua q.s. ad suspensionem pro ') |
                        str('q.s. ad pulverem pro ') |
