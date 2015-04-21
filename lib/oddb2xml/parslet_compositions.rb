@@ -209,7 +209,7 @@ class SubstanceParser < DoseParser
     (forbidden_in_substance_name.absent? >> (one_word | part_with_parenthesis | rparen) >> space?).repeat(0)
   }
   rule(:substance_name) { (der | farbstoff | name_with_parenthesis | name_without_parenthesis) >> str('.').maybe >> str('pro dosi').maybe }
-  rule(:simple_substance) { (substance_name.as(:substance_name) >> (space? >> dose.as(:dose )).maybe)}
+  rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.as(:dose).maybe >> space? >> ratio.maybe}
 
   rule(:pro_dose) { str('pro') >>  space >> dose.as(:dose_corresp) }
 
@@ -231,7 +231,7 @@ class SubstanceParser < DoseParser
   }
 
   rule(:substance_more_info) { # e.g. "acari allergeni extractum 5000 U.:
-      ((identifier|digits) >> space?).repeat(1).as(:more_info) >> space? >> (str('U.:') | str(':')) >> space?
+      (str('ratio:').absent? >> (identifier|digits) >> space?).repeat(1).as(:more_info) >> space? >> (str('U.:') | str(':')) >> space?
     }
 
   rule(:dose_pro) { (
@@ -243,7 +243,7 @@ class SubstanceParser < DoseParser
                        str('excipiens ad emulsionem pro ') |
                        str('excipiens ad pulverem pro ') |
                        str('aqua ad iniectabilia q.s. ad solutionem pro ')
-                    )  >> dose.as(:dose_pro)
+                    )  >> dose.as(:dose_pro) >> space? >> ratio.maybe
   }
 
   rule(:excipiens)  { (dose_pro |

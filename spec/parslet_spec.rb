@@ -582,6 +582,14 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+  context 'handle dose followed by ratio' do
+    # 43996 1   Keppur, Salbe
+    string = "symphyti radicis recentis extractum ethanolicum liquidum 280 mg ratio: 1:3-4"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq 1 }
+    specify { expect(composition.substances.first.name).to eq  'Symphyti Radicis Recentis Extractum Ethanolicum Liquidum' }
+  end
+
   context 'find correct result Überzug: E 132' do
     # 16863 1   Salvia Wild, Tropfen
     string  = "olanzapinum 15 mg, Überzug: E 132, excipiens pro compresso obducto."
@@ -1199,10 +1207,12 @@ Corresp. 5190 kJ pro 1 l."
       specify { expect(composition.substances.first.name).to eq 'Zuclopenthixolum' }
       specify { expect(composition.substances.first.qty).to eq 2.0}
       specify { expect(composition.substances.first.salts.size).to eq 1}
-      salt = composition.substances.first.salts.first
-      specify { expect(salt.name).to eq 'Zuclopenthixoli Dihydrochloridum' }
-      specify { expect(salt.qty).to eq nil}
-      specify { expect(salt.unit).to eq nil }
+      if composition.substances.first
+        salt = composition.substances.first.salts.first
+        specify { expect(salt.name).to eq 'Zuclopenthixoli Dihydrochloridum' }
+        specify { expect(salt.qty).to eq nil}
+        specify { expect(salt.unit).to eq nil }
+      end
     end
 
     context "should return correct substance for given with et (IKSNR 11879)" do
