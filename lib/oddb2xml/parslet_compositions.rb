@@ -220,7 +220,11 @@ class SubstanceParser < DoseParser
   rule(:substance_ut) {
     (substance_lead.maybe >> simple_substance).as(:substance_ut) >>
   (space? >> str('ut ')  >>
-    space? >> str('alia:').absent? >>(excipiens | simple_substance).as(:for_ut)
+    space? >> str('alia:').absent? >>
+    (excipiens |
+    substance_name >> space? >> str('corresp.') >> space >> simple_substance |
+    simple_substance
+    ).as(:for_ut)
   ).repeat(1) >>
     space? # >> str('alia:').maybe >> space?
   }

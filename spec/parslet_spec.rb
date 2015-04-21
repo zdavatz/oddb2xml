@@ -582,6 +582,18 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+  context "should handle ut followed by corresp. " do
+    # 65302 1   Exviera 250 mg, Filmtabletten
+    string = 'dasabuvirum 250 mg ut dasabuvirum natricum corresp. dasabuvirum natricum monohydricum 270.26 mg, excipiens pro compresso obducto'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.label_description).to eq nil }
+    specify { expect(composition.substances.size).to eq 1 }
+    specify { expect(composition.substances.first.name).to eq 'Dasabuvirum' }
+    specify { expect(composition.substances.first.salts.size).to eq 1 }
+    specify { expect(composition.substances.first.salts.first.name).to eq 'Dasabuvirum Natricum Monohydricum' }
+  end
+
   context 'find correct result for ut excipiens' do
     # 16863 1   Salvia Wild, Tropfen
     string  = "drospirenonum 3 mg, ethinylestradiolum 20 µg ut excipiens pro compresso obducto"
