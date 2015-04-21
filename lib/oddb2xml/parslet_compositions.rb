@@ -9,7 +9,7 @@
 require 'parslet'
 require 'parslet/convenience'
 include Parslet
-VERBOSE_MESSAGES = true
+VERBOSE_MESSAGES = false
 
 module ParseUtil
   def ParseUtil.capitalize(string)
@@ -184,8 +184,7 @@ class SubstanceParser < DoseParser
                             str('partes') |
                             str('ad pulverem') |
                             str('ad suspensionem') |
-                            str('q.s. ad pulverem') |
-                            str('q.s. ad solutionem') |
+                            str('q.s. ') |
                             str('ad solutionem') |
                             str('ad emulsionem') |
                             str('excipiens')
@@ -205,7 +204,7 @@ class SubstanceParser < DoseParser
                                }
   rule(:name_with_parenthesis) {
     forbidden_in_substance_name.absent? >>
-    (lparen.absent? >> any).repeat(0) >> part_with_parenthesis >>
+    ((str(',') | lparen).absent? >> any).repeat(0) >> part_with_parenthesis >>
     (forbidden_in_substance_name.absent? >> (one_word | part_with_parenthesis | rparen) >> space?).repeat(0)
   }
   rule(:substance_name) { (der | farbstoff | name_with_parenthesis | name_without_parenthesis) >> str('.').maybe >> str('pro dosi').maybe }
@@ -234,14 +233,14 @@ class SubstanceParser < DoseParser
                        str('excipiens ad solutionem pro ') |
                        str('aqua q.s. ad solutionem pro ') |
                        str('aqua q.s. ad suspensionem pro ') |
-                       str('excipiens ad emulsionem pro ') |
                        str('q.s. ad pulverem pro ') |
+                       str('excipiens ad emulsionem pro ') |
                        str('excipiens ad pulverem pro ') |
                        str('aqua ad iniectabilia q.s. ad solutionem pro ')
-                    )  >> dose
+                    )  >> dose.as(:dose_pro)
   }
 # aqua ad iniectabilia q.s. ad solutionem pro 0.5 ml.
-  rule(:excipiens)  { (dose_pro.as(:dose_pro) |
+  rule(:excipiens)  { (dose_pro |
                        str('excipiens') |
                        str('ad pulverem') |
                        str('pro charta') |
@@ -289,7 +288,7 @@ class SubstanceParser < DoseParser
     excipiens.as(:excipiens) |
     farbstoff |
     substance_ut |
-    (substance_more_info.maybe >> simple_substance >> corresp_substance.maybe >> space?  >> str('pro dosi').maybe)
+    (substance_more_info.maybe >> simple_substance >> corresp_substance.maybe >> space? >> dose_pro.maybe) >> str('pro dosi').maybe
     # TODO: Fix this problem
     # substance_with_digits_at_end_and_dose for unknown reasons adding this as last alternative disables parsing for simple stuff like 'glyceroli monostearas 40-55'
   }
@@ -524,7 +523,7 @@ class SubstanceTransformer < DoseTransformer
        :substance_name => simple(:substance_name),
        ) {
     |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
       dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : ParseDose.new(dictionary[:dose].to_s)
       substance = ParseSubstance.new(dictionary[:substance_name], dose)
       substance.more_info = dictionary[:mineralia].to_s
@@ -575,6 +574,16 @@ class SubstanceTransformer < DoseTransformer
       @@excipiens = dictionary[:excipiens].is_a?(ParseDose) ? ParseSubstance.new('excipiens', dictionary[:excipiens]) : nil
   }
 
+  rule(:substance_name => simple(:substance_name),
+       :dose_pro => simple(:dose_pro),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      dose = dictionary[:dose_pro].is_a?(ParseDose) ? dictionary[:dose_pro] : ParseDose.new(dictionary[:dose_pro].to_s)
+      substance = ParseSubstance.new(dictionary[:substance_name], dose)
+      @@substances <<  substance
+  }
+
   rule(:dose_pro => simple(:dose_pro),
        ) {
     |dictionary|
@@ -602,16 +611,15 @@ class CompositionParser < SubstanceParser
      )
   }
   rule(:label_separator) {  (str('):')  | str(')')) }
-  rule(:label) { label_id.as(:label) >>
-    (label_separator >> (space? >>
-                                    (match(/[^:]/).repeat(1)).as(:label_description)  >> str(':')
-                                  ).maybe
-      ) >> space
+  rule(:label) { label_id.as(:label) >> space? >>
+    label_separator >> str(',').absent?  >>
+               (space? >> (match(/[^:]/).repeat(0)).as(:label_description)  >> str(':') >> space).maybe
   }
-  rule(:expression_comp) {  label_id >> label_separator >> (str(' et ') | str(' pro usu: ')) >>
-                            label_id >> label_separator >> any.repeat(1) |
-                            label.maybe >>  composition.as(:composition)
-                          }
+  rule(:leading_label) {    # label_id >> label_separator >> (str(' et ') | str(', ') | str(' pro usu: ') | space) >>
+                            # label_id >> label_separator >> any.repeat(1) # |
+                            label
+    }
+  rule(:expression_comp) {  leading_label.maybe >> space? >> composition.as(:composition) }
   root :expression_comp
 end
 
@@ -798,7 +806,7 @@ class ParseComposition
       result.substances.each {
         |substance|
           substance.chemical_substance.unit = "#{substance.chemical_substance.unit}#{pro_qty}"    if substance.chemical_substance
-          substance.dose.unit               = "#{substance.dose.unit}#{pro_qty}"                  if substance.unit
+          substance.dose.unit               = "#{substance.dose.unit}#{pro_qty}"                  if substance.unit and not substance.unit.eql?(excipiens.unit)
       }
     end
     if ast.is_a?(Array) and  ast.first.is_a?(Hash)

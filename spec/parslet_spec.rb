@@ -26,20 +26,6 @@ ExcipiensIs_a_Substance = false #  might change later
 
 describe ParseComposition do
 
-context 'find correct result compositions for poloxamerum' do
-    string = "I): albuminum humanum colloidale 0.5 mg, stanni(II) chloridum dihydricum 0.2 mg, glucosum anhydricum, dinatrii phosphas monohydricus, natrii fytas (9:1), poloxamerum 238, q.s. ad pulverem pro vitro."
-    string = "albuminum humanum colloidale 0.5 mg, stanni(II) chloridum dihydricum 0.2 mg"
-    string = "albuminum humanum colloidale, stanni(II) chloridum dihydricum"
-    composition = ParseComposition.from_string(string)
-    specify { expect(composition.substances.first.name).to eq  'Albuminum Humanum Colloidale' }
-    pp composition.substances
-    binding.pry
-    specify { expect(composition.substances.size).to eq  7 }
-    poloxamerum =  composition.substances.find{ |x| x.name.match(/poloxamerum/i) }
-    skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
-    skip { expect(poloxamerum.qty.to_f).to eq  "" }
-    specify { expect(poloxamerum.unit).to eq  "" }
-  end
     context "should pass several () inside a name" do
     composition = nil
       strings = [
@@ -66,8 +52,7 @@ context 'find correct result compositions for poloxamerum' do
       specify { expect(composition.substances.first.unit).to eq 'µg' }
     pp composition.substances
     binding.pry
-    end
-
+end
 
   context "should handle WHAT???" do
     # 57900 1   Moviprep, Pulver
@@ -278,6 +263,30 @@ describe CompositionParser do
     it "parses identifier_with_comma" do
       expect(identifier_with_comma_parser).to_not parse("9,11-linolicum;")
     end
+  end
+
+  context "label parsing" do
+    let(:label_parser) { parser.label }
+
+    should_pass = [
+      'A):',
+      'II)',
+      'V)',
+      'A): acari allergeni extractum 50 U.: ',
+      ].each {
+        |id|
+        it "parses label #{id}" do
+          expect(label_parser).to     parse(id)
+        end
+      }
+    should_not_pass = [
+      'I): albuminum humanum colloidale 0.5 mg,',
+      ].each {
+        |id|
+        it "parses label #{id}" do
+          expect(label_parser).to_not   parse(id)
+        end
+      }
   end
 
   context "substance parsing" do
@@ -559,7 +568,6 @@ if RunSpecificTests
     specify { expect(dose.qty).to eq 59.5}
     specify { expect(dose.unit).to eq '% V/V' }
   end
-end
 
   context "should return correct dose for '80-120 g'" do
     string = "80-120 g"
@@ -568,13 +576,34 @@ end
     specify { expect(dose.qty).to eq nil }
     specify { expect(dose.unit).to eq 'g' }
   end
-
+end
 end if RunDoseTests
 
 
 describe ParseComposition do
+  context 'find correct result compositions for 00613 Pentavac' do
+    line_1 = "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum tetani 40 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg, virus poliomyelitis typus 1 inactivatum (D-Antigen) 40 U., virus poliomyelitis typus 2 inactivatum (D-Antigen) 8 U., virus poliomyelitis typus 3 inactivatum (D-Antigen) 32 U., aluminium ut aluminii hydroxidum hydricum ad adsorptionem, formaldehydum 10 µg, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum, streptomycinum, polymyxini B sulfas, medium199, aqua q.s. ad suspensionem pro 0.5 ml."
+    line_2 = "II) Hib-Komponente (Lyophilisat): haemophilus influenzae Typ B polysaccharida T-conjugatum 10 µg, trometamolum, saccharum, pro praeparatione."
+    txt = "#{line_1}\n#{line_2}"
+    composition = ParseComposition.from_string(line_1)
+    composition = ParseComposition.from_string(line_2)
+    info = ParseUtil.parse_compositions(txt)
+
+    specify { expect(info.first.label).to eq  'I' }
+    specify { expect(info.size).to eq  2 }
+    specify { expect(info.first.substances.size).to eq  14 }
+    toxoidum =  info.first.substances.find{ |x| x.name.match(/Toxoidum Diphtheriae/i) }
+    specify { expect(toxoidum.class).to eq  Struct::ParseSubstance }
+    if toxoidum
+      specify { expect(toxoidum.name).to eq  'Toxoidum Diphtheriae' }
+      specify { expect(toxoidum.qty.to_f).to eq  30.0 }
+      specify { expect(toxoidum.unit).to eq  'U.I./0.5 ml' }
+    end
+  end
+
   context 'find correct result compositions for fluticasoni with chemical_dose' do
-    composition = ParseComposition.from_string('fluticasoni-17 propionas 100 µg, lactosum monohydricum q.s. ad pulverem pro 25 mg.')
+    string = 'fluticasoni-17 propionas 100 µg, lactosum monohydricum q.s. ad pulverem pro 25 mg.'
+    composition = ParseComposition.from_string(string)
     specify { expect(composition.substances.size).to eq  2 }
     fluticasoni =  composition.substances.find{ |x| x.name.match(/Fluticasoni/i) }
     specify { expect(fluticasoni.name).to eq  'Fluticasoni-17 Propionas' }
@@ -582,7 +611,7 @@ describe ParseComposition do
     specify { expect(fluticasoni.unit).to eq  'µg/25 mg' }
     specify { expect(fluticasoni.dose.to_s).to eq  "100 µg/25 mg" }
     lactosum =  composition.substances.find{ |x| x.name.match(/Lactosum/i) }
-    specify { expect(lactosum.name).to eq "Lactosum Monohydricum Q.s. Ad Pulverem Pro" }
+    specify { expect(lactosum.name).to eq "Lactosum Monohydricum" }
     specify { expect(lactosum.dose.to_s).to eq  "25 mg" }
   end
 
@@ -607,9 +636,10 @@ describe ParseComposition do
     end
 
   context 'find correct result compositions for poloxamerum' do
+    # 47657   1   Nanocoll, Markierungsbesteck
     string = "I): albuminum humanum colloidale 0.5 mg, stanni(II) chloridum dihydricum 0.2 mg, glucosum anhydricum, dinatrii phosphas monohydricus, natrii fytas (9:1), poloxamerum 238, q.s. ad pulverem pro vitro."
     composition = ParseComposition.from_string(string)
-    specify { expect(composition.substances.size).to eq  7 }
+    specify { expect(composition.substances.size).to eq  6 }
     poloxamerum =  composition.substances.find{ |x| x.name.match(/poloxamerum/i) }
     skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
     skip { expect(poloxamerum.qty.to_f).to eq  "" }
@@ -670,10 +700,12 @@ describe ParseComposition do
 
 
     context "should skip lines containing I) et II)" do
+      skip  { "should skip lines containing I) et II)"
       string = 'I) et II) et III) corresp.: aminoacida 48 g/l, carbohydrata 150 g/l, materia crassa 50 g/l, in emulsione recenter mixta 1250 ml'
       composition = ParseComposition.from_string(string)
       specify { expect(composition.source).to eq string }
       specify { expect(composition.substances.size).to eq 0 }
+      }
     end
 
     context "should treat correctly CFU units" do
