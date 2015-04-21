@@ -9,7 +9,7 @@
 require 'parslet'
 require 'parslet/convenience'
 include Parslet
-VERBOSE_MESSAGES = false
+VERBOSE_MESSAGES = true
 
 module ParseUtil
   def ParseUtil.capitalize(string)
@@ -165,7 +165,7 @@ class SubstanceParser < DoseParser
                       space? >> dose.as(:dose_farbstoff).maybe >> space?
 
                    } # Match Wirkstoffe like E 270
-  rule(:der) { (str('DER:')  >> space >> digit >> match['0-9\.\-:'].repeat).as(:der)
+  rule(:der) { (str('DER:')  >> space >> digit >> match['0-9\.\-:'].repeat).as(:der) >> space?
              } # DER: 1:4 or DER: 3.5:1 or DER: 6-8:1 or DER: 4.0-9.0:1'
   rule(:forbidden_in_substance_name) {
                            str(', corresp.') |
@@ -301,6 +301,7 @@ class SubstanceParser < DoseParser
                     }
 
   rule(:substance_separator) { (comma | str('et ') | str('ut alia: ')) >> space? }
+  rule(:one_substance)       { (substance).as(:substance) }
   rule(:one_substance)       { (praeparatio | histamin | substance).as(:substance) }
   rule(:all_substances)      { (one_substance >> substance_separator.maybe).repeat(1) }
   root :all_substances

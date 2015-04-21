@@ -25,7 +25,8 @@ RunMostImportantParserTests = true
 ExcipiensIs_a_Substance = false #  might change later
 
 describe ParseComposition do
-
+end
+describe ParseComposition do
     context "should pass several () inside a name" do
     composition = nil
       strings = [
@@ -581,6 +582,14 @@ end if RunDoseTests
 
 
 describe ParseComposition do
+  context 'find correct result compositions for DER: followed by corresp.' do
+    # 16863 1   Salvia Wild, Tropfen
+    string  = "salviae extractum ethanolicum liquidum, DER: 1:4.2-5.0 corresp. ethanolum 40 % V/V"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  2 }
+    specify { expect(composition.substances.last.name).to eq  'DER: 1:4.2-5.0' }
+  end
+
   context 'find correct result compositions for 00613 Pentavac' do
     line_1 = "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum tetani 40 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg, virus poliomyelitis typus 1 inactivatum (D-Antigen) 40 U., virus poliomyelitis typus 2 inactivatum (D-Antigen) 8 U., virus poliomyelitis typus 3 inactivatum (D-Antigen) 32 U., aluminium ut aluminii hydroxidum hydricum ad adsorptionem, formaldehydum 10 µg, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum, streptomycinum, polymyxini B sulfas, medium199, aqua q.s. ad suspensionem pro 0.5 ml."
     line_2 = "II) Hib-Komponente (Lyophilisat): haemophilus influenzae Typ B polysaccharida T-conjugatum 10 µg, trometamolum, saccharum, pro praeparatione."
