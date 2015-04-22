@@ -24,7 +24,6 @@ describe ParseComposition do
 to_add = %(
       pp composition; binding.pry
 )
-
 end
 describe ParseComposition do
     context "should pass several () inside a name" do
@@ -71,6 +70,13 @@ end
 end if false
 
 describe ParseComposition do
+  context 'find dose with max.' do
+    string  = "residui: formaldehydum max. 100 µg"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  1 }
+    specify { expect(composition.substances.last.name).to eq  'Formaldehydum' }
+  end
+
   context 'handle Corresp. 4000 kJ.' do
     composition = ParseComposition.from_string('Corresp. 4000 kJ.')
     specify { expect(composition.substances.size).to eq 0 }
@@ -108,6 +114,7 @@ describe ParseComposition do
     specify { expect(composition.substances.size).to eq  2 }
     specify { expect(composition.substances.first.name).to eq  'Olanzapinum' }
     specify { expect(composition.substances.last.name).to eq  'E 132' }
+    specify { expect(composition.substances.last.more_info).to eq  'Überzug' }
   end
 
   context "should handle ut followed by corresp. " do
@@ -365,7 +372,7 @@ describe ParseComposition do
       specify { expect(composition.substances.first.more_info).to eq nil }
       specify { expect(composition.substances.first.name).to eq 'Acari Allergeni Extractum (acarus Siro)' }
       specify { expect(composition.substances.last.name).to eq  'Phenolum' } # was Acari Allergeni Extractum (acarus Siro)
-      specify { expect(composition.substances.last.more_info).to eq 'conserv' }
+      specify { expect(composition.substances.last.more_info).to match 'conserv' }
     end
 
     context "should return correct composition for containing 'A): acari allergeni extractum 50 U' (IKSNR 60606)" do
@@ -1068,12 +1075,12 @@ describe ParseComposition do
       |line|
       nr += 1
       next if line.length < 5
-      puts "#{File.basename(filename)}:#{nr} #{@nrErrors} errors: #{line}" if VERBOSE_MESSAGES
+      puts "#{File.basename(AllCompositionLines)}:#{nr} #{@nrErrors} errors: #{line}" if VERBOSE_MESSAGES
       begin
         composition = ParseComposition.from_string line
     rescue Parslet::ParseFailed
       @nrErrors += 1
-      puts "#{File.basename(filename)}:#{nr} parse_error #{@nrErrors} in: #{line}"
+      puts "#{File.basename(AllCompositionLines)}:#{nr} parse_error #{@nrErrors} in: #{line}"
 #      binding.pry
 #      binding.pry if nr > 300
     end

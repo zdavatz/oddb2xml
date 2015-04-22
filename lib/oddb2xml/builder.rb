@@ -687,7 +687,7 @@ module Oddb2xml
                     xml.SUBSTANCES {
                       composition.substances.each { |substance|
                         xml.SUBSTANCE {
-                          xml.MORE_INFO substance.more_info if substance.more_info
+                          xml.MORE_INFO substance.more_info.gsub('&gt','>').gsub('&amp', '&') if substance.more_info
                           xml.SUBSTANCE_NAME substance.name
                           xml.IS_ACTIVE_AGENT substance.is_active_agent
                           if substance.unit

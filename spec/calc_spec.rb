@@ -532,7 +532,7 @@ if RunAllTests
       specify { expect(substance3.chemical_substance.name).to eq         'Amiloridi Hydrochloridum Anhydricum' }
       specify { expect(substance3.qty.to_f).to eq  5.67 }
       specify { expect(substance3.unit).to eq  'mg' }
-      specify { expect(substance3.chemical_substance.qty.to_f).to eq  5.67 }
+      specify { expect(substance3.chemical_substance.qty.to_f).to eq  5}
       specify { expect(substance3.chemical_substance.unit).to eq  'mg' }
       specify { expect(substance3.is_active_agent).to eq true }
     end
@@ -618,7 +618,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
     natrii =  info.compositions.first.substances.find{ |x| x.name.match(/natrii chloridum/i) }
     specify { expect(natrii).not_to eq nil}
     if viscum
-      specify { expect(viscum.name).to eq  'Viscum Album (mali) Recens' }
+      specify { expect(viscum.name).to eq  'Extractum Aquosum Liquidum Fermentatum 0.05 Mg Ex Viscum Album (mali) Recens' }
       specify { expect(viscum.is_active_agent).to eq  true }
       specify { expect(viscum.dose.to_s).to eq  '0.01 mg/ml' }
       specify { expect(viscum.qty.to_f).to eq  0.01}
@@ -637,7 +637,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
     viscum =  info.compositions.first.substances.find{ |x| x.name.match(/viscum/i) }
     specify { expect(viscum).not_to eq nil}
     if viscum
-      specify { expect(viscum.name).to eq  'Viscum Album (mali) Recens' }
+      specify { expect(viscum.name).to eq  'Extractum Aquosum Liquidum Fermentatum 0.05 Mg Ex Viscum Album (mali) Recens' }
       specify { expect(viscum.dose.to_s).to eq  '0.01 mg/ml' }
       specify { expect(viscum.qty.to_f).to eq  0.01}
       specify { expect(viscum.unit).to eq  'mg/ml'}
@@ -646,7 +646,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
     argenti =  info.compositions.first.substances.find{ |x| x.name.match(/Argenti/i) }
     specify { expect(argenti).not_to eq nil}
     if argenti
-      specify { expect(argenti.name).to eq  'Argenti Carbonas' }
+      specify { expect(argenti.name).to eq  'Argenti Carbonas (0,01 Ug pro 100 Mg Herba Recente)' }
       skip  { expect(argenti.dose.to_s).to eq  '0.01 mg/ml' } # 100 mg/ml
       skip  { expect(argenti.qty.to_f).to eq  0.01}
       skip  { expect(argenti.unit).to eq  'mg/ml'}

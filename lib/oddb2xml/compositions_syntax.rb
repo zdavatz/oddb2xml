@@ -84,10 +84,11 @@ class CompositionParser < Parslet::Parser
   rule(:qty_range)       { (number >> space? >> (str(' - ') | str(' -') | str('-')) >> space? >> number).as(:qty_range) }
   rule(:qty_unit)       { dose_qty >> (space >> dose_unit).maybe }
   rule(:dose_qty)       { number.as(:qty) }
-  rule(:dose)           { (str('min.') >> space?).maybe >>
+  rule(:min_max)        { (str('min.') | str('max.')) >> space? }
+  rule(:dose)           { min_max.maybe >>
                           ( (qty_range >> (space >> dose_unit).maybe) | (qty_unit | dose_qty |dose_unit)) >> space?
                            }
-  rule(:dose_with_unit) { (str('min.') >> space?).maybe >>
+  rule(:dose_with_unit) { min_max.maybe >>
                           ( qty_range >> space >> dose_unit |
                             dose_qty  >> space >> dose_unit ) >>
                           space?
@@ -95,25 +96,25 @@ class CompositionParser < Parslet::Parser
   rule(:operator)   { match('[+]') >> space? }
 
   # Grammar parts
-  rule(:farbstoff) { (( str('antiox.:').as(:more_info) |
-                        str('Überzug:').as(:more_info) |
-                        str('arom.:').as(:more_info) |
-                        str('color.:').as(:more_info) |
-                        str('conserv.:').as(:more_info)
-                      ).  >> space).maybe >>
-                     (str('E').as(:farbstoff) >>
-                      space >> (digits >> match['(a-z)'].repeat(0,3)).as(:digits)
-                     ) >>
-                      space? >> dose.as(:dose_farbstoff).maybe >> space?
+  rule(:useage) {   (any >> str('berzug:')) | # match Überzug
+                    str('antiox.:') |
+                    str('arom.:') |
+                    str('conserv.:') |
+                    str('color.:')
+                   }
+  rule(:lebensmittel_zusatz) {  str('E').as(:lebensmittel_zusatz) >> space >>
+                                (digits >> match['(a-z)'].repeat(0,3)).as(:digits) >>
+                                (space >> dose.as(:dose_lebensmittel_zusatz)).maybe >> space?
 
                    } # Match Wirkstoffe like E 270
   rule(:der) { (str('DER:')  >> space >> digit >> match['0-9\.\-:'].repeat).as(:der) >> space?
              } # DER: 1:4 or DER: 3.5:1 or DER: 6-8:1 or DER: 4.0-9.0:1'
   rule(:forbidden_in_substance_name) {
+                           useage |
+                           min_max |
                            str(', corresp.') |
                            str('corresp.') |
                             str('et ') |
-                            str('min. ') |
                             str('ut ') |
                             str('ut alia: ') |
                             str('pro dosi') |
@@ -149,10 +150,10 @@ class CompositionParser < Parslet::Parser
   rule(:substance_name) { (
                             der |
                             name_with_parenthesis |
-                            name_without_parenthesis |
-                            farbstoff) >>
+                            name_without_parenthesis
+                          ) >>
                           str('pro dosi').maybe
-                          } # 39 errors
+                          }
   rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.as(:dose).maybe >> space? >> ratio.maybe}
   rule(:simple_subtance_with_digits_in_name_and_dose)  {
     (name_without_parenthesis >> space? >> ((digits.repeat(1) >> str('%') | digits.repeat(1)))).as(:substance_name) >>
@@ -211,7 +212,7 @@ class CompositionParser < Parslet::Parser
                       ( any.repeat(0) )
                       }
 
-  rule(:substance_lead) {
+  rule(:substance_lead) { useage.as(:more_info) |
                       str('residui:').as(:more_info) >> space? |
                       str('mineralia').as(:mineralia) >> str(':') >> space? |
                       str('Solvens:').as(:solvens) >> space? |
@@ -237,9 +238,9 @@ class CompositionParser < Parslet::Parser
     solvens |
     der  >> corresp_substance.maybe |
     excipiens.as(:excipiens) |
-    farbstoff |
+    substance_lead.maybe >> space? >> lebensmittel_zusatz |
     substance_ut |
-    substance_more_info.maybe >> substance_lead.maybe >> simple_substance >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
+    substance_lead.maybe >> space? >> simple_substance >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
   }
   rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
   rule(:praeparatio){ ((one_word >> space?).repeat(1).as(:description) >> str(':') >> space?).maybe >>
@@ -248,7 +249,6 @@ class CompositionParser < Parslet::Parser
                       ((identifier >> space?).repeat(1).as(:more_info) >> space?).maybe
                     }
   rule(:substance_separator) { (comma | str('et ') | str('ut alia: ')) >> space? }
-  rule(:one_substance)       { (substance).as(:substance) }
   rule(:one_substance)       { (praeparatio | histamin | substance).as(:substance) }
   rule(:all_substances)      { (one_substance >> substance_separator.maybe).repeat(1) }
   rule(:composition)         { all_substances }
@@ -278,7 +278,7 @@ class CompositionParser < Parslet::Parser
   rule(:corresp_line) { str('Corresp. ') >> any.repeat(1).as(:corresp)  |
                         ((label_id >> label_separator >> space? >> str('et ').maybe).repeat(1) >> any.repeat(1)).as(:corresp)
   }
-#corresp_line  |
+
   rule(:expression_comp) {
     leading_label.maybe >> space? >> composition.as(:composition) >> space? >> str('.').maybe >> space? |
     corresp_line

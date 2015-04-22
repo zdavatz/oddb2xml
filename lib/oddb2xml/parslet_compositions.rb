@@ -139,20 +139,20 @@ class CompositionTransformer < Parslet::Transform
       substance.more_info =  'Solvens'
       @@substances <<  substance
   }
-  rule(:farbstoff => simple(:farbstoff),
+  rule(:lebensmittel_zusatz => simple(:lebensmittel_zusatz),
        :more_info => simple(:more_info),
        :digits => simple(:digits)) {
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      substance =  ParseSubstance.new("#{dictionary[:farbstoff]} #{dictionary[:digits]}")
+      substance =  ParseSubstance.new("#{dictionary[:lebensmittel_zusatz]} #{dictionary[:digits]}")
       substance.more_info =  dictionary[:more_info].to_s.sub(/:$/, '')
       @@substances <<  substance
   }
-  rule(:farbstoff => simple(:farbstoff),
+  rule(:lebensmittel_zusatz => simple(:lebensmittel_zusatz),
        :digits => simple(:digits)) {
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
-      @@substances << ParseSubstance.new("#{dictionary[:farbstoff]} #{dictionary[:digits]}")
+      @@substances << ParseSubstance.new("#{dictionary[:lebensmittel_zusatz]} #{dictionary[:digits]}")
   }
   rule(:substance => simple(:substance)) {
     |dictionary|
