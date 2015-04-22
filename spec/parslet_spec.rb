@@ -23,53 +23,40 @@ RunMostImportantParserTests = true
 describe ParseComposition do
 to_add = %(
       pp composition; binding.pry
+      doses pro vase 30/60
 )
 end
-describe ParseComposition do
-    context "should pass several () inside a name" do
-    composition = nil
-      strings = [
-        'a(eine klammer) und nachher',
-        '(eine klammer) und nachher',
-                  'haemagglutininum influenzae A (eine klammer)' ,
-                  'haemagglutininum influenzae A (eine klammer) und nachher' ,
-                  'haemagglutininum influenzae A (H1N1) (in Klammer)' ,
-                  'haemagglutininum influenzae A (H1N1) (in, Klammer)' ,
-                  'haemagglutininum influenzae A (H1N1) or (H5N3) (in Klammer) more' ,
-                  'haemagglutininum influenzae A (H1N1) eins (second) even more' ,
-                  'ab (H1N1)-like: dummy',
-                  'Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A',
-                  'haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A)',
-                  ].each { |string|
-        composition = ParseComposition.from_string(string)
-        specify { expect(composition.substances.size).to eq 1 }
-    pp composition.substances;   binding.pry
-      }
-      composition = ParseComposition.from_string(strings.last + ' 15 µg')
-      specify { expect(composition.substances.first.name.downcase).to eq strings.last.downcase }
-      specify { expect(composition.substances.first.qty).to eq 15 }
-      specify { expect(composition.substances.first.unit).to eq 'µg' }
-    pp composition.substances
-    binding.pry
-end
-
-  context "should handle WHAT???" do
-    # 57900 1   Moviprep, Pulver
-    string = 'macrogolum 3350 100 g, natrii sulfas anhydricus 7.5 g'
-      composition = ParseComposition.from_string(string)
-      pp composition
-      pp composition.substances.first
-      specify { expect(composition.source).to eq string }
-      specify { expect(composition.label).to eq 'A' }
-      specify { expect(composition.label_description).to eq nil }
-      specify { expect(composition.substances.size).to eq 2 }
-      specify { expect(composition.substances.first.name).to eq 'zzz' }
-      specify { expect(composition.substances.first.more_info).to eq 'xx' }
-#      binding.pry
-    end
-end if false
 
 describe ParseComposition do
+  context 'find  corresp doses pro vase.' do
+    string = "doses pro vase 30/60"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  1 }
+    specify { expect(composition.substances.last.name).to eq  'Sal Ems' }
+  end
+
+  context 'find  corresp. ca.' do
+    string  = "sal ems 100 % m/m, corresp. ca., natrium 308.7 mg/g"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  1 }
+    specify { expect(composition.substances.last.name).to eq  'Sal Ems' }
+  end
+
+  context 'find correct result Solvens (i.m.)' do
+    string = "Solvens (i.v.): aqua ad iniectabilia 5 ml, corresp. 20 mg, pro 5 ml"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.first).to eq  nil }
+  end
+
+  context 'find correct result for dose 1 Mio U.I.' do
+    string  = "phenoxymethylpenicillinum kalicum 1 Mio U.I., conserv.: E 200, excipiens pro compresso obducto"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  2 }
+    specify { expect(composition.substances.first.name).to eq  'Phenoxymethylpenicillinum Kalicum' }
+    specify { expect(composition.substances.first.dose.to_s).to eq  '1 Mio U.I.' }
+    specify { expect(composition.substances.last.name).to eq  'E 200' }
+  end
+
   context 'find dose with max.' do
     string  = "residui: formaldehydum max. 100 µg"
     composition = ParseComposition.from_string(string)

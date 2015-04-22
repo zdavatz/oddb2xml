@@ -212,6 +212,7 @@ describe CompositionParser do
     should_pass = [
       "40 U.",
       "50'000 U.I.",
+      "1 Mio. U.I.",
 #      "3,45",
 #      "123",
 #      "123.45",
@@ -324,6 +325,8 @@ describe CompositionParser do
       'calcium',
       'calcium 10 mg',
       'pollinis allergeni extractum (Phleum pratense) 10 U.',
+      'phenoxymethylpenicillinum kalicum 1 U.I.',
+      'phenoxymethylpenicillinum kalicum 1 Mio. U.I.',
       'retinoli palmitas 7900 U.I.',
       ].each {
         |id|

@@ -503,14 +503,17 @@ class ParseComposition
   end
   def ParseComposition.from_string(string)
     return nil if string == nil or  string.eql?('.') or string.eql?('')
-    # cleaned = string.gsub(/^"|[^IU]["\n\.]+$/, '')
-    cleaned = string.gsub(/^"|["\n]+$/, '')
-    return nil unless cleaned
-    cleaned = cleaned.sub(/[\.]+$/, '') unless /(U\.I\.|U\.)$/.match(cleaned)
+    stripped = string.gsub(/^"|["\n]+$/, '')
+    return nil unless stripped
+    if /(U\.I\.|U\.)$/.match(stripped)
+      cleaned = stripped
+    else
+      cleaned = stripped.sub(/[\.]+$/, '')
+    end
     value = nil
     puts "ParseComposition.from_string #{string}" if VERBOSE_MESSAGES
     cleaned = @@errorHandler.apply_fixes(cleaned)
-    puts "ParseComposition.new cleaned #{cleaned}" if VERBOSE_MESSAGES and not cleaned.eql?(string)
+    puts "ParseComposition.new cleaned #{cleaned}" if VERBOSE_MESSAGES and not cleaned.eql?(stripped)
 
     CompositionTransformer.clear_substances
     result = ParseComposition.new(cleaned)
