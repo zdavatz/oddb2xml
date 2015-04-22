@@ -38,12 +38,12 @@ class CompositionParser < Parslet::Parser
   rule(:radio_isotop) { match['a-zA-Z'].repeat(1) >> lparen >> digits >> str('-') >> match['a-zA-Z'].repeat(1-3) >> rparen >>
                         ((space? >> match['a-zA-Z']).repeat(1)).repeat(0)
                         } # e.g. Xenonum (133-Xe) or yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt
-  rule(:ratio_value) { match['0-9:\-\.'].repeat(1)  >> space?}  # eg. ratio: 1:1, ratio: 1:1.5-2.4.
+  rule(:ratio_value) { match['0-9:\-\.'].repeat(1)  >> space?}  # eg. ratio: 1:1, ratio: 1:1.5-2.4., ratio: 1:0.68-0.95
   rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.'].repeat(0) }
   # handle stuff like acidum 9,11-linolicum specially. it must contain at least one a-z
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
   rule(:identifier_D12) { match['a-zA-Z'] >>  match['0-9'].repeat(1) }
-  rule(:identifier) { str('ca.') | str('var.') | str('spec.') | identifier_D12 | identifier_without_comma }
+  rule(:identifier) { str('A + B') | str('ca.') | str('var.') | str('spec.') | identifier_D12 | identifier_without_comma }
   rule(:identifier_with_comma) {
     match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_,']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0)
   }
@@ -54,6 +54,7 @@ class CompositionParser < Parslet::Parser
   rule(:in_parent) { lparen >> one_word.repeat(1) >> rparen }
   rule(:words_nested) { one_word.repeat(1) >> in_parent.maybe >> space? >> one_word.repeat(0) }
   # dose
+  # 150 U.I. hFSH et 150 U.I. hLH
   rule(:dose_unit)      { (
                            str('g/dm²') |
                            str('% V/V') |
@@ -62,6 +63,7 @@ class CompositionParser < Parslet::Parser
                            str('guttae') |
                            str('mg/g') |
                            str('mg/ml') |
+                           str('MBq/ml') |
                            str('MBq') |
                            str('CFU') |
                            str('mg') |
@@ -74,10 +76,14 @@ class CompositionParser < Parslet::Parser
                            str('U. Ph. Eur.') |
                            str('ml') |
                            str('µmol') |
+                           str('mmol/l') |
                            str('mmol') |
                            str('Mio CFU') |
                            str('Mio U.I.') |
                            str('Mio U.') |
+                           str('U.I. hFSH') |
+                           str('U.I. hCG') |
+                           str('U.I. hLH') |
                            str('U.I.') |
                            str('U.') |
                            str('Mia.') |
@@ -119,6 +125,7 @@ class CompositionParser < Parslet::Parser
                            str('corresp. ca.,') |
                            str(', corresp.') |
                            str('corresp.') |
+                           str('ratio:') |
                             str('Mio ') |
                             str('et ') |
                             str('ut ') |
@@ -160,7 +167,7 @@ class CompositionParser < Parslet::Parser
                           ) >>
                           str('pro dosi').maybe
                           }
-  rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.as(:dose).maybe >> space? >> ratio.maybe}
+  rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.as(:dose).maybe}
   rule(:simple_subtance_with_digits_in_name_and_dose)  {
     (name_without_parenthesis >> space? >> ((digits.repeat(1) >> str('%') | digits.repeat(1)))).as(:substance_name) >>
     space >> dose_with_unit.as(:dose)
@@ -198,7 +205,7 @@ class CompositionParser < Parslet::Parser
                        str('excipiens ad emulsionem pro ') |
                        str('excipiens ad pulverem pro ') |
                        str('aqua ad iniectabilia q.s. ad solutionem pro ')
-                    )  >> dose.as(:dose_pro) >> space? >> ratio.maybe
+                    )  >> dose.as(:dose_pro) >> space? >> ratio.as(:ratio).maybe
   }
 
   rule(:excipiens)  { (dose_pro |
@@ -214,6 +221,8 @@ class CompositionParser < Parslet::Parser
                        str('saccharum ad') |
                        str('aether q.s.') |
                        str('aqua ad iniectabilia') |
+                       str('aqua ad iniectabilia') |
+                       str('q.s. pro praeparation') |
                        str('ana partes')
                       ) >> space? >>
                       ( any.repeat(0) )
@@ -229,6 +238,7 @@ class CompositionParser < Parslet::Parser
       str(', corresp. ca.,') |
       str('corresp. ca.,') |
       str('corresp.') |
+      str('corresp.,') |
       str(', corresp.')
     }
 
@@ -256,14 +266,15 @@ class CompositionParser < Parslet::Parser
     substance_lead.maybe >> space? >> lebensmittel_zusatz |
     substance_lead.maybe >> space? >> simple_substance >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
   }
+
   rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
   rule(:praeparatio){ ((one_word >> space?).repeat(1).as(:description) >> str(':') >> space?).maybe >>
                       (name_with_parenthesis | name_without_parenthesis).repeat(1).as(:substance_name) >>
                       number.as(:qty) >> space >> str('U.:') >> space? >>
                       ((identifier >> space?).repeat(1).as(:more_info) >> space?).maybe
                     }
-  rule(:substance_separator) { (comma | str('et ') | str('ut alia: ')) >> space? }
-  rule(:one_substance)       { (praeparatio | histamin | substance).as(:substance) }
+  rule(:substance_separator) { (str(', et ') | comma | str('et ') | str('ut alia: ')) >> space? }
+  rule(:one_substance)       { (praeparatio | histamin | substance).as(:substance) >> space? >> ratio.as(:ratio).maybe }
   # rule(:one_substance)       { (substance_ut).as(:substance) } # >> str('.').maybe }
   rule(:all_substances)      { (one_substance >> substance_separator.maybe).repeat(1) }
   rule(:composition)         { all_substances }

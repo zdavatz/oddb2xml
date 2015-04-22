@@ -131,6 +131,12 @@ class CompositionTransformer < Parslet::Transform
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       @@substances.last.more_info = dictionary[:ratio].to_s
   }
+  rule(:substance => sequence(:substance),
+       :ratio => simple(:ratio)) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      @@substances.last.more_info = dictionary[:ratio].to_s
+  }
 
   rule(:solvens => simple(:solvens) ) {
     |dictionary|

@@ -10,7 +10,8 @@ require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
 
 hostname = Socket.gethostbyname(Socket.gethostname).first
-RunAllCompositionsTests = /travis/i.match(hostname) # takes about five minutes to run!
+RunAllCompositionsTests = /travis/i.match(hostname) != nil # takes about five minutes to run!
+puts "hostname is #{hostname} RunAllCompositionsTests #{RunAllCompositionsTests}"
 # Testing whether 8937 composition lines can be parsed. Found 380 errors in 293 seconds
 # 520 examples, 20 failures, 1 pending
 
@@ -22,18 +23,47 @@ RunSpecificTests = true
 RunMostImportantParserTests = true
 
 describe ParseComposition do
+#
 to_add = %(
+  VERBOSE_MESSAGES = true
       pp composition; binding.pry
-      doses pro vase 30/60
 )
 end
 
 describe ParseComposition do
+  context "allow substances containing 'A + '" do
+    string = "sennosida 20 mg corresp. sennosida A + B calcica 12 mg, excipiens pro compresso obducto"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  2 }
+  end
+
+  context "allow substances separted by ', et'" do
+    string = "extractum spissum ex: echinaceae purpureae herbae recentis tinctura 1140 mg, ratio: 1:12, et echinaceae purpureae radicis recentis tinctura 60 mg, ratio: 1:11, excipiens pro compresso"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  2 }
+  end
+
+  context 'find kalium 40 mmol/l' do
+    string = "kalium 40 mmol/l, chloridum 194 mmol/l, natrium 154 mmol/l, aqua ad iniectabilia q.s. ad solutionem pro 1000 ml"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  3 }
+    specify { expect(composition.substances.first.name).to eq  'Kalium' }
+    specify { expect(composition.substances.first.dose.to_s).to eq "40 mmol/l/1000 ml" }
+  end
+
+  context 'find  corresp doses pro vase.' do
+    string = "farfarae folii recentis succus ratio: 1:0.68-0.95"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  1 }
+    specify { expect(composition.substances.last.name).to eq  'Farfarae Folii Recentis Succus' }
+    specify { expect(composition.substances.last.more_info).to eq "ratio: 1:0.68-0.95" }
+  end
+
   context 'find  corresp doses pro vase.' do
     string = "doses pro vase 30/60"
     composition = ParseComposition.from_string(string)
-    specify { expect(composition.substances.size).to eq  1 }
-    specify { expect(composition.substances.last.name).to eq  'Sal Ems' }
+    specify { expect(composition.substances.size).to eq  0 }
+    specify { expect(composition.corresp).to eq  'pro vase 30/60' }
   end
 
   context 'find  corresp. ca.' do
