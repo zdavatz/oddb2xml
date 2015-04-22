@@ -13,7 +13,12 @@ Bundler.require
 
 require 'rspec'
 require 'webmock/rspec'
+require 'pp'
 
+begin # load pry if is available
+require 'pry'
+rescue LoadError
+end
 
 module Oddb2xml
   # we override here a few directories to make input/output when running specs to
@@ -23,6 +28,9 @@ module Oddb2xml
   Downloads      = File.join(WorkDir, 'downloads')
   SpecCompressor = File.join(Oddb2xml::SpecData, 'compressor')
 end
+
+ExcipiensIs_a_Substance = false #  might change later
+AllCompositionLines = File.expand_path("#{__FILE__}/../data/compositions.txt")
 
 require 'oddb2xml'
 

@@ -500,7 +500,7 @@ if RunAllTests
     specify { expect(info.size).to eq  2 }
     specify { expect(info.first.substances.size).to eq  14 }
     toxoidum =  info.first.substances.find{ |x| x.name.match(/Toxoidum Diphtheriae/i) }
-    specify { expect(toxoidum.class).to eq  Struct::ParseSubstance }
+    specify { expect(toxoidum.class).to eq  ParseSubstance }
     if toxoidum
       specify { expect(toxoidum.name).to eq  'Toxoidum Diphtheriae' }
       specify { expect(toxoidum.qty.to_f).to eq  30.0 }
@@ -581,7 +581,7 @@ if RunAllTests
     substance1 =  info.compositions.first.substances.find{ |x| x.name.match(/hydrochlorothiazidum/i) }
     specify { expect(substance1.name).to eq  'Hydrochlorothiazidum' }
     substance3 =  info.compositions.first.substances.find{ |x| x.name.match(/amiloridi hydrochloridum/i) }
-    specify { expect(substance3.class).to eq  Struct::ParseSubstance }
+    specify { expect(substance3.class).to eq  ParseSubstance }
     if substance3
       specify { expect(substance3.name).to eq                            'Amiloridi Hydrochloridum Dihydricum' }
       specify { expect(substance3.chemical_substance.name).to eq         'Amiloridi Hydrochloridum Anhydricum' }
@@ -605,9 +605,9 @@ if RunAllTests
     substance1 =  info.compositions.first.substances.find{ |x| x.name.match(/atropa belladonna/i) }
     specify { expect(substance1.name).to eq  'Atropa Belladonna D30' }
     substance2 =  info.compositions.first.substances.find{ |x| x.name.match(/lycopus virginicus/i) }
-    specify { expect(substance2.class).to eq  Struct::ParseSubstance }
+    specify { expect(substance2.class).to eq  ParseSubstance }
     substance3 =  info.compositions.first.substances.find{ |x| x.name.match(/lapis albus/i) }
-    specify { expect(substance3.class).to eq  Struct::ParseSubstance }
+    specify { expect(substance3.class).to eq  ParseSubstance }
     if substance3
       specify { expect(substance3.name).to eq                'Lapis Albus D12' }
     end
@@ -631,9 +631,9 @@ Solvens: aqua ad iniectabilia q.s. ad suspensionem pro 1 ml."
     if substance2
       specify { expect(substance2.name).to eq  'Albuminum Humanum' }
     end
-    specify { expect(substance2.class).to eq  Struct::ParseSubstance }
+    specify { expect(substance2.class).to eq  ParseSubstance }
     substance3 =  info.compositions.first.substances.find{ |x| x.name.match(/neomycini sulfas/i) }
-    specify { expect(substance3.class).to eq  Struct::ParseSubstance }
+    specify { expect(substance3.class).to eq  ParseSubstance }
     if substance3
       specify { expect(substance3.name).to eq  'Neomycini Sulfas' }
     end
