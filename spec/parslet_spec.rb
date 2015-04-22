@@ -15,15 +15,16 @@ RunAllCompositionsTests = false # takes about five minutes to run!
 
 RunCompositionExamples = true
 RunSubstanceExamples = true
-RunFailingSpec = false
+RunFailingSpec = true
 RunExcipiensTest = true
-RunDoseTests = true
 RunSpecificTests = true
 RunMostImportantParserTests = true
 
-ExcipiensIs_a_Substance = false #  might change later
-
 describe ParseComposition do
+to_add = %(
+      pp composition; binding.pry
+)
+
 end
 describe ParseComposition do
     context "should pass several () inside a name" do
@@ -43,8 +44,7 @@ describe ParseComposition do
                   ].each { |string|
         composition = ParseComposition.from_string(string)
         specify { expect(composition.substances.size).to eq 1 }
-    pp composition.substances
-    binding.pry
+    pp composition.substances;   binding.pry
       }
       composition = ParseComposition.from_string(strings.last + ' 15 µg')
       specify { expect(composition.substances.first.name.downcase).to eq strings.last.downcase }
@@ -70,136 +70,13 @@ end
     end
 end if false
 
-describe ParseDose do
-
-if RunSpecificTests
-
-  context "should return correct dose for 40 U.'" do
-    dose = ParseDose.from_string("40 U.")
-    specify { expect(dose.qty).to eq 40.0 }
-    specify { expect(dose.unit).to eq 'U.' }
-  end
-
-  context "should return correct dose for '50'000 U.I.' (number has ')" do
-    dose = ParseDose.from_string("50'000 U.I.")
-    specify { expect(dose.qty).to eq 50000.0 }
-    specify { expect(dose.unit).to eq 'U.I.' }
-  end if RunMostImportantParserTests
-
-  if false # units are always requested
-    context "should return correct dose for '3,45' (number has comma, no decimal point)" do
-      dose = ParseDose.from_string("3,45")
-      specify { expect(dose.qty).to eq 3.45 }
-      specify { expect(dose.unit).to eq nil }
-    end if RunMostImportantParserTests
-
-    context "should return correct dose for '123'" do
-      dose = ParseDose.from_string("123", true)
-      specify { expect(dose.qty).to eq 123 }
-      specify { expect(dose.unit).to eq nil }
-    end
-
-    context "should return correct dose for '123.45'" do
-      dose = ParseDose.from_string("123.45")
-      specify { expect(dose.qty).to eq 123.45 }
-      specify { expect(dose.unit).to eq nil }
-    end
-
-    context "should return correct dose for 'mg'" do
-      dose = ParseDose.from_string('mg')
-      specify { expect(dose.qty).to eq 1.0 }
-      specify { expect(dose.unit).to eq 'mg' }
-    end
-
-    context "should return correct dose for 'ml'" do
-      dose = ParseDose.from_string('ml')
-      specify { expect(dose.qty).to eq 1.0 }
-      specify { expect(dose.unit).to eq 'ml' }
-    end
-
-    context "should return correct dose for '80-120 g'" do
-      string = "80-120"
-      dose = ParseDose.from_string(string)
-      specify { expect(dose.to_s).to eq string }
-      specify { expect(dose.qty).to eq nil }
-      specify { expect(dose.unit).to eq nil }
-    end
-
-  end
-
-  context "should return correct dose for '20 %'" do
-    string = "20 %"
-    dose = ParseDose.from_string(string)
-    specify { expect(dose.to_s).to eq string }
-    specify { expect(dose.qty).to eq 20 }
-    specify { expect(dose.unit).to eq '%' }
-  end
-
-  context "should return correct dose for '3 Mg'" do
-    dose = ParseDose.from_string('3 Mg')
-    specify { expect(dose.qty).to eq 3.0 }
-    specify { expect(dose.unit).to eq 'Mg' }
-  end
-
-  context "should return correct dose for '2 mg'" do
-    dose = ParseDose.from_string('2 mg')
-    specify { expect(dose.qty).to eq 2.0 }
-    specify { expect(dose.unit).to eq 'mg' }
-  end
-
-  context "should return correct dose for '0.3 ml'" do
-    dose = ParseDose.from_string('0.3 ml')
-    specify { expect(dose.qty).to eq 0.3 }
-    specify { expect(dose.unit).to eq 'ml' }
-  end
-
-  context "should return correct dose for '0.01 mg/ml'" do
-    dose = ParseDose.from_string('0.01 mg/ml')
-    specify { expect(dose.qty).to eq 0.01 }
-    specify { expect(dose.unit).to eq 'mg/ml' }
-  end
-
-  context "should return correct dose for '3 mg/ml'" do
-    dose = ParseDose.from_string('3 mg/ml')
-    specify { expect(dose.qty).to eq 3.0 }
-    specify { expect(dose.unit).to eq 'mg/ml' }
-  end
-
-  context "should return correct dose for '7900 U.I.'" do
-    string = "7900 U.I."
-    dose = ParseDose.from_string(string)
-    specify { expect(dose.to_s).to eq string }
-    specify { expect(dose.qty).to eq 7900 }
-    specify { expect(dose.unit).to eq 'U.I.' }
-  end
-
-  context "should return correct dose for '20 %'" do
-    string = "20 %"
-    dose = ParseDose.from_string(string)
-    specify { expect(dose.to_s).to eq string }
-    specify { expect(dose.qty).to eq 20 }
-    specify { expect(dose.unit).to eq '%' }
-  end
-  context "should return correct dose for '59.5 % V/V'" do
-    string = "59.5 % V/V"
-    dose = ParseDose.from_string(string)
-    specify { expect(dose.to_s).to eq string }
-    specify { expect(dose.qty).to eq 59.5}
-    specify { expect(dose.unit).to eq '% V/V' }
-  end
-
-  context "should return correct dose for '80-120 g'" do
-    string = "80-120 g"
-    dose = ParseDose.from_string(string)
-    specify { expect(dose.to_s).to eq string }
-    specify { expect(dose.qty).to eq nil }
-    specify { expect(dose.unit).to eq 'g' }
-  end
-end
-end if RunDoseTests
-
-
 describe ParseComposition do
+  context 'handle Corresp. 4000 kJ.' do
+    composition = ParseComposition.from_string('Corresp. 4000 kJ.')
+    specify { expect(composition.substances.size).to eq 0 }
+    specify { expect(composition.corresp).to eq '4000 kJ' }
+  end
+
   context 'handle dose dose with g/dm²' do
     string = 'Tela cum unguento 14 g/dm²'
     composition = ParseComposition.from_string(string)
@@ -207,6 +84,7 @@ describe ParseComposition do
     specify { expect(composition.substances.first.dose.to_s).to eq  '14 g/dm²' }
     specify { expect(composition.substances.first.name).to eq  'Tela Cum Unguento' }
   end
+
   context 'handle dose  2*10^9 CFU,' do
     string = 'saccharomyces boulardii cryodesiccatus 250 mg corresp. cellulae vivae 2*10^9 CFU, excipiens pro capsula'
     composition = ParseComposition.from_string(string)
@@ -345,10 +223,10 @@ describe ParseComposition do
       specify { expect(composition.label).to eq 'A' }
       specify { expect(composition.label_description).to eq nil }
       specify { expect(composition.substances.size).to eq 2 }
-      specify { expect(composition.substances.first.name).to eq 'Macrogolum 3500' }
+      specify { expect(composition.substances.first.name).to eq 'Macrogolum 3350' }
       specify { expect(composition.substances.first.qty).to eq 100 }
       specify { expect(composition.substances.first.unit).to eq 'g' }
-    end if RunFailingSpec
+    end
 
     context "should able to handle a simple ratio" do
       string = 'allii sativi maceratum oleosum 270 mg, ratio: 1:10, excipiens pro capsula.'
@@ -434,9 +312,9 @@ describe ParseComposition do
       string = 'glyceroli monostearas 40-55'
       composition = ParseComposition.from_string(string)
       specify { expect(composition.substances.size).to eq 1 }
-      specify { expect(composition.substances.first.name).to eq 'Glyceroli Monostearas 40-55' }
-      specify { expect(composition.substances.first.dose.to_s).to eq nil }
-    end if RunFailingSpec
+      specify { expect(composition.substances.first.name).to eq 'Glyceroli Monostearas' }
+      specify { expect(composition.substances.first.dose.to_s).to eq '40-55' }
+    end
 
     context "should handle mineralia with alia" do
       string = 'mineralia: calcium 160 ut alia: ginseng extractum 50 mg'
@@ -487,7 +365,7 @@ describe ParseComposition do
       specify { expect(composition.substances.first.more_info).to eq nil }
       specify { expect(composition.substances.first.name).to eq 'Acari Allergeni Extractum (acarus Siro)' }
       specify { expect(composition.substances.last.name).to eq  'Phenolum' } # was Acari Allergeni Extractum (acarus Siro)
-      specify { expect(composition.substances.last.more_info).to eq 'conserv.' }
+      specify { expect(composition.substances.last.more_info).to eq 'conserv' }
     end
 
     context "should return correct composition for containing 'A): acari allergeni extractum 50 U' (IKSNR 60606)" do
@@ -614,7 +492,7 @@ describe ParseComposition do
 
     context "should return correct substance for 'excipiens ad pulverem pro 1000 mg'" do
       string = "excipiens ad pulverem pro 1000 mg"
-      SubstanceTransformer.clear_substances
+      CompositionTransformer.clear_substances
       composition = ParseComposition.from_string(string)
       substance = composition.substances.first
       if ExcipiensIs_a_Substance
@@ -714,14 +592,6 @@ describe ParseComposition do
 
   if RunMostImportantParserTests
 
-    context "should return correct substance for 'Xenonum(133-xe) 74 -740 Mb'" do
-      string = "Xenonum(133-Xe) 74 -740 MBq"
-      composition = ParseComposition.from_string(string)
-      substance = composition.substances.first
-      specify { expect(substance.name).to eq 'Xenonum(133-xe)' }
-      specify { expect(substance.dose.to_s).to eq '74 -740 MBq' }
-    end
-
     context "should parse a Praeparatio with a label/galenic form?" do
       string = "Praeparatio cryodesiccata: pollinis allergeni extractum 25'000 U.: urtica dioica"
       composition = ParseComposition.from_string(string)
@@ -746,7 +616,7 @@ describe ParseComposition do
 
       context "should return correct substance for 'pyrazinamidum 500 mg'" do
         string = "pyrazinamidum 500 mg"
-        SubstanceTransformer.clear_substances
+        CompositionTransformer.clear_substances
         composition = ParseComposition.from_string(string)
         substance = composition.substances.first
         specify { expect(substance.name).to eq 'Pyrazinamidum' }
@@ -825,7 +695,7 @@ Corresp. 5190 kJ pro 1 l."
           substance = composition.substances.first
           specify { expect(substance.name).to eq '9,11-linolicum' }
           specify { expect(substance.chemical_substance).to eq nil }
-          SubstanceTransformer.clear_substances
+          CompositionTransformer.clear_substances
           composition = ParseComposition.from_string(string)
         }
 
@@ -867,7 +737,7 @@ Corresp. 5190 kJ pro 1 l."
       composition = ParseComposition.from_string(string)
           substance = composition.substances.first
       specify { expect(substance.name).to eq 'Xenonum(133-xe)' }
-      specify { expect(substance.qty).to eq '74 -740' }
+      specify { expect(substance.qty).to eq '74-740' }
       specify { expect(substance.unit).to eq 'MBq' }
     end
 
@@ -1094,17 +964,76 @@ if RunSpecificTests
     skip 'what is the correct name for excipiens?'# { expect(composition.substances.last.name).to eq 'Excipiens Pro Compresso' }
   end
 
-end
+  context 'find correct result compositions for nutriflex' do
+    line_1 = 'I) Glucoselösung: glucosum anhydricum 150 g ut glucosum monohydricum, natrii dihydrogenophosphas dihydricus 2.34 g, zinci acetas dihydricus 6.58 mg, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.'
+    line_2 = 'II) Fettemulsion: sojae oleum 25 g, triglycerida saturata media 25 g, lecithinum ex ovo 3 g, glycerolum, natrii oleas, aqua q.s. ad emulsionem pro 250 ml.'
+    line_3 = 'III) Aminosäurenlösung: isoleucinum 2.34 g, leucinum 3.13 g, lysinum anhydricum 2.26 g ut lysini hydrochloridum, methioninum 1.96 g, aqua ad iniectabilia q.s. ad solutionem pro 400 ml.'
+    line_4 = 'I) et II) et III) corresp.: aminoacida 32 g/l, acetas 32 mmol/l, acidum citricum monohydricum, in emulsione recenter mixta 1250 ml.'
+    line_5 = 'Corresp. 4000 kJ.'
+    text = "#{line_1}\n#{line_2}\n#{line_3}\n#{line_4}\n#{line_5}"
+    compositions =  ParseUtil.parse_compositions(text, 'glucosum anhydricum, zinci acetas dihydricus, isoleucinum, leucinum')
+    specify { expect(compositions.first.substances.first.name).to eq 'Glucosum Anhydricum'}
+    specify { expect(compositions.first.substances.first.salts.first.name).to eq 'Glucosum Monohydricum'}
+    specify { expect(compositions.size).to eq 5}
+    specify { expect(compositions.first.substances.first.qty.to_f).to eq 150.0}
+    specify { expect(compositions.first.substances.first.unit).to eq 'g/500 ml'}
+
+    specify { expect(compositions[0].source).to eq line_1}
+    specify { expect(compositions[0].label).to eq 'I'}
+    specify { expect(compositions[0].label_description).to eq 'Glucoselösung'}
+    specify { expect(compositions[1].label).to eq 'II' }
+    specify { expect(compositions[2].label).to eq 'III' }
+    glucosum = compositions.first.substances.first
+    specify { expect(glucosum.name).to eq  'Glucosum Anhydricum' }
+    specify { expect(glucosum.qty.to_f).to eq  150.0}
+    specify { expect(glucosum.unit).to eq  'g/500 ml'}
+    specify { expect(compositions[0].substances.size).to eq ExcipiensIs_a_Substance ? 4 : 3 }
+    specify { expect(compositions[1].substances.size).to eq ExcipiensIs_a_Substance ? 6 : 5 } # should have  glycerolum, natrii oleas, aqua
+    specify { expect(compositions[2].substances.size).to eq ExcipiensIs_a_Substance ? 5 : 4 }
+    specify { expect(compositions[1].source).to eq line_2}
+    specify { expect(compositions[2].source).to eq line_3}
+    specify { expect(compositions[3].source).to eq line_4}
+    specify { expect(compositions[3].corresp).to eq line_4.sub(/\.$/, '') }
+    specify { expect(compositions[4].source).to eq line_5}
+    specify { expect(compositions[4].corresp).to eq '4000 kJ'}
+
+    # from II)
+    if compositions and compositions[1] and compositions[1].substances
+      lecithinum =  compositions[1].substances.find{ |x| x.name.match(/lecithinum/i) }
+      specify { expect(lecithinum).not_to eq nil}
+      if lecithinum
+        specify { expect(lecithinum.name).to eq  'Lecithinum Ex Ovo' }
+        specify { expect(lecithinum.qty.to_f).to eq   3.0}
+        specify { expect(lecithinum.unit).to eq  'g/250 ml'}
+      end
+
+      # From III
+      leucinum =  compositions[2].substances.find{ |x| x.name.eql?('Leucinum') }
+      specify { expect(leucinum).not_to eq nil}
+      if leucinum
+        specify { expect(leucinum.name).to eq  'Leucinum' }
+        specify { expect(leucinum.qty.to_f).to eq  3.13}
+        specify { expect(leucinum.unit).to eq  'g/400 ml'}
+      end
+      leucinum_I =  compositions[0].substances.find{ |x| x.name.eql?('Leucinum') }
+      specify { expect(leucinum_I).to eq nil}
+      leucinum_II =  compositions[1].substances.find{ |x| x.name.eql?('Leucinum') }
+      specify { expect(leucinum_II).to eq nil}
+  #    aqua =  compositions[2].substances.find{ |x| /aqua ad/i.match(x.name) }
+  #   specify { expect(aqua.name).to eq "Aqua Ad Iniectabilia Q.s. Ad Solutionem Pro"}
+    end
 
 end
 
-describe HandleSwissmedicErrors do
+end
+
+describe ParseUtil::HandleSwissmedicErrors do
   context 'should handle fixes' do
     replacement = '\1, \2'
     pattern_replacement  = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => replacement }
     test_string = 'sulfuris D6 2,2 mg hypericum perforatum D2 0,66'
     expected    = 'sulfuris D6 2,2 mg, hypericum perforatum D2 0,66'
-    handler = HandleSwissmedicErrors.new(pattern_replacement )
+    handler = ParseUtil::HandleSwissmedicErrors.new(pattern_replacement )
     result = handler.apply_fixes(test_string)
     specify { expect(result).to eq expected }
     specify { expect(handler.report.size).to eq 2 }
@@ -1125,6 +1054,7 @@ describe HandleSwissmedicErrors do
     specify { expect(report[1].index(replacement).class).to eq Fixnum }
   end
 
+  end
 end if RunSpecificTests
 
 describe ParseComposition do

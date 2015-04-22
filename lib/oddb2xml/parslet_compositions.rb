@@ -13,6 +13,46 @@ include Parslet
 VERBOSE_MESSAGES = false
 
 module ParseUtil
+  # this class is responsible to patch errors in swissmedic entries after
+  # oddb.org detected them, as it takes sometimes a few days (or more) till they get corrected
+  # Reports the number of occurrences of each entry
+  class HandleSwissmedicErrors
+
+    class ErrorEntry   < Struct.new('ErrorEntry', :pattern, :replacement, :nr_occurrences)
+    end
+
+    def reset_errors
+      @errors = []
+    end
+
+    # error_entries should be a hash of  pattern, replacement
+    def initialize(error_entries)
+      reset_errors
+      error_entries.each{ |pattern, replacement| @errors << ErrorEntry.new(pattern, replacement, 0) }
+    end
+
+    def report
+      s = ["Report of changed compositions" ]
+      @errors.each {
+        |entry|
+      s << "  replaced #{entry.nr_occurrences} times '#{entry.pattern}'  by '#{entry.replacement}'"
+      }
+      s
+    end
+
+    def apply_fixes(string)
+      result = string.clone
+      @errors.each{
+        |entry|
+        intermediate = result.clone
+        result = result.gsub(entry.pattern,  entry.replacement)
+        entry.nr_occurrences += 1 unless intermediate.eql?(intermediate)
+      }
+      result
+    end
+    #  hepar sulfuris D6 2,2 mg hypericum perforatum D2 0,66 mg where itlacks a comma and should be hepar sulfuris D6 2,2 mg, hypericum perforatum D2 0,66 mg
+  end
+
   def ParseUtil.capitalize(string)
     string.split(/\s+/u).collect { |word| word.capitalize }.join(' ').strip
   end
@@ -24,7 +64,7 @@ module ParseUtil
     lines.select {
       |line|
       composition =  ParseComposition.from_string(line)
-      if composition and composition.substances.size > 0
+      if composition.is_a?(ParseComposition)
         composition.substances.each {
           |substance_item|
           substance_item.is_active_agent = (active_agents.find {|x| x.downcase.eql?(substance_item.name.downcase) } != nil)
@@ -45,7 +85,7 @@ class QtyLit   < Struct.new(:qty)
   def eval; qty.to_i; end
 end
 
-class DoseTransformer < Parslet::Transform
+class CompositionTransformer < Parslet::Transform
   rule(:int => simple(:int))        { IntLit.new(int) }
   rule(:number => simple(:nb)) {
     nb.match(/[eE\.]/) ? Float(nb) : Integer(nb)
@@ -68,21 +108,22 @@ class DoseTransformer < Parslet::Transform
     :unit    => simple(:unit))  { ParseDose.new(nil, unit) }
   rule(
     :qty    => simple(:qty))  { ParseDose.new(qty, nil) }
-end
 
-
-class SubstanceTransformer < DoseTransformer
   @@substances ||= []
   @@excipiens  = nil
-  def SubstanceTransformer.clear_substances
+  def CompositionTransformer.clear_substances
     @@substances = []
     @@excipiens  = nil
+    @@corresp    = nil
   end
-  def SubstanceTransformer.substances
+  def CompositionTransformer.substances
     @@substances.clone
   end
-  def SubstanceTransformer.excipiens
+  def CompositionTransformer.excipiens
     @@excipiens ? @@excipiens.clone : nil
+  end
+  def CompositionTransformer.corresp
+    @@corresp ? @@corresp.clone : nil
   end
 
   rule(:ratio => simple(:ratio) ) {
@@ -259,8 +300,8 @@ class SubstanceTransformer < DoseTransformer
   rule(:substance_name => simple(:substance_name),
        ) {
     |dictionary|
-       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
-      @@substances << ParseSubstance.new(dictionary[:substance_name])
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
+      @@substances << ParseSubstance.new(dictionary[:substance_name].to_s)
   }
   rule(:one_substance => sequence(:one_substance)) {
     |dictionary|
@@ -357,6 +398,12 @@ class SubstanceTransformer < DoseTransformer
       dictionary[:dose_pro]
   }
 
+  rule(:corresp => simple(:corresp),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      @@corresp = dictionary[:corresp].to_s
+  }
 end
 
 class ParseDose
@@ -390,15 +437,6 @@ class ParseDose
     res = "#{@qty}#{@qty_range}"
     res = "#{res} #{@unit}" if @unit
     res
-  end
-  def ParseDose.from_string(string)
-    cleaned = string.sub(',', '.')
-    puts "ParseDose.from_string #{string} -> cleaned #{cleaned}" if VERBOSE_MESSAGES
-    value = nil
-    parser = DoseParser.new
-    transf = DoseTransformer.new
-    puts "#{File.basename(__FILE__)}:#{__LINE__}: ==>  #{parser.parse_with_debug(cleaned)}" if VERBOSE_MESSAGES
-    result = transf.apply(parser.parse(cleaned))
   end
 end
 
@@ -438,57 +476,19 @@ class ParseSubstance
   end
 end
 
-# this class is responsible to patch errors in swissmedic entries after
-# oddb.org detected them, as it takes sometimes a few days (or more) till they get corrected
-# Reports the number of occurrences of each entry
-class HandleSwissmedicErrors
-
-  class ErrorEntry   < Struct.new('ErrorEntry', :pattern, :replacement, :nr_occurrences)
-  end
-
-  def reset_errors
-    @errors = []
-  end
-
-  # error_entries should be a hash of  pattern, replacement
-  def initialize(error_entries)
-    reset_errors
-    error_entries.each{ |pattern, replacement| @errors << ErrorEntry.new(pattern, replacement, 0) }
-  end
-
-  def report
-    s = ["Report of changed compositions" ]
-    @errors.each {
-      |entry|
-    s << "  replaced #{entry.nr_occurrences} times '#{entry.pattern}'  by '#{entry.replacement}'"
-    }
-    s
-  end
-
-  def apply_fixes(string)
-    result = string.clone
-    @errors.each{
-      |entry|
-      intermediate = result.clone
-      result = result.gsub(entry.pattern,  entry.replacement)
-      entry.nr_occurrences += 1 unless intermediate.eql?(intermediate)
-    }
-    result
-  end
-  #  hepar sulfuris D6 2,2 mg hypericum perforatum D2 0,66 mg where itlacks a comma and should be hepar sulfuris D6 2,2 mg, hypericum perforatum D2 0,66 mg
-end
-
 class ParseComposition
-  attr_accessor   :source, :label, :label_description, :substances, :galenic_form, :route_of_administration
+  attr_accessor   :source, :label, :label_description, :substances, :galenic_form, :route_of_administration,
+                  :corresp
 
   ErrorsToFix = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => '\1, \2',
+                  /(\d+)\s+\-\s*(\d+)/ => '\1-\2',
                   /(excipiens ad solutionem pro \d+ ml), corresp\./ => '\1 corresp.',
                   /^(acari allergeni extractum 5000 U\.\:)/ => 'A): \1',
 
                   # excipiens ad solutionem pro 1 ml
                   "F(ab')2" => "F_ab_2",
                 }
-  @@errorHandler = HandleSwissmedicErrors.new( ErrorsToFix )
+  @@errorHandler = ParseUtil::HandleSwissmedicErrors.new( ErrorsToFix )
 
   def initialize(source)
     @substances ||= []
@@ -496,7 +496,7 @@ class ParseComposition
     @source = source.to_s
   end
   def ParseComposition.reset
-    @@errorHandler = HandleSwissmedicErrors.new( ErrorsToFix )
+    @@errorHandler = ParseUtil::HandleSwissmedicErrors.new( ErrorsToFix )
   end
   def ParseComposition.report
     @@errorHandler.report
@@ -512,10 +512,10 @@ class ParseComposition
     cleaned = @@errorHandler.apply_fixes(cleaned)
     puts "ParseComposition.new cleaned #{cleaned}" if VERBOSE_MESSAGES and not cleaned.eql?(string)
 
-    SubstanceTransformer.clear_substances
+    CompositionTransformer.clear_substances
     result = ParseComposition.new(cleaned)
     parser3 = CompositionParser.new
-    transf3 = SubstanceTransformer.new
+    transf3 = CompositionTransformer.new
     begin
       if defined?(RSpec)
         ast = transf3.apply(parser3.parse_with_debug(cleaned))
@@ -527,18 +527,14 @@ class ParseComposition
       puts "#{File.basename(__FILE__)}:#{__LINE__}: failed parsing ==>  #{cleaned}"
       return nil
     end
-    # pp ast; binding.pry
     result.source = string
     return result unless ast
     return result if ast.is_a?(Parslet::Slice)
-    label = (ast and ast[:label]) ? ast[:label].to_s : nil
-    if label and not /((A|B|C|D|E|I|II|III|IV|\)+)\s+et\s+(A|B|C|D|E|I|II|III|IV|\))+)/.match(label)
-      result.label  = label if label
-    end
-    result.label_description  = ast[:label_description].to_s if ast[:label_description]
+    # pp ast; binding.pry
 
-    result.substances = SubstanceTransformer.substances
-    excipiens = SubstanceTransformer.excipiens
+    result.substances = CompositionTransformer.substances
+    excipiens = CompositionTransformer.excipiens
+    result.corresp = CompositionTransformer.corresp if CompositionTransformer.corresp
     if excipiens and excipiens.unit
       pro_qty = "/#{excipiens.qty} #{excipiens.unit}".sub(/\/1\s+/, '/')
       result.substances.each {
@@ -548,8 +544,17 @@ class ParseComposition
       }
     end
     if ast.is_a?(Array) and  ast.first.is_a?(Hash)
-      result.label              = ast.first[:label].to_s
-      result.label_description  = ast.first[:label_description].to_s
+      label = ast.first[:label].to_s if ast.first[:label]
+      label_description = ast.first[:label_description].to_s if ast.first[:label_description]
+    elsif ast and ast.is_a?(Hash)
+      label = ast[:label].to_s if  ast[:label]
+      label_description = ast[:label_description].to_s if ast[:label_description]
+    end
+    if label
+      if label and not /((A|B|C|D|E|I|II|III|IV|\)+)\s+et\s+(A|B|C|D|E|I|II|III|IV|\))+)/.match(label)
+        result.label  = label
+      end
+      result.label_description = label_description
     end
     return result
   end

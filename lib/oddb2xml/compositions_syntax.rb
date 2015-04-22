@@ -9,9 +9,8 @@
 require 'parslet'
 require 'parslet/convenience'
 include Parslet
-VERBOSE_MESSAGES = false
 
-class DoseParser < Parslet::Parser
+class CompositionParser < Parslet::Parser
 
   # Single character rules
   rule(:lparen)     { str('(') }
@@ -43,22 +42,25 @@ class DoseParser < Parslet::Parser
   rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.'].repeat(0) }
   # handle stuff like acidum 9,11-linolicum specially. it must contain at least one a-z
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
-  rule(:identifier_D12) { match['a-zA-Z'] >> digit.repeat(1) }
+  rule(:identifier_D12) { match['a-zA-Z'] >>  match['0-9'].repeat(1) }
+  rule(:identifier) { identifier_D12 | identifier_without_comma }
   rule(:identifier_with_comma) {
     match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_,']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0)
   }
   rule(:identifier_without_comma) {
     match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0)
   }
-  rule(:one_word) { identifier_with_comma }
+  rule(:one_word) { match['a-zA-Z'] >> match['0-9'].repeat(1) | match['a-zA-Z'].repeat(1) }
   rule(:in_parent) { lparen >> one_word.repeat(1) >> rparen }
   rule(:words_nested) { one_word.repeat(1) >> in_parent.maybe >> space? >> one_word.repeat(0) }
   # dose
   rule(:dose_unit)      { (
                            str('g/dm²') |
                            str('% V/V') |
+                           str('µg/g') |
                            str('µg') |
                            str('guttae') |
+                           str('mg/g') |
                            str('mg/ml') |
                            str('MBq') |
                            str('CFU') |
@@ -75,25 +77,21 @@ class DoseParser < Parslet::Parser
                            str('U.I.') |
                            str('U.') |
                            str('Mia. U.') |
+                           str('% m/m') |
+                           str('% m/m') |
                            str('%')
                           ).as(:unit) }
-  rule(:qty_range)       { (number >> space? >> str('-') >> space? >> number).as(:qty_range) }
-  rule(:qty_unit)       { dose_qty >> space? >> dose_unit.maybe }
+  rule(:qty_range)       { (number >> space? >> (str(' - ') | str(' -') | str('-')) >> space? >> number).as(:qty_range) }
+  rule(:qty_unit)       { dose_qty >> (space >> dose_unit).maybe }
   rule(:dose_qty)       { number.as(:qty) }
   rule(:dose)           { (str('min.') >> space?).maybe >>
-                          ( (qty_range >> space? >> dose_unit.maybe) | (qty_unit | dose_qty |dose_unit)) >> space?
+                          ( (qty_range >> (space >> dose_unit).maybe) | (qty_unit | dose_qty |dose_unit)) >> space?
                            }
   rule(:dose_with_unit) { (str('min.') >> space?).maybe >>
-                          ( qty_range >> space? >> dose_unit |
-                            dose_qty  >> space? >> dose_unit ) >>
+                          ( qty_range >> space >> dose_unit |
+                            dose_qty  >> space >> dose_unit ) >>
                           space?
                         }
-  root :dose
-
-end
-
-class SubstanceParser < DoseParser
-
   rule(:operator)   { match('[+]') >> space? }
 
   # Grammar parts
@@ -118,7 +116,6 @@ class SubstanceParser < DoseParser
                             str('min. ') |
                             str('ut ') |
                             str('ut alia: ') |
-                            str('ut alia: ') |
                             str('pro dosi') |
                             str('pro capsula') |
                             (digits.repeat(1) >> space >> str(':')) | # match 50 %
@@ -135,12 +132,10 @@ class SubstanceParser < DoseParser
     }
   rule(:name_without_parenthesis) {
     (
-     (str('(') |
-      forbidden_in_substance_name).absent? >> (radio_isotop |
-                                               str('> 1000') |
-                                               str('> 500') |
-
-                                               one_word) >> space?).repeat(1)
+      (str('(') | forbidden_in_substance_name).absent? >>
+        (radio_isotop | str('> 1000') | str('> 500') | identifier.repeat(1)) >>
+      space?
+    ).repeat(1)
   }
 
   rule(:part_with_parenthesis) { lparen >> ( (lparen | rparen).absent? >> any).repeat(1) >>
@@ -149,10 +144,21 @@ class SubstanceParser < DoseParser
   rule(:name_with_parenthesis) {
     forbidden_in_substance_name.absent? >>
     ((str(',') | lparen).absent? >> any).repeat(0) >> part_with_parenthesis >>
-    (forbidden_in_substance_name.absent? >> (one_word | part_with_parenthesis | rparen) >> space?).repeat(0)
+    (forbidden_in_substance_name.absent? >> (identifier.repeat(1) | part_with_parenthesis | rparen) >> space?).repeat(0)
   }
-  rule(:substance_name) { (der | farbstoff | name_with_parenthesis | name_without_parenthesis) >> str('.').maybe >> str('pro dosi').maybe }
+  rule(:substance_name) { (
+                            der |
+                            name_with_parenthesis |
+                            name_without_parenthesis |
+                            farbstoff) >>
+                          str('pro dosi').maybe
+                          } # 39 errors
   rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.as(:dose).maybe >> space? >> ratio.maybe}
+  rule(:simple_subtance_with_digits_in_name_and_dose)  {
+    (name_without_parenthesis >> space? >> ((digits.repeat(1) >> str('%') | digits.repeat(1)))).as(:substance_name) >>
+    space >> dose_with_unit.as(:dose)
+  }
+
 
   rule(:pro_dose) { str('pro') >>  space >> dose.as(:dose_corresp) }
 
@@ -162,19 +168,19 @@ class SubstanceParser < DoseParser
 
     # TODO: what does ut alia: impl?
   rule(:substance_ut) {
-    (substance_lead.maybe >> simple_substance).as(:substance_ut) >>
+      (substance_lead.maybe >> simple_substance).as(:substance_ut) >>
   (space? >> str('ut ')  >>
     space? >> str('alia:').absent? >>
     (excipiens |
     substance_name >> space? >> str('corresp.') >> space >> simple_substance |
     simple_substance
-    ).as(:for_ut)
+     ).as(:for_ut)
   ).repeat(1) >>
     space? # >> str('alia:').maybe >> space?
-  }
+    }
 
   rule(:substance_more_info) { # e.g. "acari allergeni extractum 5000 U.:
-      (str('ratio:').absent? >> (identifier|digits) >> space?).repeat(1).as(:more_info) >> space? >> (str('U.:') | str(':')) >> space?
+      (str('ratio:').absent? >> (identifier|digits) >> space?).repeat(1).as(:more_info) >> space? >> (str('U.:') | str(':')| str('.:')) >> space?
     }
 
   rule(:dose_pro) { (
@@ -206,7 +212,7 @@ class SubstanceParser < DoseParser
                       }
 
   rule(:substance_lead) {
-                      str('residui:').as(:residui) >> space? |
+                      str('residui:').as(:more_info) >> space? |
                       str('mineralia').as(:mineralia) >> str(':') >> space? |
                       str('Solvens:').as(:solvens) >> space? |
                       substance_more_info
@@ -225,40 +231,27 @@ class SubstanceParser < DoseParser
                    (substance.as(:substance) >> str('/L').maybe).maybe  >>
                     any.maybe
                 }
-  rule(:substance_with_digits_at_end_and_dose) {
-    ((one_word >> space?).repeat(1) >> match['0-9\-'].repeat(1)).as(:substance_name) >>
-    space? >> dose.as(:dose).maybe
-  }
-
   rule(:substance) {
+    simple_subtance_with_digits_in_name_and_dose |
     ratio.as(:ratio) |
     solvens |
     der  >> corresp_substance.maybe |
     excipiens.as(:excipiens) |
     farbstoff |
     substance_ut |
-    substance_more_info.maybe >> simple_substance >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
-    # TODO: Fix this problem
-    # substance_with_digits_at_end_and_dose for unknown reasons adding this as last alternative disables parsing for simple stuff like 'glyceroli monostearas 40-55'
+    substance_more_info.maybe >> substance_lead.maybe >> simple_substance >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
   }
-
   rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
   rule(:praeparatio){ ((one_word >> space?).repeat(1).as(:description) >> str(':') >> space?).maybe >>
                       (name_with_parenthesis | name_without_parenthesis).repeat(1).as(:substance_name) >>
                       number.as(:qty) >> space >> str('U.:') >> space? >>
                       ((identifier >> space?).repeat(1).as(:more_info) >> space?).maybe
                     }
-
   rule(:substance_separator) { (comma | str('et ') | str('ut alia: ')) >> space? }
   rule(:one_substance)       { (substance).as(:substance) }
   rule(:one_substance)       { (praeparatio | histamin | substance).as(:substance) }
   rule(:all_substances)      { (one_substance >> substance_separator.maybe).repeat(1) }
-  root :all_substances
-end
-
-class CompositionParser < SubstanceParser
-
-  rule(:composition) { all_substances }
+  rule(:composition)         { all_substances }
   rule(:label_id) {
      (
                            str('V') |
@@ -282,7 +275,14 @@ class CompositionParser < SubstanceParser
                             label_id >> label_separator >> any.repeat(1)  |
                             label
     }
-  rule(:expression_comp) {  leading_label.maybe >> space? >> composition.as(:composition) }
+  rule(:corresp_line) { str('Corresp. ') >> any.repeat(1).as(:corresp)  |
+                        ((label_id >> label_separator >> space? >> str('et ').maybe).repeat(1) >> any.repeat(1)).as(:corresp)
+  }
+#corresp_line  |
+  rule(:expression_comp) {
+    leading_label.maybe >> space? >> composition.as(:composition) >> space? >> str('.').maybe >> space? |
+    corresp_line
+  }
   root :expression_comp
 end
 

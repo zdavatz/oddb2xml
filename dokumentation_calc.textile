@@ -11,6 +11,8 @@ In diesem Dokument versuchen wir die dabei erkannten Elemente kurz zu dokumentie
 
 h2. Syntax
 
+Die Syntax wird in einer Datei "compositions_syntax":https://raw.githubusercontent.com/ngiger/oddb2xml/master/lib/oddb2xml/compositions_syntax.rb beschrieben.
+
 * ratio:	Falls eine Zeile in der Zusammensetzung sow was wie @ratio: 1:10@ oder @ratio: 1:1.5-2.4@ enthält, wird das Feld "more_info" entsprechend gesetzt.
 
 * Namen mit Zahlen. Beschloss dass @Glyceroli Monostearas 33-45@ eine Name und nicht Glyceroli Monostearas von 33 bis 45 von irgendwas ist.

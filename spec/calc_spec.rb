@@ -329,17 +329,13 @@ if RunAllTests
         find{|x| x.text.eql?(matri_name)}.text.should eq matri_name
       XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE").last.text.should eq 'Levomenolum'
       XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY").first.text.should eq '98.9'
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT").first.text.should eq 'g/100 g'
+#      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT").first.text.should eq 'g/100 g'
       XPath.match( doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Lidocaini Hydrochloridum'
       XPath.match( doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT").first.text.should eq 'mg/ml'
 
       XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_QTY").first.text.should eq '10-50'
       XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_UNIT").first.text.should eq 'mg/100 g'
 
-      XPath.match( doc, "//ARTICLE[GTIN='7680656770019']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE").first.text.should eq 'Glatiramerum'
-      XPath.match( doc, "//ARTICLE[GTIN='7680656770019']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_QTY").first.text.should eq '18'
-      XPath.match( doc, "//ARTICLE[GTIN='7680656770019']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_UNIT").first.text.should eq 'mg'
-      XPath.match( doc, "//ARTICLE[GTIN='7680656770019']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/IS_ACTIVE_AGENT").first.text.should eq 'true'
    end
   end
 
@@ -438,58 +434,6 @@ end
   end
 
 if RunAllTests
-  context 'find correct result compositions for nutriflex' do
-    text = "#{Line_1}\n#{Line_2}\n#{Line_3}\n#{Line_4}\n#{Line_5}"
-    result = Calc.new('Nutriflex Lipid peri, Infusionsemulsion, 1250ml', nil, nil,
-                      'glucosum anhydricum, zinci acetas dihydricus, isoleucinum, leucinum',
-                      text
-                      )
-#  Line_1 = 'I) Glucoselösung: glucosum anhydricum 150 g ut glucosum monohydricum, natrii dihydrogenophosphas dihydricus 2.34 g, zinci acetas dihydricus 6.58 mg, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.'
-    specify { expect(result.compositions.first.substances.first.name).to eq 'Glucosum Anhydricum'}
-    specify { expect(result.compositions.first.substances.first.chemical_substance.name).to eq 'Glucosum Monohydricum'}
-    specify { expect(result.compositions.first.substances.first.chemical_substance.qty.to_f).to eq 150.0}
-    specify { expect(result.compositions.first.substances.first.chemical_substance.unit).to eq 'g/500 ml'}
-
-    specify { expect(result.compositions[0].source).to eq Line_1}
-    specify { expect(result.compositions[0].label).to eq 'I'}
-    specify { expect(result.compositions[0].label_description).to eq 'Glucoselösung'}
-    specify { expect(result.compositions[1].label).to eq 'II' }
-    specify { expect(result.compositions[2].label).to eq 'III' }
-    glucosum = result.compositions.first.substances.first
-    specify { expect(glucosum.name).to eq  'Glucosum Anhydricum' }
-    specify { expect(glucosum.qty.to_f).to eq  150.0}
-    specify { expect(glucosum.unit).to eq  'g/500 ml'}
-    specify { expect(result.compositions.size).to eq 3}
-    specify { expect(result.compositions[0].substances.size).to eq 4}
-    specify { expect(result.compositions[1].substances.size).to eq 6} # should have  glycerolum, natrii oleas, aqua
-    specify { expect(result.compositions[2].substances.size).to eq 5}
-    specify { expect(result.compositions[1].source).to eq Line_2}
-    specify { expect(result.compositions[2].source).to eq Line_3}
-
-    # from II)
-    lecithinum =  result.compositions[1].substances.find{ |x| x.name.match(/lecithinum/i) }
-    specify { expect(lecithinum).not_to eq nil}
-    if lecithinum
-      specify { expect(lecithinum.name).to eq  'Lecithinum Ex Ovo' }
-      specify { expect(lecithinum.qty.to_f).to eq   3.0}
-      specify { expect(lecithinum.unit).to eq  'g/250 ml'}
-    end
-
-    # From III
-    leucinum =  result.compositions[2].substances.find{ |x| x.name.eql?('Leucinum') }
-    specify { expect(leucinum).not_to eq nil}
-    if leucinum
-      specify { expect(leucinum.name).to eq  'Leucinum' }
-      specify { expect(leucinum.qty.to_f).to eq  3.13}
-      specify { expect(leucinum.unit).to eq  'g/400 ml'}
-    end
-    leucinum_I =  result.compositions[0].substances.find{ |x| x.name.eql?('Leucinum') }
-    specify { expect(leucinum_I).to eq nil}
-    leucinum_II =  result.compositions[1].substances.find{ |x| x.name.eql?('Leucinum') }
-    specify { expect(leucinum_II).to eq nil}
- #    aqua =  result.compositions[2].substances.find{ |x| /aqua ad/i.match(x.name) }
- #   specify { expect(aqua.name).to eq "Aqua Ad Iniectabilia Q.s. Ad Solutionem Pro"}
-  end
 
   context 'find correct result compositions for 00613 Pentavac' do
     line_1 = "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum tetani 40 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg, virus poliomyelitis typus 1 inactivatum (D-Antigen) 40 U., virus poliomyelitis typus 2 inactivatum (D-Antigen) 8 U., virus poliomyelitis typus 3 inactivatum (D-Antigen) 32 U., aluminium ut aluminii hydroxidum hydricum ad adsorptionem, formaldehydum 10 µg, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum, streptomycinum, polymyxini B sulfas, medium199, aqua q.s. ad suspensionem pro 0.5 ml."
@@ -504,7 +448,7 @@ if RunAllTests
     if toxoidum
       specify { expect(toxoidum.name).to eq  'Toxoidum Diphtheriae' }
       specify { expect(toxoidum.qty.to_f).to eq  30.0 }
-      specify { expect(toxoidum.unit).to eq  'U.I/ml' }
+      specify { expect(toxoidum.unit).to eq  'U.I./0.5 ml' }
     end
   end
 
@@ -518,7 +462,7 @@ if RunAllTests
     specify { expect(fluticasoni.unit).to eq  'µg/25 mg' }
     specify { expect(fluticasoni.dose.to_s).to eq  "100 µg/25 mg" }
     lactosum =  info.first.substances.find{ |x| x.name.match(/Lactosum/i) }
-    specify { expect(lactosum.name).to eq "Lactosum Monohydricum Q.s. Ad Pulverem Pro" }
+    specify { expect(lactosum.name).to eq "Lactosum Monohydricum" }
     specify { expect(lactosum.dose.to_s).to eq  "25 mg" }
   end
 
@@ -526,7 +470,7 @@ if RunAllTests
     txt = 'calcium carbonicum hahnemanni C7 5 %, chamomilla recutita D5 22.5 %, magnesii hydrogenophosphas trihydricus C5 50 %, passiflora incarnata D5 22.5 %, xylitolum, excipiens ad globulos.'
     info = ParseUtil.parse_compositions(txt)
     specify { expect(info.size).to eq  1 }
-    specify { expect(info.first.substances.size).to eq  6 }
+    specify { expect(info.first.substances.size).to eq ExcipiensIs_a_Substance ? 6 : 5 }
     recutita =  info.first.substances.find{ |x| x.name.match(/recutita/i) }
     specify { expect(recutita.name).to eq  'Chamomilla Recutita D5' }
     specify { expect(recutita.qty.to_f).to eq  22.5 }
@@ -553,7 +497,7 @@ if RunAllTests
                       text
                       )
     specify { expect(info.compositions.size).to eq  2 }
-    specify { expect(info.compositions.first.substances.size).to eq  7 }
+    specify { expect(info.compositions.first.substances.size).to eq ExcipiensIs_a_Substance ? 7 : 6 }
     poloxamerum =  info.compositions.first.substances.find{ |x| x.name.match(/poloxamerum/i) }
     skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
     skip { expect(poloxamerum.qty.to_f).to eq  "" }
@@ -667,7 +611,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
                     text)
     specify { expect(info.pkg_size).to eq '2 x 7' }
     specify { expect(info.selling_units).to eq 14 }
-    specify { expect(info.compositions.first.substances.size).to eq 3 }
+    specify { expect(info.compositions.first.substances.size).to eq ExcipiensIs_a_Substance ? 3 : 2 }
     viscum =  info.compositions.first.substances.find{ |x| x.name.match(/viscum/i) }
     specify { expect(viscum).not_to eq nil}
     natrii =  info.compositions.first.substances.find{ |x| x.name.match(/natrii chloridum/i) }
@@ -678,9 +622,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
       specify { expect(viscum.dose.to_s).to eq  '0.01 mg/ml' }
       specify { expect(viscum.qty.to_f).to eq  0.01}
       specify { expect(viscum.unit).to eq  'mg/ml'}
-      specify { expect(viscum.chemical_substance.name).to eq  nil }
-      specify { expect(viscum.chemical_substance.qty).to eq  nil }
-      specify { expect(viscum.chemical_substance.unit).to eq nil }
+      specify { expect(viscum.chemical_substance).to eq  nil }
     end
   end
   context 'find correct result compositions for 56829 sequence 23 Iscador Ag 0,01 mg' do
@@ -690,7 +632,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
                     text)
     specify { expect(info.pkg_size).to eq '2 x 7' }
     specify { expect(info.selling_units).to eq 14 }
-    specify { expect(info.compositions.first.substances.size).to eq 4 }
+    specify { expect(info.compositions.first.substances.size).to eq ExcipiensIs_a_Substance ? 4 : 3 }
     viscum =  info.compositions.first.substances.find{ |x| x.name.match(/viscum/i) }
     specify { expect(viscum).not_to eq nil}
     if viscum
@@ -698,9 +640,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
       specify { expect(viscum.dose.to_s).to eq  '0.01 mg/ml' }
       specify { expect(viscum.qty.to_f).to eq  0.01}
       specify { expect(viscum.unit).to eq  'mg/ml'}
-      specify { expect(viscum.chemical_substance.name).to eq  nil }
-      specify { expect(viscum.chemical_substance.qty).to eq  nil }
-      specify { expect(viscum.chemical_substance.unit).to eq nil }
+      specify { expect(viscum.chemical_substance).to eq  nil }
     end
     argenti =  info.compositions.first.substances.find{ |x| x.name.match(/Argenti/i) }
     specify { expect(argenti).not_to eq nil}
@@ -709,9 +649,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
       skip  { expect(argenti.dose.to_s).to eq  '0.01 mg/ml' } # 100 mg/ml
       skip  { expect(argenti.qty.to_f).to eq  0.01}
       skip  { expect(argenti.unit).to eq  'mg/ml'}
-      specify { expect(argenti.chemical_substance.name).to eq  nil }
-      specify { expect(argenti.chemical_substance.qty).to eq  nil }
-      specify { expect(argenti.chemical_substance.unit).to eq nil }
+      specify { expect(argenti.chemical_substance).to eq  nil }
     end
   end
 end

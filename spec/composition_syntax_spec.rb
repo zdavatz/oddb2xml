@@ -3,9 +3,56 @@
 require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
+require 'parslet/convenience'
 
 RunAllParsingExamples = false # Takes over 3 minutes to run, all the other ones just a few seconds
+GoIntoPry = false
+describe CompositionParser do
+ context "identifier parsing" do
+    let(:identifier_parser) { parser.identifier }
 
+    it "parses identifier" do
+      res1 = identifier_parser.parse_with_debug('D2')
+      pp res1
+      res2 = identifier_parser.parse_with_debug('calendula' )
+      pp res2
+      binding.pry
+    end
+  end if false
+
+  let(:parser) { CompositionParser.new }
+  context "should help me find problems" do
+    let(:substance_name_parser) { parser.substance_name }
+
+    it "parses substance_name my manual test" do
+      res1 = substance_name_parser.parse_with_debug(
+'calendula officinalis D2' )
+      pp res1
+      res2 = substance_name_parser.parse_with_debug(      'macrogolum 3350' )
+      pp res2
+      res3 = substance_name_parser.parse_with_debug(      'virus poliomyelitis typus inactivatum' )
+      pp res3
+      binding.pry
+    end
+  end
+  context "should help me find problems" do
+    let(:substance_parser) { parser.substance }
+
+    it "parses substance my manual test" do
+      res1 = substance_parser.parse_with_debug(
+'calendula officinalis D2 2,2 mg' )
+      pp res1
+      res2 = substance_parser.parse_with_debug(      'macrogolum 3350 33.7 mg' )
+      pp res2
+      res3 = substance_parser.parse_with_debug(
+'calendula officinalis D2' )
+      pp res3
+      binding.pry
+    end
+  end if false
+end if GoIntoPry
+
+unless GoIntoPry
 excipiens_tests = {
   'aether q.s. ad solutionem pro 1 g' => 'aether q.s. ad solutionem',
   'saccharum ad globulos pro 1 g'  => 'saccarum',
@@ -163,11 +210,42 @@ describe CompositionParser do
     let(:dose_parse) { parser.dose }
 
     should_pass = [
+      "40 U.",
+      "50'000 U.I.",
+#      "3,45",
+#      "123",
+#      "123.45",
+#      'mg',
+#      'ml',
+      '3 Mg',
+      '2 mg',
+      '0.3 ml',
+      '0.01 mg/ml',
+      '3 mg/ml',
       '2*10^9 CFU',
+      '20 mg',
+      '100 % m/m',
+      '308.7 mg/g',
+      '0.11 µg/g',
+      '2.2 g',
+      '2,2 g',
+      '59.5 % V/V',
+      '50 %',
+      '80-120 g',
       ].each {
         |id|
         it "parses dose #{id}" do
           expect(dose_parse).to     parse(id)
+        end
+      }
+    should_not_pass = [
+      '10 2*10^9 CFU',
+      '20 20 mg',
+      '50%', # This can be part of a name like ferrum-quarz 50%
+      ].each {
+        |id|
+        it "parses dose #{id}" do
+          expect(dose_parse).to_not     parse(id)
         end
       }
   end
@@ -177,11 +255,12 @@ describe CompositionParser do
 
     it "parses identifier" do
       expect(identifier_parser).to     parse("calcium")
+      expect(identifier_parser).to     parse("D2")
+      expect(identifier_parser).to     parse("9,11-linolicum")
       expect(identifier_parser).to_not parse("10")
       expect(identifier_parser).to_not parse("pro asdf")
       expect(identifier_parser).to_not parse("calcium,")
       expect(identifier_parser).to_not parse("xenonum(133-Xe)")
-      expect(identifier_parser).to_not parse("9,11-linolicum")
     end
   end
 
@@ -263,6 +342,40 @@ describe CompositionParser do
 
   end
 
+  context "substance_name parsing" do
+    let(:substance_name_parser) { parser.substance_name }
+
+    should_pass = [
+      'calcium',
+#      'macrogolum 3350',
+      'calendula officinalis D2',
+#      'ferrum-quarz 50%',
+      'pollinis allergeni extractum (Phleum pratense)',
+      'retinoli palmitas',
+      ].each {
+        |id|
+        it "parses substance_name #{id}" do
+          expect(substance_name_parser).to     parse(id)
+        end
+      }
+
+    should_not_pass = [
+      'calcium 10 mg',
+      'ferrum-quarz 50% 20 mg',
+      'calendula officinalis D2 2.2 mg',
+      'macrogolum 3.2',
+      'macrogolum 3350 10 mg',
+      'pollinis allergeni extractum (Phleum pratense) 10 U.',
+      'retinoli palmitas 7900 U.I.',
+      ].each {
+        |id|
+        it "parses substance_name #{id}" do
+          expect(substance_name_parser).not_to     parse(id)
+        end
+      }
+
+  end
+
   context "simple_substance parsing" do
     let(:simple_substance_parser) { parser.simple_substance }
     should_pass = [
@@ -292,7 +405,6 @@ describe CompositionParser do
     should_pass = [
       'calcium',
       'calcium par_2 Part_C',
-      'ethanol.',
       'semecarpus anacardium D12',
       'virus poliomyelitis typus inactivatum',
       'virus poliomyelitis typus inactivatum (D-Antigen)',
@@ -302,6 +414,7 @@ describe CompositionParser do
       'DER: 3-5:1',
       'DER: 6-8:1',
       'DER: 4.0-9.0:1',
+      'calendula officinalis D2',
 #      "Viperis Antitoxinum Equis F(ab')2", swissmedic patch, as only one occurrence
       "xenonum(133-Xe)",
       ].each {
@@ -312,12 +425,13 @@ describe CompositionParser do
         end
       }
     should_not_pass = [
+      'calendula officinalis D2 2,2 mg',
       'calcium corresp. xx',
       'calcium residui: xx',
       'calcium ut xx',
       'calcium et xx',
-      'calcium 10',
       'calcium,',
+      'ethanol.',
       'calcium9,',
       'excipiens pro',
       'albuminum humanum colloidale, stanni(II) chloridum dihydricum',
@@ -351,12 +465,16 @@ describe CompositionParser do
     composition_tests.each{
       |value, name|
       let(:composition_parser) { parser.composition }
-      it "parses composition #{value}" do   expect(composition_parser).to parse(value)     end
+      it "parses composition #{value}" do
+        expect(composition_parser).to parse(value)
+      end
     }
     puts "Testing whether #{substance_tests.size} substances can be parsed"
     substance_tests.each{
       |value, name|
-      it "parses substance #{value}" do   expect(composition_parser).to parse(value)   end
+      it "parses substance #{value}" do
+        expect(composition_parser).to parse(value)
+      end
     }
 
     if RunAllParsingExamples
@@ -374,4 +492,5 @@ describe CompositionParser do
 
   end
 
+end
 end
