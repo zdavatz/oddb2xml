@@ -681,12 +681,13 @@ module Oddb2xml
               xml.COMPOSITIONS {
                 info.compositions.each { |composition|
                   xml.COMPOSITION {
-                    # xml.SOURCE composition.source # emit this if you want to debug the results
+                    xml.CORRESP composition.corresp if composition.corresp
                     xml.LABEL composition.label if composition.label
                     xml.LABEL_DESCRIPTION composition.label_description if composition.label_description
                     xml.SUBSTANCES {
                       composition.substances.each { |substance|
                         xml.SUBSTANCE {
+                          xml.MORE_INFO substance.more_info if substance.more_info
                           xml.SUBSTANCE_NAME substance.name
                           xml.IS_ACTIVE_AGENT substance.is_active_agent
                           if substance.unit
