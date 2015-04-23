@@ -396,6 +396,18 @@ class CompositionTransformer < Parslet::Transform
       @@excipiens = dose
       @@substances <<  substance
   }
+  rule(:substance_name => simple(:substance_name),
+       :dose => simple(:dose),
+       :dose_pro => simple(:dose_pro),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      dose = dictionary[:dose_pro].is_a?(ParseDose) ? dictionary[:dose_pro] : ParseDose.new(dictionary[:dose_pro].to_s)
+      dose_pro = dictionary[:dose_pro].is_a?(ParseDose) ? dictionary[:dose_pro] : ParseDose.new(dictionary[:dose_pro].to_s)
+      substance = ParseSubstance.new(dictionary[:substance_name], dose)
+      @@excipiens = dose_pro
+      @@substances <<  substance
+  }
 
   rule(:dose_pro => simple(:dose_pro),
        ) {

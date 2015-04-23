@@ -10,14 +10,14 @@ require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
 
 hostname = Socket.gethostbyname(Socket.gethostname).first
-RunAllCompositionsTests = /travis/i.match(hostname) != nil # takes about five minutes to run!
+RunAllCompositionsTests = /travis|localhost/i.match(hostname) != nil # takes about five minutes to run!
 puts "hostname is #{hostname} RunAllCompositionsTests #{RunAllCompositionsTests}"
 # Testing whether 8937 composition lines can be parsed. Found 380 errors in 293 seconds
 # 520 examples, 20 failures, 1 pending
 
 RunCompositionExamples = true
 RunSubstanceExamples = true
-RunFailingSpec = true
+RunFailingSpec = false
 RunExcipiensTest = true
 RunSpecificTests = true
 RunMostImportantParserTests = true
@@ -27,17 +27,49 @@ to_add = %(
   VERBOSE_MESSAGES = true
       pp composition; binding.pry
 )
+
 end
 
 describe ParseComposition do
+  context "allow substance complicated, calculated dose '6.0 +/-1.2 µg'" do
+    string =
+"piscis oleum 500 mg corresp. acida carboxylica omega-3 oligoinsaturata 150 mg ut acidum eicosapentaenoicum 90 mg et acidum docosahexaenoicum 60 mg, excipiens pro capsula"
+    composition = ParseComposition.from_string(string)
+    pp composition; binding.pry
+    specify { expect(composition.substances.first.name).to eq  'Magnesii Aspartas Dihydricus' }  # TODO:
+    specify { expect(composition.substances.first.chemical_substance.name).to eq  'Magnesium' }  # TODO:
+    specify { expect(composition.substances.size).to eq  5 }
+  end
+
+  context "allow substance complicated, calculated dose '6.0 +/-1.2 µg'" do
+    string =
+"enzephalitidis japanensis virus antigenum (Stamm: SA-14-2) 6.0 +/-1.2 µg, aluminium ut aluminii oxidum hydricum, kalii dihydrogenophosphas, dinatrii phosphas anhydricus, natrii chloridum, aqua q.s. ad solutionem pro 0.5 ml"
+    composition = ParseComposition.from_string(string)
+    pp composition; binding.pry
+    specify { expect(composition.substances.first.name).to eq  'Magnesii Aspartas Dihydricus' }
+    specify { expect(composition.substances.first.chemical_substance.name).to eq  'Magnesium' }
+    specify { expect(composition.substances.size).to eq  5 }
+  end
+end if RunFailingSpec
+
+describe ParseComposition do
+  context "allow 2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum)" do
+    string = "2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum)"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.first.name).to eq  "2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum)" }
+    specify { expect(composition.substances.size).to eq  1 }
+  end
+
   context "allow substancename with 90 % " do
     string =
 "acidum nitricum 70 per centum 580.66 mg, acidum aceticum glaciale 41.08 mg, acidum oxalicum dihydricum 57.32 mg, acidum lacticum 90 % 4.55 mg, cupri(II) nitras trihydricus 0.048 mg, excipiens ad solutionem pro 1 ml"
-    string = "acidum lacticum 90 % 4.55 mg"
-    composition = ParseComposition.from_string(string)
-    specify { expect(composition.substances.first.name).to eq  'Acidum Lacticum 90 %' }
-    specify { expect(composition.substances.first.dose.to_s).to eq  '4.55 mg' }
+        composition = ParseComposition.from_string(string)
     specify { expect(composition.substances.size).to eq  5 }
+    substance = composition.substances.find{ |x| /lacticum/i.match(x.name) }
+    specify { expect(composition.substances.first.name).to eq  "Acidum Nitricum" }
+    specify { expect(composition.substances.first.dose.to_s).to eq  "580.66 mg/ml" }
+    specify { expect(substance.name).to eq  'Acidum Lacticum 90 %' }
+    specify { expect(substance.dose.to_s).to eq  '4.55 mg/ml' }
   end
   context "allow substance with two corresp" do
     string = "magnesii aspartas dihydricus 3.895 g corresp. magnesium 292 mg corresp. 12 mmol, arom.: bergamottae aetheroleum et alia, natrii cyclamas, saccharinum natricum, excipiens ad granulatum pro charta"

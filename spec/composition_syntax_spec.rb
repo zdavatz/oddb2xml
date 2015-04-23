@@ -8,18 +8,18 @@ require 'parslet/convenience'
 RunAllParsingExamples = false # Takes over 3 minutes to run, all the other ones just a few seconds
 GoIntoPry = false
 describe CompositionParser do
+let(:parser) { CompositionParser.new }
  context "identifier parsing" do
-    let(:identifier_parser) { parser.identifier }
+    let(:identifier_parser) { parser.substance }
 
     it "parses identifier" do
-      res1 = identifier_parser.parse_with_debug('D2')
+      res1 = identifier_parser.parse_with_debug("acidum lacticum 90 % 4.55 mg")
       pp res1
-      res2 = identifier_parser.parse_with_debug('calendula' )
-      pp res2
       binding.pry
     end
   end if false
-
+end
+describe CompositionParser do
   let(:parser) { CompositionParser.new }
   context "should help me find problems" do
     let(:substance_name_parser) { parser.substance_name }
@@ -258,10 +258,10 @@ describe CompositionParser do
       expect(identifier_parser).to     parse("calcium")
       expect(identifier_parser).to     parse("D2")
       expect(identifier_parser).to     parse("9,11-linolicum")
+      expect(identifier_parser).to     parse("xenonum(133-Xe)")
       expect(identifier_parser).to_not parse("10")
       expect(identifier_parser).to_not parse("pro asdf")
       expect(identifier_parser).to_not parse("calcium,")
-      expect(identifier_parser).to_not parse("xenonum(133-Xe)")
     end
   end
 
@@ -324,6 +324,8 @@ describe CompositionParser do
     should_pass = [
       'calcium',
       'calcium 10 mg',
+      'ferrum-quarz 50% 20 mg',
+      'macrogolum 3350',
       'pollinis allergeni extractum (Phleum pratense) 10 U.',
       'phenoxymethylpenicillinum kalicum 1 U.I.',
       'phenoxymethylpenicillinum kalicum 1 Mio. U.I.',
@@ -352,7 +354,6 @@ describe CompositionParser do
       'calcium',
 #      'macrogolum 3350',
       'calendula officinalis D2',
-#      'ferrum-quarz 50%',
       'pollinis allergeni extractum (Phleum pratense)',
       'retinoli palmitas',
       ].each {
@@ -382,6 +383,7 @@ describe CompositionParser do
   context "simple_substance parsing" do
     let(:simple_substance_parser) { parser.simple_substance }
     should_pass = [
+      "2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum)",
       "calcium part_b",
       "calcium 10",
       "calcium 10 mg",

@@ -39,16 +39,22 @@ class CompositionParser < Parslet::Parser
                         ((space? >> match['a-zA-Z']).repeat(1)).repeat(0)
                         } # e.g. Xenonum (133-Xe) or yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt
   rule(:ratio_value) { match['0-9:\-\.'].repeat(1)  >> space?}  # eg. ratio: 1:1, ratio: 1:1.5-2.4., ratio: 1:0.68-0.95
-  rule(:identifier) { (match['a-zA-Zéàèèçïöäüâ'] | digit >> str('-'))  >> match['0-9a-zA-Z\-éàèèçïöäüâ\'\/\.'].repeat(0) }
-  # handle stuff like acidum 9,11-linolicum specially. it must contain at least one a-z
+
+  # handle stuff like acidum 9,11-linolicum or 2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum) specially. it must contain at least one a-z
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
   rule(:identifier_D12) { match['a-zA-Z'] >>  match['0-9'].repeat(1) }
-  rule(:identifier) { str('spag.') | str('spp.') | str('A + B') | str('ca.') | str('var.') | str('spec.') | identifier_D12 | identifier_without_comma }
+  rule(:identifier)  {  str('spag.') | str('spp.') | str('ssp.') |
+                        str('A + B') | str('ca.') | str('var.') | str('spec.') >>
+                        identifier_D12 | identifier_without_comma | identifier_with_comma
+                     }
+
   rule(:identifier_with_comma) {
     match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_,']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0)
   }
+
   rule(:identifier_without_comma) {
-    match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0)
+    match['0-9\',\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0) >>
+        lparen >> (rparen.absent? >> any).repeat(1) >> rparen
   }
   rule(:one_word) { match['a-zA-Z'] >> match['0-9'].repeat(1) | match['a-zA-Z'].repeat(1) }
   rule(:in_parent) { lparen >> one_word.repeat(1) >> rparen }
@@ -60,6 +66,7 @@ class CompositionParser < Parslet::Parser
                            str('g/l') |
                            str('g/L') |
                            str('% V/V') |
+                           str('µg/24 h') |
                            str('µg/g') |
                            str('µg') |
                            str('guttae') |
@@ -113,6 +120,7 @@ class CompositionParser < Parslet::Parser
   # Grammar parts
   rule(:useage) {   (any >> str('berzug:')) | # match Überzug
                     str('antiox.:') |
+                    str('potenziert mit.:') |
                     str('arom.:') |
                     str('conserv.:') |
                     str('color.:')
@@ -134,7 +142,9 @@ class CompositionParser < Parslet::Parser
                             str('Mio ') |
                             str('et ') |
                             str('ut ') |
+                            str('Beutel: ') |
                             str('ut alia: ') |
+                            str('per centum ') |
                             str('pro dosi') |
                             str('pro capsula') |
                             (digits.repeat(1) >> space >> str(':')) | # match 50 %
@@ -174,6 +184,7 @@ class CompositionParser < Parslet::Parser
                           }
   rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.as(:dose).maybe}
   rule(:simple_subtance_with_digits_in_name_and_dose)  {
+    substance_lead.maybe >> space? >>
     (name_without_parenthesis >> space? >> ((digits.repeat(1) >> (str(' %') | str('%')) | digits.repeat(1)))).as(:substance_name) >>
     space >> dose_with_unit.as(:dose)
   }
@@ -205,6 +216,7 @@ class CompositionParser < Parslet::Parser
                        str('aqua q.s. ad suspensionem pro ') |
                        str('q.s. ad pulverem pro ') |
                        str('pro vase ') |
+                       str('per centum ') |
                        str('excipiens ad emulsionem pro ') |
                        str('excipiens ad pulverem pro ') |
                        str('aqua ad iniectabilia q.s. ad solutionem pro ')
@@ -232,6 +244,7 @@ class CompositionParser < Parslet::Parser
                       }
 
   rule(:substance_lead) { useage.as(:more_info) >> space? |
+                      str('Beutel:').as(:more_info) >> space? |
                       str('residui:').as(:more_info) >> space? |
                       str('mineralia').as(:mineralia) >> str(':') >> space? |
                       str('Solvens:').as(:solvens) >> space? |
