@@ -18,11 +18,14 @@ module ParseUtil
   # Reports the number of occurrences of each entry
   class HandleSwissmedicErrors
 
+    attr_accessor :nrParsingErrors
     class ErrorEntry   < Struct.new('ErrorEntry', :pattern, :replacement, :nr_occurrences)
     end
 
     def reset_errors
       @errors = []
+      @nrLines = 0
+      @nrParsingErrors = 0
     end
 
     # error_entries should be a hash of  pattern, replacement
@@ -32,7 +35,7 @@ module ParseUtil
     end
 
     def report
-      s = ["Report of changed compositions" ]
+      s = ["Report of changed compositions in #{@nrLines} lines. Had #{@nrParsingErrors} parsing errors" ]
       @errors.each {
         |entry|
       s << "  replaced #{entry.nr_occurrences} times '#{entry.pattern}'  by '#{entry.replacement}'"
@@ -46,8 +49,9 @@ module ParseUtil
         |entry|
         intermediate = result.clone
         result = result.gsub(entry.pattern,  entry.replacement)
-        entry.nr_occurrences += 1 unless intermediate.eql?(intermediate)
+        entry.nr_occurrences += 1 unless result.eql?(intermediate)
       }
+      @nrLines += 1
       result
     end
     #  hepar sulfuris D6 2,2 mg hypericum perforatum D2 0,66 mg where itlacks a comma and should be hepar sulfuris D6 2,2 mg, hypericum perforatum D2 0,66 mg
@@ -502,9 +506,6 @@ class ParseComposition
                   /(\d+)\s+\-\s*(\d+)/ => '\1-\2',
                   /(excipiens ad solutionem pro \d+ ml), corresp\./ => '\1 corresp.',
                   /^(acari allergeni extractum 5000 U\.\:)/ => 'A): \1',
-
-                  # excipiens ad solutionem pro 1 ml
-                  "F(ab')2" => "F_ab_2",
                 }
   @@errorHandler = ParseUtil::HandleSwissmedicErrors.new( ErrorsToFix )
 
@@ -523,6 +524,7 @@ class ParseComposition
     return nil if string == nil or  string.eql?('.') or string.eql?('')
     stripped = string.gsub(/^"|["\n]+$/, '')
     return nil unless stripped
+    @@errorHandler.nrParsingErrors += 1
     if /(U\.I\.|U\.)$/.match(stripped)
       cleaned = stripped
     else
@@ -577,6 +579,7 @@ class ParseComposition
       end
       result.label_description = label_description
     end
+    @@errorHandler.nrParsingErrors -=1 if result.substances.size > 0 or result.corresp
     return result
   end
 end
