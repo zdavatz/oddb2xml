@@ -31,7 +31,18 @@ end
 
 describe ParseComposition do
 
- context "should handle '150 U.I. hFSH et 150 U.I. hLH'" do
+  context "should handle '150 U.I. hFSH et 150 U.I. hLH'" do
+    string =
+'Tela cum praeparatione (Panel 1): niccoli sulfas 0.16 mg, alcoholes adipis lanae 0.81 mg, neomycini sulfas 0.49 mg, kalii dichromas 44 µg, Cain-mix: benzocainum 0.364 mg, cinchocaini hydrochloridum 73 µg, tetracaini hydrochloridum 73 µg, Parfum-Mix: amylcinnamaldehydum 15 µg, isoeugenolum 15 µg, cinnamaldehydum 34 µg, eugenolum 34 µg, alcohol cinnamylicus 54 µg, hydroxycitronellalum 54 µg, geraniolum 70 µg, evernia prunastri 70 µg, colophonium 0.97 mg, E 320, E 321, Paraben-Mix: E 218 0.16 mg, E 214 0.16 mg, E 216 0.16 mg, butylis parahydroxybenzoas 0.16 mg, benzylis parahydroxybenzoas 0.16 mg, Negativ-Kontrolle, balsamum peruvianum 0.65 mg, ethylendiamini dihydrochloridum 41 µg, cobalti dichloridum 16 µg, excipiens pro praeparatione'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    context "wrong name Benzocainum" do
+        specify { expect( composition.substances.first.name).to eq "Niccoli Sulfas" } # TODO: is not Benzocainum
+    end
+    specify { expect( composition.label).to eq "Tela cum praeparatione (Panel 1):" }
+  end
+
+  context "should handle '150 U.I. hFSH et 150 U.I. hLH'" do
     string = 'Praeparatio cryodesiccata: menotropinum 150 U.I. hFSH et 150 U.I. hLH, gonadotropinum chorionicum 7-21 U.I. hCG, lactosum monohydricum, pro vitro'
     composition = ParseComposition.from_string(string)
     specify { expect(composition.source).to eq string}
@@ -69,7 +80,6 @@ describe ParseComposition do
     string =
 "piscis oleum 500 mg corresp. acida carboxylica omega-3 oligoinsaturata 150 mg ut acidum eicosapentaenoicum 90 mg et acidum docosahexaenoicum 60 mg, excipiens pro capsula"
     composition = ParseComposition.from_string(string)
-    pp composition; binding.pry
     specify { expect(composition.substances.first.name).to eq  'Magnesii Aspartas Dihydricus' }  # TODO:
     specify { expect(composition.substances.first.chemical_substance.name).to eq  'Magnesium' }  # TODO:
     specify { expect(composition.substances.size).to eq  5 }
@@ -79,7 +89,6 @@ describe ParseComposition do
     string =
 "enzephalitidis japanensis virus antigenum (Stamm: SA-14-2) 6.0 +/-1.2 µg, aluminium ut aluminii oxidum hydricum, kalii dihydrogenophosphas, dinatrii phosphas anhydricus, natrii chloridum, aqua q.s. ad solutionem pro 0.5 ml"
     composition = ParseComposition.from_string(string)
-    pp composition; binding.pry
     specify { expect(composition.substances.first.name).to eq  'Magnesii Aspartas Dihydricus' }
     specify { expect(composition.substances.first.chemical_substance.name).to eq  'Magnesium' }
     specify { expect(composition.substances.size).to eq  5 }
@@ -510,7 +519,7 @@ describe ParseComposition do
       specify { expect(composition.substances.first.name).to eq "Virus Rabiei Inactivatum (stamm: Wistar Rabies Pm/wi 38-1503-3m)" }
       specify { expect(composition.substances.first.qty).to eq 2.5 }
       specify { expect(composition.substances.first.unit).to eq 'U.I.' }
-      specify { expect(composition.substances.first.more_info).to eq "Praeparatio cryodesiccata" }
+      specify { expect(composition.label).to eq "Praeparatio cryodesiccata:" }
     end
 
     context "should return correct composition for containing Histamin Equivalent Pric. (e.g IKSNR 58566)" do
@@ -714,8 +723,8 @@ describe ParseComposition do
       string = "Praeparatio cryodesiccata: pollinis allergeni extractum 25'000 U.: urtica dioica"
       composition = ParseComposition.from_string(string)
       substance = composition.substances.first
-      specify { expect(substance.name).to eq 'Pollinis Allergeni Extractum' }
-      specify { expect(substance.description).to eq 'Praeparatio cryodesiccata' }
+#      specify { expect(substance.name).to eq 'Urtica Dioica' } # TODO: is this okay?
+      specify { expect(composition.label).to eq 'Praeparatio cryodesiccata:' }
     end
 
     context "should return correct substance for equis F(ab')2" do

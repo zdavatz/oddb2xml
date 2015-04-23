@@ -99,6 +99,7 @@ class CompositionParser < Parslet::Parser
                            str('U.I. hCG') |
                            str('U.I. hLH') |
                            str('U.I.') |
+                           str('U./ml') |
                            str('U.') |
                            str('Mia.') |
                            str('Mrd.') |
@@ -106,10 +107,10 @@ class CompositionParser < Parslet::Parser
                            str('% m/m') |
                            str('%')
                           ).as(:unit) }
-  rule(:qty_range)       { (number >> space? >> (str(' - ') | str(' -') | str('-')) >> space? >> number).as(:qty_range) }
+  rule(:qty_range)       { (number >> space? >> (str(' - ') | str(' -') | str('-') | str('±')) >> space? >> number).as(:qty_range) }
   rule(:qty_unit)       { dose_qty >> (space >> dose_unit).maybe }
   rule(:dose_qty)       { number.as(:qty) }
-  rule(:min_max)        { (str('min.') | str('max.') | str('ca.') ) >> space? }
+  rule(:min_max)        { str('mind.') | (str('min.') | str('max.') | str('ca.') ) >> space? } # TODO: swissmedic should replace mind. -> min.
   # 75 U.I. hFSH et 75 U.I. hLH
   rule(:dose_fsh) { qty_unit >> space >> str('et') >> space >> qty_unit.as(:dose_right) }
   rule(:dose)           { dose_fsh |
@@ -304,18 +305,22 @@ class CompositionParser < Parslet::Parser
   # rule(:one_substance)       { (substance_ut).as(:substance) } # >> str('.').maybe }
   rule(:all_substances)      { (one_substance >> substance_separator.maybe).repeat(1) }
   rule(:composition)         { all_substances }
+  rule(:long_labels) {
+        str('Praeparatio cryodesiccata:') |
+        str('Tela cum praeparatione (Panel ') >> digit >> str('):') 
+      }
   rule(:label_id) {
      (
-                           str('V') |
-                           str('IV') |
-                           str('III') |
-                           str('II') |
-                           str('I') |
-                           str('A') |
-                           str('B') |
-                           str('C') |
-                           str('D') |
-                           str('E')
+        str('V') |
+        str('IV') |
+        str('III') |
+        str('II') |
+        str('I') |
+        str('A') |
+        str('B') |
+        str('C') |
+        str('D') |
+        str('E')
      )
   }
   rule(:label_separator) {  (str('):')  | str(')')) }
@@ -325,6 +330,7 @@ class CompositionParser < Parslet::Parser
   }
   rule(:leading_label) {    label_id >> label_separator >> (str(' et ') | str(', ') | str(' pro usu: ') | space) >>
                             label_id >> label_separator >> any.repeat(1)  |
+                            long_labels.as(:label) |
                             label
     }
   rule(:corresp_label) {
