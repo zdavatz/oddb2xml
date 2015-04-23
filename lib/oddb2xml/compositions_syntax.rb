@@ -44,7 +44,7 @@ class CompositionParser < Parslet::Parser
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
   rule(:identifier_D12) { match['a-zA-Z'] >>  match['0-9'].repeat(1) }
   rule(:identifier)  {  str('spag.') | str('spp.') | str('ssp.') |
-                        str('A + B') | str('ca.') | str('var.') | str('spec.') >>
+                        str('A + B') | str('ca.') | str('var.') | str('spec.') |
                         identifier_D12 | identifier_without_comma | identifier_with_comma
                      }
 
@@ -172,7 +172,7 @@ class CompositionParser < Parslet::Parser
                                }
   rule(:name_with_parenthesis) {
     forbidden_in_substance_name.absent? >>
-    ((str(',') | lparen).absent? >> any).repeat(0) >> part_with_parenthesis >>
+    ((comma | lparen).absent? >> any).repeat(0) >> part_with_parenthesis >>
     (forbidden_in_substance_name.absent? >> (identifier.repeat(1) | part_with_parenthesis | rparen) >> space?).repeat(0)
   }
   rule(:substance_name) { (

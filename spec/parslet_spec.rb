@@ -27,10 +27,10 @@ to_add = %(
   VERBOSE_MESSAGES = true
       pp composition; binding.pry
 )
-
 end
 
 describe ParseComposition do
+
   context "allow substance complicated, calculated dose '6.0 +/-1.2 µg'" do
     string =
 "piscis oleum 500 mg corresp. acida carboxylica omega-3 oligoinsaturata 150 mg ut acidum eicosapentaenoicum 90 mg et acidum docosahexaenoicum 60 mg, excipiens pro capsula"
@@ -688,7 +688,7 @@ describe ParseComposition do
       string = "viperis antitoxinum equis F(ab')2"
       composition = ParseComposition.from_string(string)
       substance = composition.substances.first
-      specify { expect(substance.name).to eq "Viperis Antitoxinum Equis F_ab_2" }
+      specify { expect(substance.name).to eq "Viperis Antitoxinum Equis F(ab')" }
     end
 
     context "should return correct substance for with two et substances corresp" do
@@ -994,14 +994,14 @@ if RunSpecificTests
   end
 
   context "should return correct composition for 'terra silicea spec..'" do
-    string = 'terra silicea spec..'
+    string = 'terra silicea spec. 810 mg, excipiens pro compresso'
     composition = ParseComposition.from_string(string)
     specify { expect(composition.source).to eq string}
     specify { expect(composition.label).to eq nil }
     specify { expect(composition.label_description).to eq nil }
     specify { expect(composition.galenic_form).to eq nil }
     specify { expect(composition.route_of_administration).to eq nil }
-    specify { expect( composition.substances.first.name).to eq "Terra Silicea Spec" }
+    specify { expect( composition.substances.first.name).to eq "Terra Silicea Spec." }
   end
 
   context "should return correct composition for 'minoxidilum'" do
