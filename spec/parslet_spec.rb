@@ -23,7 +23,6 @@ RunSpecificTests = true
 RunMostImportantParserTests = true
 
 describe ParseComposition do
-#
 to_add = %(
   VERBOSE_MESSAGES = true
       pp composition; binding.pry
@@ -31,10 +30,38 @@ to_add = %(
 end
 
 describe ParseComposition do
+  context "allow substancename with 90 % " do
+    string =
+"acidum nitricum 70 per centum 580.66 mg, acidum aceticum glaciale 41.08 mg, acidum oxalicum dihydricum 57.32 mg, acidum lacticum 90 % 4.55 mg, cupri(II) nitras trihydricus 0.048 mg, excipiens ad solutionem pro 1 ml"
+    string = "acidum lacticum 90 % 4.55 mg"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.first.name).to eq  'Acidum Lacticum 90 %' }
+    specify { expect(composition.substances.first.dose.to_s).to eq  '4.55 mg' }
+    specify { expect(composition.substances.size).to eq  5 }
+  end
+  context "allow substance with two corresp" do
+    string = "magnesii aspartas dihydricus 3.895 g corresp. magnesium 292 mg corresp. 12 mmol, arom.: bergamottae aetheroleum et alia, natrii cyclamas, saccharinum natricum, excipiens ad granulatum pro charta"
+    composition = ParseComposition.from_string(string)
+    context "with correct names" do
+      specify { expect(composition.substances.first.name).to eq  'Magnesii Aspartas Dihydricus' }
+      specify { expect(composition.substances.first.chemical_substance.name).to eq  'Magnesium' }
+    end
+    specify { expect(composition.substances.size).to eq  5 }
+  end
+
+  context "allow substances containing ut, corresp, arom," do
+    string =
+"calcii carbonas 3 g corresp. calcium 1.2 g, cholecalciferolum 800 U.I. ut cholecalciferoli pulvis corresp. arom.: saccharinum, natrii cyclamas et alia, excipiens pro compresso"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  5 }
+  end
+
   context "allow substances containing 'A + '" do
     string = "sennosida 20 mg corresp. sennosida A + B calcica 12 mg, excipiens pro compresso obducto"
     composition = ParseComposition.from_string(string)
-    specify { expect(composition.substances.size).to eq  2 }
+    specify { expect(composition.substances.size).to eq  1 }
+    specify { expect(composition.substances.first.name).to eq  'Sennosida' }
+    specify { expect(composition.substances.first.chemical_substance.name).to eq  'Sennosida A + B Calcica' }
   end
 
   context "allow substances separted by ', et'" do

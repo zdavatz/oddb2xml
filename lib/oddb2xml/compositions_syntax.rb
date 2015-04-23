@@ -43,7 +43,7 @@ class CompositionParser < Parslet::Parser
   # handle stuff like acidum 9,11-linolicum specially. it must contain at least one a-z
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
   rule(:identifier_D12) { match['a-zA-Z'] >>  match['0-9'].repeat(1) }
-  rule(:identifier) { str('A + B') | str('ca.') | str('var.') | str('spec.') | identifier_D12 | identifier_without_comma }
+  rule(:identifier) { str('spag.') | str('spp.') | str('A + B') | str('ca.') | str('var.') | str('spec.') | identifier_D12 | identifier_without_comma }
   rule(:identifier_with_comma) {
     match['0-9,\-'].repeat(0) >> (match['a-zA-Z']|umlaut)  >> (match(['_,']).maybe >> (match['0-9a-zA-Z\-\'\/'] | umlaut)).repeat(0)
   }
@@ -57,6 +57,8 @@ class CompositionParser < Parslet::Parser
   # 150 U.I. hFSH et 150 U.I. hLH
   rule(:dose_unit)      { (
                            str('g/dm²') |
+                           str('g/l') |
+                           str('g/L') |
                            str('% V/V') |
                            str('µg/g') |
                            str('µg') |
@@ -81,12 +83,15 @@ class CompositionParser < Parslet::Parser
                            str('Mio CFU') |
                            str('Mio U.I.') |
                            str('Mio U.') |
+                           str('Mio. U.I.') |
+                           str('Mio. U.') |
                            str('U.I. hFSH') |
                            str('U.I. hCG') |
                            str('U.I. hLH') |
                            str('U.I.') |
                            str('U.') |
                            str('Mia.') |
+                           str('Mrd.') |
                            str('% m/m') |
                            str('% m/m') |
                            str('%')
@@ -169,14 +174,12 @@ class CompositionParser < Parslet::Parser
                           }
   rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.as(:dose).maybe}
   rule(:simple_subtance_with_digits_in_name_and_dose)  {
-    (name_without_parenthesis >> space? >> ((digits.repeat(1) >> str('%') | digits.repeat(1)))).as(:substance_name) >>
+    (name_without_parenthesis >> space? >> ((digits.repeat(1) >> (str(' %') | str('%')) | digits.repeat(1)))).as(:substance_name) >>
     space >> dose_with_unit.as(:dose)
   }
 
 
   rule(:pro_dose) { str('pro') >>  space >> dose.as(:dose_corresp) }
-
-  #  "sal ems 100 % m/m, corresp. ca., natrium 308.7 mg/g"
 
     # TODO: what does ut alia: impl?
   rule(:substance_ut) {
@@ -184,7 +187,7 @@ class CompositionParser < Parslet::Parser
   (space? >> (str('pro dosi ut ') | str('ut ') )  >>
     space? >> str('alia:').absent? >>
     (excipiens |
-    substance_name >> space? >> str('corresp.') >> space? >> simple_substance |
+    substance_name >> space? >> str('corresp.') >> space? >> substance_lead.maybe >> space? >> simple_substance |
     simple_substance
      ).as(:for_ut)
   ).repeat(1) >>
@@ -264,7 +267,7 @@ class CompositionParser < Parslet::Parser
     excipiens.as(:excipiens) |
     substance_ut |
     substance_lead.maybe >> space? >> lebensmittel_zusatz |
-    substance_lead.maybe >> space? >> simple_substance >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
+    substance_lead.maybe >> space? >> simple_substance >> corresp_substance.maybe >> space? >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
   }
 
   rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
@@ -309,6 +312,7 @@ class CompositionParser < Parslet::Parser
     str('Solvens (i.m.): ') |
     str('Solvens: ') |
     str('Solutio reconstituta:') |
+    str('Corresp., ') |
     str('Corresp. ') |
     str('corresp. ')
   }
