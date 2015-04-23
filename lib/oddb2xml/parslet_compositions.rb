@@ -257,6 +257,15 @@ class CompositionTransformer < Parslet::Transform
       @@substances <<  substance
       substance.more_info =  dictionary[:residui].to_s.sub(/:$/, '')
   }
+  rule(:qty => simple(:qty),
+       :unit => simple(:unit),
+       :dose_right => simple(:dose_right),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
+      ParseDose.new(dictionary[:qty].to_s, dictionary[:unit].to_s + ' et ' +  dictionary[:dose_right].to_s )
+  }
+
   rule(:substance_name => simple(:substance_name),
        :qty => simple(:qty),
        ) {
@@ -371,10 +380,10 @@ class CompositionTransformer < Parslet::Transform
       @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
       nil
   }
-
-  rule(:substance_name => simple(:substance_name),
-       :dose => simple(:dose),
-       :more_info => simple(:more_info)) {
+  rule( :more_info => simple(:more_info),
+        :substance_name => simple(:substance_name),
+        :dose => simple(:dose),
+      ) {
     |dictionary|
         puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
         dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : ParseDose.new(dictionary[:dose].to_s)

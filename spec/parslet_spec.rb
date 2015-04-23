@@ -31,6 +31,40 @@ end
 
 describe ParseComposition do
 
+ context "should handle '150 U.I. hFSH et 150 U.I. hLH'" do
+    string = 'Praeparatio cryodesiccata: menotropinum 150 U.I. hFSH et 150 U.I. hLH, gonadotropinum chorionicum 7-21 U.I. hCG, lactosum monohydricum, pro vitro'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    specify { expect( composition.substances.first.name).to eq "Menotropinum" }
+    specify { expect( composition.substances.first.dose.to_s).to eq "150 U.I. hFSH et 150 U.I. hLH" }
+  end
+
+  context "should handle '&' and 'deklr.'" do
+    string = 'TM: cardiospermum halicacabum 100 mg, cetearyl octanoat & isopropylmyristat deklar., alcohol benzylicus, aqua q.s. ad unguentum pro'
+    composition = ParseComposition.from_string(string)
+    composition = ParseComposition.from_string('macrogoli 9 aether laurilicus 5 mg, ethanolum 50 mg')
+    specify { expect( composition.substances.first.name).to eq "Tm: Cardiospermum Halicacabum" }
+  end
+
+  context "should handle 'potenziert mit: excipiens pro compresso'" do
+    string = 'ambra grisea D6 30 mg, conium maculatum D3 30 mg, anamirta cocculus D4 210 mg, petroleum rectificatum D8 30 mg, potenziert mit: excipiens pro compresso'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.label_description).to eq nil }
+    specify { expect(composition.galenic_form).to eq nil }
+    specify { expect(composition.route_of_administration).to eq nil }
+    specify { expect( composition.substances.first.name).to eq "Terra Silicea Spec." }
+  end
+
+  context "allow substancename with 'ethanol.'" do
+    string = "mandragora ethanol. decoctum D1 30 mg"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq  1 }
+    specify { expect(composition.substances.first.name).to eq  "Mandragora Ethanol. Decoctum D1" }
+    specify { expect(composition.substances.first.dose.to_s).to eq  "30 mg" }
+  end
+
   context "allow substance complicated, calculated dose '6.0 +/-1.2 µg'" do
     string =
 "piscis oleum 500 mg corresp. acida carboxylica omega-3 oligoinsaturata 150 mg ut acidum eicosapentaenoicum 90 mg et acidum docosahexaenoicum 60 mg, excipiens pro capsula"
@@ -284,7 +318,7 @@ describe ParseComposition do
     poloxamerum =  composition.substances.find{ |x| x.name.match(/poloxamerum/i) }
     skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
     skip { expect(poloxamerum.qty.to_f).to eq  "" }
-    specify { expect(poloxamerum.unit).to eq  "" }
+    specify { expect(poloxamerum.unit).to eq  nil }
   end
 
     context "should handle DER followed by corresp" do

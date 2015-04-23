@@ -10,14 +10,14 @@ GoIntoPry = false
 describe CompositionParser do
 let(:parser) { CompositionParser.new }
  context "identifier parsing" do
-    let(:identifier_parser) { parser.substance }
+    let(:identifier_parser) { parser.dose }
 
     it "parses identifier" do
-      res1 = identifier_parser.parse_with_debug( "terra silicea spec. 810 mg, excipiens pro compresso")
+    res1 = identifier_parser.parse_with_debug( "75 U.I. hFSH et 75 U.I. hLH")
       pp res1
       binding.pry
     end
-  end if false
+  end if 1
 end
 describe CompositionParser do
   let(:parser) { CompositionParser.new }

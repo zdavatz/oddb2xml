@@ -43,8 +43,9 @@ class CompositionParser < Parslet::Parser
   # handle stuff like acidum 9,11-linolicum or 2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum) specially. it must contain at least one a-z
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
   rule(:identifier_D12) { match['a-zA-Z'] >>  match['0-9'].repeat(1) }
-  rule(:identifier)  {  str('spag.') | str('spp.') | str('ssp.') |
-                        str('A + B') | str('ca.') | str('var.') | str('spec.') |
+  rule(:identifier)  {  str('A + B') | str('ethanol.') | str('poloxamerum 238') | str('TM:') | str('&') | # TODO: why do we have to hard code these identifiers?
+                        str('spag.') | str('spp.') | str('ssp.') | str('deklar.') | # TODO: Sind diese Abkürzung wirklich Teil eines Substanznamens?
+                        str('ca.') | str('var.') | str('spec.') |
                         identifier_D12 | identifier_without_comma | identifier_with_comma
                      }
 
@@ -61,7 +62,7 @@ class CompositionParser < Parslet::Parser
   rule(:words_nested) { one_word.repeat(1) >> in_parent.maybe >> space? >> one_word.repeat(0) }
   # dose
   # 150 U.I. hFSH et 150 U.I. hLH
-  rule(:dose_unit)      { (
+  rule(:dose_unit)      { (str('cm²') |
                            str('g/dm²') |
                            str('g/l') |
                            str('g/L') |
@@ -92,6 +93,8 @@ class CompositionParser < Parslet::Parser
                            str('Mio U.') |
                            str('Mio. U.I.') |
                            str('Mio. U.') |
+                           str('Mia. U.I.') |
+                           str('Mia. U.') |
                            str('U.I. hFSH') |
                            str('U.I. hCG') |
                            str('U.I. hLH') |
@@ -107,12 +110,17 @@ class CompositionParser < Parslet::Parser
   rule(:qty_unit)       { dose_qty >> (space >> dose_unit).maybe }
   rule(:dose_qty)       { number.as(:qty) }
   rule(:min_max)        { (str('min.') | str('max.') | str('ca.') ) >> space? }
-  rule(:dose)           { min_max.maybe >>
-                          ( (qty_range >> (space >> dose_unit).maybe) | (qty_unit | dose_qty |dose_unit)) >> space?
+  # 75 U.I. hFSH et 75 U.I. hLH
+  rule(:dose_fsh) { qty_unit >> space >> str('et') >> space >> qty_unit.as(:dose_right) }
+  rule(:dose)           { dose_fsh |
+                          ( min_max.maybe >>
+                            ( (qty_range >> (space >> dose_unit).maybe) | (qty_unit | dose_qty |dose_unit)) >> space? )
                            }
   rule(:dose_with_unit) { min_max.maybe >>
+                            dose_fsh |
                           ( qty_range >> space >> dose_unit |
-                            dose_qty  >> space >> dose_unit ) >>
+                            dose_qty  >> space >> dose_unit
+                          ) >>
                           space?
                         }
   rule(:operator)   { match('[+]') >> space? }
@@ -120,7 +128,6 @@ class CompositionParser < Parslet::Parser
   # Grammar parts
   rule(:useage) {   (any >> str('berzug:')) | # match Überzug
                     str('antiox.:') |
-                    str('potenziert mit.:') |
                     str('arom.:') |
                     str('conserv.:') |
                     str('color.:')
@@ -224,6 +231,9 @@ class CompositionParser < Parslet::Parser
   }
 
   rule(:excipiens)  { (dose_pro |
+                       str('excipiens pro compresso obducto') |
+                       str('excipiens pro compresso') |
+                       str('excipiens pro praeparatione') |
                        str('excipiens') |
                        str('ad pulverem') |
                        str('pro charta') |
@@ -254,7 +264,7 @@ class CompositionParser < Parslet::Parser
       str(', corresp. ca.,') |
       str('corresp. ca.,') |
       str('corresp.') |
-      str('corresp.,') |
+      str('corresp., ') |
       str(', corresp.')
     }
 
@@ -277,7 +287,7 @@ class CompositionParser < Parslet::Parser
     ratio.as(:ratio) |
     solvens |
     der  >> corresp_substance.maybe |
-    excipiens.as(:excipiens) |
+    (str('potenziert mit:') >> space).maybe >> excipiens.as(:excipiens) |
     substance_ut |
     substance_lead.maybe >> space? >> lebensmittel_zusatz |
     substance_lead.maybe >> space? >> simple_substance >> corresp_substance.maybe >> space? >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
