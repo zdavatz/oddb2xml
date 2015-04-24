@@ -16,3 +16,35 @@ Die Syntax wird in einer Datei "compositions_syntax":https://raw.githubuserconte
 * ratio:	Falls eine Zeile in der Zusammensetzung sow was wie @ratio: 1:10@ oder @ratio: 1:1.5-2.4@ enthält, wird das Feld "more_info" entsprechend gesetzt.
 
 * Namen mit Zahlen. Beschloss dass @Glyceroli Monostearas 33-45@ eine Name und nicht Glyceroli Monostearas von 33 bis 45 von irgendwas ist.
+
+h2. Gebrauchte Abkürzungen und Schlüsselworte
+
+* q.s.
+* pro praeparatione
+* excipiens
+* pro compresso obducto
+* pro compresso
+* epro praeparatione
+* ad pulverem
+* pro charta
+* ad globulos
+* aqua ad iniectabilia q.s. ad solutionem
+* solvens (i.v.): aqua ad iniectabilia
+* ad solutionem
+* q.s. ad
+* aqua q.s. ad
+* saccharum ad
+* aether q.s.
+* aqua ad iniectabilia
+* q.s. pro praeparatione
+* ana partes
+* et oder @,@ trennen Substanzen
+* ut vorgehende Substanz wird via nachstehend aufgeführte Salze(e) aufgenommen
+
+
+h2. Vorgeschlag für Bereinigung
+
+* SwissmedicErrorHandler
+* Corresp: als Label für Bestandteile
+* corresp. für zugehörende Substanz
+* @<@ durch @max.@ ersetzen (1 Mal)

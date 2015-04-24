@@ -49,7 +49,10 @@ module ParseUtil
         |entry|
         intermediate = result.clone
         result = result.gsub(entry.pattern,  entry.replacement)
-        entry.nr_occurrences += 1 unless result.eql?(intermediate)
+        unless result.eql?(intermediate)
+            entry.nr_occurrences += 1
+            puts "Fixed #{result}" if VERBOSE_MESSAGES
+        end
       }
       @nrLines += 1
       result
@@ -133,13 +136,13 @@ class CompositionTransformer < Parslet::Transform
   rule(:ratio => simple(:ratio) ) {
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      @@substances.last.more_info = dictionary[:ratio].to_s
+      @@substances.last.more_info = dictionary[:ratio].to_s if @@substances.last
   }
   rule(:substance => sequence(:substance),
        :ratio => simple(:ratio)) {
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      @@substances.last.more_info = dictionary[:ratio].to_s
+      @@substances.last.more_info = dictionary[:ratio].to_s if @@substances.last
   }
 
   rule(:solvens => simple(:solvens) ) {
@@ -163,11 +166,11 @@ class CompositionTransformer < Parslet::Transform
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
       @@substances << ParseSubstance.new("#{dictionary[:lebensmittel_zusatz]} #{dictionary[:digits]}")
+      dictionary[:substance]
   }
   rule(:substance => simple(:substance)) {
     |dictionary|
     puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-    dictionary[:substance]
   }
   rule(:substance_name => simple(:substance_name),
        :dose => simple(:dose),
@@ -180,7 +183,6 @@ class CompositionTransformer < Parslet::Transform
        ) {
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-#      @@substances << ParseSubstance.new(dictionary[:substance_ut].to_s)
       nil
   }
   rule(:for_ut => sequence(:for_ut),
@@ -262,7 +264,7 @@ class CompositionTransformer < Parslet::Transform
        :dose_right => simple(:dose_right),
        ) {
     |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       ParseDose.new(dictionary[:qty].to_s, dictionary[:unit].to_s + ' et ' +  dictionary[:dose_right].to_s )
   }
 
@@ -446,9 +448,7 @@ class ParseDose
       string = qty.to_s.gsub("'", '')
       if string.index('-') and (string.index('-') > 0)
         @qty_range = string
-      elsif string.index('^')
-        @qty  = string
-      elsif string.index('*')
+      elsif string.index(/\^|\*|\//)
         @qty  = string
       else
         @qty  = string.index('.') ? string.to_f : string.to_i
@@ -478,7 +478,7 @@ class ParseSubstance
     puts "ParseSubstance.new from #{name.inspect} #{dose.inspect}" if VERBOSE_MESSAGES
     @name = ParseUtil.capitalize(name.to_s)
     @name.sub!(/\baqua\b/i, 'aqua')
-    @name.sub!(/\DER\b/i, 'DER')
+    @name.sub!(/\bDER\b/i, 'DER')
     @name.sub!(/\bad pulverem\b/i, 'ad pulverem')
     @name.sub!(/\bad iniectabilia\b/i, 'ad iniectabilia')
     @name.sub!(/\bad suspensionem\b/i, 'ad suspensionem')
@@ -513,7 +513,10 @@ class ParseComposition
 
   ErrorsToFix = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => '\1, \2',
                   /(\d+)\s+\-\s*(\d+)/ => '\1-\2',
+                  'o.1' => '0.1',
+                  'g DER:' => 'g, DER:',
                   /(excipiens ad solutionem pro \d+ ml), corresp\./ => '\1 corresp.',
+                  /^(pollinis allergeni extractum[^\:]+\:)/ => 'A): \1',
                   /^(acari allergeni extractum 5000 U\.\:)/ => 'A): \1',
                 }
   @@errorHandler = ParseUtil::HandleSwissmedicErrors.new( ErrorsToFix )
@@ -540,7 +543,8 @@ class ParseComposition
       cleaned = stripped.sub(/[\.]+$/, '')
     end
     value = nil
-    puts "ParseComposition.from_string #{string}" if VERBOSE_MESSAGES
+    puts "ParseComposition.from_string #{string}" if VERBOSE_MESSAGES # /ng-tr/.match(Socket.gethostbyname(Socket.gethostname).first)
+
     cleaned = @@errorHandler.apply_fixes(cleaned)
     puts "ParseComposition.new cleaned #{cleaned}" if VERBOSE_MESSAGES and not cleaned.eql?(stripped)
 

@@ -44,6 +44,9 @@ class CompositionParser < Parslet::Parser
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
   rule(:identifier_D12) { match['a-zA-Z'] >>  match['0-9'].repeat(1) }
   rule(:identifier)  {  str('A + B') | str('ethanol.') | str('poloxamerum 238') | str('TM:') | str('&') | # TODO: why do we have to hard code these identifiers?
+                        str('F.E.I.B.A.') | str('LA 25% TM') | str('50/50') | str('polysorbatum 80') |
+                        digit >> digit.maybe >> space >> str('per centum ') >> str('q.s.').maybe| str('1g/9.6 cm²') |
+                        str('9 g/L 5.4 ml') |
                         str('spag.') | str('spp.') | str('ssp.') | str('deklar.') | # TODO: Sind diese Abkürzung wirklich Teil eines Substanznamens?
                         str('ca.') | str('var.') | str('spec.') |
                         identifier_D12 | identifier_without_comma | identifier_with_comma
@@ -70,6 +73,7 @@ class CompositionParser < Parslet::Parser
                            str('µg/24 h') |
                            str('µg/g') |
                            str('µg') |
+                           str('ng') |
                            str('guttae') |
                            str('mg/g') |
                            str('mg/ml') |
@@ -95,6 +99,7 @@ class CompositionParser < Parslet::Parser
                            str('Mio. U.') |
                            str('Mia. U.I.') |
                            str('Mia. U.') |
+                           str('U. Botox,') | # TODO: Should be U. Botox
                            str('U.I. hFSH') |
                            str('U.I. hCG') |
                            str('U.I. hLH') |
@@ -107,13 +112,15 @@ class CompositionParser < Parslet::Parser
                            str('% m/m') |
                            str('%')
                           ).as(:unit) }
-  rule(:qty_range)       { (number >> space? >> (str(' - ') | str(' -') | str('-') | str('±')) >> space? >> number).as(:qty_range) }
+  rule(:qty_range)       { (number >> space? >> (str('+/-') | str(' - ') | str(' -') | str('-') | str('±') ) >> space? >> number).as(:qty_range) }
   rule(:qty_unit)       { dose_qty >> (space >> dose_unit).maybe }
   rule(:dose_qty)       { number.as(:qty) }
-  rule(:min_max)        { str('mind.') | (str('min.') | str('max.') | str('ca.') ) >> space? } # TODO: swissmedic should replace mind. -> min.
+  rule(:min_max)        { str('mind.') | (str('min.') | str('max.') | str('ca.') | str('<') ) >> space? } # TODO: swissmedic should replace mind. -> min.
   # 75 U.I. hFSH et 75 U.I. hLH
   rule(:dose_fsh) { qty_unit >> space >> str('et') >> space >> qty_unit.as(:dose_right) }
+  rule(:dose_per) { (digits >> str('/') >> digits).as(:qty)}
   rule(:dose)           { dose_fsh |
+                          dose_per |
                           ( min_max.maybe >>
                             ( (qty_range >> (space >> dose_unit).maybe) | (qty_unit | dose_qty |dose_unit)) >> space? )
                            }
@@ -152,7 +159,6 @@ class CompositionParser < Parslet::Parser
                             str('ut ') |
                             str('Beutel: ') |
                             str('ut alia: ') |
-                            str('per centum ') |
                             str('pro dosi') |
                             str('pro capsula') |
                             (digits.repeat(1) >> space >> str(':')) | # match 50 %
@@ -224,7 +230,6 @@ class CompositionParser < Parslet::Parser
                        str('aqua q.s. ad suspensionem pro ') |
                        str('q.s. ad pulverem pro ') |
                        str('pro vase ') |
-                       str('per centum ') |
                        str('excipiens ad emulsionem pro ') |
                        str('excipiens ad pulverem pro ') |
                        str('aqua ad iniectabilia q.s. ad solutionem pro ')
@@ -248,7 +253,7 @@ class CompositionParser < Parslet::Parser
                        str('aether q.s.') |
                        str('aqua ad iniectabilia') |
                        str('aqua ad iniectabilia') |
-                       str('q.s. pro praeparation') |
+                       str('q.s. pro praeparatione') |
                        str('ana partes')
                       ) >> space? >>
                       ( any.repeat(0) )
@@ -285,6 +290,7 @@ class CompositionParser < Parslet::Parser
                 }
   rule(:substance) {
     simple_subtance_with_digits_in_name_and_dose |
+    useage.as(:more_info) >> space? >> excipiens |
     ratio.as(:ratio) |
     solvens |
     der  >> corresp_substance.maybe |
@@ -293,7 +299,6 @@ class CompositionParser < Parslet::Parser
     substance_lead.maybe >> space? >> lebensmittel_zusatz |
     substance_lead.maybe >> space? >> simple_substance >> corresp_substance.maybe >> space? >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
   }
-
   rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
   rule(:praeparatio){ ((one_word >> space?).repeat(1).as(:description) >> str(':') >> space?).maybe >>
                       (name_with_parenthesis | name_without_parenthesis).repeat(1).as(:substance_name) >>
@@ -306,8 +311,9 @@ class CompositionParser < Parslet::Parser
   rule(:all_substances)      { (one_substance >> substance_separator.maybe).repeat(1) }
   rule(:composition)         { all_substances }
   rule(:long_labels) {
-        str('Praeparatio cryodesiccata:') |
-        str('Tela cum praeparatione (Panel ') >> digit >> str('):') 
+        str('Praeparatio sicca cum solvens: praeparatio sicca:') |
+        str('Praeparatio cryodesiccata') >> (str(':').absent? >> any).repeat(0) >> str(':') |
+        str('Tela cum praeparatione (Panel ') >> digit >> str('):')
       }
   rule(:label_id) {
      (

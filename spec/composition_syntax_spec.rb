@@ -10,15 +10,19 @@ GoIntoPry = false
 describe CompositionParser do
 let(:parser) { CompositionParser.new }
  context "identifier parsing" do
-    let(:identifier_parser) { parser.dose }
+    let(:dose_parser) { parser.dose }
+    let(:identifier_parser) { parser.identifier }
+    let(:substance_parser) { parser.substance }
+    let(:substance_name_parser) { parser.substance_name }
 
     it "parses identifier" do
+        #  >> space? >> str('q.s.').maybe
     res1 = identifier_parser.parse_with_debug( "75 U.I. hFSH et 75 U.I. hLH")
       pp res1
       binding.pry
     end
-  end if 1
-end
+  end
+end if false
 describe CompositionParser do
   let(:parser) { CompositionParser.new }
   context "should help me find problems" do
@@ -416,6 +420,7 @@ describe CompositionParser do
       'virus poliomyelitis typus inactivatum (D-Antigen)',
       'virus poliomyelitis typus 1 inactivatum (D-Antigen)',
       'stanni(II) chloridum dihydricum',
+      'ethanol.',
       'DER: 1:4',
       'DER: 3-5:1',
       'DER: 6-8:1',
@@ -437,7 +442,6 @@ describe CompositionParser do
       'calcium ut xx',
       'calcium et xx',
       'calcium,',
-      'ethanol.',
       'calcium9,',
       'excipiens pro',
       'albuminum humanum colloidale, stanni(II) chloridum dihydricum',
@@ -499,4 +503,4 @@ describe CompositionParser do
   end
 
 end
-end if false
+end

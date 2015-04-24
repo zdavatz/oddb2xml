@@ -31,6 +31,64 @@ end
 
 describe ParseComposition do
 
+  context "should handle missing arom.: before excipiens" do
+    string = "nicotinum 4 mg ut nicotini resinas, aromatica, antiox.: E 321, arom.: excipiens pro praeparatione"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    binding.pry
+    specify { expect( composition.substances.size).to eq 3 }
+    specify { expect( composition.substances.first.name).to eq "Nicotinum" } # TODO: is not Benzocainum
+  end
+
+  context "should handle missing Label A:) in pollinis allergeni extractu" do
+    string = '"pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    binding.pry
+    specify { expect( composition.substances.size).to eq 0 }
+    specify { expect( composition.label).to eq 'A' }
+    specify { expect( composition.composition.label_description).to eq 'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.' }
+  end
+
+  context "should handle dose with /" do
+    string = 'poly(dl-lactidum-co-glycolidum) 75/25'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    specify { expect( composition.substances.first.name).to eq "Poly(dl-lactidum-co-glycolidum)" }
+    specify { expect( composition.substances.first.dose.to_s).to eq '75/25' }
+  end
+
+  context "should handle per centum" do
+    string = 'acidum nitricum 70 per centum 537 mg, acidum aceticum glaciale 20.4 mg, acidum oxalicum dihydricum 58.6 mg, zinci nitras hexahydricus 6 mg, excipiens ad solutionem pro 1 ml'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    specify { expect( composition.substances.first.name).to eq "Acidum Nitricum 70 Per Centum)" }
+  end
+
+  context "should handle Praeparatio sicca" do
+    string = 'Praeparatio sicca cum solvens: praeparatio sicca: albiglutidum 66.95 mg, trehalosum dihydricum, mannitolum, dinatrii phosphas anhydricus, natrii dihydrogenophosphas monohydricus, polysorbatum 80, solvens: aqua ad iniectabilia 0.65 ml pro vitro'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    specify { expect( composition.substances.first.name).to eq "Albiglutidum)" }
+    specify { expect( composition.label).to eq "Praeparatio sicca cum solvens: praeparatio sicca:" }
+  end
+
+  context "should handle dose with +/-" do
+    string = 'enzephalitidis japanensis virus antigenum (Stamm: SA-14-2) 6.0 +/-1.2 µg, aluminium ut aluminii oxidum hydricum, kalii dihydrogenophosphas, dinatrii phosphas anhydricus, natrii chloridum, aqua q.s. ad solutionem pro 0.5 ml'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    specify { expect( composition.substances.first.name).to eq "Enzephalitidis Japanensis Virus Antigenum (stamm: Sa-14-2)" }
+    specify { expect( composition.substances.first.dose.to_s).to eq '6.0 +/-1.2 µg/0.5 ml' }
+  end
+
+  context "should handle label Praeparatio cryodesiccata (Thrombin)" do
+    string = 'Praeparatio cryodesiccata (Thrombin): thrombinum humanum 500 U.I., natrii chloridum, natrii citras dihydricus, pro vitro'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    specify { expect( composition.substances.first.name).to eq "Thrombinum Humanum" }
+    specify { expect( composition.label).to eq "Praeparatio cryodesiccata (Thrombin):" }
+  end
+
   context "should handle '150 U.I. hFSH et 150 U.I. hLH'" do
     string =
 'Tela cum praeparatione (Panel 1): niccoli sulfas 0.16 mg, alcoholes adipis lanae 0.81 mg, neomycini sulfas 0.49 mg, kalii dichromas 44 µg, Cain-mix: benzocainum 0.364 mg, cinchocaini hydrochloridum 73 µg, tetracaini hydrochloridum 73 µg, Parfum-Mix: amylcinnamaldehydum 15 µg, isoeugenolum 15 µg, cinnamaldehydum 34 µg, eugenolum 34 µg, alcohol cinnamylicus 54 µg, hydroxycitronellalum 54 µg, geraniolum 70 µg, evernia prunastri 70 µg, colophonium 0.97 mg, E 320, E 321, Paraben-Mix: E 218 0.16 mg, E 214 0.16 mg, E 216 0.16 mg, butylis parahydroxybenzoas 0.16 mg, benzylis parahydroxybenzoas 0.16 mg, Negativ-Kontrolle, balsamum peruvianum 0.65 mg, ethylendiamini dihydrochloridum 41 µg, cobalti dichloridum 16 µg, excipiens pro praeparatione'
@@ -109,7 +167,7 @@ describe ParseComposition do
         composition = ParseComposition.from_string(string)
     specify { expect(composition.substances.size).to eq  5 }
     substance = composition.substances.find{ |x| /lacticum/i.match(x.name) }
-    specify { expect(composition.substances.first.name).to eq  "Acidum Nitricum" }
+    specify { expect(composition.substances.first.name).to eq  "Acidum Nitricum 70 Per Centum" }
     specify { expect(composition.substances.first.dose.to_s).to eq  "580.66 mg/ml" }
     specify { expect(substance.name).to eq  'Acidum Lacticum 90 %' }
     specify { expect(substance.dose.to_s).to eq  '4.55 mg/ml' }
@@ -164,8 +222,9 @@ describe ParseComposition do
   context 'find  corresp doses pro vase.' do
     string = "doses pro vase 30/60"
     composition = ParseComposition.from_string(string)
-    specify { expect(composition.substances.size).to eq  0 }
-    specify { expect(composition.corresp).to eq  'pro vase 30/60' }
+    specify { expect(composition.substances.size).to eq  1 }
+    specify { expect( composition.substances.first.name).to eq  'Doses pro Vase' }
+    specify { expect( composition.substances.first.dose.to_s).to eq  '30/60' }
   end
 
   context 'find  corresp. ca.' do
