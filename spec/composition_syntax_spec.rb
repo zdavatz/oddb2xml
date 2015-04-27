@@ -14,10 +14,10 @@ let(:parser) { CompositionParser.new }
     let(:identifier_parser) { parser.identifier }
     let(:substance_parser) { parser.substance }
     let(:substance_name_parser) { parser.substance_name }
+    let(:number_parser) { parser.number }
 
     it "parses identifier" do
-        #  >> space? >> str('q.s.').maybe
-    res1 = identifier_parser.parse_with_debug( "75 U.I. hFSH et 75 U.I. hLH")
+        res1 = number_parser.parse_with_debug( "min.10^4.4 U..")
       pp res1
       binding.pry
     end
@@ -217,17 +217,13 @@ describe CompositionParser do
       "40 U.",
       "50'000 U.I.",
       "1 Mio. U.I.",
-#      "3,45",
-#      "123",
-#      "123.45",
-#      'mg',
-#      'ml',
       '3 Mg',
       '2 mg',
       '0.3 ml',
       '0.01 mg/ml',
       '3 mg/ml',
       '2*10^9 CFU',
+      '10^4.4 U.',
       '20 mg',
       '100 % m/m',
       '308.7 mg/g',

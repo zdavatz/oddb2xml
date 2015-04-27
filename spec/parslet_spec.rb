@@ -35,7 +35,6 @@ describe ParseComposition do
     string = "nicotinum 4 mg ut nicotini resinas, aromatica, antiox.: E 321, arom.: excipiens pro praeparatione"
     composition = ParseComposition.from_string(string)
     specify { expect(composition.source).to eq string}
-    binding.pry
     specify { expect( composition.substances.size).to eq 3 }
     specify { expect( composition.substances.first.name).to eq "Nicotinum" } # TODO: is not Benzocainum
   end
@@ -44,7 +43,6 @@ describe ParseComposition do
     string = '"pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml'
     composition = ParseComposition.from_string(string)
     specify { expect(composition.source).to eq string}
-    binding.pry
     specify { expect( composition.substances.size).to eq 0 }
     specify { expect( composition.label).to eq 'A' }
     specify { expect( composition.composition.label_description).to eq 'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.' }
@@ -65,7 +63,7 @@ describe ParseComposition do
     specify { expect( composition.substances.first.name).to eq "Acidum Nitricum 70 Per Centum)" }
   end
 
-  context "should handle Praeparatio sicca" do
+  context "should handle Praeparatio sicca and polysorbatum" do
     string = 'Praeparatio sicca cum solvens: praeparatio sicca: albiglutidum 66.95 mg, trehalosum dihydricum, mannitolum, dinatrii phosphas anhydricus, natrii dihydrogenophosphas monohydricus, polysorbatum 80, solvens: aqua ad iniectabilia 0.65 ml pro vitro'
     composition = ParseComposition.from_string(string)
     specify { expect(composition.source).to eq string}
@@ -222,9 +220,9 @@ describe ParseComposition do
   context 'find  corresp doses pro vase.' do
     string = "doses pro vase 30/60"
     composition = ParseComposition.from_string(string)
-    specify { expect(composition.substances.size).to eq  1 }
-    specify { expect( composition.substances.first.name).to eq  'Doses pro Vase' }
-    specify { expect( composition.substances.first.dose.to_s).to eq  '30/60' }
+    specify { expect( composition.substances.size).to eq 0 }
+#    specify { expect( composition.substances.first.name).to eq  'Doses pro Vase' } # TODO: must be found somewher eles
+#    specify { expect( composition.substances.first.dose.to_s).to eq  '30/60' }
   end
 
   context 'find  corresp. ca.' do

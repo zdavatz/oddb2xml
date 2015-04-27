@@ -29,7 +29,7 @@ class CompositionParser < Parslet::Parser
         str('0') | (match('[1-9]') >> match('[0-9\']').repeat)
       ) >> (
             (str('*') >>  digit.repeat(1)).maybe >>
-            match(['.,^']) >> digit.repeat(1)
+            (match(['.,^']) >> digit.repeat(1)).repeat(1)
       ).maybe >> (
         match('[eE]') >> (str('+') | str('-')).maybe >> digit.repeat(1)
       ).maybe
@@ -44,7 +44,7 @@ class CompositionParser < Parslet::Parser
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
   rule(:identifier_D12) { match['a-zA-Z'] >>  match['0-9'].repeat(1) }
   rule(:identifier)  {  str('A + B') | str('ethanol.') | str('poloxamerum 238') | str('TM:') | str('&') | # TODO: why do we have to hard code these identifiers?
-                        str('F.E.I.B.A.') | str('LA 25% TM') | str('50/50') | str('polysorbatum 80') |
+                        str('F.E.I.B.A.') | str('LA 25% TM') | str('50/50') | str('polysorbatum ') >> digit >> digit | str('q.s.') |
                         digit >> digit.maybe >> space >> str('per centum ') >> str('q.s.').maybe| str('1g/9.6 cm²') |
                         str('9 g/L 5.4 ml') |
                         str('spag.') | str('spp.') | str('ssp.') | str('deklar.') | # TODO: Sind diese Abkürzung wirklich Teil eines Substanznamens?
@@ -161,6 +161,7 @@ class CompositionParser < Parslet::Parser
                             str('ut alia: ') |
                             str('pro dosi') |
                             str('pro capsula') |
+                            str('pro vitroe') |
                             (digits.repeat(1) >> space >> str(':')) | # match 50 %
                             str('ad globulos') |
                             str('ana ') |
@@ -168,7 +169,8 @@ class CompositionParser < Parslet::Parser
                             str('partes') |
                             str('ad pulverem') |
                             str('ad suspensionem') |
-                            str('q.s. ') |
+                            str('q.s. ad ') |
+                            str('q.s. pro ') |
                             str('ad solutionem') |
                             str('ad emulsionem') |
                             str('excipiens')
@@ -194,7 +196,7 @@ class CompositionParser < Parslet::Parser
                             name_with_parenthesis |
                             name_without_parenthesis
                           ) >>
-                          str('pro dosi').maybe
+                          str('pro dosi').maybe >> space?
                           }
   rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.as(:dose).maybe}
   rule(:simple_subtance_with_digits_in_name_and_dose)  {
@@ -229,6 +231,7 @@ class CompositionParser < Parslet::Parser
                        str('aqua q.s. ad solutionem pro ') |
                        str('aqua q.s. ad suspensionem pro ') |
                        str('q.s. ad pulverem pro ') |
+                       str('doses pro vase ') |
                        str('pro vase ') |
                        str('excipiens ad emulsionem pro ') |
                        str('excipiens ad pulverem pro ') |
@@ -251,8 +254,9 @@ class CompositionParser < Parslet::Parser
                        str('aqua q.s. ad') |
                        str('saccharum ad') |
                        str('aether q.s.') |
+                       str('pro vitro') |
                        str('aqua ad iniectabilia') |
-                       str('aqua ad iniectabilia') |
+                       str('pro praeparatione') |
                        str('q.s. pro praeparatione') |
                        str('ana partes')
                       ) >> space? >>
