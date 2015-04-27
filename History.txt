@@ -1,3 +1,8 @@
+=== 2.0.6 / 27.04.2015
+
+* Remove trailing spaces in names imported from ZurRose transfer.dat
+* Use ISO-8859-14 when reading ZurRose transfer.dat to avoid unreadable characters, eg. Ethacridin
+
 === 2.0.5 / 31.03.2015
 
 * --calc adds boolean flag is_active_agent
