@@ -456,7 +456,7 @@ module Oddb2xml
     # see http://dev.ywesee.com/Bbmb/TransferDat
     def initialize(dat, extended = false)
       @@extended = extended
-      @@error_file ||= File.open(File.join(WorkDir, "duplicate_ean13_from_zur_rose.txt"), 'w+')
+      @@error_file ||= File.open(File.join(WorkDir, "duplicate_ean13_from_zur_rose.txt"), 'w+:ISO-8859-14')
       @@items_without_ean13s ||= 0
       @@duplicated_ean13s ||= 0
       @@zur_rose_items ||= 0

@@ -188,4 +188,16 @@ describe Oddb2xml::ZurroseExtractor do
     it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("3") end
     it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to eq("SOFRADEX Gtt Auric 8 ml") end
   end
+  context 'when Ethacridin is given' do
+    subject do
+      filename = File.expand_path(File.join(__FILE__, '..', 'data', 'zurrose_transfer.dat'))
+      Oddb2xml::ZurroseExtractor.new(filename)
+    end
+    it { expect(subject.to_hash.keys.length).to eq(1) }
+    it { expect(subject.to_hash.keys.first).to eq("7680172330681") }
+    it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to eq("Ethacridin lactat 1 100ml") end
+  end
+
+
+
 end
