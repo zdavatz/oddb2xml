@@ -186,5 +186,6 @@ describe Oddb2xml::ZurroseExtractor do
     end
     #it { expect(subject.to_hash.keys.first).to eq("7680316950157") }
     it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("3") end
+    it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to eq("SOFRADEX Gtt Auric 8 ml") end
   end
 end
