@@ -490,7 +490,7 @@ module Oddb2xml
           :line   => line.chomp,
           :ean   => ean13,
           :vat   => line[96],
-          :description => line[10..59], # .sub(/\s+$/, ''),
+          :description => line[10..59].sub(/\s+$/, ''),
           :additional_desc => '',
           :pharmacode => pharma_code,
           :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
