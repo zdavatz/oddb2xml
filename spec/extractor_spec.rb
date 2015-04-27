@@ -119,6 +119,7 @@ describe Oddb2xml::MedregbmExtractor do
 end
 
 describe Oddb2xml::ZurroseExtractor do
+if false
   context 'when transfer.dat is empty' do
     subject { Oddb2xml::ZurroseExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
@@ -188,4 +189,42 @@ describe Oddb2xml::ZurroseExtractor do
     it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("3") end
     it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to eq("SOFRADEX Gtt Auric 8 ml") end
   end
+  context 'when Ethacridin is given' do
+    subject do
+      dat = <<-DAT
+1128807890Ethacridin lactat 1\069 100ml                        0009290013701000000000000000000000002\r\n
+      DAT
+      Oddb2xml::ZurroseExtractor.new(dat, true)
+    end
+    #it { expect(subject.to_hash.keys.first).to eq("7680316950157") }
+    it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("2") end
+    it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to eq("Ethacridin lactat 1 100ml") end
+  end if false
+end
+  context 'when parsing examples' do
+    subject do
+      filename = File.expand_path(File.join(__FILE__, '..', 'data', 'zurrose_transfer.dat'))
+      puts "filename #{filename} #{File.exists?(filename)}"
+      Oddb2xml::ZurroseExtractor.new(filename, true)
+    end
+    it "should set the correct Ethacridin description" do
+        ethacridin = subject.to_hash.values.find{ |x| /Ethacridin/i.match(x[:description])}
+        expect(ethacridin[:description]).to eq("Ethacridin lactat 1‰ 100ml")
+    end
+    specials = { 'SEMPER Cookie' => 'SEMPER Cookie-O’s glutenfrei 150 g',
+                 'DermaSilk' => 'DermaSilk Set Body + Strumpfhöschen 24-36 Mon (98)',
+                 'after sting Roll-on' => 'CER’8 after sting Roll-on 20 ml',
+                 'Inkosport' => 'Inkosport Activ Pro 80 Himbeer - Joghurt Ds 750g',
+                 'Ethacridin' => "Ethacridin lactat 1‰ 100ml",}.
+    each{ | key, value |
+            it "should set the correct #{key} description" do
+                item = subject.to_hash.values.find{ |x| /#{key}/i.match(x[:description])}
+                expect(item[:description]).to eq(value)
+            end
+          }
+
+  end
+
+
+
 end
