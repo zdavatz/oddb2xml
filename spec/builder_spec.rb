@@ -41,7 +41,7 @@ def check_validation_via_xsd
   }
 end
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 73
+  NrExtendedArticles = 78
   NrPharmaAndNonPharmaArticles = 60
   NrPharmaArticles = 5
   include ServerMockHelper

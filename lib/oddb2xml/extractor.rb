@@ -456,16 +456,25 @@ module Oddb2xml
     # see http://dev.ywesee.com/Bbmb/TransferDat
     def initialize(dat, extended = false)
       @@extended = extended
-      @@error_file ||= File.open(File.join(WorkDir, "duplicate_ean13_from_zur_rose.txt"), 'w+')
+      @@error_file ||= File.open(File.join(WorkDir, "duplicate_ean13_from_zur_rose.txt"), 'wb+:ISO-8859-14')
       @@items_without_ean13s ||= 0
       @@duplicated_ean13s ||= 0
       @@zur_rose_items ||= 0
-      @io = StringIO.new(dat) if dat
+      if dat
+        if File.exists?(dat)
+          @io = File.open(dat, 'rb:ISO-8859-14')
+        else
+          @io = StringIO.new(dat)
+        end
+        @io
+      else
+         nil
+      end
     end
     def to_hash
       data = {}
       while line = @io.gets
-        line = line.chomp
+        line = line.encode('utf-8').gsub("\u0089", "‰").gsub("\u0092", '’').gsub("\u0096", '-').chomp
         next if line =~ /(ad us\.* vet)|(\(vet\))/i
         if @@extended
           next unless line =~ /(\d{13})(\d{1})$/
