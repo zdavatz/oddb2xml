@@ -205,6 +205,7 @@ public
 
     def get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
       begin
+        break_condition = (defined?(Pry) and false) # /5 x 2500 ml/.match(pkg_size_L))
         return pkg_size_to_int(pkg_size_L) unless part_from_name_C
         part_from_name_C = part_from_name_C.gsub(/[()]/, '_')
         Measurements.each{ |x|
@@ -212,6 +213,7 @@ public
                             puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('measurement einheit_M')
                             @measure = x
+                            binding.pry if break_condition
                             return pkg_size_to_int(pkg_size_L, true)
                           end
                         }
@@ -220,12 +222,14 @@ public
                             puts "feste_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
                             update_rule('feste_form name_C')
                             @measure = x
+                            binding.pry if break_condition
                             return pkg_size_to_int(pkg_size_L)
                           end
                           if einheit_M and x.eql?(einheit_M)
                             puts "feste_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('feste_form einheit_M')
                             @measure = x
+                            binding.pry if break_condition
                             return pkg_size_to_int(pkg_size_L)
                           end
                         }
@@ -234,18 +238,21 @@ public
                             puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
                             update_rule('liquid_form name_C')
                             @measure = x
+                            binding.pry if break_condition
                             return pkg_size_to_int(pkg_size_L, true)
                           end
                           if part_from_name_C and x.match(part_from_name_C.split(' ')[0])
                             puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
                             update_rule('liquid_form first_part')
+                            binding.pry if break_condition
                             return pkg_size_to_int(pkg_size_L, true)
                           end
                           if einheit_M and x.eql?(einheit_M)
                             puts "liquid_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
                             update_rule('liquid_form einheit_M')
                             @measure = x
-                            return pkg_size_to_int(pkg_size_L, false)
+                            binding.pry if break_condition
+                            return pkg_size_to_int(pkg_size_L, Measurements.find{ |x| pkg_size_L.index(" #{x}")})
                           end
                         }
         Measurements.each{ |x|
@@ -253,9 +260,11 @@ public
                             puts "measurement in pkg_size_L #{pkg_size_L} matched: #{x}" if $VERBOSE
                             update_rule('measurement pkg_size_L')
                             @measure = x
+                            binding.pry if break_condition
                             return pkg_size_to_int(pkg_size_L, true)
                           end
                         }
+        binding.pry if break_condition
         puts "Could not find anything for name_C #{part_from_name_C} pkg_size_L: #{pkg_size_L} einheit_M #{einheit_M}" if $VERBOSE
         update_rule('unbekannt')
         return 'unbekannt'

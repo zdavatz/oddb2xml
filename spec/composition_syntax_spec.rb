@@ -27,7 +27,7 @@ let(:parser) { CompositionParser.new }
       binding.pry
     end
   end
-end if true
+end if false
 describe CompositionParser do
   let(:parser) { CompositionParser.new }
   context "should help me find problems" do

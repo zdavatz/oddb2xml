@@ -293,7 +293,7 @@ if RunAllTests
       m = />.*  /.match(xml)
       m.should eq nil
       doc = REXML::Document.new xml
-#      puts xml; binding.pry
+      # puts xml; binding.pry
       gtin = '7680540151009'
       ean12 = '7680' + sprintf('%05d',tst_naropin.iksnr_A) + sprintf('%03d',tst_naropin.pack_K)
       ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
@@ -328,14 +328,20 @@ if RunAllTests
 
       XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").
         find{|x| x.text.eql?(matri_name)}.text.should eq matri_name
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE").last.text.should eq 'Levomenolum'
+      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/NAME").last.text.should eq 'Kamillin Medipharm, Bad'
       XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY").first.text.should eq '98.9'
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/MORE_INFO").first.text.should eq 'ratio: 1:2-2.8'
       XPath.match( doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Lidocaini Hydrochloridum'
       XPath.match( doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT").first.text.should eq 'mg/ml'
+      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Levomenolum'
+      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/MORE_INFO").first.text.should eq 'ratio: 1:2-2.8'
+      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/DOSE_TEXT").first.text.should eq '10-50 mg'
+      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/QTY").first.should eq nil
+      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/UNIT").first.should eq nil
 
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_QTY").first.text.should eq '10-50'
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_UNIT").first.text.should eq 'mg/100 g'
+      XPath.match( doc, "//ARTICLE[GTIN='7680446250592']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SALTS/SALT/SUBSTANCE_NAME").first.text.should eq 'Ceftriaxonum Natricum'
+
+      XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/NAME").first.text.should eq 'Nutriflex Omega special, Infusionsemulsion 2500 ml'
+      XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/SELLING_UNITS").first.text.should eq '5'
 
     end
   end
@@ -464,14 +470,14 @@ if RunAllTests
     specify { expect(fluticasoni.dose.to_s).to eq  "100 µg/25 mg" }
     lactosum =  info.first.substances.find{ |x| x.name.match(/Lactosum/i) }
     specify { expect(lactosum.name).to eq "Lactosum Monohydricum" }
-    specify { expect(lactosum.dose.to_s).to eq  "25 mg" }
+    specify { expect(lactosum.dose).to eq  nil }
   end
 
   context 'find correct result compositions for stuff with percents' do
     txt = 'calcium carbonicum hahnemanni C7 5 %, chamomilla recutita D5 22.5 %, magnesii hydrogenophosphas trihydricus C5 50 %, passiflora incarnata D5 22.5 %, xylitolum, excipiens ad globulos.'
     info = ParseUtil.parse_compositions(txt)
     specify { expect(info.size).to eq  1 }
-    specify { expect(info.first.substances.size).to eq 6 }
+    specify { expect(info.first.substances.size).to eq 5 }
     recutita =  info.first.substances.find{ |x| x.name.match(/recutita/i) }
     specify { expect(recutita.name).to eq  'Chamomilla Recutita D5' }
     specify { expect(recutita.qty.to_f).to eq  22.5 }
@@ -498,11 +504,11 @@ if RunAllTests
                       text
                       )
     specify { expect(info.compositions.size).to eq  2 }
-    specify { expect(info.compositions.first.substances.size).to eq 7 }
+    specify { expect(info.compositions.first.substances.size).to eq 6 }
     poloxamerum =  info.compositions.first.substances.find{ |x| x.name.match(/poloxamerum/i) }
     skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
     skip { expect(poloxamerum.qty.to_f).to eq  "" }
-    specify { expect(poloxamerum.unit).to eq  "" }
+    specify { expect(poloxamerum.unit).to eq  nil }
   end
 
   context 'find correct result for 61676 Phostal 3-Bäume A): ' do
@@ -566,7 +572,7 @@ Solvens: aqua ad iniectabilia q.s. ad suspensionem pro 1 ml."
                       text
                       )
     specify { expect(info.compositions.size).to eq  2 }
-    specify { expect(info.compositions.first.label).to eq  nil }
+    specify { expect(info.compositions.first.label).to eq  "Praeparatio cryodesiccata:" }
     substance1 =  info.compositions.first.substances.find{ |x| x.name.match(/virus rabiei inactivatu/i) }
     specify { expect(substance1).should_not be  nil }
     if substance1
@@ -612,14 +618,14 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
                     text)
     specify { expect(info.pkg_size).to eq '2 x 7' }
     specify { expect(info.selling_units).to eq 14 }
-    specify { expect(info.compositions.first.substances.size).to eq 3 }
+    specify { expect(info.compositions.first.substances.size).to eq 2 }
     viscum =  info.compositions.first.substances.find{ |x| x.name.match(/viscum/i) }
     specify { expect(viscum).not_to eq nil}
     natrii =  info.compositions.first.substances.find{ |x| x.name.match(/natrii chloridum/i) }
     specify { expect(natrii).not_to eq nil}
     if viscum
       specify { expect(viscum.name).to eq  'Extractum Aquosum Liquidum Fermentatum 0.05 Mg Ex Viscum Album (mali) Recens' }
-      specify { expect(viscum.is_active_agent).to eq  true }
+      skip { expect(viscum.is_active_agent).to eq  true } # TODO: Grenzfall. Active-Agent viscum album (mali) recens ist sub-string
       specify { expect(viscum.dose.to_s).to eq  '0.01 mg/ml' }
       specify { expect(viscum.qty.to_f).to eq  0.01}
       specify { expect(viscum.unit).to eq  'mg/ml'}
@@ -633,7 +639,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
                     text)
     specify { expect(info.pkg_size).to eq '2 x 7' }
     specify { expect(info.selling_units).to eq 14 }
-    specify { expect(info.compositions.first.substances.size).to eq 4 }
+    specify { expect(info.compositions.first.substances.size).to eq 3 }
     viscum =  info.compositions.first.substances.find{ |x| x.name.match(/viscum/i) }
     specify { expect(viscum).not_to eq nil}
     if viscum

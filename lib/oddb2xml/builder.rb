@@ -1,4 +1,4 @@
-# encoding: utf-8
+  # encoding: utf-8
 
 require 'nokogiri'
 require 'oddb2xml/util'
@@ -31,7 +31,7 @@ module Oddb2xml
   'xmlns'             => 'http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration',
   'CREATION_DATETIME' => Time.new.strftime('%FT%T%z'),
   'PROD_DATE'         => Time.new.strftime('%FT%T%z'),
-  'VALID_DATE'        => Time.new.strftime('%FT%T%z')
+  'VALID_DATE'        => Time.new.strftime('%FT%T%z'),
   }
   class Builder
     attr_accessor :subject, :index, :items, :flags, :lppvs,
@@ -632,6 +632,34 @@ module Oddb2xml
     end
 
     def build_calc
+      def emit_substance(xml, substance, emit_active=false)
+          xml.MORE_INFO substance.more_info if substance.more_info
+          xml.SUBSTANCE_NAME substance.name
+          xml.IS_ACTIVE_AGENT substance.is_active_agent if emit_active
+          if substance.dose
+            if substance.qty.is_a?(Float) or substance.qty.is_a?(Fixnum)
+              xml.QTY  substance.qty
+              xml.UNIT substance.unit
+            else
+              xml.DOSE_TEXT substance.dose.to_s
+            end
+          end
+          if substance.chemical_substance
+            xml.CHEMICAL_SUBSTANCE {
+              emit_substance(xml, substance.chemical_substance)
+            }
+          end
+          if substance.salts and substance.salts.size > 0
+            xml.SALTS {
+              substance.salts.each { |salt|
+                xml.SALT {
+                  emit_substance(xml, salt)
+                         }
+                                   }
+              }
+
+          end
+      end
       packungen_xlsx = File.join(Oddb2xml::WorkDir, "swissmedic_package.xlsx")
       idx = 0
       return unless File.exists?(packungen_xlsx)
@@ -688,22 +716,7 @@ module Oddb2xml
                     xml.LABEL composition.label if composition.label
                     xml.LABEL_DESCRIPTION composition.label_description if composition.label_description
                     xml.SUBSTANCES {
-                      composition.substances.each { |substance|
-                        xml.SUBSTANCE {
-                          xml.MORE_INFO substance.more_info.gsub('&gt','>').gsub('&amp', '&') if substance.more_info
-                          xml.SUBSTANCE_NAME substance.name
-                          xml.IS_ACTIVE_AGENT substance.is_active_agent
-                          if substance.unit
-                            xml.QTY  substance.qty
-                            xml.UNIT substance.unit
-                          end
-                          if substance.chemical_substance
-                            xml.CHEMICAL_SUBSTANCE  substance.chemical_substance.name
-                            xml.CHEMICAL_QTY        substance.chemical_substance.qty
-                            xml.CHEMICAL_UNIT       substance.chemical_substance.unit
-                          end
-                        }
-                      }
+                        composition.substances.each { |substance| xml.SUBSTANCE { emit_substance(xml, substance, true) }}
                     } if composition.substances
                   }
                 }
