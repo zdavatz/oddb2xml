@@ -13,34 +13,39 @@ h2. Syntax
 
 Die Syntax wird in einer Datei "compositions_syntax":https://raw.githubusercontent.com/ngiger/oddb2xml/master/lib/oddb2xml/compositions_syntax.rb beschrieben.
 
-* ratio:	Falls eine Zeile in der Zusammensetzung sow was wie @ratio: 1:10@ oder @ratio: 1:1.5-2.4@ enthält, wird das Feld "more_info" entsprechend gesetzt.
+- ratio := Falls eine Zeile in der Zusammensetzung sow was wie @ratio: 1:10@ oder @ratio: 1:1.5-2.4@ enthält, wird das Feld "more_info" entsprechend gesetzt.
 
-* Namen mit Zahlen. Beschloss dass @Glyceroli Monostearas 33-45@ eine Name und nicht Glyceroli Monostearas von 33 bis 45 von irgendwas ist.
+- Namen mit Zahlen := Beschloss dass @Glyceroli Monostearas 33-45@ eine Name und nicht Glyceroli Monostearas von 33 bis 45 von irgendwas ist.
+
+- Dosis := Häufig einfach, z.B. @5 mg@. Komplizierte Ausdrücke wie @2*10^9 CFU@, @9 g/L 5 ml@, @40-55@, @75/25@, @150 U.I. hFSH et 150 U.I. hLH@ oder @6.0 +/-1.2 µg/0.5 ml@ findet man auch.
+
+- chemical_substance := In der XML-Datei findet man die Substance welche im Swissmedic-Jargon via @corresp@ (u.ä) als eigentlicher Wirkstoff referenziert wird. 
 
 h2. Gebrauchte Abkürzungen und Schlüsselworte
 
-* q.s.
-* pro praeparatione
-* excipiens
-* pro compresso obducto
-* pro compresso
-* epro praeparatione
-* ad pulverem
-* pro charta
-* ad globulos
-* aqua ad iniectabilia q.s. ad solutionem
-* solvens (i.v.): aqua ad iniectabilia
-* ad solutionem
-* q.s. ad
-* aqua q.s. ad
-* saccharum ad
-* aether q.s.
-* aqua ad iniectabilia
-* q.s. pro praeparatione
-* ana partes
-* et oder @,@ trennen Substanzen
-* ut vorgehende Substanz wird via nachstehend aufgeführte Salze(e) aufgenommen
-
+- et alia  := es gibt noch andere Substanzen. Beispiel: 62504 Olanzapin Sandoz Solufilm 20 mg
+- et oder ,  := trennen Substanzen. Beispiel: 29555 NaCl 11,7 % B. Braun, Zusatzampullen zu Infusionslösungen
+- ut := vorgehende Substanz wird via nachstehend aufgeführte Salze(e) aufgenommen. Beispiel: 54749 Supradyn Vital 50+.
+- DER: :=  DrugEthanol Ratio
+- q.s. :=
+- pro praeparatione :=
+- excipiens :=
+- pro compresso obducto :=
+- pro compresso :=
+- epro praeparatione :=
+- ad pulverem :=
+- pro charta :=
+- ad globulos :=
+- aqua ad iniectabilia q.s. ad solutionem :=
+- solvens (i.v.): aqua ad iniectabilia :=
+- ad solutionem :=
+- q.s. ad :=
+- aqua q.s. ad :=
+- saccharum ad :=
+- aether q.s. :=
+- aqua ad iniectabilia :=
+- q.s. pro praeparatione :=
+- ana partes :=
 
 h2. Vorgeschlag für Bereinigung
 
@@ -48,3 +53,4 @@ h2. Vorgeschlag für Bereinigung
 * Corresp: als Label für Bestandteile
 * corresp. für zugehörende Substanz
 * @<@ durch @max.@ ersetzen (1 Mal)
+* @mind.@ durch @min.@ ersetzen, @min.@ kommt viel häufiger vor
