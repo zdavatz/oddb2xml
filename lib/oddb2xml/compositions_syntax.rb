@@ -38,13 +38,14 @@ class CompositionParser < Parslet::Parser
   rule(:radio_isotop) { match['a-zA-Z'].repeat(1) >> lparen >> digits >> str('-') >> match['a-zA-Z'].repeat(1-3) >> rparen >>
                         ((space? >> match['a-zA-Z']).repeat(1)).repeat(0)
                         } # e.g. Xenonum (133-Xe) or yttrii(90-Y) chloridum zum Kalibrierungszeitpunkt
-  rule(:ratio_value) { match['0-9:\-\.'].repeat(1)  >> space?}  # eg. ratio: 1:1, ratio: 1:1.5-2.4., ratio: 1:0.68-0.95
+  rule(:ratio_value) { match['0-9:\-\.,'].repeat(1)  >> space?}  # eg. ratio: 1:1, ratio: 1:1.5-2.4., ratio: 1:0.68-0.95, 1:4,1
 
   # handle stuff like acidum 9,11-linolicum or 2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum) specially. it must contain at least one a-z
   rule(:umlaut) { match(['éàèèçïöäüâ']) }
   rule(:identifier_D12) { match['a-zA-Z'] >>  match['0-9'].repeat(1) }
   rule(:identifier)  {  str('A + B') | str('ethanol.') | str('poloxamerum 238') | str('TM:') | str('&') | # TODO: why do we have to hard code these identifiers?
                         str('F.E.I.B.A.') | str('LA 25% TM') | str('50/50') | str('polysorbatum ') >> digit >> digit | str('q.s.') |
+                        str("2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum)") |
                         digit >> digit.maybe >> space >> str('per centum ') >> str('q.s.').maybe| str('1g/9.6 cm²') |
                         str('9 g/L 5.4 ml') |
                         str('spag.') | str('spp.') | str('ssp.') | str('deklar.') | # TODO: Sind diese Abkürzung wirklich Teil eines Substanznamens?
@@ -105,6 +106,7 @@ class CompositionParser < Parslet::Parser
                            str('U.I. hLH') |
                            str('U.I.') |
                            str('U./ml') |
+                           str('U.K.I.') |
                            str('U.') |
                            str('Mia.') |
                            str('Mrd.') |
@@ -122,7 +124,8 @@ class CompositionParser < Parslet::Parser
   rule(:dose)           { dose_fsh |
                           dose_per |
                           ( min_max.maybe >>
-                            ( (qty_range >> (space >> dose_unit).maybe) | (qty_unit | dose_qty |dose_unit)) >> space? )
+                            ( (qty_range >> (space >> dose_unit).maybe) | (qty_unit | dose_qty |dose_unit)) >> space? ) >>
+                        str('pro dosi').maybe >> space?
                            }
   rule(:dose_with_unit) { min_max.maybe >>
                             dose_fsh |
@@ -145,35 +148,40 @@ class CompositionParser < Parslet::Parser
                                 (space >> dose.as(:dose_lebensmittel_zusatz)).maybe >> space?
 
                    } # Match Wirkstoffe like E 270
-  rule(:der) { (str('DER:')  >> space >> digit >> match['0-9\.\-:'].repeat).as(:der) >> space?
+  rule(:der) { (str('DER:')  >> space >> digit >> match['0-9\.\-:'].repeat).as(:substance_name) >> space? >> dose.maybe.as(:dose)
              } # DER: 1:4 or DER: 3.5:1 or DER: 6-8:1 or DER: 4.0-9.0:1'
   rule(:forbidden_in_substance_name) {
-                           useage |
-                           min_max |
-                           str('corresp. ca.,') |
-                           str(', corresp.') |
-                           str('corresp.') |
-                           str('ratio:') |
-                            str('Mio ') |
-                            str('et ') |
-                            str('ut ') |
-                            str('Beutel: ') |
-                            str('ut alia: ') |
-                            str('pro dosi') |
-                            str('pro capsula') |
-                            str('pro vitroe') |
+                            min_max |
+                            useage |
+                            excipiens_identifiers |
+                            pro_identifiers |
                             (digits.repeat(1) >> space >> str(':')) | # match 50 %
+                            str(', corresp.') |
+                            str('Beutel: ') |
+                            str('Mio ') |
+                            str('ad emulsionem') |
                             str('ad globulos') |
-                            str('ana ') |
-                            str('ana partes') |
-                            str('partes') |
                             str('ad pulverem') |
+                            str('ad q.s. ') |
+                            str('ad solutionem') |
                             str('ad suspensionem') |
+                            str('ana partes') |
+                            str('ana ') |
+                            str('aqua ad ') |
+                            str('aqua q.s. ') |
+                            str('corresp. ca.,') |
+                            str('corresp.') |
+                            str('et ') |
+                            str('excipiens') |
+                            str('partes') |
+                            str('pro capsula') |
+                            str('pro dosi') |
+                            str('pro vitroe') |
                             str('q.s. ad ') |
                             str('q.s. pro ') |
-                            str('ad solutionem') |
-                            str('ad emulsionem') |
-                            str('excipiens')
+                            str('ratio:') |
+                            str('ut alia: ') |
+                            str('ut ')
     }
   rule(:name_without_parenthesis) {
     (
@@ -192,116 +200,124 @@ class CompositionParser < Parslet::Parser
     (forbidden_in_substance_name.absent? >> (identifier.repeat(1) | part_with_parenthesis | rparen) >> space?).repeat(0)
   }
   rule(:substance_name) { (
-                            der |
                             name_with_parenthesis |
                             name_without_parenthesis
                           ) >>
                           str('pro dosi').maybe >> space?
                           }
-  rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.as(:dose).maybe}
+  rule(:simple_substance) { substance_name.as(:substance_name) >> space? >> dose.maybe.as(:dose)}
   rule(:simple_subtance_with_digits_in_name_and_dose)  {
-    substance_lead.maybe >> space? >>
+    substance_lead.maybe.as(:more_info) >> space? >>
     (name_without_parenthesis >> space? >> ((digits.repeat(1) >> (str(' %') | str('%')) | digits.repeat(1)))).as(:substance_name) >>
     space >> dose_with_unit.as(:dose)
   }
 
 
-  rule(:pro_dose) { str('pro') >>  space >> dose.as(:dose_corresp) }
-
-    # TODO: what does ut alia: impl?
-  rule(:substance_ut) {
-      (substance_lead.maybe >> simple_substance).as(:substance_ut) >>
-  (space? >> (str('pro dosi ut ') | str('ut ') )  >>
-    space? >> str('alia:').absent? >>
-    (excipiens |
-    substance_name >> space? >> str('corresp.') >> space? >> substance_lead.maybe >> space? >> simple_substance |
-    simple_substance
-     ).as(:for_ut)
-  ).repeat(1) >>
-    space? # >> str('alia:').maybe >> space?
-    }
-
   rule(:substance_more_info) { # e.g. "acari allergeni extractum 5000 U.:
-      (str('ratio:').absent? >> (identifier|digits) >> space?).repeat(1).as(:more_info) >> space? >> (str('U.:') | str(':')| str('.:')) >> space?
+      (str('ratio:').absent? >> (identifier|digits) >> space?).repeat(1) >> space? >> (str('U.:') | str(':')| str('.:')) >> space?
     }
 
-  rule(:dose_pro) { (
-                       str('excipiens ad solutionem pro ') |
-                       str('aqua q.s. ad gelatume pro ') |
-                       str('aqua q.s. ad solutionem pro ') |
-                       str('aqua q.s. ad suspensionem pro ') |
-                       str('q.s. ad pulverem pro ') |
+  rule(:pro_identifiers) {
+                       str('ut aqua ad iniectabilia q.s. ad emulsionem pro ') |
+                       str('aqua ').maybe >> str('ad iniectabilia q.s. ad solutionem pro ') |
+                       str('aqua ').maybe >> str('ad solutionem pro ')  |
+                       str('aqua ').maybe >> str('q.s. ad emulsionem pro ') |
+                       str('aqua ').maybe >> str('q.s. ad gelatume pro ') |
+                       str('aqua ').maybe >> str('q.s. ad solutionem pro ') |
+                       str('aqua ').maybe >> str('q.s. ad suspensionem pro ') |
                        str('doses pro vase ') |
-                       str('pro vase ') |
                        str('excipiens ad emulsionem pro ') |
                        str('excipiens ad pulverem pro ') |
-                       str('aqua ad iniectabilia q.s. ad solutionem pro ')
-                    )  >> dose.as(:dose_pro) >> space? >> ratio.as(:ratio).maybe
+                       str('excipiens ad solutionem pro ') |
+                       str('pro vase ') |
+                       str('q.s. ad pulverem pro ')
   }
+  rule(:excipiens_dose) { pro_identifiers.as(:excipiens_description)  >> dose.as(:dose) >> space? >> ratio.maybe.as(:ratio) >>
+                    space? >> str('corresp.').maybe >> space? >> dose.maybe.as(:dose_corresp)
+                    }
 
-  rule(:excipiens)  { (dose_pro |
+  rule(:excipiens_identifiers)  {
+                       str('ad globulos') |
+                       str('ad pulverem') |
+                       str('ad solutionem') |
+                       str('aether q.s.') |
+                       str('ana partes') |
+                       str('aqua ad iniectabilia q.s. ad solutionem') |
+                       str('aqua ad iniectabilia') |
+                       str('aqua q.s. ad') |
                        str('excipiens pro compresso obducto') |
                        str('excipiens pro compresso') |
                        str('excipiens pro praeparatione') |
                        str('excipiens') |
-                       str('ad pulverem') |
                        str('pro charta') |
-                       str('ad globulos') |
-                       str('aqua ad iniectabilia q.s. ad solutionem') |
-                       str('solvens (i.v.): aqua ad iniectabilia') |
-                       str('ad solutionem') |
-                       str('q.s. ad') |
-                       str('aqua q.s. ad') |
-                       str('saccharum ad') |
-                       str('aether q.s.') |
-                       str('pro vitro') |
-                       str('aqua ad iniectabilia') |
                        str('pro praeparatione') |
+                       str('pro vitro') |
+                       str('q.s. ad') |
                        str('q.s. pro praeparatione') |
-                       str('ana partes')
-                      ) >> space? >>
-                      ( any.repeat(0) )
+                       str('saccharum ad') |
+                       str('solvens (i.v.): aqua ad iniectabilia')
                       }
 
-  rule(:substance_lead) { useage.as(:more_info) >> space? |
-                      str('Beutel:').as(:more_info) >> space? |
-                      str('residui:').as(:more_info) >> space? |
-                      str('mineralia').as(:mineralia) >> str(':') >> space? |
-                      str('Solvens:').as(:solvens) >> space? |
+  rule(:excipiens)  { substance_lead.maybe.as(:more_info) >> space? >>
+                      ( excipiens_dose | excipiens_identifiers.as(:excipiens_description)) >>
+                      space? >> excipiens_dose.maybe.as(:dose_2) >>
+                      any.repeat(0)
+                    }
+
+  rule(:substance_lead) { useage >> space? |
+                      str('Beutel:') >> space? |
+                      str('residui:') >> space? |
+                      str('mineralia:') >> str(':') >> space? |
+                      str('Solvens:') >> space? |
                       substance_more_info
     }
   rule(:corresp_substance_label) {
       str(', corresp. ca.,') |
       str('corresp. ca.,') |
+      str('corresp.,') |
       str('corresp.') |
-      str('corresp., ') |
       str(', corresp.')
+    }
+  rule(:ratio) { str('ratio:') >>  space >> ratio_value }
+
+  rule(:solvens) { (str('Solvens:') | str('Solvens (i.m.):'))>> space >> (any.repeat).as(:more_info) >> space? >>
+                   (substance.as(:substance) >> str('/L').maybe).maybe  >>
+                    any.maybe
+                }
+    # Perhaps we could have some syntax sugar to make this more easy?
+    #
+    def tag(opts={})
+        close = opts[:close] || false
+    end
+
+    # TODO: what does ut alia: impl?
+  rule(:substance_ut) {
+   (space? >> (str('pro dosi ut ') | str('ut ') ) >>
+    space? >> str('alia:').absent? >>(substance) # | excipiens.as(:excipiens2))
+  ) >>
+    space?
     }
 
   rule(:corresp_substance) {
                             (corresp_substance_label) >> space? >>
                             (
-                             simple_substance.as(:substance_corresp) |
+                             substance |
                              dose.as(:dose_corresp_2)
                             )
   }
 
-  rule(:ratio) { str('ratio:') >>  space >> ratio_value }
-
-  rule(:solvens) { (str('Solvens:') | str('Solvens (i.m.):'))>> space >> (any.repeat).as(:solvens) >> space? >>
-                   (substance.as(:substance) >> str('/L').maybe).maybe  >>
-                    any.maybe
-                }
   rule(:substance) {
-    simple_subtance_with_digits_in_name_and_dose |
-    useage.as(:more_info) >> space? >> excipiens |
-    ratio.as(:ratio) |
-    solvens |
-    der  >> corresp_substance.maybe |
-    (str('potenziert mit:') >> space).maybe >> excipiens.as(:excipiens) |
-    substance_ut |
-    substance_lead.maybe >> space? >> lebensmittel_zusatz |
-    substance_lead.maybe >> space? >> simple_substance >> corresp_substance.maybe >> space? >> corresp_substance.maybe >> space? >> dose_pro.maybe >> str('pro dosi').maybe
+      (
+      simple_subtance_with_digits_in_name_and_dose |
+    der |
+    substance_lead.maybe.as(:more_info) >> space? >> lebensmittel_zusatz |
+    substance_lead.maybe.as(:more_info) >> space? >> simple_substance >> str('pro dosi').maybe
+      ).as(:substance) >>
+    (space? >> str(', ').maybe >> ratio.maybe).as(:ratio) >>
+    space? >> corresp_substance.maybe.as(:chemical_substance) >>
+    space? >> substance_ut.repeat(0).as(:substance_ut) #>>
+    # (space? >> str(', ').maybe >> ratio.maybe).as(:ratio)
+
   }
   rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
   rule(:praeparatio){ ((one_word >> space?).repeat(1).as(:description) >> str(':') >> space?).maybe >>
@@ -310,9 +326,8 @@ class CompositionParser < Parslet::Parser
                       ((identifier >> space?).repeat(1).as(:more_info) >> space?).maybe
                     }
   rule(:substance_separator) { (str(', et ') | comma | str('et ') | str('ut alia: ')) >> space? }
-  rule(:one_substance)       { (praeparatio | histamin | substance).as(:substance) >> space? >> ratio.as(:ratio).maybe }
-  # rule(:one_substance)       { (substance_ut).as(:substance) } # >> str('.').maybe }
-  rule(:all_substances)      { (one_substance >> substance_separator.maybe).repeat(1) }
+  rule(:one_substance)       { (praeparatio | histamin | substance) >> space? >> ratio.as(:ratio).maybe >> space? }
+  rule(:all_substances)      { (one_substance >> substance_separator.maybe).repeat(1) >> space? >> excipiens.as(:excipiens).maybe}
   rule(:composition)         { all_substances }
   rule(:long_labels) {
         str('Praeparatio sicca cum solvens: praeparatio sicca:') |
@@ -344,6 +359,8 @@ class CompositionParser < Parslet::Parser
                             label
     }
   rule(:corresp_label) {
+    str('aqua ') |
+    str('excipiens ') |
     str('doses ') |
     str('Pulver: ') |
     str('Diluens: ') |
@@ -357,11 +374,27 @@ class CompositionParser < Parslet::Parser
   }
   rule(:corresp_line) { corresp_label >> any.repeat(1).as(:corresp)  |
                         ((label_id >> label_separator >> space? >> str('et ').maybe).repeat(1) >> any.repeat(1)).as(:corresp)
+                      }
+  rule(:corresp_line_neu) { corresp_label >> any.repeat(1).as(:corresp) }
+
+  rule(:multiple_et_line) {
+                        ((label_id >> label_separator >> space? >> (str('pro usu') |str('et '))).repeat(1) >> any.repeat(1)).as(:corresp)
   }
+
+  rule(:polvac) { label_id.as(:label) >> label_separator >> space? >> composition.as(:composition) >> space? >> str('.').maybe >> space? }
+
+  rule(:label_composition) { label >> space? >> composition.as(:excipiens) >> space? >> str('.').maybe >> space? }
+  rule(:label_comment_excipiens) { label >> space? >> excipiens.as(:excipiens) >> space? >> str('.').maybe >> space? }
 
   rule(:expression_comp) {
     leading_label.maybe >> space? >> composition.as(:composition) >> space? >> str('.').maybe >> space? |
-    corresp_line
+    multiple_et_line |
+    corresp_line_neu |
+    label_composition |
+    polvac |
+    label_comment_excipiens |
+    excipiens.as(:composition) |
+    space.repeat(3)
   }
   root :expression_comp
 end

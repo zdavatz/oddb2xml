@@ -471,7 +471,7 @@ if RunAllTests
     txt = 'calcium carbonicum hahnemanni C7 5 %, chamomilla recutita D5 22.5 %, magnesii hydrogenophosphas trihydricus C5 50 %, passiflora incarnata D5 22.5 %, xylitolum, excipiens ad globulos.'
     info = ParseUtil.parse_compositions(txt)
     specify { expect(info.size).to eq  1 }
-    specify { expect(info.first.substances.size).to eq ExcipiensIs_a_Substance ? 6 : 5 }
+    specify { expect(info.first.substances.size).to eq 6 }
     recutita =  info.first.substances.find{ |x| x.name.match(/recutita/i) }
     specify { expect(recutita.name).to eq  'Chamomilla Recutita D5' }
     specify { expect(recutita.qty.to_f).to eq  22.5 }
@@ -498,7 +498,7 @@ if RunAllTests
                       text
                       )
     specify { expect(info.compositions.size).to eq  2 }
-    specify { expect(info.compositions.first.substances.size).to eq ExcipiensIs_a_Substance ? 7 : 6 }
+    specify { expect(info.compositions.first.substances.size).to eq 7 }
     poloxamerum =  info.compositions.first.substances.find{ |x| x.name.match(/poloxamerum/i) }
     skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
     skip { expect(poloxamerum.qty.to_f).to eq  "" }
@@ -612,7 +612,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
                     text)
     specify { expect(info.pkg_size).to eq '2 x 7' }
     specify { expect(info.selling_units).to eq 14 }
-    specify { expect(info.compositions.first.substances.size).to eq ExcipiensIs_a_Substance ? 3 : 2 }
+    specify { expect(info.compositions.first.substances.size).to eq 3 }
     viscum =  info.compositions.first.substances.find{ |x| x.name.match(/viscum/i) }
     specify { expect(viscum).not_to eq nil}
     natrii =  info.compositions.first.substances.find{ |x| x.name.match(/natrii chloridum/i) }
@@ -633,7 +633,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
                     text)
     specify { expect(info.pkg_size).to eq '2 x 7' }
     specify { expect(info.selling_units).to eq 14 }
-    specify { expect(info.compositions.first.substances.size).to eq ExcipiensIs_a_Substance ? 4 : 3 }
+    specify { expect(info.compositions.first.substances.size).to eq 4 }
     viscum =  info.compositions.first.substances.find{ |x| x.name.match(/viscum/i) }
     specify { expect(viscum).not_to eq nil}
     if viscum

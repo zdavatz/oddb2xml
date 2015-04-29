@@ -93,6 +93,122 @@ class QtyLit   < Struct.new(:qty)
 end
 
 class CompositionTransformer < Parslet::Transform
+  def CompositionTransformer.get_ratio(parse_info)
+    if parse_info[:ratio]
+      if parse_info[:ratio].to_s.length > 0 and parse_info[:ratio].to_s != ', '
+        parse_info[:ratio].to_s.sub(/^,\s+/, '').sub(/,\s+$/,'')
+      else
+        nil
+      end
+    else
+      nil
+    end
+  end
+
+  rule(:corresp => simple(:corresp),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      @@corresp = dictionary[:corresp].to_s
+  }
+  rule( :substance_name => simple(:substance_name),
+        :dose => simple(:dose),
+      ) {
+    |dictionary|
+        puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+        dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : nil
+        substance = ParseSubstance.new(dictionary[:substance_name], dose)
+        @@substances <<  substance
+        substance
+  }
+
+  rule( :more_info => simple(:more_info),
+      ) {
+    |dictionary|
+        puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+        @@corresp = dictionary[:more_info].to_s.strip.sub(/:$/, '')
+  }
+  rule( :more_info => simple(:more_info),
+        :substance_name => simple(:substance_name),
+        :dose => simple(:dose),
+      ) {
+    |dictionary|
+        puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+        dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : nil
+        substance = ParseSubstance.new(dictionary[:substance_name].to_s, dose)
+        substance.more_info = dictionary[:more_info].to_s.strip.sub(/:$/, '') if dictionary[:more_info] and dictionary[:more_info].to_s.length > 0
+        @@substances <<  substance
+        substance
+  }
+
+  rule(:lebensmittel_zusatz => simple(:lebensmittel_zusatz),
+       :more_info => simple(:more_info),
+       :digits => simple(:digits)) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      substance =  ParseSubstance.new("#{dictionary[:lebensmittel_zusatz]} #{dictionary[:digits]}")
+      substance.more_info =  dictionary[:more_info].to_s.sub(/:\s+$/, '').strip if dictionary[:more_info]
+      @@substances <<  substance
+      substance
+  }
+  rule(:excipiens => subtree(:excipiens),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      info = dictionary[:excipiens].is_a?(Hash) ? dictionary[:excipiens] : dictionary[:excipiens].first
+      @@excipiens           =  ParseSubstance.new(info[:excipiens_description] ? info[:excipiens_description] : 'Excipiens')
+      @@excipiens.dose      = info[:dose] if info[:dose]
+      @@excipiens.more_info = CompositionTransformer.get_ratio(dictionary)
+      @@excipiens.cdose     = info[:dose_corresp] if info[:dose_corresp]
+      @@excipiens.more_info = info[:more_info] if info[:more_info]
+      binding.pry if dictionary[:dose_2]
+      nil
+  }
+  rule(:composition => subtree(:composition),
+       ) {
+    |dictionary|
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      info = dictionary[:composition].is_a?(Hash) ? dictionary[:composition] : dictionary[:composition].first
+      if info.is_a?(Hash)
+        @@excipiens           =  ParseSubstance.new(info[:excipiens_description] ? info[:excipiens_description] : 'Excipiens')
+        @@excipiens.dose      = info[:dose] if info[:dose]
+        @@excipiens.more_info = CompositionTransformer.get_ratio(dictionary)
+        @@excipiens.cdose     = info[:dose_corresp] if info[:dose_corresp]
+        @@excipiens.more_info = info[:more_info] if info[:more_info]
+        binding.pry if dictionary[:dose_2]
+        @@excipiens
+       else
+        info
+       end
+       }
+  rule(:substance => simple(:substance),
+       :chemical_substance => simple(:chemical_substance),
+       :substance_ut => sequence(:substance_ut),
+       :ratio => simple(:ratio),
+       ) {
+    |dictionary|
+       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+       ratio = CompositionTransformer.get_ratio(dictionary)
+       if ratio and ratio.length > 0
+        if dictionary[:substance].more_info
+          dictionary[:substance].more_info += ' ' + ratio.strip
+        else
+          dictionary[:substance].more_info = ratio.strip
+        end
+       end
+       if  dictionary[:chemical_substance]
+        dictionary[:substance].chemical_substance = dictionary[:chemical_substance]
+        @@substances -= [dictionary[:chemical_substance]]
+       end
+       if  dictionary[:substance_ut].size > 0
+        dictionary[:substance].salts += dictionary[:substance_ut].last.salts
+        dictionary[:substance_ut].last.salts = []
+        dictionary[:substance].salts << dictionary[:substance_ut].last
+        @@substances -= dictionary[:substance_ut]
+       end
+       dictionary[:substance]
+  }
+
   rule(:int => simple(:int))        { IntLit.new(int) }
   rule(:number => simple(:nb)) {
     nb.match(/[eE\.]/) ? Float(nb) : Integer(nb)
@@ -115,8 +231,17 @@ class CompositionTransformer < Parslet::Transform
     :unit    => simple(:unit))  { ParseDose.new(nil, unit) }
   rule(
     :qty    => simple(:qty))  { ParseDose.new(qty, nil) }
+  rule(
+    :qty    => simple(:qty),
+    :unit    => simple(:unit),
+    :dose_right    => simple(:dose_right),
+  )  {
+    dose = ParseDose.new(qty, unit)
+    dose.unit = dose.unit.to_s + ' et ' + ParseDose.new(dose_right).to_s
+    dose
+  }
 
-  @@substances ||= []
+@@substances ||= []
   @@excipiens  = nil
   def CompositionTransformer.clear_substances
     @@substances = []
@@ -132,311 +257,6 @@ class CompositionTransformer < Parslet::Transform
   def CompositionTransformer.corresp
     @@corresp ? @@corresp.clone : nil
   end
-
-  rule(:ratio => simple(:ratio) ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      @@substances.last.more_info = dictionary[:ratio].to_s if @@substances.last
-  }
-  rule(:substance => sequence(:substance),
-       :ratio => simple(:ratio)) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      @@substances.last.more_info = dictionary[:ratio].to_s if @@substances.last
-  }
-
-  rule(:solvens => simple(:solvens) ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      substance =  ParseSubstance.new(dictionary[:solvens].to_s)
-      substance.more_info =  'Solvens'
-      @@substances <<  substance
-  }
-  rule(:lebensmittel_zusatz => simple(:lebensmittel_zusatz),
-       :more_info => simple(:more_info),
-       :digits => simple(:digits)) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      substance =  ParseSubstance.new("#{dictionary[:lebensmittel_zusatz]} #{dictionary[:digits]}")
-      substance.more_info =  dictionary[:more_info].to_s.sub(/:$/, '')
-      @@substances <<  substance
-  }
-  rule(:lebensmittel_zusatz => simple(:lebensmittel_zusatz),
-       :digits => simple(:digits)) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
-      @@substances << ParseSubstance.new("#{dictionary[:lebensmittel_zusatz]} #{dictionary[:digits]}")
-      dictionary[:substance]
-  }
-  rule(:substance => simple(:substance)) {
-    |dictionary|
-    puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-  }
-  rule(:substance_name => simple(:substance_name),
-       :dose => simple(:dose),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      @@substances << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
-  }
-  rule(:substance_ut => sequence(:substance_ut),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      nil
-  }
-  rule(:for_ut => sequence(:for_ut),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      if dictionary[:for_ut].size > 1
-        @@substances[-2].salts << dictionary[:for_ut].last.clone
-        @@substances.delete(dictionary[:for_ut].last)
-      end
-      nil
-  }
-
-  rule(:substance_name => simple(:substance_name),
-       :dose => simple(:dose),
-       :substance_corresp => sequence(:substance_corresp),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      substance = ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
-      substance.chemical_substance = @@substances.last
-      @@substances.delete_at(-1)
-      @@substances <<  substance
-  }
-
-  rule(:mineralia => simple(:mineralia),
-       :more_info => simple(:more_info),
-       :substance_name => simple(:substance_name),
-       :dose => simple(:dose),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      substance = ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
-      substance.more_info = dictionary[:mineralia].to_s + ' ' + dictionary[:more_info].to_s
-       # TODO: fix alia
-      @@substances <<  substance
-  }
-  rule(:substance_name => simple(:substance_name),
-       :conserv => simple(:conserv),
-       :dose => simple(:dose),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
-      substance = ParseSubstance.new(dictionary[:substance_name], ParseDose.new(dictionary[:dose].to_s))
-      @@substances <<  substance
-      substance.more_info =  dictionary[:conserv].to_s.sub(/:$/, '')
-  }
-
-  rule(:substance_name => simple(:substance_name),
-       :mineralia => simple(:mineralia),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
-      substance = ParseSubstance.new(dictionary[:substance_name])
-      substance.more_info =  dictionary[:mineralia].to_s.sub(/:$/, '')
-      @@substances <<  substance
-  }
-  rule(:substance_name => simple(:substance_name),
-       :more_info => simple(:more_info),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      substance = ParseSubstance.new(dictionary[:substance_name])
-      @@substances <<  substance
-      substance.more_info =  dictionary[:more_info].to_s.sub(/:$/, '')
-  }
-  rule(:substance_name => simple(:substance_name),
-       :residui => simple(:residui),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-       binding.pry
-      substance = ParseSubstance.new(dictionary[:substance_name])
-      @@substances <<  substance
-      substance.more_info =  dictionary[:residui].to_s.sub(/:$/, '')
-  }
-  rule(:qty => simple(:qty),
-       :unit => simple(:unit),
-       :dose_right => simple(:dose_right),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      ParseDose.new(dictionary[:qty].to_s, dictionary[:unit].to_s + ' et ' +  dictionary[:dose_right].to_s )
-  }
-
-  rule(:substance_name => simple(:substance_name),
-       :qty => simple(:qty),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
-      @@substances << ParseSubstance.new(dictionary[:substance_name].to_s.strip, ParseDose.new(dictionary[:qty].to_s))
-  }
-
-  rule(:substance_name => simple(:substance_name),
-       :dose_corresp => simple(:dose_corresp),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
-      @@substances << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose_corresp])
-  }
-  rule(:description => simple(:description),
-       :substance_name => simple(:substance_name),
-       :qty => simple(:qty),
-       :more_info => simple(:more_info),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      substance = ParseSubstance.new(dictionary[:substance_name], ParseDose.new(dictionary[:qty].to_s))
-      @@substances <<  substance
-      substance.more_info =  dictionary[:more_info].to_s
-      substance.description =  dictionary[:description].to_s
-      substance
-  }
-  rule(:der => simple(:der),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      @@substances << ParseSubstance.new(dictionary[:der].to_s)
-  }
-  rule(:der => simple(:der),
-       :substance_corresp => sequence(:substance_corresp),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      substance = ParseSubstance.new(dictionary[:der].to_s)
-      substance.chemical_substance = @@substances.last
-      @@substances.delete_at(-1)
-      @@substances <<  substance
-  }
-  rule(:histamin => simple(:histamin),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: histamin dictionary #{dictionary}"
-      @@substances << ParseSubstance.new(dictionary[:histamin].to_s)
-  }
-  rule(:substance_name => simple(:substance_name),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
-      @@substances << ParseSubstance.new(dictionary[:substance_name].to_s)
-  }
-  rule(:one_substance => sequence(:one_substance)) {
-    |dictionary|
-       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
-      @@substances << ParseSubstance.new(dictionary[:one_substance])
-  }
-  rule(:one_substance => sequence(:one_substance)) {
-    |dictionary|
-       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
-      @@substances << ParseSubstance.new(dictionary[:one_substance])
-  }
-
-  rule(:substance_name => simple(:substance_name),
-       :substance_ut => sequence(:substance_ut),
-       :dose => simple(:dose),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
-      @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
-      nil
-  }
-
-  rule(:mineralia => simple(:mineralia),
-       :dose => simple(:dose),
-       :substance_name => simple(:substance_name),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"  if VERBOSE_MESSAGES
-      dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : ParseDose.new(dictionary[:dose].to_s)
-      substance = ParseSubstance.new(dictionary[:substance_name], dose)
-      substance.more_info = dictionary[:mineralia].to_s
-      @@substances <<  substance
-      # @@substances << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
-  }
-
-  rule(:mineralia => simple(:mineralia),
-       :dose => simple(:dose),
-       :substance_ut => simple(:substance_ut),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
-      dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : ParseDose.new(dictionary[:dose].to_s)
-      substance = ParseSubstance.new(dictionary[:substance_ut], dose)
-      substance.more_info = dictionary[:mineralia].to_s
-       binding.pry
-      @@substances <<  substance
-      nil
-  }
-
-
-  rule(:mineralia => simple(:mineralia),
-       :substance_ut => simple(:substance_ut),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}"
-       binding.pry
-      @@substances.last.salts << ParseSubstance.new(dictionary[:substance_name].to_s, dictionary[:dose])
-      nil
-  }
-  rule( :more_info => simple(:more_info),
-        :substance_name => simple(:substance_name),
-        :dose => simple(:dose),
-      ) {
-    |dictionary|
-        puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-        dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : ParseDose.new(dictionary[:dose].to_s)
-        substance = ParseSubstance.new(dictionary[:substance_name], dose)
-        substance.more_info = dictionary[:more_info].to_s
-        @@substances <<  substance
-  }
-
-  rule(:excipiens => simple(:excipiens),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      @@excipiens = dictionary[:excipiens].is_a?(ParseDose) ? ParseSubstance.new('excipiens', dictionary[:excipiens]) : nil
-  }
-
-  rule(:substance_name => simple(:substance_name),
-       :dose_pro => simple(:dose_pro),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      dose = dictionary[:dose_pro].is_a?(ParseDose) ? dictionary[:dose_pro] : ParseDose.new(dictionary[:dose_pro].to_s)
-      substance = ParseSubstance.new(dictionary[:substance_name], dose)
-      @@excipiens = dose
-      @@substances <<  substance
-  }
-  rule(:substance_name => simple(:substance_name),
-       :dose => simple(:dose),
-       :dose_pro => simple(:dose_pro),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      dose = dictionary[:dose_pro].is_a?(ParseDose) ? dictionary[:dose_pro] : ParseDose.new(dictionary[:dose_pro].to_s)
-      dose_pro = dictionary[:dose_pro].is_a?(ParseDose) ? dictionary[:dose_pro] : ParseDose.new(dictionary[:dose_pro].to_s)
-      substance = ParseSubstance.new(dictionary[:substance_name], dose)
-      @@excipiens = dose_pro
-      @@substances <<  substance
-  }
-
-  rule(:dose_pro => simple(:dose_pro),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      dictionary[:dose_pro]
-  }
-
-  rule(:corresp => simple(:corresp),
-       ) {
-    |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      @@corresp = dictionary[:corresp].to_s
-  }
 end
 
 class ParseDose
@@ -509,15 +329,18 @@ end
 
 class ParseComposition
   attr_accessor   :source, :label, :label_description, :substances, :galenic_form, :route_of_administration,
-                  :corresp
+                  :corresp, :excipiens
 
   ErrorsToFix = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => '\1, \2',
                   /(\d+)\s+\-\s*(\d+)/ => '\1-\2',
                   'o.1' => '0.1',
                   'g DER:' => 'g, DER:',
-                  /(excipiens ad solutionem pro \d+ ml), corresp\./ => '\1 corresp.',
+                  ' mind. ' => ' min. ',
+                  ' streptococci pyogen. ' => ' streptococci pyogen ',
+                  ' ut excipiens' => ', excipiens',
+#                  /(excipiens ad solutionem pro \d+ ml), corresp\./ => '\1 corresp.',
                   /^(pollinis allergeni extractum[^\:]+\:)/ => 'A): \1',
-                  /^(acari allergeni extractum 5000 U\.\:)/ => 'A): \1',
+                  /^(acari allergeni extractum (\(acarus siro\)|).+\s+U\.\:)/ => 'A): \1',
                 }
   @@errorHandler = ParseUtil::HandleSwissmedicErrors.new( ErrorsToFix )
 
@@ -547,7 +370,6 @@ class ParseComposition
 
     cleaned = @@errorHandler.apply_fixes(cleaned)
     puts "ParseComposition.new cleaned #{cleaned}" if VERBOSE_MESSAGES and not cleaned.eql?(stripped)
-
     CompositionTransformer.clear_substances
     result = ParseComposition.new(cleaned)
     parser3 = CompositionParser.new
@@ -555,7 +377,8 @@ class ParseComposition
     begin
       if defined?(RSpec)
         ast = transf3.apply(parser3.parse_with_debug(cleaned))
-        puts "#{File.basename(__FILE__)}:#{__LINE__}: ==>  #{ast}" if VERBOSE_MESSAGES
+        puts "#{File.basename(__FILE__)}:#{__LINE__}: ==> " if VERBOSE_MESSAGES
+        pp ast if VERBOSE_MESSAGES
       else
         ast = transf3.apply(parser3.parse(cleaned))
       end
@@ -566,17 +389,17 @@ class ParseComposition
     result.source = string
     return result unless ast
     return result if ast.is_a?(Parslet::Slice)
-    # pp ast; binding.pry
 
     result.substances = CompositionTransformer.substances
-    excipiens = CompositionTransformer.excipiens
+    result.excipiens = CompositionTransformer.excipiens
     result.corresp = CompositionTransformer.corresp if CompositionTransformer.corresp
-    if excipiens and excipiens.unit
-      pro_qty = "/#{excipiens.qty} #{excipiens.unit}".sub(/\/1\s+/, '/')
+    if result.excipiens and result.excipiens.unit
+      pro_qty = "/#{result.excipiens.qty} #{result.excipiens.unit}".sub(/\/1\s+/, '/')
       result.substances.each {
         |substance|
+            next unless substance.is_a?(ParseSubstance)
           substance.chemical_substance.unit = "#{substance.chemical_substance.unit}#{pro_qty}"    if substance.chemical_substance
-          substance.dose.unit               = "#{substance.dose.unit}#{pro_qty}"                  if substance.unit and not substance.unit.eql?(excipiens.unit)
+          substance.dose.unit               = "#{substance.dose.unit}#{pro_qty}"                  if substance.unit and not substance.unit.eql?(result.excipiens.unit)
       }
     end
     if ast.is_a?(Array) and  ast.first.is_a?(Hash)

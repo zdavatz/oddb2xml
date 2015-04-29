@@ -649,7 +649,7 @@ module Oddb2xml
             seqnr               = "%02d" % row.cells[1].value.to_i
             if row_nr % 250 == 0
                 puts "#{Time.now}: At row #{row_nr} iksnr #{iksnr}";
-                $stdout.sync
+                $stdout.flush
             end
             no8                 = sprintf('%05d',row.cells[0].value.to_i) + sprintf('%03d',row.cells[10].value.to_i)
             name                = row.cells[2].value

@@ -13,16 +13,21 @@ let(:parser) { CompositionParser.new }
     let(:dose_parser) { parser.dose }
     let(:identifier_parser) { parser.identifier }
     let(:substance_parser) { parser.substance }
+    let(:salts_parser) { parser.salts }
     let(:substance_name_parser) { parser.substance_name }
     let(:number_parser) { parser.number }
 
     it "parses identifier" do
-        res1 = number_parser.parse_with_debug( "min.10^4.4 U..")
+        "piscis oleum 500 mg corresp. acida carboxylica omega-3 oligoinsaturata 150 mg ut acidum eicosapentaenoicum 90 mg"
+    res1 = salts_parser.parse_with_debug( " ut acidum eicosapentaenoicum 90 mg")
+      pp res1
+
+    res2 = substance_parser.parse_with_debug("piscis oleum 500 mg corresp. acida carboxylica omega-3 oligoinsaturata 150 mg ut acidum eicosapentaenoicum 90 mg")
       pp res1
       binding.pry
     end
   end
-end if false
+end if true
 describe CompositionParser do
   let(:parser) { CompositionParser.new }
   context "should help me find problems" do
@@ -499,4 +504,4 @@ describe CompositionParser do
   end
 
 end
-end
+end if false

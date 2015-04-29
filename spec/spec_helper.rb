@@ -29,7 +29,6 @@ module Oddb2xml
   SpecCompressor = File.join(Oddb2xml::SpecData, 'compressor')
 end
 
-ExcipiensIs_a_Substance = false #  might change later
 AllCompositionLines = File.expand_path("#{__FILE__}/../data/compositions.txt")
 
 require 'oddb2xml'
