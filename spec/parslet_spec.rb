@@ -5,6 +5,7 @@ require 'pry'
 rescue LoadError
 end
 require 'pp'
+VERBOSE_MESSAGES = false
 require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
@@ -43,6 +44,43 @@ end
 end
 
 describe ParseComposition do
+  context "should handle excipiens" do
+    string = "conserv.: E 216, E 218, excipiens pro suppositorio."
+    composition = ParseComposition.from_string(string)
+    specify { expect( composition.substances.size).to eq 2 }
+    specify { expect( composition.label).to eq nil }
+    specify { expect( composition.excipiens.name).to match /excipiens pro suppositorio/i }
+    specify { expect( composition.substances.first.name).to eq "E 216" }
+  end
+
+  context "should return label with description" do
+    string = "I) Glucoselösung: glucosum anhydricum 240 g ut glucosum monohydricum, calcii chloridum dihydricum 600 mg, acidum citricum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 500 ml."
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.substances.size).to eq 3 }
+    specify { expect(composition.label).to eq 'I' }
+    specify { expect(composition.label_description).to eq 'Glucoselösung' }
+  end
+
+  context "should handle label-description for Cyclacur" do
+    # 37987 1   Cyclacur, Dragées
+    string = "I) Weisse Dragées: estradioli valeras 2 mg, excipiens pro compresso obducto."
+    composition = ParseComposition.from_string(string)
+    specify { expect( composition.substances.size).to eq 1 }
+    specify { expect( composition.label).to eq 'I' }
+    specify { expect( composition.label_description).to eq "Weisse Dragées" }
+    specify { expect( composition.substances.first.name).to eq "Estradioli Valeras" }
+  end
+
+  context "should handle label-description for Moviprep" do
+    # 61631   1   Moviprep Orange, Pulver
+    string = "A): macrogolum 3350 100 g, natrii sulfas anhydricus 7.5 g, natrii chloridum 2.691 g, kalii chloridum 1.015 g, arom.: aspartamum et alia, excipiens ad pulverem pro charta."
+    composition = ParseComposition.from_string(string)
+    specify { expect( composition.substances.size).to eq 6 }
+    specify { expect( composition.label).to eq 'A' }
+    specify { expect( composition.label_description).to eq nil }
+    specify { expect( composition.substances.first.name).to eq "Macrogolum 3350" }
+  end
+
   context "should handle 'LA 2x%" do
     # 48473 1   Wala Echinacea-Mundspray, anthroposophisches Arzneimittel
     string = "echinacea pallida ex herba LA 20% TM 10 g"

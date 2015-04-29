@@ -343,6 +343,10 @@ if RunAllTests
       XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/NAME").first.text.should eq 'Nutriflex Omega special, Infusionsemulsion 2500 ml'
       XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/SELLING_UNITS").first.text.should eq '5'
 
+      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq 'Excipiens ad solutionem'
+      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/QTY").first.text.should eq '1'
+      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/UNIT").first.text.should eq 'ml'
+      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/NAME").first.text.should eq 'W-Tropfen'
     end
   end
 

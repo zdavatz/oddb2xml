@@ -10,7 +10,7 @@ require 'parslet'
 require 'parslet/convenience'
 require 'oddb2xml/compositions_syntax'
 include Parslet
-VERBOSE_MESSAGES = false
+VERBOSE_MESSAGES ||= false
 
 module ParseUtil
   # this class is responsible to patch errors in swissmedic entries after
@@ -156,12 +156,17 @@ class CompositionTransformer < Parslet::Transform
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       info = dictionary[:excipiens].is_a?(Hash) ? dictionary[:excipiens] : dictionary[:excipiens].first
-      @@excipiens           =  ParseSubstance.new(info[:excipiens_description] ? info[:excipiens_description] : 'Excipiens')
-      @@excipiens.dose      = info[:dose] if info[:dose]
-      @@excipiens.more_info = CompositionTransformer.get_ratio(dictionary)
-      @@excipiens.cdose     = info[:dose_corresp] if info[:dose_corresp]
-      @@excipiens.more_info = info[:more_info] if info[:more_info]
-      binding.pry if dictionary[:dose_2]
+      if info[:excipiens_description] or
+       info[:dose] or
+       info[:dose_corresp] or
+       info[:more_info] or
+       CompositionTransformer.get_ratio(dictionary)
+        @@excipiens           =  ParseSubstance.new(info[:excipiens_description] ? info[:excipiens_description] : 'Excipiens')
+        @@excipiens.dose      = info[:dose] if info[:dose]
+        @@excipiens.more_info = CompositionTransformer.get_ratio(dictionary)
+        @@excipiens.cdose     = info[:dose_corresp] if info[:dose_corresp]
+        @@excipiens.more_info = info[:more_info] if info[:more_info]
+      end
       nil
   }
   rule(:composition => subtree(:composition),
@@ -416,7 +421,7 @@ class ParseComposition
       if label and not /((A|B|C|D|E|I|II|III|IV|\)+)\s+et\s+(A|B|C|D|E|I|II|III|IV|\))+)/.match(label)
         result.label  = label
       end
-      result.label_description = label_description
+      result.label_description = label_description.gsub(/:+$/, '').strip if label_description
     end
     return result
   end

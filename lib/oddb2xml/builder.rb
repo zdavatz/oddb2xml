@@ -712,6 +712,7 @@ module Oddb2xml
               xml.COMPOSITIONS {
                 info.compositions.each { |composition|
                   xml.COMPOSITION {
+                    xml.EXCIPIENS { emit_substance(xml, composition.excipiens) } if composition.excipiens
                     xml.CORRESP composition.corresp if composition.corresp
                     xml.LABEL composition.label if composition.label
                     xml.LABEL_DESCRIPTION composition.label_description if composition.label_description

@@ -296,8 +296,7 @@ class CompositionParser < Parslet::Parser
                       }
 
   rule(:excipiens)  { substance_lead.maybe.as(:more_info) >> space? >>
-                      ( excipiens_dose | excipiens_identifiers.as(:excipiens_description)) >>
-                      space? >> excipiens_dose.maybe.as(:dose_2) >>
+                      ( excipiens_dose | (excipiens_identifiers >> any.repeat(0)).as(:excipiens_description)) >>
                       any.repeat(0)
                     }
 
@@ -419,14 +418,17 @@ class CompositionParser < Parslet::Parser
 
   rule(:polvac) { label_id.as(:label) >> label_separator >> space? >> composition.as(:composition) >> space? >> str('.').maybe >> space? }
 
-  rule(:label_composition) { label >> space? >> composition.as(:excipiens) >> space? >> str('.').maybe >> space? }
   rule(:label_comment_excipiens) { label >> space? >> excipiens.as(:excipiens) >> space? >> str('.').maybe >> space? }
 
+  rule(:label_id_composition) { label_id.as(:label) >> label_separator >>
+                                ((space >> identifier).repeat(1) >> str(':')).maybe.as(:label_description) >>
+                                composition.as(:composition)  }
+
   rule(:expression_comp) {
+    multiple_et_line |
+    label_id_composition |
     corresp_line_neu |
     leading_label.maybe >> space? >> composition.as(:composition) >> space? >> str('.').maybe >> space? |
-    multiple_et_line |
-    label_composition |
     polvac |
     label_comment_excipiens |
     excipiens.as(:composition) |
