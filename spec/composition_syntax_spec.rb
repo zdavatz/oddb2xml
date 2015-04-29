@@ -22,13 +22,23 @@ let(:parser) { CompositionParser.new }
     let(:salts_parser) { parser.salts }
     let(:substance_name_parser) { parser.substance_name }
     let(:number_parser) { parser.number }
+    let(:excipiens_parser) { parser.excipiens }
     let(:composition_parser) { parser.composition }
 
     it "parses identifier" do
-      res1 = substance_name_parser.parse_with_debug("argenti nitras aquos. D13")
-      res1 = substance_parser.parse_with_debug("argenti nitras aquos. D13 1 g")
+      res1 = substance_parser.parse_with_debug('pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml')
       pp res1
       binding.pry
+    res1 = excipiens_parser.parse_with_debug "excipiens ad emulsionem pro 1 g"
+      pp res1
+      binding.pry
+    res1 = substance_parser.parse_with_debug "excipiens ad emulsionem pro 1 g"
+      pp res1
+      binding.pry
+    res2 = substance_parser.parse_with_debug "excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi"
+      pp res2
+      binding.pry
+   res1 = substance_name_parser.parse_with_debug("argenti nitras aquos. D13")
 
       string =
 "chlorhexidini digluconas 1 mg, aromatica, color.: corresp. ethanolum 8.5 % V/V, E 127, excipiens ad solutionem pro 1 ml"
@@ -61,6 +71,8 @@ excipiens_tests = {
 }
 
 substance_tests = {
+  'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml' => 'zzz',
+  'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana)' => 'xxx',
   "U = Histamin Equivalent Prick" => 'U = Histamin Equivalent Prick', # 58566
   "Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50, natrii chloridum" => "Vipera Aspis > 1000 Ld50 Mus",
   "Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50, natrii chloridum, polysorbatum 80" => "Vipera Aspis > 1000 Ld50 Mus",
@@ -312,6 +324,10 @@ describe CompositionParser do
       'pollinis allergeni extractum (Phleum pratense) 10 U.',
       'phenoxymethylpenicillinum kalicum 1 U.I.',
       'phenoxymethylpenicillinum kalicum 1 Mio. U.I.',
+      'DER: 1:4',
+      'DER: 3-5:1',
+      'DER: 6-8:1',
+      'DER: 4.0-9.0:1',
       'retinoli palmitas 7900 U.I.',
       ].each {
         |id|
@@ -320,12 +336,16 @@ describe CompositionParser do
         end
       }
     it "parses substance calcium, zwei" do      expect(substance_parser).to_not parse("calcium, zwei")    end
+  end
+
+  context "excipiens parsing" do
+    let(:excipiens_parser) { parser.excipiens }
 
     puts "Testing whether #{excipiens_tests.size} excipiens can be parsed"
-    let(:substance_parser) { parser.substance }
+    let(:excipiens_parser) { parser.excipiens }
     excipiens_tests.each{
       |value, name|
-      it "parses substance #{value}" do expect(substance_parser).to parse(value) end
+      it "parses excipiens #{value}" do expect(excipiens_parser).to parse(value) end
     }
 
   end
@@ -400,10 +420,6 @@ describe CompositionParser do
       'virus poliomyelitis typus 1 inactivatum (D-Antigen)',
       'stanni(II) chloridum dihydricum',
       'ethanol.',
-      'DER: 1:4',
-      'DER: 3-5:1',
-      'DER: 6-8:1',
-      'DER: 4.0-9.0:1',
       'calendula officinalis D2',
 #      "Viperis Antitoxinum Equis F(ab')2", swissmedic patch, as only one occurrence
       "xenonum(133-Xe)",
@@ -458,7 +474,7 @@ describe CompositionParser do
         expect(composition_parser).to parse(value)
       end
     }
-    puts "Testing whether #{substance_tests.size} substances can be parsed"
+    puts "Testing whether #{substance_tests.size} substances can be parsed as composition"
     substance_tests.each{
       |value, name|
       it "parses substance #{value}" do

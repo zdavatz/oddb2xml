@@ -24,36 +24,11 @@ to_add = %(
       pp composition; binding.pry
 )
 
-  context "should handle missing Label A:) in pollinis allergeni extractu" do
-    # 62573   2   Staloral 300 3 Bäume (300 IR/ml) , sublinguale Lösung
-    string =
-'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml'
-    composition = ParseComposition.from_string(string)
-    specify { expect(composition.source).to eq string}
-    specify { expect( composition.substances.size).to eq 1 }
-    specify { expect( composition.substances.first.name).to eq "pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana)" }
-    specify { expect( composition.label).to eq nil }
-      pp composition;      binding.pry
-  end
   context "should handle failed" do
-      composition = ParseComposition.from_string          'argenti nitras aquos. D13 1 g'
-      composition = ParseComposition.from_string 'betulae cortex 50 % et fraxinus excelsior 50 %'
-      pp composition
-      binding.pry if composition.substances.size == 0
   strings = [
-"echinacea pallida ex herba LA 20% TM 10 g, calendula officinalis e floribus LA 20% TM 10 g, salvia officinalis LA 20% TM 10 g, argenti nitras aquos. D13 1 g, eucalyptus globulus ferm D1 1 g, gingiva bovis GI D4 1 g, gingiva bovis GI D8 1 g, tonsilla pallatina bovis GI D4 1 g, tonsilla pallatina bovis GI D8 1 g, excipiens ad solutionem, corresp. ethanolum 18 % V/V et propellentia ad aerosolum pro 100 ml",
-"pollinis allergeni extractum 10'000 U.: alnus glutinosa 50 % et corylus avellana 50 %, aluminium ut aluminii hydroxidum hydricum ad adsorptionem, natrii chloridum, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
-"pollinis allergeni extractum 10'000 U.: betula spec. 35 % et alnus glutinosa 30 % et corylus avellana 35 %, aluminium ut aluminii hydroxidum hydricum ad adsorptionem, natrii chloridum, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
-"pollinis allergeni extractum 10 U.: betulae cortex 50 % et fraxinus excelsior 50 %, natrii chloridum, aluminii hydroxidum hydricum ad adsorptionem, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
-"pollinis allergeni extractum 10 U.: betula pendula Roth 25 % et alnus glutinosa 25 % et corylus avellana 25 % et fraxinus excelsior 25 %, mannitolum, natrii chloridum, aluminii hydroxidum hydricum ad adsorptionem, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
-"pollinis allergeni extractum 100 U.: betula pendula Roth 50 % et fraxinus excelsior 50 % excipiens ad solutionem pro 1 ml",
-"pollinis allergeni extractum 100 U.: betula pendula Roth 25 % et alnus glutinosa 25 % et corylus avellana 25 % et fraxinus excelsior 25 %, excipiens ad solutionem pro 1 ml",
-"pollinis allergeni extractum 10 U.: betula pendula Roth 50 % et fraxinus excelsior 50 %, natrii chloridum, glycerolum, tricalcii phosphas, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
-"pollinis allergeni extractum 10 U.: betula pendula Roth 25 % et alnus glutinosa 25 % et corylus avellana 25 % et fraxinus excelsior 25 %, natrii chloridum, glycerolum, tricalcii phosphas, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
   ]
     strings.each{ |string|
       composition = ParseComposition.from_string(string)
-      puts string
       binding.pry if composition.substances.size == 0
       specify { expect( composition.substances.size).not_to eq 0 }
     }
@@ -156,7 +131,7 @@ describe ParseComposition do
     composition = ParseComposition.from_string(string)
     specify { expect(composition.source).to eq string}
     specify { expect( composition.substances.size).to eq 1 }
-    specify { expect( composition.substances.first.name).to eq "pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana)" }
+    specify { expect( composition.substances.first.name).to eq "Pollinis Allergeni Extractum (alnus Glutinosa, Betula Alba, Corylus Avellana)" }
     specify { expect( composition.label).to eq nil }
   end
 

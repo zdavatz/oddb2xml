@@ -177,13 +177,16 @@ class CompositionParser < Parslet::Parser
                     str('conserv.:') |
                     str('color.:')
                    }
+
+  # Match Wirkstoffe like E 270
   rule(:lebensmittel_zusatz) {  str('E').as(:lebensmittel_zusatz) >> space >>
                                 (digits >> match['(a-z)'].repeat(0,3)).as(:digits) >>
                                 (space >> dose.as(:dose_lebensmittel_zusatz)).maybe >> space?
 
-                   } # Match Wirkstoffe like E 270
-  rule(:der) { (str('DER:')  >> space >> digit >> match['0-9\.\-:'].repeat).as(:substance_name) >> space? >> dose.maybe.as(:dose)
-             } # DER: 1:4 or DER: 3.5:1 or DER: 6-8:1 or DER: 4.0-9.0:1'
+                   }
+   # DER: 1:4 or DER: 3.5:1 or DER: 6-8:1 or DER: 4.0-9.0:1'
+  rule(:der_identifier) { str('DER:')  >> space >> digit >> match['0-9\.\-:'].repeat }
+  rule(:der) { (der_identifier).as(:substance_name) >> space? >> dose.maybe.as(:dose) }
   rule(:forbidden_in_substance_name) {
                             min_max |
                             useage |
@@ -343,16 +346,14 @@ class CompositionParser < Parslet::Parser
 
   rule(:substance) {
       (
-      simple_subtance_with_digits_in_name_and_dose |
-    der |
-    substance_lead.maybe.as(:more_info) >> space? >> lebensmittel_zusatz |
-    substance_lead.maybe.as(:more_info) >> space? >> simple_substance >> str('pro dosi').maybe
+        simple_subtance_with_digits_in_name_and_dose |
+        der |
+        substance_lead.maybe.as(:more_info) >> space? >> lebensmittel_zusatz |
+        substance_lead.maybe.as(:more_info) >> space? >> simple_substance >> str('pro dosi').maybe
       ).as(:substance) >>
-    (space? >> str(', ').maybe >> ratio.maybe).as(:ratio) >>
-    space? >> corresp_substance.maybe.as(:chemical_substance) >>
-    space? >> substance_ut.repeat(0).as(:substance_ut) #>>
-    # (space? >> str(', ').maybe >> ratio.maybe).as(:ratio)
-
+      (space? >> str(', ').maybe >> ratio.maybe).as(:ratio) >>
+      space? >> corresp_substance.maybe.as(:chemical_substance) >>
+      space? >> substance_ut.repeat(0).as(:substance_ut)
   }
   rule(:histamin) { str('U = Histamin Equivalent Prick').as(:histamin) }
   rule(:praeparatio){ ((one_word >> space?).repeat(1).as(:description) >> str(':') >> space?).maybe >>

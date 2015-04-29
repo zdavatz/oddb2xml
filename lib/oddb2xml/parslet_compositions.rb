@@ -51,7 +51,7 @@ module ParseUtil
         result = result.gsub(entry.pattern,  entry.replacement)
         unless result.eql?(intermediate)
             entry.nr_occurrences += 1
-            puts "Fixed #{result}" if VERBOSE_MESSAGES
+            puts "#{File.basename(__FILE__)}:#{__LINE__}: fixed \nbefore: #{intermediate}\nafter:  #{result}"
         end
       }
       @nrLines += 1
@@ -331,8 +331,7 @@ class ParseComposition
   attr_accessor   :source, :label, :label_description, :substances, :galenic_form, :route_of_administration,
                   :corresp, :excipiens
 
-  ErrorsToFix = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => '\1, \2',
-                  /(\d+)\s+\-\s*(\d+)/ => '\1-\2',
+  ErrorsToFix = { /(\d+)\s+\-\s*(\d+)/ => '\1-\2',
                   'o.1' => '0.1',
                   /\s+(mg|g) DER:/ => ' \1, DER:',
                   ' mind. ' => ' min. ',
@@ -342,9 +341,8 @@ class ParseComposition
                   ',,' => ',',
                   'avena elatior,dactylis glomerata' => 'avena elatior, dactylis glomerata',
                   ' color.: corresp. ' => ' corresp.',
-#                  /(excipiens ad solutionem pro \d+ ml), corresp\./ => '\1 corresp.',
-#                  /^(pollinis allergeni extractum[^\:]+\:)/ => 'A): \1',
-                  / U\.: (alnus|betula|betulae) / =>  ' U.:, \1 ',
+                  / U\.: (excipiens) / =>  ' U. \1 ',
+                  / U\.: (alnus|betula|betula|betulae) / =>  ' U., \1 ',
                   /^(acari allergeni extractum (\(acarus siro\)|).+\s+U\.\:)/ => 'A): \1',
                 }
   @@errorHandler = ParseUtil::HandleSwissmedicErrors.new( ErrorsToFix )
