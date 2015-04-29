@@ -1,3 +1,16 @@
+=== 2.0.7 / 29.04.2015
+
+* parse swissmedic composition with the help of RubyGem parslet.
+** with extensive unit-tests (spec/composition_spec.rb and spec/parslet_spec.rb
+* new/changed fields when using --calc, e.g.
+** more_info
+** salts
+** dose_text if qty/unit is not normalized
+** chemical_substance is now represented as a normal substance
+** composition.label
+** composition.label_description
+** composition.correpond
+
 === 2.0.6 / 27.04.2015
 
 * Remove trailing spaces in names imported from ZurRose transfer.dat
