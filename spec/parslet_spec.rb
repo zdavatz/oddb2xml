@@ -10,13 +10,12 @@ require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require 'parslet/rig/rspec'
 
 hostname = Socket.gethostbyname(Socket.gethostname).first
-RunAllCompositionsTests = /travis|localhost/i.match(hostname) != nil # takes about five minutes to run!
+RunAllCompositionsTests = false # /travis|localhost/i.match(hostname) != nil # takes about five minutes to run!
 puts "hostname is #{hostname} RunAllCompositionsTests #{RunAllCompositionsTests}"
 # Testing whether 8937 composition lines can be parsed. Found 380 errors in 293 seconds
 # 520 examples, 20 failures, 1 pending
 
 RunFailingSpec = true
-  VERBOSE_MESSAGES = true
 
 describe ParseComposition do
 to_add = %(
@@ -1330,19 +1329,6 @@ describe ParseUtil::HandleSwissmedicErrors do
     specify { expect(handler.report.size).to eq 2 }
     specify { expect(/report/i.match(handler.report[0]).class).to eq MatchData }
     specify { expect(handler.report[1].index(replacement).class).to eq Fixnum }
-  end
-
-  context 'should be used when calling ParseComposition' do
-    replacement = '\1, \2'
-    test_string = 'sulfuris D6 2,2 mg hypericum perforatum D2 0,66'
-    report = ParseComposition.reset
-    composition = ParseComposition.from_string(test_string).clone
-    report = ParseComposition.report
-    specify { expect(composition.substances.size).to eq 2 }
-    specify { expect(composition.substances.first.name).to eq 'Sulfuris D6' }
-    specify { expect(composition.substances.last.name).to eq 'Hypericum Perforatum D2' }
-    specify { expect(/report/i.match(report[0]).class).to eq MatchData }
-    specify { expect(report[1].index(replacement).class).to eq Fixnum }
   end
 
   end

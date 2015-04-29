@@ -48,6 +48,7 @@ prepare_for_gem_test
 # we will skip some long running tests as travis jobs must finish in less than 50 minutes
 # unfortunately it returns a very common name
 unless 'localhost.localdomain'.eql?(Socket.gethostbyname(Socket.gethostname).first)
+  test_one_call('oddb2xml --calc')
   test_one_call('oddb2xml -e')
   test_one_call('oddb2xml -e -I80')
   test_one_call('oddb2xml -f dat --append -I 80')

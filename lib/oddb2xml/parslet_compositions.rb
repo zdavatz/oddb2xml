@@ -51,7 +51,7 @@ module ParseUtil
         result = result.gsub(entry.pattern,  entry.replacement)
         unless result.eql?(intermediate)
             entry.nr_occurrences += 1
-            puts "#{File.basename(__FILE__)}:#{__LINE__}: fixed \nbefore: #{intermediate}\nafter:  #{result}"
+            puts "#{File.basename(__FILE__)}:#{__LINE__}: fixed \nbefore: #{intermediate}\nafter:  #{result}" unless defined?(RSpec)
         end
       }
       @nrLines += 1

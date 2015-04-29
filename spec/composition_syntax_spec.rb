@@ -9,7 +9,7 @@ RunAllParsingExamples = false # Takes over 3 minutes to run, all the other ones 
 GoIntoPry = true
 NoGoIntoPry = false
 
-if GoIntoPry
+if NoGoIntoPry
 
 describe CompositionParser do
 let(:parser) { CompositionParser.new }
@@ -28,29 +28,14 @@ let(:parser) { CompositionParser.new }
     it "parses identifier" do
       res1 = substance_parser.parse_with_debug('pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml')
       pp res1
-      binding.pry
-    res1 = excipiens_parser.parse_with_debug "excipiens ad emulsionem pro 1 g"
-      pp res1
-      binding.pry
-    res1 = substance_parser.parse_with_debug "excipiens ad emulsionem pro 1 g"
-      pp res1
-      binding.pry
-    res2 = substance_parser.parse_with_debug "excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi"
-      pp res2
-      binding.pry
-   res1 = substance_name_parser.parse_with_debug("argenti nitras aquos. D13")
-
-      string =
-"chlorhexidini digluconas 1 mg, aromatica, color.: corresp. ethanolum 8.5 % V/V, E 127, excipiens ad solutionem pro 1 ml"
-    res2 = composition_parser.parse_with_debug(string)
-    res2 = substance_parser.parse_with_debug(string)
-      pp res1
+      # binding.pry
     end
   end
 end
 else
 
 excipiens_tests = {
+  'aqua ad iniectabilia ad solutionem pro 4 ml' => nil,
   'aether q.s. ad solutionem pro 1 g' => 'aether q.s. ad solutionem',
   'saccharum ad globulos pro 1 g'  => 'saccarum',
   'q.s. ad solutionem pro 5 ml' => 'q.s. ad solutionem pro 5 ml',
@@ -71,8 +56,6 @@ excipiens_tests = {
 }
 
 substance_tests = {
-  'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml' => 'zzz',
-  'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana)' => 'xxx',
   "U = Histamin Equivalent Prick" => 'U = Histamin Equivalent Prick', # 58566
   "Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50, natrii chloridum" => "Vipera Aspis > 1000 Ld50 Mus",
   "Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50, natrii chloridum, polysorbatum 80" => "Vipera Aspis > 1000 Ld50 Mus",
@@ -80,7 +63,6 @@ substance_tests = {
   "Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50, natrii chloridum, polysorbatum 80, aqua ad iniectabilia q.s. ad solutionem pro 4 ml" => "Vipera Aspis > 1000 Ld50 Mus",
   "antitoxinum equis Fab'" => "Antitoxinum Equis Fab'",
   "antitoxinum equis Fab'x" => "Antitoxinum Equis Fab'x",
-  "aqua ad iniectabilia ad solutionem pro 4 ml" => nil,# "Aqua Ad Iniectabilia Ad Solutionem Pro",
   "calcii gluconas 100 mg corresp. calcium 100 mg" => 'Calcii Gluconas',
   "calcii gluconas 100 mg et calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg corresp. calcium 100 mg" => 'Calcii Gluconas',
   "calcii gluconas 100 mg et calcii lactas pentahydricus 25 mg et calcii hydrogenophosphas anhydricus 300 mg" => 'Calcii Gluconas',
@@ -93,8 +75,6 @@ substance_tests = {
   "conserv.: E 217, E 219, natrii dehydroacetas" => "E 217",
   "conserv.: E 217, E 219, natrii dehydroacetas, excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi" => "line #{__LINE__}",
   "ethanolum 59.5 % V/V" => 'Ethanolum',
-  "excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi" => "Excipiens Ad Solutionem Pro 1 Ml Corresp. 50 µg Pro Dosi",
-  "excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi" => "line #{__LINE__}",
   "globulina equina (immunisé')" => "Globulina Equina (immunisé')",
   "globulina equina (immunisé)" => 'Globulina Equina (immunisé)',
   "globulina equina'" => "Globulina Equina'",
@@ -124,7 +104,6 @@ substance_tests = {
   'benzoe 40 ml' => 'Benzoe',
   'color.: E 160(a)' => 'E 160', # TODO: or E 160(a) ??
   'ethanolum 70-78 % V/V' => "Ethanolum",
-  'excipiens ad solutionem pro 1 ml' => "Ad Solutionem Pro",
   'ginseng extractum corresp. ginsenosidea 3.4 mg' => 'Ginseng Extractum Corresp. Ginsenosidea',
   'moelle épinière' => 'Moelle épinière',
   'pimpinellae radix 15 % ad pulverem' => 'Pimpinellae Radix',
@@ -172,8 +151,6 @@ composition_tests = [
   "color.: E 160(a)\n",
   "conserv.: E 217, E 219, natrii dehydroacetas",
   "conserv.: E 217, E 219, natrii dehydroacetas, excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi.",
-  "excipiens ad emulsionem pro 1 g.\n",
-  "excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi.",
   "extractum ethanolicum et glycerolicum liquidum ex absinthii herba 0.7 mg, cinnamomi cortex 3.8 mg, guaiaci lignum 14.3 mg, millefolii herba 7 mg, rhoeados flos 11 mg, tormentillae rhizoma 9.5 mg, balsamum tolutanum 0.3 mg, benzoe tonkinensis 4.8 mg, myrrha 2.4 mg, olibanum 0.9 mg, excipiens ad solutionem pro 1 ml, corresp. 40 guttae, corresp. ethanolum 37 % V/V",
   "hamamelis virginiana D1 0,22 mg, hepar sulfuris D6 2,2 mg hypericum perforatum D2 0,66 mg, mercurius solubilis hahnemanni D8 1,1 mg, symphytum officinale D6 2,2 mg, aqua ad iniectabilia, natrii chloridum q.s. ad solutionem pro 2,2 ml.\n",
   "hepar sulfuris D6 2,2 mg hypericum perforatum D2 0,66 mg",
@@ -188,7 +165,6 @@ composition_tests = [
   "sennae folium 75 % corresp. hydroxyanthracenae 2.7 %",
   "viperis antitoxinum equis F(ab')2 corresp. Vipera aspis > 1000 LD50 mus et Vipera berus > 500 LD50 mus et Vipera ammodytes > 1000 LD50 mus, natrii chloridum, polysorbatum 80, aqua ad iniectabilia q.s. ad solutionem pro 4 ml.",
   "xylometazolini hydrochloridum 0.5 mg, natrii hyaluronas, conserv.: E 217, E 219, natrii dehydroacetas, excipiens ad solutionem pro 1 ml corresp. 50 µg pro dosi.",
-  'excipiens ad pulverem corresp. suspensio reconstituta 1 ml',
   'gasum inhalationis, pro vitro',
   'toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg',
   'xenonum 74 -740 MBq',
