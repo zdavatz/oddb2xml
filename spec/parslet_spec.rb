@@ -15,18 +15,50 @@ puts "hostname is #{hostname} RunAllCompositionsTests #{RunAllCompositionsTests}
 # Testing whether 8937 composition lines can be parsed. Found 380 errors in 293 seconds
 # 520 examples, 20 failures, 1 pending
 
-RunCompositionExamples = true
-RunSubstanceExamples = true
 RunFailingSpec = true
-RunExcipiensTest = true
-RunSpecificTests = true
-RunMostImportantParserTests = true
+  VERBOSE_MESSAGES = true
 
 describe ParseComposition do
 to_add = %(
   VERBOSE_MESSAGES = true
       pp composition; binding.pry
 )
+
+  context "should handle missing Label A:) in pollinis allergeni extractu" do
+    # 62573   2   Staloral 300 3 Bäume (300 IR/ml) , sublinguale Lösung
+    string =
+'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml'
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string}
+    specify { expect( composition.substances.size).to eq 1 }
+    specify { expect( composition.substances.first.name).to eq "pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana)" }
+    specify { expect( composition.label).to eq nil }
+      pp composition;      binding.pry
+  end
+  context "should handle failed" do
+      composition = ParseComposition.from_string          'argenti nitras aquos. D13 1 g'
+      composition = ParseComposition.from_string 'betulae cortex 50 % et fraxinus excelsior 50 %'
+      pp composition
+      binding.pry if composition.substances.size == 0
+  strings = [
+"echinacea pallida ex herba LA 20% TM 10 g, calendula officinalis e floribus LA 20% TM 10 g, salvia officinalis LA 20% TM 10 g, argenti nitras aquos. D13 1 g, eucalyptus globulus ferm D1 1 g, gingiva bovis GI D4 1 g, gingiva bovis GI D8 1 g, tonsilla pallatina bovis GI D4 1 g, tonsilla pallatina bovis GI D8 1 g, excipiens ad solutionem, corresp. ethanolum 18 % V/V et propellentia ad aerosolum pro 100 ml",
+"pollinis allergeni extractum 10'000 U.: alnus glutinosa 50 % et corylus avellana 50 %, aluminium ut aluminii hydroxidum hydricum ad adsorptionem, natrii chloridum, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
+"pollinis allergeni extractum 10'000 U.: betula spec. 35 % et alnus glutinosa 30 % et corylus avellana 35 %, aluminium ut aluminii hydroxidum hydricum ad adsorptionem, natrii chloridum, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
+"pollinis allergeni extractum 10 U.: betulae cortex 50 % et fraxinus excelsior 50 %, natrii chloridum, aluminii hydroxidum hydricum ad adsorptionem, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
+"pollinis allergeni extractum 10 U.: betula pendula Roth 25 % et alnus glutinosa 25 % et corylus avellana 25 % et fraxinus excelsior 25 %, mannitolum, natrii chloridum, aluminii hydroxidum hydricum ad adsorptionem, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
+"pollinis allergeni extractum 100 U.: betula pendula Roth 50 % et fraxinus excelsior 50 % excipiens ad solutionem pro 1 ml",
+"pollinis allergeni extractum 100 U.: betula pendula Roth 25 % et alnus glutinosa 25 % et corylus avellana 25 % et fraxinus excelsior 25 %, excipiens ad solutionem pro 1 ml",
+"pollinis allergeni extractum 10 U.: betula pendula Roth 50 % et fraxinus excelsior 50 %, natrii chloridum, glycerolum, tricalcii phosphas, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
+"pollinis allergeni extractum 10 U.: betula pendula Roth 25 % et alnus glutinosa 25 % et corylus avellana 25 % et fraxinus excelsior 25 %, natrii chloridum, glycerolum, tricalcii phosphas, conserv.: phenolum 4.0 mg, aqua q.s. ad suspensionem pro 1 ml",
+  ]
+    strings.each{ |string|
+      composition = ParseComposition.from_string(string)
+      puts string
+      binding.pry if composition.substances.size == 0
+      specify { expect( composition.substances.size).not_to eq 0 }
+    }
+  end
+
 end
 
 if RunFailingSpec
@@ -37,6 +69,47 @@ end
 end
 
 describe ParseComposition do
+  context "should handle 'LA 2x%" do
+    # 48473 1   Wala Echinacea-Mundspray, anthroposophisches Arzneimittel
+    string = "echinacea pallida ex herba LA 20% TM 10 g"
+    composition = ParseComposition.from_string(string)
+    specify { expect( composition.substances.size).to eq 1 }
+    specify { expect( composition.substances.first.name).to eq "Echinacea Pallida Ex Herba La 20% Tm" }
+  end
+
+  context "should handle 'CRM 197" do
+    # 1 Prevenar 13, Suspension in Fertigspritzen
+    string = "proteinum corynebacteriae diphtheriae CRM 197 ca. 32 µg"
+    composition = ParseComposition.from_string(string)
+    specify { expect( composition.substances.size).to eq 1 }
+    specify { expect( composition.substances.first.name).to eq "Proteinum Corynebacteriae Diphtheriae Crm 197" }
+  end
+
+  context "should handle ', Corresp. '" do
+    # 65427 1   Adlers Bronchialpastillen, Pastillen
+    string = "liquiritiae extractum ethanolicum liquidum corresp. acidum glycyrrhizinicum 2.0-2.6 mg, DER: 1.8-2.1:1, Corresp. massa siccata 19.67 mg, droserae extractum ethanolicum liquidum, ratio: 0.6:1, Corresp. massa siccata 0.42 mg, plantaginis folii extractum ethanolicum liquidum, ratio: 0.51:1, Corresp. massa siccata 1.9 mg, aromatica, natrii cyclamas, excipiens pro pastillo"
+    composition = ParseComposition.from_string(string)
+    specify { expect( composition.substances.size).to eq 6 }
+    specify { expect( composition.substances.first.name).to eq "Liquiritiae Extractum Ethanolicum Liquidum" }
+  end
+
+  context "should handle ',,'" do
+    # 52433 1   Botox 100 Allergan-Einheiten, Pulver zur Herstellung einer Injektionslösung
+    string = "Praeparatio cryodesiccata: toxinum botulinicum A 100 U. Botox,, albuminum humanum, natrii chloridum, pro vitro."
+    composition = ParseComposition.from_string(string)
+    specify { expect( composition.substances.size).to eq 3 }
+    specify { expect( composition.substances.first.name).to eq 'Toxinum Botulinicum A' }
+    specify { expect( composition.excipiens.name).to match /vitro/i }
+  end
+
+  context "should handle corresp. excipiens" do
+    string = "petasina 8 mg corresp. excipiens pro compresso obducto"
+    composition = ParseComposition.from_string(string)
+    specify { expect( composition.substances.size).to eq 1 }
+    specify { expect( composition.substances.first.name).to eq 'Petasina' }
+    specify { expect( composition.excipiens.name).to match /excipiens/i }
+  end
+
   context "should handle missing Label A:) in pollinis allergeni extractu" do
     # 62573   2   Staloral 300 3 Bäume (300 IR/ml) , sublinguale Lösung
     string = 'III): pro usu: I) et II) recenter radioactivatum 99m-technetio ut natrii pertechnetas'
@@ -82,9 +155,9 @@ describe ParseComposition do
     string = 'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml'
     composition = ParseComposition.from_string(string)
     specify { expect(composition.source).to eq string}
-    specify { expect( composition.substances.size).to eq 0 }
-    specify { expect( composition.label).to eq 'A' }
-    specify { expect( composition.label_description).to eq 'pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.' }
+    specify { expect( composition.substances.size).to eq 1 }
+    specify { expect( composition.substances.first.name).to eq "pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana)" }
+    specify { expect( composition.label).to eq nil }
   end
 
   context "handle 39541 A. Vogel Entspannungs-Tropfen" do
@@ -183,7 +256,7 @@ describe ParseComposition do
     specify { expect(composition.substances.size).to eq 5  }
   end
 
-  context "should handle Corresp. ca. 8370 kJ" do
+  context "should handle 'aqua ad iniectabilia ad solutionem'" do
     string = "aqua ad iniectabilia ad solutionem"
     composition = ParseComposition.from_string(string)
     specify { expect(composition.substances.size).to eq  0 }
@@ -696,7 +769,6 @@ describe ParseComposition do
       specify { expect(composition.substances.first.name).to eq 'Pollinis Allergeni Extractum (phleum Pratense)' }
     end
 
-  if RunExcipiensTest
     context "should handle aqua ad iniectabilia" do
       string = "any_substance, aqua ad iniectabilia q.s. ad solutionem pro 5 ml"
       composition = ParseComposition.from_string(string)
@@ -753,7 +825,7 @@ describe ParseComposition do
       specify { expect(composition.excipiens.qty).to eq 1000.0 }
       specify { expect(composition.excipiens.unit).to eq 'mg' }
     end
-  end
+
     context "should pass with 'etinoli 7900 U.I'" do
       string = "retinoli 7900 U.I."
       composition = ParseComposition.from_string(string)
@@ -838,9 +910,6 @@ describe ParseComposition do
       specify { expect(composition.substances.first.name).to eq 'E 160(a)' }
       specify { expect(composition.substances.last.name).to eq 'E 171' }
     end
-
-
-  if RunMostImportantParserTests
 
     context "should parse a Praeparatio with a label/galenic form?" do
       string = "Praeparatio cryodesiccata: pollinis allergeni extractum 25'000 U.: urtica dioica"
@@ -1027,21 +1096,19 @@ Corresp. 5190 kJ pro 1 l."
     specify { expect(substance.unit).to eq 'µg' }
   end
 
- end
-
-    context "should return correct substance Rote Filmtablett 54819 Beriplast" do
-      string = "A) Rote Filmtablette: estradiolum 1 mg ut estradiolum hemihydricum, excipiens pro compresso obducto"
-      string = "estradiolum 1 mg ut estradiolum hemihydricum, excipiens pro compresso obducto"
-      composition = ParseComposition.from_string(string)
-      substance = composition.substances.first
-      specify { expect(composition.substances.size).to eq 1 }
-      # specify { expect(composition.substances.last.name).to eq 'Obducto' }
-      specify { expect(substance.name).to eq 'Estradiolum' }
-      specify { expect(composition.substances.first.salts.first.name).to eq 'Estradiolum Hemihydricum' }
-      specify { expect(substance.cdose.to_s).to eq "" }
-      specify { expect(substance.qty).to eq 1.0}
-      specify { expect(substance.unit).to eq 'mg' }
-    end
+  context "should return correct substance Rote Filmtablett 54819 Beriplast" do
+    string = "A) Rote Filmtablette: estradiolum 1 mg ut estradiolum hemihydricum, excipiens pro compresso obducto"
+    string = "estradiolum 1 mg ut estradiolum hemihydricum, excipiens pro compresso obducto"
+    composition = ParseComposition.from_string(string)
+    substance = composition.substances.first
+    specify { expect(composition.substances.size).to eq 1 }
+    # specify { expect(composition.substances.last.name).to eq 'Obducto' }
+    specify { expect(substance.name).to eq 'Estradiolum' }
+    specify { expect(composition.substances.first.salts.first.name).to eq 'Estradiolum Hemihydricum' }
+    specify { expect(substance.cdose.to_s).to eq "" }
+    specify { expect(substance.qty).to eq 1.0}
+    specify { expect(substance.unit).to eq 'mg' }
+  end
 
   context "should return correct composition for containing ut IKSNR 613" do
     string = 'aluminium ut aluminii hydroxidum hydricum ad adsorptionem'
@@ -1067,7 +1134,6 @@ Corresp. 5190 kJ pro 1 l."
     specify { expect(haemagglutininum.unit).to eq 'µg' }
   end
 
-if RunSpecificTests
   context "should return correct composition for containing parenthesis in substance name abd 40 U. (e.g IKSNR 613)" do
     string = 'virus poliomyelitis typus 1 inactivatum (D-Antigen) 40 U.'
     composition = ParseComposition.from_string(string)
@@ -1275,7 +1341,7 @@ if RunSpecificTests
 
 end
 
-end
+
 
 describe ParseUtil::HandleSwissmedicErrors do
   context 'should handle fixes' do
@@ -1305,7 +1371,7 @@ describe ParseUtil::HandleSwissmedicErrors do
   end
 
   end
-end if RunSpecificTests
+end
 
 describe ParseComposition do
   context "should parse a complex composition" do
@@ -1330,5 +1396,5 @@ describe ParseComposition do
     }
     at_exit { puts "Testing whether #{nr} composition lines can be parsed. Found #{@nrErrors} errors in #{(Time.now - start_time).to_i} seconds" }
 
-  end  if RunAllCompositionsTests
-end
+  end
+end if RunAllCompositionsTests

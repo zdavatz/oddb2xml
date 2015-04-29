@@ -6,62 +6,40 @@ require 'parslet/rig/rspec'
 require 'parslet/convenience'
 
 RunAllParsingExamples = false # Takes over 3 minutes to run, all the other ones just a few seconds
-GoIntoPry = false
+GoIntoPry = true
+NoGoIntoPry = false
+
+if GoIntoPry
+
 describe CompositionParser do
 let(:parser) { CompositionParser.new }
  context "identifier parsing" do
     let(:dose_parser) { parser.dose }
     let(:identifier_parser) { parser.identifier }
+    let(:identifier_with_comma_parser) { parser.identifier_with_comma }
+    let(:identifier_without_comma_parser) { parser.identifier_without_comma }
     let(:substance_parser) { parser.substance }
     let(:salts_parser) { parser.salts }
     let(:substance_name_parser) { parser.substance_name }
     let(:number_parser) { parser.number }
+    let(:composition_parser) { parser.composition }
 
     it "parses identifier" do
-        "piscis oleum 500 mg corresp. acida carboxylica omega-3 oligoinsaturata 150 mg ut acidum eicosapentaenoicum 90 mg"
-    res1 = salts_parser.parse_with_debug( " ut acidum eicosapentaenoicum 90 mg")
-      pp res1
-
-    res2 = substance_parser.parse_with_debug("piscis oleum 500 mg corresp. acida carboxylica omega-3 oligoinsaturata 150 mg ut acidum eicosapentaenoicum 90 mg")
+      res1 = substance_name_parser.parse_with_debug("argenti nitras aquos. D13")
+      res1 = substance_parser.parse_with_debug("argenti nitras aquos. D13 1 g")
       pp res1
       binding.pry
+
+      string =
+"chlorhexidini digluconas 1 mg, aromatica, color.: corresp. ethanolum 8.5 % V/V, E 127, excipiens ad solutionem pro 1 ml"
+    res2 = composition_parser.parse_with_debug(string)
+    res2 = substance_parser.parse_with_debug(string)
+      pp res1
     end
   end
-end if false
-describe CompositionParser do
-  let(:parser) { CompositionParser.new }
-  context "should help me find problems" do
-    let(:substance_name_parser) { parser.substance_name }
+end
+else
 
-    it "parses substance_name my manual test" do
-      res1 = substance_name_parser.parse_with_debug(
-'calendula officinalis D2' )
-      pp res1
-      res2 = substance_name_parser.parse_with_debug(      'macrogolum 3350' )
-      pp res2
-      res3 = substance_name_parser.parse_with_debug(      'virus poliomyelitis typus inactivatum' )
-      pp res3
-      binding.pry
-    end
-  end
-  context "should help me find problems" do
-    let(:substance_parser) { parser.substance }
-
-    it "parses substance my manual test" do
-      res1 = substance_parser.parse_with_debug(
-'calendula officinalis D2 2,2 mg' )
-      pp res1
-      res2 = substance_parser.parse_with_debug(      'macrogolum 3350 33.7 mg' )
-      pp res2
-      res3 = substance_parser.parse_with_debug(
-'calendula officinalis D2' )
-      pp res3
-      binding.pry
-    end
-  end if false
-end if GoIntoPry
-
-unless GoIntoPry
 excipiens_tests = {
   'aether q.s. ad solutionem pro 1 g' => 'aether q.s. ad solutionem',
   'saccharum ad globulos pro 1 g'  => 'saccarum',
@@ -504,4 +482,4 @@ describe CompositionParser do
   end
 
 end
-end if false
+end

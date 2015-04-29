@@ -334,12 +334,17 @@ class ParseComposition
   ErrorsToFix = { /(sulfuris D6\s[^\s]+\smg)\s([^,]+)/ => '\1, \2',
                   /(\d+)\s+\-\s*(\d+)/ => '\1-\2',
                   'o.1' => '0.1',
-                  'g DER:' => 'g, DER:',
+                  /\s+(mg|g) DER:/ => ' \1, DER:',
                   ' mind. ' => ' min. ',
                   ' streptococci pyogen. ' => ' streptococci pyogen ',
                   ' ut excipiens' => ', excipiens',
+                  ' Corresp. ' => ' corresp. ',
+                  ',,' => ',',
+                  'avena elatior,dactylis glomerata' => 'avena elatior, dactylis glomerata',
+                  ' color.: corresp. ' => ' corresp.',
 #                  /(excipiens ad solutionem pro \d+ ml), corresp\./ => '\1 corresp.',
-                  /^(pollinis allergeni extractum[^\:]+\:)/ => 'A): \1',
+#                  /^(pollinis allergeni extractum[^\:]+\:)/ => 'A): \1',
+                  / U\.: (alnus|betula|betulae) / =>  ' U.:, \1 ',
                   /^(acari allergeni extractum (\(acarus siro\)|).+\s+U\.\:)/ => 'A): \1',
                 }
   @@errorHandler = ParseUtil::HandleSwissmedicErrors.new( ErrorsToFix )
@@ -359,7 +364,6 @@ class ParseComposition
     return nil if string == nil or  string.eql?('.') or string.eql?('')
     stripped = string.gsub(/^"|["\n]+$/, '')
     return nil unless stripped
-    @@errorHandler.nrParsingErrors += 1
     if /(U\.I\.|U\.)$/.match(stripped)
       cleaned = stripped
     else
@@ -383,6 +387,7 @@ class ParseComposition
         ast = transf3.apply(parser3.parse(cleaned))
       end
     rescue Parslet::ParseFailed => error
+      @@errorHandler.nrParsingErrors += 1
       puts "#{File.basename(__FILE__)}:#{__LINE__}: failed parsing ==>  #{cleaned}"
       return nil
     end
@@ -415,7 +420,6 @@ class ParseComposition
       end
       result.label_description = label_description
     end
-    @@errorHandler.nrParsingErrors -=1 if result.substances.size > 0 or result.corresp
     return result
   end
 end
