@@ -27,25 +27,25 @@ h2. Gebrauchte Abkürzungen und Schlüsselworte
 - et oder ,  := trennen Substanzen. Beispiel: 29555 NaCl 11,7 % B. Braun, Zusatzampullen zu Infusionslösungen
 - ut := vorgehende Substanz wird via nachstehend aufgeführte Salze(e) aufgenommen. Beispiel: 54749 Supradyn Vital 50+.
 - DER: :=  DrugEthanol Ratio
-- q.s. :=
-- pro praeparatione :=
-- excipiens :=
-- pro compresso obducto :=
-- pro compresso :=
-- epro praeparatione :=
-- ad pulverem :=
-- pro charta :=
-- ad globulos :=
-- aqua ad iniectabilia q.s. ad solutionem :=
-- solvens (i.v.): aqua ad iniectabilia :=
-- ad solutionem :=
-- q.s. ad :=
-- aqua q.s. ad :=
-- saccharum ad :=
-- aether q.s. :=
-- aqua ad iniectabilia :=
-- q.s. pro praeparatione :=
-- ana partes :=
+- q.s. :=tbd
+- pro praeparatione :=tbd
+- excipiens :=tbd
+- pro compresso obducto :=tbd
+- pro compresso :=tbd
+- epro praeparatione :=tbd
+- ad pulverem :=tbd
+- pro charta :=tbd
+- ad globulos :=tbd
+- aqua ad iniectabilia q.s. ad solutionem :=tbd
+- solvens (i.v.): aqua ad iniectabilia :=tbd
+- ad solutionem :=tbd
+- q.s. ad :=tbd
+- aqua q.s. ad :=tbd
+- saccharum ad :=tbd
+- aether q.s. :=tbd
+- aqua ad iniectabilia :=tbd
+- q.s. pro praeparatione :=tbd
+- ana partes :=tbd
 
 h2. Vorgeschlag für Bereinigung
 
