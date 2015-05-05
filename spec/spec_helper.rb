@@ -30,6 +30,7 @@ module Oddb2xml
 end
 
 AllCompositionLines = File.expand_path("#{__FILE__}/../data/compositions.txt")
+AllColumn_C_Lines = File.expand_path("#{__FILE__}/../data/column_c.txt")
 
 require 'oddb2xml'
 

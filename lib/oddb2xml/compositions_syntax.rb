@@ -434,6 +434,16 @@ class CompositionParser < Parslet::Parser
     excipiens.as(:composition) |
     space.repeat(3)
   }
+
+
+  rule(:prepation_separator) { str(', ') | str("\n") }
+  rule(:prepation_name) { (prepation_separator.absent? >> any).repeat(1)  }
+  rule(:galenic)   { prepation_name.as(:prepation_name) >> space? >>
+                     dose.maybe >> space? >> str(',').maybe >> space? >>
+                     (prepation_separator.absent? >> any.repeat(1) >> comma).repeat(1).maybe >>
+                     (prepation_separator.absent? >> any).repeat(1).maybe.as(:galenic_form) >> space?
+                   }
+
   root :expression_comp
 end
 
