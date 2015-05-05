@@ -23,34 +23,88 @@ Die Syntax wird in einer Datei "compositions_syntax":https://raw.githubuserconte
 
 h2. Gebrauchte Abkürzungen und Schlüsselworte
 
-- et alia  := es gibt noch andere Substanzen. Beispiel: 62504 Olanzapin Sandoz Solufilm 20 mg
-- et oder ,  := trennen Substanzen. Beispiel: 29555 NaCl 11,7 % B. Braun, Zusatzampullen zu Infusionslösungen
-- ut := vorgehende Substanz wird via nachstehend aufgeführte Salze(e) aufgenommen. Beispiel: 54749 Supradyn Vital 50+.
-- DER: :=  DrugEthanol Ratio
-- q.s. := quantum satis (genügend, meist ohne Limitenangabe)
-- pro praeparatione := pro Präparat
-- excipiens := Füllmittel
-- pro compresso obducto := pro Dragée
-- pro compresso := pro Tablette
-- pro praeparatione := pro Präparat
-- ad pulverem := zum Pulver hinzufügen
-- pro charta := pro Pulver Briefchen
+- DER :=  DrugEthanol Ratio
+- Diluens := tbd
+- Pulver := tbd
+- Solutio reconstituta := tbd
+- Solvens (i.m.) := tbd
+- Solvens (i.v.) := tbd
+- Solvens := tbd
+- ad emulsionem := tbd
 - ad globulos := zu den Vaginalkugeln
-- aqua ad iniectabilia q.s. ad solutionem := genügend steriles Wasser zur Lösung/zum Lösen
-- solvens (i.v.): aqua ad iniectabilia := Lösungsmittel (intravenös): Wasser zu Injektionszwecken
+- ad pulverem := zum Pulver hinzufügen
 - ad solutionem := füge zur Lösung hinzu
-- q.s. ad := quatum satis ad (genügend für/zu/zum)
-- aqua q.s. ad := genügend Wasser zu
-- saccharum ad := Zucker hinzufügen zu
+- ad suspensionem := tbd
 - aether q.s. := genügend Äther/Aether/Ether
-- aqua ad iniectabilia := Wasser zu Injektionszwecken
-- q.s. pro praeparatione := genügend für Präparat
 - ana partes := zu gleichen Teilen
+- antiox. := tbd
+- aqua := tbd
+- aqua ad := tbd
+- aqua ad iniectabilia := Wasser zu Injektionszwecken
+- aqua ad iniectabilia := tbd
+- aqua ad iniectabilia q.s. ad solutionem := genügend steriles Wasser zur Lösung/zum Lösen
+- aqua ad iniectabilia q.s. ad solutionem := tbd
+- aqua ad iniectabilia q.s. ad solutionem pro := tbd
+- aqua ad solutionem pro := tbd
+- aqua q.s. := tbd
+- aqua q.s. ad := genügend Wasser zu
+- aqua q.s. ad := tbd
+- aqua q.s. ad emulsionem pro := tbd
+- aqua q.s. ad gelatume pro := tbd
+- aqua q.s. ad solutionem pro := tbd
+- aqua q.s. ad suspensionem pro := tbd
+- aquos := tbd
+- arom. := tbd
+- ca. := tbd
+- color. := tbd
+- conserv. := tbd
+- corresp. := tbd
+- corresp. ca. := tbd
+- deklar. := tbd
+- doses := tbd
+- doses pro vase := tbd
+- et alia := es gibt noch andere Substanzen. Beispiel 62504 Olanzapin Sandoz Solufilm 20 mg
+- et oder , := trennen Substanzen. Beispiel 29555 NaCl 11,7 % B. Braun, Zusatzampullen zu Infusionslösungen
+- excipiens := Füllmittel
+- excipiens ad emulsionem pro := tbd
+- excipiens ad pulverem pro := tbd
+- excipiens ad solutionem pro := tbd
+- excipiens pro compresso := tbd
+- excipiens pro compresso obducto := tbd
+- excipiens pro praeparatione := tbd
+- mineralia := tbd
+- pro capsula := tbd
+- pro charta := pro Pulver Briefchen
+- pro compresso := pro Tablette
+- pro compresso obducto := pro Dragée
+- pro dosi := tbd
+- pro praeparatione := pro Präparat
+- pro vase := tbd
+- pro vitro := tbd
+- q.s. := quantum satis (genügend, meist ohne Limitenangabe)
+- q.s. ad := quatum satis ad (genügend für/zu/zum)
+- q.s. ad pulverem pro := tbd
+- q.s. pro praeparatione := genügend für Präparat
+- ratio := tbd
+- residui := tbd
+- saccharum ad := Zucker hinzufügen zu
+- solvens (i.v.) aqua ad iniectabilia := Lösungsmittel (intravenös) Wasser zu Injektionszwecken
+- spag. := tbd
+- spec. := tbd
+- spp. := tbd
+- ssp. := tbd
+- ut := vorgehende Substanz wird via nachstehend aufgeführte Salze(e) aufgenommen. Beispiel 54749 Supradyn Vital 50+.
+- ut alia := tbd
+- ut aqua ad iniectabilia q.s. ad emulsionem pro := tbd
+- var. := tbd
 
 h2. Vorschlag für Bereinigung
 
 * SwissmedicErrorHandler
-* Corresp: als Label für Bestandteile
-* corresp. für zugehörende Substanz
+* Corresp: als Label für Bestandteile immer Gross schreiben
+* corresp. für zugehörende Substanz, immer klein schreiben
+* Namen von Präparaten und Substanzen, welche Klammern, Anführungszeichen, etc enthalten, mit einfache Anführungszeichen umgeben, z.B. @2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum)@ -> @"2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum)"@. Dito für Namen, welche Zahlen enthalten wie @Macrogolum 3350@
 * @<@ durch @max.@ ersetzen (1 Mal)
 * @mind.@ durch @min.@ ersetzen, @min.@ kommt viel häufiger vor
+* Alle Bereiche wie @2.4-60 GBq@  durch @2.4-60 GBq@ ersetzen, damit das maschinelle Parsen einfacher wird. Siehe auch Bemerkung über Dosis.
+
