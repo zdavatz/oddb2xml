@@ -1,3 +1,8 @@
+=== 2.0.9 / 05.05.2015
+
+* rm /downloads when running with option "-e"
+* update documentation and xsd for "--calc" option
+
 === 2.0.8 / 29.04.2015
 
 * --calc.
