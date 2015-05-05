@@ -27,25 +27,25 @@ h2. Gebrauchte Abkürzungen und Schlüsselworte
 - et oder ,  := trennen Substanzen. Beispiel: 29555 NaCl 11,7 % B. Braun, Zusatzampullen zu Infusionslösungen
 - ut := vorgehende Substanz wird via nachstehend aufgeführte Salze(e) aufgenommen. Beispiel: 54749 Supradyn Vital 50+.
 - DER: :=  DrugEthanol Ratio
-- q.s. :=tbd
-- pro praeparatione :=tbd
-- excipiens :=tbd
-- pro compresso obducto :=tbd
-- pro compresso :=tbd
-- epro praeparatione :=tbd
-- ad pulverem :=tbd
-- pro charta :=tbd
-- ad globulos :=tbd
-- aqua ad iniectabilia q.s. ad solutionem :=tbd
-- solvens (i.v.): aqua ad iniectabilia :=tbd
-- ad solutionem :=tbd
-- q.s. ad :=tbd
-- aqua q.s. ad :=tbd
-- saccharum ad :=tbd
-- aether q.s. :=tbd
-- aqua ad iniectabilia :=tbd
-- q.s. pro praeparatione :=tbd
-- ana partes :=tbd
+- q.s. := quantum satis (genügend, meist ohne Limitenangabe)
+- pro praeparatione := pro Präparat
+- excipiens := Füllmittel
+- pro compresso obducto := pro Dragée
+- pro compresso := pro Tablette
+- epro praeparatione := tbd
+- ad pulverem := füge zum Pulver hinzu
+- pro charta := pro Pulver Briefchen
+- ad globulos := zu den Vaginalkugeln
+- aqua ad iniectabilia q.s. ad solutionem := genügend steriles Wasser zur Lösung/zum Lösen
+- solvens (i.v.): aqua ad iniectabilia := Lösungsmittel (intravenös): Wasser zu Injektionszwecken
+- ad solutionem := füge zur Lösung hinzu
+- q.s. ad := quatum satis ad (genügend für/zu/zum)
+- aqua q.s. ad := genügend Wasser zu
+- saccharum ad := Zucker hinzufügen zu
+- aether q.s. := genügend Äther/Aether/Ether
+- aqua ad iniectabilia := Wasser zu Injektionszwecken
+- q.s. pro praeparatione := genügend für Präparat
+- ana partes := zu gleichen Teilen
 
 h2. Vorgeschlag für Bereinigung
 
