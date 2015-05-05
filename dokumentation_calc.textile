@@ -32,8 +32,8 @@ h2. Gebrauchte Abkürzungen und Schlüsselworte
 - excipiens := Füllmittel
 - pro compresso obducto := pro Dragée
 - pro compresso := pro Tablette
-- epro praeparatione := tbd
-- ad pulverem := füge zum Pulver hinzu
+- pro praeparatione := pro Präparat
+- ad pulverem := zum Pulver hinzufügen
 - pro charta := pro Pulver Briefchen
 - ad globulos := zu den Vaginalkugeln
 - aqua ad iniectabilia q.s. ad solutionem := genügend steriles Wasser zur Lösung/zum Lösen
