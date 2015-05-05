@@ -108,3 +108,51 @@ h2. Vorschlag für Bereinigung
 * @mind.@ durch @min.@ ersetzen, @min.@ kommt viel häufiger vor
 * Alle Bereiche wie @2.4-60 GBq@  durch @2.4-60 GBq@ ersetzen, damit das maschinelle Parsen einfacher wird. Siehe auch Bemerkung über Dosis.
 
+h2. Vorkommende Lebensmittelfarbstoffe (E 100-199), Konservierungsstoffe (E 200-299) und Antioxidantien und Säureregulatoren (E 300-399)
+
+E 102 Tartrazin
+E 104 Chinolingelb
+E 106
+E 110 Gelborange S
+E 120 Echtes Karmin
+E 122 Azorubin
+E 123 Amaranth
+E 124 Cochenillerot A
+E 127 Erythrosin
+E 129 Allurarot AC
+E 131 Patentblau V
+E 132 Indigotin I
+E 133 Brillantblau FCF
+E 141 Kupferhaltige Komplexe der Chlorophylle, kupferhaltige Komplexe der Chlorophylline
+E 142 Grün S
+E 150 Zuckerkulöre
+E 151 Brillantschwarz BN
+E 153 Pflanzenkohle
+E 160
+E 171 Titandioxid
+E 172 Eisenoxide und -hydroxide
+E 200 Sorbinsäure
+E 202 Kaliumsorbat
+E 210 Benzoesäure
+E 211 Natriumbenzoat
+E 214 4-Hydroxybenzoesäureethylester
+E 215 Natrium-4-Hydroxybenzoesäureethylester
+E 216 4-Hydroxybenzoesäurepropylester (nicht zugelassen)
+E 217 Natrium-4-Hydroxybenzoesäurepropylester (nicht zugelassen)
+E 218 4-Hydroxybenzoesäuremethylester
+E 219 Natrium-4-Hydroxybenzoesäuremethylester
+E 220 Schwefeldioxid / Schweflige Säure
+E 221 Natriumsulfit
+E 222 Natriumhydrogensulfit
+E 223 Natriumdisulfit
+E 224 Kaliumdisulfit
+E 281 Natriumpropionat
+E 300 Ascorbinsäure
+E 301 Natriumascorbat
+E 304 Ascorbylpalmitat, Ascorbylstearat
+E 307 Alpha-Tocopherol
+E 310 Propylgallat
+E 311 Octylgallat
+E 312 Dodecylgallat
+E 320 Butylhydroxyanisol (BHA)
+E 321 Butylhydroxytoluol (BHT)
