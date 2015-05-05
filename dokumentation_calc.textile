@@ -47,7 +47,7 @@ h2. Gebrauchte Abkürzungen und Schlüsselworte
 - q.s. pro praeparatione := genügend für Präparat
 - ana partes := zu gleichen Teilen
 
-h2. Vorgeschlag für Bereinigung
+h2. Vorschlag für Bereinigung
 
 * SwissmedicErrorHandler
 * Corresp: als Label für Bestandteile
