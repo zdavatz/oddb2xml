@@ -43,6 +43,8 @@ module Oddb2xml
     end
     def run
       threads = []
+      files2rm = Dir.glob(File.join(Downloads, '*'))
+      FileUtils.rm_f(files2rm, :verbose => @options[:log]) if files2rm.size > 0 and not Oddb2xml.skip_download?
       if @options[:calc] and not @options[:extended]
         threads << download(:package) # swissmedic
       elsif @options[:address]
