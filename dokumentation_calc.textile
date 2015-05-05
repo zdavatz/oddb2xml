@@ -156,3 +156,22 @@ E 311 Octylgallat
 E 312 Dodecylgallat
 E 320 Butylhydroxyanisol (BHA)
 E 321 Butylhydroxytoluol (BHT)
+
+h2. mit Vorsicht zu geniessende Konservierungsstoffe
+
+kritisch im Hinblick auf Nebenwirkungen im menschlichen Körper, sind meines Wissens folgende Stoffe:
+
+214  PHB-Ester
+215  PHB-Ethylester-Natriumsalz
+218  PHB-Methylester
+219  PHB-Methylester-Natriumsalz
+220  Schwefeldioxid
+221  Natriumsulfit
+222  Natriumhydrogensulfit
+223  Natriummetabisulfit
+224  Kaliummetabisulfit
+226  Calciumsulfit
+
+Aber Vorsicht: Patienten können auch auf andere Zusatzstoffe reagieren - meist Reaktionen allergischer Natur. Gemeinhin treten primär gastro-intestinale Probleme auf (angefangen bei schlechtem Mundgeruch bis hin zu akuter Diarrhöe (Durchfall), Übelkeit, Kopfschmerzen, Hautausschläge, Jucken usw.).  
+
+Für Kleininder kann Banzylalkohol (z.T. auch in Schokoladewaren) schlimme Folgen haben. Darum dürfen Ampullenlösungen für die Pädiatrie NIE Benzylakohol als Konservierungsmittel enthalten!
