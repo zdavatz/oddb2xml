@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified"
+  elementFormDefault="qualified"
+  targetNamespace="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns1="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration">
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      oddb2xml is a ruby gem developed and maintained by yweese GmbH.
+      The source code is available under https://github.com/zdavatz/oddb2xml.
+      It might be installed (Ruby >= 1.9 required) via "gem install oddb2xml".
+      Under http://dev.ywesee.com/Main/Oddb2xml you find more information on how
+      the data is generated.
+
+      This is the XSD for the oddb_calc.xml generated when running oddb2xml--calc.
+      In this XSD file we refer to the following sources:
+      # Packungen.xls      https://www.swissmedic.ch/arzneimittel/00156/00221/00222/00230/index.html?lang=de
+    </xs:documentation>
+  </xs:annotation>
+  <xs:element name="CHEMICAL_SUBSTANCE" substitutionGroup="ns1:SUBSTANCE"/>
+  <xs:element name="CORRESP" type="xs:string" />
+  <xs:element name="DOSE_TEXT" type="xs:string" />
+  <xs:element name="EXCIPIENS" substitutionGroup="ns1:SUBSTANCE"/>
+  <xs:element name="GALENIC_FORM" type="xs:string" />
+  <xs:element name="GALENIC_GROUP" type="xs:string" />
+  <xs:element name="GTIN" type="xs:integer" />
+  <xs:element name="IS_ACTIVE_AGENT" type="xs:boolean" />
+  <xs:element name="LABEL" type="xs:string" />
+  <xs:element name="LABEL_DESCRIPTION" type="xs:string" />
+  <xs:element name="MEASURE" type="xs:string" />
+  <xs:element name="MORE_INFO" type="xs:string" />
+  <xs:element name="NAME" type="xs:string" />
+  <xs:element name="PKG_SIZE" type="xs:string" />
+  <xs:element name="QTY">
+    <xs:annotation>
+      <xs:documentation xml:lang="de">
+        Entweder ein float oder
+        ein integer
+      </xs:documentation>
+      <xs:documentation xml:lang="en">
+        either a float or an
+        integer
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:pattern value="[0-9\.]+" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="SALT" substitutionGroup="ns1:SUBSTANCE"/>
+  <xs:element name="SELLING_UNITS">
+    <xs:annotation>
+      <xs:documentation xml:lang="de">
+        Entweder eine Zahl oder 'unbekannt'
+      </xs:documentation>
+      <xs:documentation xml:lang="en">
+        either an integer or 'unbekannt'
+      </xs:documentation>
+    </xs:annotation>
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:pattern value="[0-9]+|unbekannt" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+  <xs:element name="SUBSTANCE_NAME" type="xs:string" />
+  <xs:element name="UNIT" type="xs:string" />
+
+
+  <xs:element name="SUBSTANCE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:MORE_INFO"  />
+        <xs:element ref="ns1:SUBSTANCE_NAME" />
+        <xs:element minOccurs="0" ref="ns1:IS_ACTIVE_AGENT" />
+        <xs:element minOccurs="0" ref="ns1:QTY" />
+        <xs:element minOccurs="0" ref="ns1:UNIT" />
+        <xs:element minOccurs="0" ref="ns1:DOSE_TEXT" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ns1:CHEMICAL_SUBSTANCE" />
+        <xs:element minOccurs="0" name="SALTS">
+          <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0"  maxOccurs="unbounded" ref="ns1:SALT" />
+
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="COMPOSITION">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="ns1:EXCIPIENS" />
+        <xs:element minOccurs="0" ref="ns1:LABEL" />
+        <xs:element minOccurs="0" ref="ns1:LABEL_DESCRIPTION" />
+        <xs:element minOccurs="0" ref="ns1:CORRESP" />
+        <xs:element minOccurs="0" name="SUBSTANCES">
+          <xs:complexType>
+            <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:SUBSTANCE" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ARTICLES">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ARTICLE" maxOccurs="unbounded"
+          minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="ns1:GTIN" />
+              <xs:element ref="ns1:NAME" />
+              <xs:element ref="ns1:PKG_SIZE" />
+              <xs:element minOccurs="0" ref="ns1:SELLING_UNITS" />
+              <xs:element minOccurs="0" ref="ns1:MEASURE" />
+              <xs:element minOccurs="0" ref="ns1:GALENIC_FORM" />
+              <xs:element minOccurs="0" ref="ns1:GALENIC_GROUP" />
+              <xs:element name="COMPOSITIONS">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="20" ref="ns1:COMPOSITION" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute type="xs:string" name="CREATION_DATETIME" />
+      <xs:attribute type="xs:string" name="PROD_DATE" />
+      <xs:attribute type="xs:string" name="VALID_DATE" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -112,10 +112,12 @@ The file oddb2xml.xsd was manually created by merging the output of the xmlbeans
 * http://www.thaiopensource.com/relaxng/trang.html
 
 Running rake spec will validated the XML-files generated during the tests using the Nokogiri validator.
+We have two XSD files. One for oddb_calc.xml and one for the rest.
 
 Manually you can also validate (assuming that you have installed the xmlbeans tools) all generated XML-files using
 
-* xsdvalidate oddb2xml.xsd *.xml
+* xsdvalidate oddb_calc.xsd oddb_article.xml oddb_calc.xml
+* xsdvalidate oddb2xml.xsd oddb_article.xml oddb_code.xml oddb_interaction.xml oddb_product.xml oddb_substance.xml
 
 ## XML files
 

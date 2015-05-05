@@ -289,7 +289,13 @@ if RunAllTests
               full = File.join(Oddb2xml::WorkDir, file)
               expect(File.exists?(full)).to eq true
              }
-      xml = File.read(File.join(Oddb2xml::WorkDir, 'oddb_calc.xml'))
+      xml_file_name = File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')
+      xml = File.read(xml_file_name)
+      oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
+      File.exists?(oddb_calc_xsd).should eq true
+      xsd = Nokogiri::XML::Schema(File.read(oddb_calc_xsd))
+      doc = Nokogiri::XML(File.read(xml_file_name))
+      xsd.validate(doc).each do |error|  expect(error).to be_nil end
       m = />.*  /.match(xml)
       m.should eq nil
       doc = REXML::Document.new xml

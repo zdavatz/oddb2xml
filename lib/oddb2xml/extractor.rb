@@ -509,15 +509,24 @@ module Oddb2xml
         }
         @@zur_rose_items += 1
       end if @io
+      if defined?(@@extended) and @@extended
+        @@error_file.puts get_error_msg
+      end
+      @@error_file.close
+      @@error_file = nil
       data
     end
     at_exit do
+      puts get_error_msg
+    end if defined?(@@extended) and @@extended
+private
+    def get_error_msg
       if defined?(@@extended) and @@extended
         msg = "Added #{@@items_without_ean13s} via pharmacodes of #{@@zur_rose_items} items when extracting the transfer.dat from \"Zur Rose\""
         msg += "\n  found #{@@duplicated_ean13s} lines with duplicated ean13" if @@duplicated_ean13s > 0
-        puts msg
-        @@error_file.puts msg
+        return msg
       end
+      nil
     end
   end
 end
