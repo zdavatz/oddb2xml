@@ -15,7 +15,7 @@ Die Syntax wird in einer Datei "compositions_syntax":https://raw.githubuserconte
 
 - ratio := Falls eine Zeile in der Zusammensetzung so was wie @ratio: 1:10@ oder @ratio: 1:1.5-2.4@ enthält, wird das Feld "more_info" entsprechend gesetzt.
 
-- Namen mit Zahlen := Beschloss dass @Glyceroli Monostearas 33-45@ eine Name und nicht Glyceroli Monostearas von 33 bis 45 von irgendwas ist.
+- Namen mit Zahlen := @Glyceroli Monostearas 33-45@ ist eine Name und nicht Glyceroli Monostearas von 33 bis 45.
 
 - Dosis := Häufig einfach, z.B. @5 mg@. Komplizierte Ausdrücke wie @2*10^9 CFU@, @9 g/L 5 ml@, @40-55@, @75/25@, @150 U.I. hFSH et 150 U.I. hLH@ oder @6.0 +/-1.2 µg/0.5 ml@ findet man auch.
 
