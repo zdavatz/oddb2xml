@@ -44,7 +44,7 @@ h2. Gebrauchte Abkürzungen und Schlüsselworte
 - aqua q.s. := genügend Wasser ...
 - aqua q.s. ad := entsprechende Menge Wasser für ...
 - aqua q.s. ad emulsionem pro := genügende Menge Wasser zur Herstellung der … best. Menge …. an Emulsion
-- aqua q.s. ad gelatume pro (Schreibfehler ??)
+- aqua q.s. ad gelatum pro := tbd
 - aqua q.s. ad solutionem pro := ausreichende Menge Wasser  zur Herstellung einer (best. Menge/Volumen) einer Lösung
 - aqua q.s. ad suspensionem pro := dito wie oben, jedoch für eine Suspension
 - aquos := tdb, 52 Vorkommnisse, z.B. 53096  @Sanukehl Strep D6, homöopathische Tropfen@
