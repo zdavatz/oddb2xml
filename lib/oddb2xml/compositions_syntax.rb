@@ -96,8 +96,7 @@ class CompositionParser < Parslet::Parser
   rule(:words_nested) { one_word.repeat(1) >> in_parent.maybe >> space? >> one_word.repeat(0) }
   # dose
   # 150 U.I. hFSH et 150 U.I. hLH
-  rule(:dose_unit) {
-    (
+  rule(:units) {
       str('cm²') |
       str('g/dm²') |
       str('g/l') |
@@ -118,6 +117,7 @@ class CompositionParser < Parslet::Parser
       str('kJ') |
       str('G') |
       str('g') |
+      str('I.E.') |
       str('l') |
       str('µl') |
       str('U. Ph. Eur.') |
@@ -146,8 +146,8 @@ class CompositionParser < Parslet::Parser
       str('% m/m') |
       str('% m/m') |
       str('%')
-    ).as(:unit)
   }
+  rule(:dose_unit) { units.as(:unit) }
   rule(:qty_range)       { (number >> space? >> (str('+/-') | str(' - ') | str(' -') | str('-') | str('±') ) >> space? >> number).as(:qty_range) }
   rule(:qty_unit)       { dose_qty >> (space >> dose_unit).maybe }
   rule(:dose_qty)       { number.as(:qty) }
@@ -437,11 +437,63 @@ class CompositionParser < Parslet::Parser
 
 
   rule(:prepation_separator) { str(', ') | str("\n") }
-  rule(:prepation_name) { (prepation_separator.absent? >> any).repeat(1)  }
-  rule(:galenic)   { prepation_name.as(:prepation_name) >> space? >>
-                     dose.maybe >> space? >> str(',').maybe >> space? >>
-                     (prepation_separator.absent? >> any.repeat(1) >> comma).repeat(1).maybe >>
-                     (prepation_separator.absent? >> any).repeat(1).maybe.as(:galenic_form) >> space?
+
+  rule(:prepation_name) { ((prepation_separator|lparen).absent? >> any).repeat(1)
+                          }
+  rule(:dose_with_pro) {
+                            ( match('[0-9a-zA-Z]').repeat(1) >>
+                               str('/') >>
+                              match('[0-9a-zA-Z\'%]').repeat(1)
+                            ).maybe
+  }
+
+  rule(:gal_form) {
+    qty_unit_silent.maybe >>
+    ((( str("\n") # |
+        str(',') >> space? >> qty_unit_silent |
+        digits >> str('%')
+      ).absent? >> any).repeat(1) >>
+        (lparen >> (rparen.absent? >> any).repeat(1) >> rparen).maybe
+    ).as(:galenic_form) >>
+    space?
+
+  }
+
+  rule(:standard_galenic) {
+                            prepation_name.as(:prepation_name) >> space? >>
+                            prepation_separator >> space? >>
+                            (name_without_parenthesis >> qty_unit_silent >> prepation_separator).maybe >>
+                            (qty_unit_silent >> space?).maybe >>
+                            (dose_with_pro >> space? >> str(',') >> space?).maybe >>
+                            gal_form >> space?
+                         }
+
+  rule(:qty_unit_silent) { number >> space >> units  }
+  rule(:name_then_dose) { ((space.absent? >> any).repeat(1) >>
+                            space >> qty_unit_silent).as(:prepation_name) >> space?.as(:galenic_form)
+                          }
+
+  rule(:only_name) { any.repeat(1).as(:prepation_name) >> space?.as(:galenic_form)
+                     }
+
+  rule(:name_comma_gal_form) { (space.absent? >> any).repeat(1).as(:prepation_name) >>
+                                comma >> space >>
+                                any.repeat(1).as(:galenic_form)
+                              }
+  rule(:simple_name) { (match(["a-zA-Z0-9,%"]) | str('-') | umlaut).repeat(1) }
+  rule(:name_gal_form) { # e.g. Dicloabak 0,1% Augentropfen or 35 Clear-Flex 3,86 % Peritonealdialyselösung
+                           (simple_name >> space).repeat(1).as(:prepation_name) >>
+                           space? >>
+                            (dose_with_pro >> space?).maybe >>
+                          gal_form >> space?
+  }
+  rule(:galenic)   {
+                     standard_galenic |
+                     name_comma_gal_form |
+                     name_then_dose >> space? |
+                     name_gal_form |
+                     only_name >> space? |
+                     space?
                    }
 
   root :expression_comp

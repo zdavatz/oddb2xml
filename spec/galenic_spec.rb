@@ -6,72 +6,220 @@ require 'parslet/rig/rspec'
 require 'parslet/convenience'
 require 'csv'
 
-RunAllParsingExamples = false # Takes over 3 minutes to run, all the other ones just a few seconds
-GoIntoPry = true
-NGoIntoPry = false
+RunAllParsingExamples = false #  RunAllParsingExamples /travis|localhost/i.match(hostname) != nil # takes about one minute to run
 
 galenic_tests = {
-  'Acetocaustin, Lösung'                      => { :prepation_name=>"Acetocaustin", :galenic_form=>"Lösung" },
-  '3TC 150 mg, Filmtabletten'                 => { :prepation_name=>"3TC 150 mg", :galenic_form=>"Filmtabletten" },
-  'Sandostatin 0,2 mg/mL, Injektionslösung'   => { :prepation_name=>"Sandostatin 0,2 mg/mL", :galenic_form=>"Injektionslösung" },
-  'Atorvastax-Drossapharm 20 mg'              => { :prepation_name=>"Atorvastax-Drossapharm 20 mg", :galenic_form=> nil },
-#  'Atorvastatin Helvepharm, 10 mg Filmtabletten' => {:prepation_name=>"Atorvastatin Helvepharm", :galenic_form=> 'Filmtabletten'  },
-#  'Ondansetron Labatec, 8mg/4ml concentré pour perfusion' =>    {:prepation_name=>"Ondansetron Labatec", :galenic_form=> 'concentré pour perfusion'  },
-#  'Ondansetron Labatec, 8mg/4ml, concentré pour perfusion' =>   {:prepation_name=>"Ondansetron Labatec", :galenic_form=> 'concentré pour perfusion'  },
-#  'Alustal Bäume, Injektionssuspension' =>    {:prepation_name=>"Alustal Bäume", :galenic_form=> 'Injektionssuspension'  },
-#  'Alustal 3-Bäume, Injektionssuspension' =>    {:prepation_name=>"Alustal 3-Bäume", :galenic_form=> 'Injektionssuspension'  },
+  '1001 Blattgrün Dragées' =>  { :prepation_name=>'1001 Blattgrün ', :galenic_form=> 'Dragées' },
+  'Amoxicillin Streuli, Granulat zur Herstellung einer Suspension' => { :prepation_name=>'Amoxicillin Streuli', :galenic_form=> 'Granulat zur Herstellung einer Suspension', },
+  '3TC 150 mg, Filmtabletten'                 => { :prepation_name=>'3TC 150 mg', :galenic_form=>'Filmtabletten' },
+  'Acetocaustin, Lösung'                      => { :prepation_name=>'Acetocaustin', :galenic_form=>'Lösung' },
+  'Alustal 3-Bäume, Injektionssuspension' =>    {:prepation_name=>'Alustal 3-Bäume', :galenic_form=> 'Injektionssuspension'  },
+  'Alustal Bäume, Injektionssuspension' =>    {:prepation_name=>'Alustal Bäume', :galenic_form=> 'Injektionssuspension'  },
+  'Arkocaps Passiflore/Passionsblume, 300 mg, capsules'=> { :prepation_name=>'Arkocaps Passiflore/Passionsblume', :galenic_form=>'capsules' },
+  'Atenativ, Antithrombin III 500 I.E., Injektionspräparat' => { :prepation_name=>'Atenativ', :galenic_form=>'Injektionspräparat' },
+  'Atorvastatin Helvepharm, 10 mg Filmtabletten' => {:prepation_name=>'Atorvastatin Helvepharm', :galenic_form=> 'Filmtabletten'  },
+  'Atorvastax-Drossapharm 20 mg'              => {:prepation_name=> 'Atorvastax-Drossapharm 20 mg', :galenic_form=> nil},
+  'Co-Losartan Spirig HC 50/12,5 mg'   => { :prepation_name=>'Co-Losartan Spirig HC 50/12,5 mg', :galenic_form=> nil, },
+  'Dicloabak 0,1% Augentropfen' => { :prepation_name=>'Dicloabak 0,1% ', :galenic_form=>'Augentropfen' },
+  'Kaliumchlorid 14,9 % B. Braun, Zusatzampullen'=> { :prepation_name=>'Kaliumchlorid 14,9 % B. Braun', :galenic_form=>'Zusatzampullen' },
+  'Ondansetron Labatec, 8mg/4ml, concentré pour perfusion' =>   {:prepation_name=>'Ondansetron Labatec', :galenic_form=> 'concentré pour perfusion'  },
+  'Paronex 20, Filmtabletten'=> { :prepation_name=>'Paronex 20', :galenic_form=>'Filmtabletten' },
+  'Physioneal 35 Clear-Flex 3,86 % Peritonealdialyselösung' => { :prepation_name=>'Physioneal 35 Clear-Flex 3,86 % ', :galenic_form=>'Peritonealdialyselösung' },
+  'Sandostatin 0,2 mg/mL, Injektionslösung'   => { :prepation_name=>'Sandostatin 0,2 mg/mL', :galenic_form=>'Injektionslösung' },
+  'Tramal 100, Injektionslösung (i.m., i.v.)' => { :prepation_name=>'Tramal 100', :galenic_form=>'Injektionslösung (i.m., i.v.)' },
+  'Uman Albumin Kedrion 20%'  => { :prepation_name=>'Uman Albumin Kedrion 20%', :galenic_form=> nil },
+
   }
 
-if GoIntoPry
+galenic_tests = {
+  'Nitroderm TTS 10' => { :prepation_name=>'Nitroderm TTS 10', :galenic_form=> nil },
+  'Methrexx 7.5 mg / 0.75 ml,Injektionslösung in Fertigspritzen'=> { :prepation_name=>'Methrexx', :galenic_form=> 'Injektionslösung in Fertigspritzen' },
+  'Phytopharma foie et bile capsules/Leber-Galle Kapseln'  => { :prepation_name=>'Phytopharma', :galenic_form=> 'Kapseln' },
+  'Sulfure de Rhénium (186Re)-RE-186-MM-1 Cis bio International,       Suspension' => { :prepation_name=>'Sulfure de Rhénium (186Re)-RE-186-MM-1 Cis bio International', :galenic_form=> 'Suspension' },
+  'Amoxicillin Sandoz 100mg/4ml,Granulat zur Herst.einer Suspension' => { :prepation_name=>'Amoxicillin Sandoz', :galenic_form=> 'Granulat zur Herst.einer Suspension' },
 
-describe CompositionParser do
+#  'Tramal 100, Injektionslösung (i.m., i.v.)' => { :prepation_name=>'Tramal 100', :galenic_form=>'Injektionslösung (i.m., i.v.)' },
+
+  # Fix ,Zusatzampullen
+  # "Kaliumchlorid 14,9 % B. Braun,Zusatzampullen"=> { :prepation_name=>"Kaliumchlorid 14,9 % B. Braun", :galenic_form=>"Zusatzampullen" },
+  }
+
+def test_one_string(parser, string, expected)
+  res1 = parser.parse_with_debug(string)
+  res1.delete(:qty)   if res1
+  res1.delete(:unit)  if res1
+  stringified = res1 ? res1.to_s.gsub(/@\d+/, '') : nil
+  if res1 == nil or ! stringified.eql? expected.to_s
+    puts "Failed testing: #{string}"
+    pp res1
+    binding.pry
+  end
+  expect(stringified).to eq expected.to_s if expected
+end
+
+if false then describe CompositionParser do
   let(:parser) { CompositionParser.new }
   context "identifier parsing" do
     let(:galenic_parser) { parser.galenic }
-    it "parses identifier" do
-      galenic_tests.each{
+    let(:qty_unit_parser) { parser.qty_unit }
+
+    galenic_tests.each{
         |string, expected|
         puts string
-        res1 = galenic_parser.parse_with_debug(string)
-        res1.delete(:qty)   if res1
-        res1.delete(:unit)  if res1
-        if res1 == nil or ! res1.to_s.gsub(/@\d+/, '').eql? expected.to_s
-          pp res1
-          binding.pry
+        it "parses galenic #{string}" do
+          test_one_string(galenic_parser, string, expected)
         end
-        res1.should eq expected
-                        }
-    end
+    }
   end
-end
-else
-  describe CompositionParser do
-    context "should parse all lines in #{File.basename(AllColumn_C_Lines)}" do
-      let(:galenic_parser) { CompositionParser.new.galenic }
-      ausgabe = {}
-      count = 0
-      galenic_parser = CompositionParser.new.galenic
-      IO.readlines(AllColumn_C_Lines).each {
-        |string|
-          count += 1
-          # break if count > 100
-          puts string
-          res1 = galenic_parser.parse_with_debug(string)
-          ausgabe[res1[:prepation_name].to_s] = res1[:galenic_form] if res1
-          it "parses galenic #{string}" do
-            res1 = galenic_parser.parse_with_debug(string)
-            unless res1
-              pp res1
-              binding.pry
-            end
+end end
+
+if RunAllParsingExamples then describe CompositionParser do
+  context "should parse all lines in #{File.basename(AllColumn_C_Lines)}" do
+    let(:galenic_parser) { CompositionParser.new.galenic }
+    ausgabe = {}
+    count = 0
+    galenic_parser = CompositionParser.new.galenic
+    IO.readlines(AllColumn_C_Lines).each {
+      |string|
+        count += 1
+        # break if count > 100
+        puts string.strip
+        it "parses galenic #{string}" do
+          res1 = galenic_parser.parse_with_debug(string.strip)
+          if res1
+            ausgabe[res1[:prepation_name].to_s] = res1[:galenic_form] if res1
+          else
+            puts "Failed testing: #{string}"
+            pp res1
+#            binding.pry
           end
-      }
-      csv_name = File.join(Oddb2xml::WorkDir, 'galenic.csv')
-      CSV.open(csv_name, "w+", :col_sep => ';') do |csv|
+        end
+    }
+    csv_name = File.join(Oddb2xml::WorkDir, 'galenic.csv')
+    at_exit do CSV.open(csv_name, "w+", :col_sep => ';') do |csv|
         ausgabe.each do |key, value|
           csv <<  [key, value]
         end
       end
     end
   end
+end end
+
+describe CompositionParser do
+  let(:parser) { CompositionParser.new }
+  context "gal_form parsing" do
+    let(:gal_form_parser) { parser.gal_form }
+
+    should_pass = [
+      ', Lösung',
+      ', 100mg Lösung',
+      'Lösung',
+      '100mg Lösung',
+      'Injektionslösung (i.m., i.v.)',
+      ].each {
+        |id|
+        it "parses gal_form #{id}" do
+          expect(gal_form_parser).to     parse(id)
+        end
+      }
+    should_not_pass = [
+      ].each {
+        |id|
+        it "parses gal_form #{id}" do
+          expect(gal_form_parser).to_not   parse(id)
+        end
+      }
+  end
+  context "name_gal_form parsing" do
+    let(:name_gal_form_parser) { parser.name_gal_form }
+
+    should_pass = [
+      'Dicloabak 0,1% Augentropfen',
+      '35 Clear-Flex 3,86 % Peritonealdialyselösung',
+      'Esmeron 100mg/10ml Injektionslösung',
+      ].each {
+        |id|
+        it "parses name_gal_form #{id}" do
+          expect(name_gal_form_parser).to     parse(id)
+        end
+      }
+    should_not_pass = [
+      ].each {
+        |id|
+        it "parses name_gal_form #{id}" do
+          expect(name_gal_form_parser).to_not   parse(id)
+        end
+      }
+  end
+
+  context "prepation_name parsing" do
+    let(:prepation_name_parser) { parser.prepation_name }
+
+    should_pass = [
+      'name',
+      'name more',
+      'name more and more',
+      'Dicloabak 0,1% Augentropfen',
+      ].each {
+        |id|
+        it "parses prepation_name #{id}" do
+          expect(prepation_name_parser).to     parse(id)
+        end
+      }
+    should_not_pass = [
+      ].each {
+        |id|
+        it "parses prepation_name #{id}" do
+          expect(prepation_name_parser).to_not   parse(id)
+        end
+      }
+  end
+  context "standard_galenic parsing" do
+    let(:standard_galenic_parser) { parser.standard_galenic }
+
+    should_pass = [
+     'Antithrombin III 500 I.E., Injektionspräparat',
+      'Ondansetron Labatec, 8mg/4ml, concentré pour perfusion',
+      ].each {
+        |id|
+        it "parses standard_galenic #{id}" do
+          expect(standard_galenic_parser).to     parse(id)
+        end
+      }
+    should_not_pass = [
+      'Dicloabak 0,1% Augentropfen',
+      '35 Clear-Flex 3,86 % Peritonealdialyselösung',
+      'Esmeron 100mg/10ml Injektionslösung',
+      ].each {
+        |id|
+        it "parses standard_galenic #{id}" do
+          expect(standard_galenic_parser).to_not   parse(id)
+        end
+      }
+  end
+  context "dose_with_pro parsing" do
+    let(:dose_with_pro_parser) { parser.dose_with_pro }
+
+    should_pass = [
+     '100mg/10ml',
+      '8mg/4ml',
+      ].each {
+        |id|
+        it "parses dose_with_pro #{id}" do
+          expect(dose_with_pro_parser).to     parse(id)
+        end
+      }
+    should_not_pass = [
+     '100mgx10ml',
+      '8mgX4ml',
+      ].each {
+        |id|
+        it "parses dose_with_pro #{id}" do
+          expect(dose_with_pro_parser).to_not   parse(id)
+        end
+      }
+  end
+
+
 end
+
