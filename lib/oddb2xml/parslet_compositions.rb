@@ -83,6 +83,7 @@ module ParseUtil
     comps << ParseComposition.new(composition_text.split(/,|:|\(/)[0]) if comps.size == 0
     comps
   end
+
 end
 
 class IntLit   < Struct.new(:int)
@@ -424,5 +425,48 @@ class ParseComposition
       result.label_description = label_description.gsub(/:+$/, '').strip if label_description
     end
     return result
+  end
+end
+
+class GalenicFormTransformer < CompositionTransformer
+
+  rule( :preparation_name => simple(:preparation_name),
+        :galenic_form => simple(:preparation_name),
+      ) {
+    |dictionary|
+        puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+      binding.pry
+        name = dictionary[:preparation_name] ? dictionary[:preparation_name].to_s : nil
+        form = dictionary[:galenic_form] ? dictionary[:galenic_form].to_s : nil
+        # name, form
+  }
+end
+
+class ParseGalenicForm
+  def ParseGalenicForm.from_string(string)
+    return nil if string == nil
+    stripped = string.gsub(/^"|["\n]+$/, '')
+    return nil unless stripped
+    puts "ParseGalenicForm.from_string #{string}" if VERBOSE_MESSAGES # /ng-tr/.match(Socket.gethostbyname(Socket.gethostname).first)
+
+    parser = GalenicFormParser.new
+    transf = GalenicFormTransformer.new
+    begin
+      if defined?(RSpec)
+        ast = transf.apply(parser.parse_with_debug(string))
+        puts "#{File.basename(__FILE__)}:#{__LINE__}: ==> " if VERBOSE_MESSAGES
+        pp ast if VERBOSE_MESSAGES
+      else
+        ast = transf.apply(parser.parse(string))
+      end
+    rescue Parslet::ParseFailed => error
+      @@errorHandler.nrParsingErrors += 1
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: failed parsing ==>  #{string}"
+      return nil
+    end
+    return [] unless ast
+    form = ast[:galenic_form] ? ast[:galenic_form].to_s.sub(/^\/\s+/, '') : nil
+    name = ast[:prepation_name] ? ast[:prepation_name].to_s.strip : nil
+    return [name,  form]
   end
 end

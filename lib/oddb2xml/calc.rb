@@ -103,7 +103,7 @@ module Oddb2xml
     @@names_without_galenic_forms = []
     @@rules_counter = {}
     attr_accessor   :galenic_form, :unit, :pkg_size
-    attr_reader     :name, :substances, :composition, :compositions
+    attr_reader     :name, :substances, :composition, :compositions, :column_c
     attr_reader     :selling_units, :count, :multi, :measure, :addition, :scale # s.a. commercial_form in oddb.org/src/model/part.rb
     def self.get_galenic_group(name, lang = 'de')
       @@galenic_groups.values.collect { |galenic_group|
@@ -156,16 +156,32 @@ private
       string ? string.to_s.gsub(/\s\s+/, ' ') : nil
     end
 public
-    def initialize(name = nil, size = nil, unit = nil, active_substance = nil, composition= nil)
-      @name = remove_duplicated_spaces(name)
+    def initialize(column_c = nil, size = nil, unit = nil, active_substance = nil, composition= nil)
+      @column_c = column_c ? column_c.gsub(/\s\s+/, ' ') : nil
+      @name, gal_form =  ParseGalenicForm.from_string(column_c)
+      gal_form = gal_form.gsub(/\s\s+/, ' ').sub(' / ', '/') if gal_form
+      @galenic_form = search_galenic_info(gal_form)
       @pkg_size = remove_duplicated_spaces(size)
       @unit = unit
-      # @pkg_size, @galenic_group, @galenic_form =
-      search_galenic_info
+      @selling_units = get_selling_units(@name, @pkg_size, @unit)
       @composition = composition
       @measure = unit if unit and not @measure
+      unless @galenic_form
+        parts = column_c.split(/\s+|,|\-/)
+        parts.each{
+          |part|
+          if idx = search_exact_galform(part)
+            @galenic_form = idx
+            break
+          end
+        }
+      end if column_c
+      if @measure and not @galenic_form
+        @galenic_form ||= search_exact_galform(@measure)
+        @galenic_form ||= search_exact_galform(@measure.sub('(n)', 'n'))
+      end
+      handle_unknown_galform(gal_form)
       @measure = @galenic_form.description if @galenic_form and not @measure
-      @galenic_form  ||= @@galenic_forms[UnknownGalenicForm]
 
       unless composition
         @compositions = []
@@ -192,9 +208,6 @@ public
         galenic_form  ? galenic_form.description  : '' ,
         galenic_group ? galenic_group.description : ''
         ]
-    end
-    def galenic_form__xxx
-      @galenic_form.description
     end
   private
 
@@ -291,63 +304,49 @@ public
         return 1
       end
     end
-    # Parse a string for a numerical value and unit, e.g. 1.5 ml
-    def self.check_for_value_and_units(what)
-      if m = /^([\d.]+)\s*(\D+)/.match(what)
-        # return [m[1], m[2] ]
-        return m[0].to_s
+
+    def search_exact_galform(name)
+      return nil unless name
+      if idx = @@galenic_forms.values.find{|x| x.descriptions['de'] and x.descriptions['de'].downcase.eql?(name.downcase) } or
+        idx = @@galenic_forms.values.find{|x| x.descriptions['fr'] and x.descriptions['fr'].downcase.eql?(name.downcase) } or
+        idx = @@galenic_forms.values.find{|x| x.descriptions['en'] and x.descriptions['en'].downcase.eql?(name.downcase) }
+        return idx
+      end
+      return nil
+    end
+
+    def handle_unknown_galform(gal_form)
+      return if @galenic_form
+      if gal_form
+        @galenic_form =  GalenicForm.new(0, {'de' => remove_duplicated_spaces(gal_form.gsub(' +', ' '))}, @@galenic_forms[UnknownGalenicForm] )
+        @@new_galenic_forms << gal_form
       else
-        nil
+        @galenic_form = @@galenic_forms[UnknownGalenicForm]
       end
     end
-    def search_galenic_info
-      @substances = nil
-      @substances = @composition.split(/\s*,(?!\d|[^(]+\))\s*/u).collect { |name| ParseUtil.capitalize(name) }.uniq if @composition
 
-      name = @name ? @name.clone : ''
-      parts = name.split(',')
-      form_name = nil
-      if parts.size == 0
-      elsif parts.size == 1
-        @@names_without_galenic_forms << name
-      else
-        parts[1..-1].each{
+    def search_galenic_info(gal_form)
+      if idx = search_exact_galform(gal_form)
+        return idx
+      end
+      if gal_form and gal_form.index(',')
+        parts = gal_form.split(/\s+|,/)
+        parts.each{
           |part|
-          form_name = part.strip
-          @galenic_form = Calc.get_galenic_form(form_name)
-          # puts "oid #{UnknownGalenicForm} #{@galenic_form.oid} for #{name}"
-          break unless @galenic_form.oid == UnknownGalenicForm
-          if @galenic_form.oid == UnknownGalenicForm
-            @galenic_form =  GalenicForm.new(0, {'de' => remove_duplicated_spaces(form_name.gsub(' +', ' '))}, @@galenic_forms[UnknownGalenicForm] )
-            @@new_galenic_forms << form_name
+          if idx = search_exact_galform(part)
+            return idx
           end
         }
-      end
-      @name = name.strip
-      if @pkg_size.is_a?(Fixnum)
-        @count = @pkg_size
-        res = [@pkg_size]
-      else
-        res = @pkg_size ? @pkg_size.split(/x/i) : []
-        if res.size >= 1
-          @count = res[0].to_i
-        else
-          @count = 1
+      elsif gal_form
+        if gal_form.eql?('capsule')
+          idx = search_exact_galform('capsules')
+          return idx
         end
-      end
-      # check whether we find numerical and units
-      if res.size >= 2
-        if (result = Calc.check_for_value_and_units(res[1].strip)) != nil
-          @multi = result[1].to_f
-        else
-          @multi = res[1].to_i
+        if idx = search_exact_galform(gal_form)
+          return idx
         end
-      else
-        @multi = 1
+        return nil
       end
-      @addition = 0
-      @scale = 1
-      @selling_units = get_selling_units(form_name, @pkg_size, @unit)
     end
   end
 end

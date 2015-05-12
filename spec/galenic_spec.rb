@@ -6,7 +6,7 @@ require 'parslet/rig/rspec'
 require 'parslet/convenience'
 require 'csv'
 
-RunAllParsingExamples = true #  RunAllParsingExamples /travis|localhost/i.match(hostname) != nil # takes about one minute to run
+RunAllParsingExamples = false #  RunAllParsingExamples /travis|localhost/i.match(hostname) != nil # takes about one minute to run
 
 galenic_tests = {
 
@@ -114,6 +114,34 @@ Madopar LIQ 125 Tabletten zur Herstellung einer Suspension zum Einnehmen
 Anginazol forte tablettes à sucer
 Tisane provençale No 1  tisane laxative, plantes coupées
 )
+
+describe ParseGalenicForm do
+  context "parse_column_c should work" do
+    name, gal_form =  ParseGalenicForm.from_string(galenic_tests.first.first)
+    specify { expect(name).to eq galenic_tests.first.last[:prepation_name].strip }
+    specify { expect(gal_form).to eq galenic_tests.first.last[:galenic_form] }
+  end
+
+  galenic_tests.each{
+    |string, expected|
+      context "should handle #{string}" do
+        name, form = ParseGalenicForm.from_string(string)
+        specify { expect(name).to eq expected[:prepation_name].strip }
+        specify { expect(form).to eq expected[:galenic_form] }
+      end
+  }
+
+  { 'Phytopharma dragées pour le coeur / Herz Dragées' =>
+    { :prepation_name=>'Phytopharma dragées pour le coeur', :galenic_form=> 'Herz Dragées' },
+    }.each {
+    |string, expected|
+      context "should handle #{string}" do
+        name, form = ParseGalenicForm.from_string(string)
+        specify { expect(name).to eq expected[:prepation_name].strip }
+        specify { expect(form).to eq expected[:galenic_form] }
+      end
+  }
+end
 
 def test_one_string(parser, string, expected)
   res1 = parser.parse_with_debug(string)

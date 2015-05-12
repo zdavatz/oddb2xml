@@ -159,7 +159,6 @@ if RunAllTests
     specify { expect(result.selling_units).to eq 10 }
     specify { expect(result.measure).to eq 'ml' }
   end
-
   context 'should return correct value for Diamox, comprimés' do
     pkg_size_L = '1 x 25'
     einheit_M  = 'Tablette(n)'
@@ -241,29 +240,16 @@ if RunAllTests
     specify { expect(info.galenic_group.description).to eq  'Injektion/Infusion' }
     specify { expect(info.pkg_size).to eq '1 x 5 x 100' }
     skip    { expect(info.measure).to eq  '100 ml' }
-    # specify { expect(info.count).to eq  5 }
-    # specify { expect(info.multi).to eq  1 }
-    # specify { expect(info.addition).to eq 0 }
-    # specify { expect(info.scale).to eq  1 }
   end
 
   context 'find correct result for Inflora, capsule' do
     info = Calc.new(tst_infloran.name_C, tst_infloran.package_size_L, tst_infloran.einheit_M, tst_infloran.active_substance_0, tst_infloran.composition_P)
     specify { expect(tst_infloran.url).to eq 'http://ch.oddb.org/de/gcc/drug/reg/00679/seq/02/pack/012' }
-    specify { expect(info.galenic_form.description).to eq 'capsule' }
-    skip { expect(info.galenic_group.description).to eq  'Injektion/Infusion' }
+    specify { expect(info.galenic_form.description).to eq 'Kapseln' }
+    specify { expect(info.galenic_group.description).to eq  'Tabletten' }
     specify { expect(info.pkg_size).to eq '2x10' }
     specify { expect(info.selling_units).to eq  20 }
-    skip { expect(info.measure).to eq  '0' }
-    # specify { expect(info.count).to eq  5 }
-    # specify { expect(info.multi).to eq  1 }
-    # specify { expect(info.addition).to eq 0 }
-    # specify { expect(info.scale).to eq  1 }
-  end
-
-  context 'convert mg/l into ml/mg for solutions' do
-    result = Calc.new('50', 'g/l')
-    skip { expect(result.measure).to eq  50 }
+    specify { expect(info.measure).to eq  'Kapsel(n)' }
   end
 
   run_time_options = '--calc --skip-download'
@@ -296,8 +282,6 @@ if RunAllTests
       xsd = Nokogiri::XML::Schema(File.read(oddb_calc_xsd))
       doc = Nokogiri::XML(File.read(xml_file_name))
       xsd.validate(doc).each do |error|  expect(error).to be_nil end
-      m = />.*  /.match(xml)
-      m.should eq nil
       doc = REXML::Document.new xml
       # puts xml; binding.pry
       gtin = '7680540151009'
@@ -325,7 +309,9 @@ if RunAllTests
       matri_name = 'Matricariae Extractum Isopropanolicum Liquidum'
       XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").
         find{|x| x.text.eql?("Alprostadilum")}.text.should eq 'Alprostadilum'
+#      XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun'
       XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
+      XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/GALENIC_FORM").last.text.should match /Ampulle/i
       XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").first.text.should eq 'I'
       XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL_DESCRIPTION").first.text.should eq 'Glucoselösung'
       XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").each{ |x| puts x.text }
@@ -334,7 +320,9 @@ if RunAllTests
 
       XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").
         find{|x| x.text.eql?(matri_name)}.text.should eq matri_name
+#      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/NAME").last.text.should eq 'Kamillin Medipharm'
       XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/NAME").last.text.should eq 'Kamillin Medipharm, Bad'
+      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/GALENIC_FORM").last.text.should eq 'Bad'
       XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY").first.text.should eq '98.9'
       XPath.match( doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Lidocaini Hydrochloridum'
       XPath.match( doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT").first.text.should eq 'mg/ml'
@@ -346,13 +334,19 @@ if RunAllTests
 
       XPath.match( doc, "//ARTICLE[GTIN='7680446250592']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SALTS/SALT/SUBSTANCE_NAME").first.text.should eq 'Ceftriaxonum Natricum'
 
+#      XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/NAME").first.text.should eq 'Nutriflex Omega special'
       XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/NAME").first.text.should eq 'Nutriflex Omega special, Infusionsemulsion 2500 ml'
+      XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/GALENIC_FORM").first.text.should eq 'Infusionsemulsion'
       XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/SELLING_UNITS").first.text.should eq '5'
 
       XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq 'Excipiens ad solutionem'
       XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/QTY").first.text.should eq '1'
       XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/UNIT").first.text.should eq 'ml'
       XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/NAME").first.text.should eq 'W-Tropfen'
+      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/GALENIC_FORM").last.text.should eq 'Tropfen'
+
+      XPath.match( doc, "//ARTICLE[GTIN='7680589430011']/NAME").first.text.should eq 'Apligraf'
+      XPath.match( doc, "//ARTICLE[GTIN='7680589430011']/GALENIC_FORM").last.text.should eq 'Unbekannt' # TODO?? 'Scheibe(n)/disque(s)'
     end
   end
 
@@ -390,8 +384,10 @@ if RunAllTests
   context 'should handle CFU' do
     result = Calc.new(nil, nil, nil, 'lactobacillus acidophilus cryodesiccatus, bifidobacterium infantis',
                       'lactobacillus acidophilus cryodesiccatus min. 10^9 CFU, bifidobacterium infantis min. 10^9 CFU, color.: E 127, E 132, E 104, excipiens pro capsula.')
-    skip "Infloran, capsule mit cryodesiccatus min. 10^9 CFU"
+    specify { expect(result.compositions.first.substances.first.name).to eq  'Lactobacillus Acidophilus Cryodesiccatus' }
+    specify { expect(result.compositions.first.substances.first.dose.to_s).to eq  '10^9 CFU' }
   end
+
   context 'find correct result compositions' do
     result = Calc.new(nil, nil, nil, 'rutosidum trihydricum, aescinum', 'rutosidum trihydricum 20 mg, aescinum 25 mg, aromatica, excipiens pro compresso.')
     specify { expect(result.compositions.first.substances.first.name).to eq  'Rutosidum Trihydricum' }
@@ -405,20 +401,21 @@ if RunAllTests
   context 'find correct result for Inflora, capsule' do
     info = Calc.new(tst_infloran.name_C, tst_infloran.package_size_L, tst_infloran.einheit_M, tst_infloran.active_substance_0, tst_infloran.composition_P)
     # specify { expect(tst_infloran.url).to eq 'http://ch.oddb.org/de/gcc/drug/reg/00679/seq/02/pack/012' }
-    specify { expect(info.galenic_form.description).to eq 'capsule' }
-    skip { expect(info.galenic_group.description).to eq  'Injektion/Infusion' }
+    specify { expect(info.galenic_form.oid).to eq 24 }
+    specify { expect(info.galenic_form.description).to eq 'Kapseln' }
+    specify { expect(info.galenic_group.description).to eq  'Tabletten' }
     specify { expect(info.pkg_size).to eq '2x10' }
     specify { expect(info.selling_units).to eq  20 }
-    skip { expect(info.measure).to eq  '0' }
+    specify { expect(info.measure).to eq  'Kapsel(n)' }
     bifidobacterium =  info.compositions.first.substances.find{ |x| x.name.match(/Bifidobacterium/i) }
     specify { expect(bifidobacterium).not_to eq nil}
     if bifidobacterium
       specify { expect(bifidobacterium.name).to eq  'Bifidobacterium Infantis' }
-      skip { expect(bifidobacterium.qty.to_f).to eq  '10^9'}
-      skip { expect(bifidobacterium.unit).to eq  'CFU'}
+      specify { expect(bifidobacterium.dose.to_s).to eq  '10^9 CFU'}
+      specify { expect(bifidobacterium.unit).to eq  'CFU'}
     end
     e_127 =  info.compositions.first.substances.find{ |x| x.name.match(/E 127/i) }
-    skip { expect(e_127).not_to eq nil}
+    specify { expect(e_127).not_to eq nil}
     if e_127
       specify { expect(e_127.name).to eq  'E 127' }
       specify { expect(e_127.unit).to eq  nil}
@@ -431,7 +428,8 @@ end
     specify { expect(info.galenic_group.description).to eq  'unbekannt' }
     specify { expect(info.pkg_size).to eq '3' }
     specify { expect(info.selling_units).to eq  3 }
-    specify { expect(info.name).to eq 'Cardio-Pulmo-Rénal Sérocytol, suppositoire'}
+    specify { expect(info.column_c).to eq tst_cardio_pumal.name_C }
+    specify { expect(info.name).to eq 'Cardio-Pulmo-Rénal Sérocytol'}
     specify { expect(info.measure).to eq  'Suppositorien' }
     globulina =  info.compositions.first.substances.find{ |x| x.name.match(/porcins|globulina/i) }
     specify { expect(globulina).not_to eq nil}
@@ -516,8 +514,8 @@ if RunAllTests
     specify { expect(info.compositions.size).to eq  2 }
     specify { expect(info.compositions.first.substances.size).to eq 6 }
     poloxamerum =  info.compositions.first.substances.find{ |x| x.name.match(/poloxamerum/i) }
-    skip { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
-    skip { expect(poloxamerum.qty.to_f).to eq  "" }
+    specify { expect(poloxamerum.name).to eq  'Poloxamerum 238' }
+    specify { expect(poloxamerum.qty).to eq  nil}
     specify { expect(poloxamerum.unit).to eq  nil }
   end
 

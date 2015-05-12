@@ -698,7 +698,7 @@ module Oddb2xml
             items[ean13] = info
             xml.ARTICLE {
               xml.GTIN          ean13
-              xml.NAME          info.name
+              xml.NAME          info.column_c
               xml.PKG_SIZE      info.pkg_size
               xml.SELLING_UNITS info.selling_units
               xml.MEASURE       info.measure # Nur wenn Lösung wen Spalte M ml, Spritze
