@@ -435,6 +435,10 @@ class CompositionParser < Parslet::Parser
     space.repeat(3)
   }
 
+  root :expression_comp
+end
+
+class GalenicFormParser < CompositionParser
 
   rule(:prepation_separator) { str(', ') | str("\n") }
 
@@ -480,22 +484,54 @@ class CompositionParser < Parslet::Parser
                                 comma >> space >>
                                 any.repeat(1).as(:galenic_form)
                               }
-  rule(:simple_name) { (match(["a-zA-Z0-9,%"]) | str('-') | umlaut).repeat(1) }
+  rule(:simple_name) { ((match(["a-zA-Z0-9,%"]) | str('-') | umlaut).repeat(1))  >>
+                       (lparen >> (rparen.absent? >> any.repeat(1)) >> rparen).maybe
+                     }
   rule(:name_gal_form) { # e.g. Dicloabak 0,1% Augentropfen or 35 Clear-Flex 3,86 % Peritonealdialyselösung
                            (simple_name >> space).repeat(1).as(:prepation_name) >>
                            space? >>
                             (dose_with_pro >> space?).maybe >>
-                          gal_form >> space?
+                          (digits.absent? >> gal_form) >> space?
   }
+
+  rule(:name_without_comma_gal_form) { # Sulfure de Rhénium (186Re)-RE-186-MM-1 Cis bio International
+    ((str(', ')| str(',') >> match(['A-Z'])).absent? >> any).repeat(1).as(:prepation_name) >>
+    comma >> space? >>
+    gal_form >> space?
+  }
+
+# Phytopharma foie et bile capsules/Leber-Galle Kapseln
+  rule(:leber_gallen_kapseln) { ((str('/Leber-Galle Kapseln').absent? >> any).repeat(1)).as(:prepation_name)  >>
+                                str('/') >> any.repeat(1).as(:galenic_form) >>
+                                space?
+                              }
+# Plak-out Spray 0,1 %
+  rule(:plak_out_spray) { str('Plak-out Spray 0,1 %').as(:prepation_name)  >>
+                                space? >> str('dummy').maybe.as(:galenic_form) >> space?
+                              }
   rule(:galenic)   {
+                     plak_out_spray |
+                     leber_gallen_kapseln |
                      standard_galenic |
                      name_comma_gal_form |
                      name_then_dose >> space? |
+                     name_without_comma_gal_form |
                      name_gal_form |
                      only_name >> space? |
                      space?
                    }
 
-  root :expression_comp
+  # for debugging purposes only
+  rule(:galenicD)   {
+                     plak_out_spray.as(:plak_out_spray) |
+                     leber_gallen_kapseln.as(:leber_gallen_kapseln) |
+                     standard_galenic.as(:standard_galenic) |
+                     name_comma_gal_form.as(:name_comma_gal_form) |
+                     name_then_dose.as(:name_then_dose) >> space? |
+                     name_without_comma_gal_form.as(:name_without_comma_gal_form) |
+                     name_gal_form.as(:name_gal_form) |
+                     only_name.as(:only_name) >> space? |
+                     space?
+                   }
+  root :galenic
 end
-
