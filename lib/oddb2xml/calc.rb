@@ -345,8 +345,8 @@ public
         if idx = search_exact_galform(gal_form)
           return idx
         end
-        return nil
       end
+      return nil
     end
   end
 end
