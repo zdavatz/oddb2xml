@@ -26,7 +26,7 @@ to_add = %(
 
   context "should handle failed" do
   strings = [
-  ]
+    ]
     strings.each{ |string|
       composition = ParseComposition.from_string(string)
       binding.pry if composition.substances.size == 0
@@ -196,10 +196,10 @@ describe ParseComposition do
   end
 
   context 'find unit for aqua q.s. ad emulsionem pro 250 ml' do
-    string = "q.s. ad emulsionem pro 250 ml."
+    string = "natrii oleas, aqua q.s. ad emulsionem pro 250 ml."
     composition = ParseComposition.from_string(string)
     specify { expect(composition.source).to eq string}
-    specify { expect(composition.substances.size).to eq  0}
+    specify { expect(composition.substances.size).to eq  1}
     specify { expect( composition.excipiens.dose.to_s).to eq "250 ml" }
     specify { expect( composition.excipiens.name).to match /emulsionem/i }
   end

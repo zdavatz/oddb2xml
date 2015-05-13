@@ -190,19 +190,17 @@ class CompositionTransformer < Parslet::Transform
        info[:more_info] or
        CompositionTransformer.get_ratio(dictionary)
        CompositionTransformer.add_excipiens(info)
+       info
       end
       nil
   }
   rule(:composition => subtree(:composition),
        ) {
     |dictionary|
-        puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
        info = dictionary[:composition].is_a?(Hash) ? dictionary[:composition] : dictionary[:composition].first
-       if info.is_a?(Hash)
-         CompositionTransformer.add_excipiens(info)
-       else
-         info
-       end
+       CompositionTransformer.add_excipiens(info) if info.is_a?(Hash)
+       info
        }
   rule(:substance => simple(:substance),
        :chemical_substance => simple(:chemical_substance),
@@ -453,7 +451,6 @@ class GalenicFormTransformer < CompositionTransformer
       ) {
     |dictionary|
         puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      binding.pry
         name = dictionary[:preparation_name] ? dictionary[:preparation_name].to_s : nil
         form = dictionary[:galenic_form] ? dictionary[:galenic_form].to_s : nil
         # name, form
