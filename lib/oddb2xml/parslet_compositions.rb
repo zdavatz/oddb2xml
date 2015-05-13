@@ -94,6 +94,7 @@ class QtyLit   < Struct.new(:qty)
 end
 
 class CompositionTransformer < Parslet::Transform
+  @@more_info = nil
   def CompositionTransformer.get_ratio(parse_info)
     if parse_info[:ratio]
       if parse_info[:ratio].to_s.length > 0 and parse_info[:ratio].to_s != ', '
@@ -104,6 +105,30 @@ class CompositionTransformer < Parslet::Transform
     else
       nil
     end
+  end
+
+  def CompositionTransformer.check_e_substance(substance)
+    return unless /^E \d\d\d/.match(substance.name)
+    unless substance.more_info
+      case substance.name[2]
+      when "1"
+        substance.more_info = 'color.'
+      when "2"
+        substance.more_info = 'conserv.'
+      else
+      end
+      substance.more_info ||= @@more_info
+    end
+    @@more_info = substance.more_info
+  end
+
+  def CompositionTransformer.add_excipiens(info)
+    @@more_info           = nil
+    @@excipiens           = ParseSubstance.new(info[:excipiens_description] ? info[:excipiens_description] : 'Excipiens')
+    @@excipiens.dose      = info[:dose] if info[:dose]
+    @@excipiens.more_info = CompositionTransformer.get_ratio(info)
+    @@excipiens.cdose     = info[:dose_corresp] if info[:dose_corresp]
+    @@excipiens.more_info = info[:more_info] if info[:more_info]
   end
 
   rule(:corresp => simple(:corresp),
@@ -138,6 +163,7 @@ class CompositionTransformer < Parslet::Transform
         dose = dictionary[:dose].is_a?(ParseDose) ? dictionary[:dose] : nil
         substance = ParseSubstance.new(dictionary[:substance_name].to_s, dose)
         substance.more_info = dictionary[:more_info].to_s.strip.sub(/:$/, '') if dictionary[:more_info] and dictionary[:more_info].to_s.length > 0
+        CompositionTransformer.check_e_substance(substance)
         @@substances <<  substance
         substance
   }
@@ -148,7 +174,8 @@ class CompositionTransformer < Parslet::Transform
     |dictionary|
       puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
       substance =  ParseSubstance.new("#{dictionary[:lebensmittel_zusatz]} #{dictionary[:digits]}")
-      substance.more_info =  dictionary[:more_info].to_s.sub(/:\s+$/, '').strip if dictionary[:more_info]
+      substance.more_info = dictionary[:more_info].to_s.strip.sub(/:$/, '') if dictionary[:more_info] and dictionary[:more_info].to_s.length > 0
+      CompositionTransformer.check_e_substance(substance)
       @@substances <<  substance
       substance
   }
@@ -162,29 +189,19 @@ class CompositionTransformer < Parslet::Transform
        info[:dose_corresp] or
        info[:more_info] or
        CompositionTransformer.get_ratio(dictionary)
-        @@excipiens           =  ParseSubstance.new(info[:excipiens_description] ? info[:excipiens_description] : 'Excipiens')
-        @@excipiens.dose      = info[:dose] if info[:dose]
-        @@excipiens.more_info = CompositionTransformer.get_ratio(dictionary)
-        @@excipiens.cdose     = info[:dose_corresp] if info[:dose_corresp]
-        @@excipiens.more_info = info[:more_info] if info[:more_info]
+       CompositionTransformer.add_excipiens(info)
       end
       nil
   }
   rule(:composition => subtree(:composition),
        ) {
     |dictionary|
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
-      info = dictionary[:composition].is_a?(Hash) ? dictionary[:composition] : dictionary[:composition].first
-      if info.is_a?(Hash)
-        @@excipiens           =  ParseSubstance.new(info[:excipiens_description] ? info[:excipiens_description] : 'Excipiens')
-        @@excipiens.dose      = info[:dose] if info[:dose]
-        @@excipiens.more_info = CompositionTransformer.get_ratio(dictionary)
-        @@excipiens.cdose     = info[:dose_corresp] if info[:dose_corresp]
-        @@excipiens.more_info = info[:more_info] if info[:more_info]
-        binding.pry if dictionary[:dose_2]
-        @@excipiens
+        puts "#{File.basename(__FILE__)}:#{__LINE__}: dictionary #{dictionary}" if VERBOSE_MESSAGES
+       info = dictionary[:composition].is_a?(Hash) ? dictionary[:composition] : dictionary[:composition].first
+       if info.is_a?(Hash)
+         CompositionTransformer.add_excipiens(info)
        else
-        info
+         info
        end
        }
   rule(:substance => simple(:substance),
@@ -247,9 +264,10 @@ class CompositionTransformer < Parslet::Transform
     dose
   }
 
-@@substances ||= []
+  @@substances ||= []
   @@excipiens  = nil
   def CompositionTransformer.clear_substances
+    @@more_info  = nil
     @@substances = []
     @@excipiens  = nil
     @@corresp    = nil

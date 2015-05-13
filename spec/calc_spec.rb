@@ -141,6 +141,28 @@ Corresp. 5300 kJ.",
                                }
                             )
 
+  context 'handle E substances correctly' do
+    e_200_examples =
+        {
+        'Comprimé pelliculé: ondansetronum 4 mg ut ondansetroni hydrochloridum dihydricum, E 200, arom.: vanillinum, color.: E 104, excipiens pro compresso obducto.'  =>
+          'conserv.',
+      'ginkgonis extractum siccum raffinatum et quantificatum 120 mg corresp. flavonglycosida ginkgo 26.4-32.4 mg et terpenlactona ginkgo 6.48-7.92 mg, DER: 35-67:1, antiox.: E 200, excipiens pro compresso obducto.' =>
+        'antiox.',
+      'lamotriginum 100 mg, aromatica, antiox.: E 310, E 320, E 321, conserv.: E 200, excipiens pro compresso.' =>
+        'conserv.',
+        }
+    e_200_examples.each{
+      | txt, e_200_expected_attribut|
+      context txt.split(' ').first do
+        info = ParseUtil.parse_compositions(txt)
+        e_200 =  info.first.substances.find{ |x| x.name.match(/E 200/i) }
+        specify { expect(info.first.excipiens.more_info).to eq  nil }
+        specify { expect(e_200.class).to eq  ParseSubstance }
+        specify { expect(e_200.more_info).to eq  e_200_expected_attribut}
+      end
+    }
+  end
+
 if RunAllTests
   context 'should return correct value for liquid' do
     pkg_size_L = '1 x 5 x 200'
@@ -421,7 +443,7 @@ if RunAllTests
       specify { expect(e_127.unit).to eq  nil}
     end
   end
-end
+
   context 'find correct result for 274 Cardio-Pulmo-Rénal Sérocytol, suppositoire' do
     info = Calc.new(tst_cardio_pumal.name_C, tst_cardio_pumal.package_size_L, tst_cardio_pumal.einheit_M, tst_cardio_pumal.active_substance_0, tst_cardio_pumal.composition_P)
     specify { expect(info.galenic_form.description).to eq 'suppositoire' }
@@ -443,12 +465,13 @@ end
     if e_216
       specify { expect(e_216.name).to eq  'E 216' }
       specify { expect(e_216.unit).to eq  nil}
+      specify { expect(e_216.more_info).to eq 'conserv.'}
     end
     e_218 =  info.compositions.first.substances.find{ |x| x.name.match(/E 218/i) }
     specify { expect(e_218).not_to eq nil}
+    specify { expect(e_218).not_to eq nil}
+    specify { expect(e_218.more_info).to eq 'conserv.'}
   end
-
-if RunAllTests
 
   context 'find correct result compositions for 00613 Pentavac' do
     line_1 = "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum tetani 40 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg, virus poliomyelitis typus 1 inactivatum (D-Antigen) 40 U., virus poliomyelitis typus 2 inactivatum (D-Antigen) 8 U., virus poliomyelitis typus 3 inactivatum (D-Antigen) 32 U., aluminium ut aluminii hydroxidum hydricum ad adsorptionem, formaldehydum 10 µg, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum, streptomycinum, polymyxini B sulfas, medium199, aqua q.s. ad suspensionem pro 0.5 ml."
