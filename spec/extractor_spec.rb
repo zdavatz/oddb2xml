@@ -204,7 +204,6 @@ end
   context 'when parsing examples' do
     subject do
       filename = File.expand_path(File.join(__FILE__, '..', 'data', 'zurrose_transfer.dat'))
-      puts "filename #{filename} #{File.exists?(filename)}"
       Oddb2xml::ZurroseExtractor.new(filename, true)
     end
     it "should set the correct Ethacridin description" do
