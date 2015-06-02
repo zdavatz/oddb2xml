@@ -366,6 +366,7 @@ class ParseComposition
                   / U\.: (excipiens) / =>  ' U. \1 ',
                   / U\.: (alnus|betula|betula|betulae) / =>  ' U., \1 ',
                   /^(acari allergeni extractum (\(acarus siro\)|).+\s+U\.\:)/ => 'A): \1',
+                  'Solvens: alprostadilum' => 'alprostadilum',
                 }
   @@errorHandler = ParseUtil::HandleSwissmedicErrors.new( ErrorsToFix )
 
@@ -396,15 +397,15 @@ class ParseComposition
     puts "ParseComposition.new cleaned #{cleaned}" if VERBOSE_MESSAGES and not cleaned.eql?(stripped)
     CompositionTransformer.clear_substances
     result = ParseComposition.new(cleaned)
-    parser3 = CompositionParser.new
-    transf3 = CompositionTransformer.new
+    parser = CompositionParser.new
+    transf = CompositionTransformer.new
     begin
       if defined?(RSpec)
-        ast = transf3.apply(parser3.parse_with_debug(cleaned))
+        ast = transf.apply(parser.parse_with_debug(cleaned))
         puts "#{File.basename(__FILE__)}:#{__LINE__}: ==> " if VERBOSE_MESSAGES
         pp ast if VERBOSE_MESSAGES
       else
-        ast = transf3.apply(parser3.parse(cleaned))
+        ast = transf.apply(parser.parse(cleaned))
       end
     rescue Parslet::ParseFailed => error
       @@errorHandler.nrParsingErrors += 1

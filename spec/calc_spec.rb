@@ -141,6 +141,7 @@ Corresp. 5300 kJ.",
                                }
                             )
 
+if RunAllTests
   context 'handle E substances correctly' do
     e_200_examples =
         {
@@ -163,7 +164,6 @@ Corresp. 5300 kJ.",
     }
   end
 
-if RunAllTests
   context 'should return correct value for liquid' do
     pkg_size_L = '1 x 5 x 200'
     einheit_M  = 'ml'
@@ -369,6 +369,10 @@ if RunAllTests
 
       XPath.match( doc, "//ARTICLE[GTIN='7680589430011']/NAME").first.text.should eq 'Apligraf'
       XPath.match( doc, "//ARTICLE[GTIN='7680589430011']/GALENIC_FORM").last.text.should eq 'Unbekannt' # TODO?? 'Scheibe(n)/disque(s)'
+
+      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/NAME").first.text.should eq "Caverject DC 20, Injektionspräparat"
+      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size.should eq 5
+      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq "aqua ad iniectabilia q.s. ad solutionem"
     end
   end
 
@@ -691,4 +695,4 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
     end
   end
 end
-  end
+end
