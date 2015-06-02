@@ -63,6 +63,14 @@ module ServerMockHelper
     setup_migel_server_mock
     setup_medregbm_server_mock
     setup_zurrose_server_mock
+    setup_epha_atc_csv_mock
+  end
+
+  def setup_epha_atc_csv_mock
+    body =  File.read(File.join(Oddb2xml::SpecData, 'atc.csv'))
+    stub_request(:get, "https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv").
+      with(:headers => {'Accept'=>'*/*', 'User-Agent'=>'Ruby'}).
+      to_return(:status => 200, :body => body, :headers => {})
   end
   def setup_bag_xml_server_mock
     # zip

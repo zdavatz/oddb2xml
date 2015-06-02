@@ -1,3 +1,4 @@
+require 'open-uri'
 module Oddb2xml
   def Oddb2xml.calc_checksum(str)
     str = str.strip
@@ -15,6 +16,21 @@ module Oddb2xml
     Downloads     = "#{Dir.pwd}/downloads"
   end
   @options = {}
+  @atc_csv_origin = 'https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv'
+  @atc_csv_content = {}
+
+  def Oddb2xml.add_epha_changes_for_ATC(iksnr, atc_code)
+    if @atc_csv_content.size == 0
+      open(@atc_csv_origin).readlines.each{
+        |line|
+          items = line.split(',')
+          @atc_csv_content[[items[0], items[1]]] = items[2]
+      }
+
+    end
+    new_value = @atc_csv_content[[iksnr.to_s, atc_code]]
+    new_value ? new_value : atc_code
+  end
 
   def Oddb2xml.log(msg)
     return unless @options[:log]

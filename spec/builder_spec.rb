@@ -44,6 +44,7 @@ describe Oddb2xml::Builder do
   NrExtendedArticles = 78
   NrPharmaAndNonPharmaArticles = 60
   NrPharmaArticles = 5
+  NrPackages = 18
   include ServerMockHelper
   before(:each) do
     @savedDir = Dir.pwd
@@ -54,7 +55,6 @@ describe Oddb2xml::Builder do
   after(:each) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
-
   context 'XSD-generation: ' do
     let(:cli) do
         opts = {}
@@ -116,7 +116,6 @@ describe Oddb2xml::Builder do
         article_xml.should match(/<PRICE>164.55</)
         article_xml.should match(/<PTYP>PPUB</)
         article_xml.should match(/<PRICE>205.3</)
-
         article_xml.should match(/Levetiracetam DESITIN/i) #
         article_xml.should match(/7680536620137/) # Pharmacode
         article_xml.should match(/<PRICE>13.49</)
@@ -130,11 +129,14 @@ describe Oddb2xml::Builder do
         product_xml.match(/<DSCRF>Levetiracetam DESITIN cpr pell 250 mg/).should_not == nil
         product_xml.match(/<SubstanceSwissmedic>levetiracetamum</)
         product_xml.match(/<CompositionSwissmedic>levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.</).should_not == nil
-
         article_xml.scan(/<ART DT=/).size.should eq(NrPharmaArticles)
         article_xml.should match(/<PHAR>5819012</)
         article_xml.should match(/<DSCRD>LEVETIRACETAM DESITIN Filmtabl 250 mg/)
         article_xml.should match(/<COMPNO>7601001320451</)
+
+        doc = REXML::Document.new File.new(product_filename)
+        XPath.match( doc, "//PRD[GTIN='7680620690084']/ATC").first.text.should == 'N03AX14'
+        XPath.match( doc, "//PRD[GTIN='7680161050583']/ATC").first.text.should == 'C05BA01' # modified by atc.csv!
       end
     end
   end
@@ -382,7 +384,7 @@ describe Oddb2xml::Builder do
       res = buildr_capture(:stdout){ cli.run }
       doc = REXML::Document.new File.new(File.join(Oddb2xml::WorkDir, 'oddb_substance.xml'))
       names = XPath.match( doc, "//NAML" )
-      names.size.should == 10
+      names.size.should == 11
       names.find_all{|x| x.text.match('Lamivudinum') }.size.should == 1
     end
 
@@ -413,8 +415,8 @@ describe Oddb2xml::Builder do
         product_xml.should_not match(/ZYVOXID/i)
       end
       doc = REXML::Document.new File.new(product_filename)
-      XPath.match( doc, "//PRD" ).find_all{|x| true}.size.should == 17
-      XPath.match( doc, "//GTIN" ).find_all{|x| true}.size.should == 17
+      XPath.match( doc, "//PRD" ).find_all{|x| true}.size.should == NrPackages
+      XPath.match( doc, "//GTIN" ).find_all{|x| true}.size.should == NrPackages
       XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should == 1
     end
 

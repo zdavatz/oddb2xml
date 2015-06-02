@@ -292,7 +292,7 @@ module Oddb2xml
               :prodno               => prodno ? prodno : '',
               :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
               :swissmedic_category  => row[cat].value.to_s,
-              :atc_code             => row[atc] ? row[atc].value.to_s : '',
+              :atc_code             => row[atc] ? Oddb2xml.add_epha_changes_for_ATC(row[i_5].value.to_s, row[atc].value.to_s) : '',
               :list_code            => row[list_code] ? row[list_code].value.to_s : '',
               :package_size         => row[siz] ? row[siz].value.to_s : '',
               :einheit_swissmedic   => row[eht] ? row[eht].value.to_s : '',

@@ -62,6 +62,10 @@ describe Oddb2xml::MigelExtractor do
 end
 
 describe Oddb2xml::SwissmedicInfoExtractor do
+  before(:each) do
+    setup_epha_atc_csv_mock
+  end
+
   context 'when transfer.dat is empty' do
     subject { Oddb2xml::SwissmedicInfoExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
@@ -70,7 +74,7 @@ describe Oddb2xml::SwissmedicInfoExtractor do
     it {
         filename = File.join(Oddb2xml::SpecData, 'swissmedic_package.xlsx')
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :package).to_hash
-        expect(@packs.size).to eq(16)
+        expect(@packs.size).to eq(17)
         serocytol = nil
         @packs.each{|pack|
                     serocytol = pack[1] if pack[0].to_s == '00274001'

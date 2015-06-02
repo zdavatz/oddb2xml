@@ -14,7 +14,6 @@ include Oddb2xml
 describe Oddb2xml::Calc do
   RunAllTests = true
 
-
   after(:each) do
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, '*.*')))
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, 'downloads', '*')))
@@ -22,6 +21,7 @@ describe Oddb2xml::Calc do
   before(:each) do
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, '*.xml')))
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WorkDir, '*.csv')))
+    setup_epha_atc_csv_mock
   end
 
   Line_1 = 'I) Glucoselösung: glucosum anhydricum 150 g ut glucosum monohydricum, natrii dihydrogenophosphas dihydricus 2.34 g, zinci acetas dihydricus 6.58 mg, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.'
@@ -142,6 +142,14 @@ Corresp. 5300 kJ.",
                             )
 
 if RunAllTests
+  context "adapt ATC for epha 16105 C05BA" do
+    specify { expect(Oddb2xml.add_epha_changes_for_ATC(16105, 'C05BA')).to eq 'C05BA01' }
+  end
+
+  context "adapt ATC for epha 161 C05BA" do
+    specify { expect(Oddb2xml.add_epha_changes_for_ATC(161, 'C05BA')).to eq 'C05BA' }
+  end
+
   context 'handle E substances correctly' do
     e_200_examples =
         {
@@ -373,6 +381,7 @@ if RunAllTests
       XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/NAME").first.text.should eq "Caverject DC 20, Injektionspräparat"
       XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size.should eq 5
       XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq "aqua ad iniectabilia q.s. ad solutionem"
+
     end
   end
 
