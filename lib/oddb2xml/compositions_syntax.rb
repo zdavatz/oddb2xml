@@ -399,9 +399,6 @@ class CompositionParser < Parslet::Parser
     str('doses ') |
     str('Pulver: ') |
     str('Diluens: ') |
-    str('Solvens (i.v.): ') |
-    str('Solvens (i.m.): ') |
-    str('Solvens: ') |
     str('Solutio reconstituta:') |
     str('Corresp., ') |
     str('Corresp. ') |
@@ -411,6 +408,13 @@ class CompositionParser < Parslet::Parser
                         ((label_id >> label_separator >> space? >> str('et ').maybe).repeat(1) >> any.repeat(1)).as(:corresp)
                       }
   rule(:corresp_line_neu) { corresp_label >> any.repeat(1).as(:corresp) }
+
+  rule(:solvens_label) {
+    str('Solvens (i.v.)') |
+    str('Solvens (i.m.)') |
+    str('Solvens')
+  }
+  rule(:solvens_line) { solvens_label.as(:label) >> (str(': ') >> composition.repeat(1).as(:composition) | any.repeat(1).as(:corresp))}
 
   rule(:multiple_et_line) {
                         ((label_id >> label_separator >> space? >> (str('pro usu') |str('et '))).repeat(1) >> any.repeat(1)).as(:corresp)
@@ -425,12 +429,25 @@ class CompositionParser < Parslet::Parser
                                 composition.as(:composition)  }
 
   rule(:expression_comp) {
+    solvens_line |
     multiple_et_line |
     label_id_composition |
     corresp_line_neu |
     leading_label.maybe >> space? >> composition.as(:composition) >> space? >> str('.').maybe >> space? |
     polvac |
     label_comment_excipiens |
+    excipiens.as(:composition) |
+    space.repeat(3)
+  }
+
+  rule(:expression_compD) {
+    solvens_line |
+    multiple_et_line.as('multiple_et_line') |
+    label_id_composition.as('label_id_composition') |
+    corresp_line_neu.as('corresp_line_neu') |
+    leading_label.maybe >> space? >> composition.as(:composition) >> space? >> str('.').maybe >> space? |
+    polvac.as('polvac') |
+    label_comment_excipiens.as('label_comment_excipiens') |
     excipiens.as(:composition) |
     space.repeat(3)
   }

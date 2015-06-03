@@ -1,3 +1,9 @@
+=== 2.1.5 / 03.06.2015
+
+* Give substances for lines starting with Solvens
+* Emit label Solvens when line stars with Solvens
+* Don't emit SUBSTANCES if no substance is contained
+
 === 2.1.4 / 02.06.2015
 
 * Consider changes in ATC-codes by EPha

@@ -142,6 +142,16 @@ Corresp. 5300 kJ.",
                             )
 
 if RunAllTests
+  context 'should parse Solvens:' do
+    text = 'Solvens: conserv.: alcohol benzylicus 18 mg, aqua ad iniectabilia q.s. ad solutionem pro 2 ml.'
+    info = Calc.new('Solu-Cortef 100 mg, Injektions-/Infusionspräparat', nil, nil,
+                      'hydrocortisonum',
+                      text
+                      )
+    specify { expect(info.compositions.first.substances.first.name).to eq   "Alcohol Benzylicus" }
+    specify { expect(info.compositions.first.substances.size).to eq  1 }
+  end
+
   context "adapt ATC for epha 16105 C05BA" do
     specify { expect(Oddb2xml.add_epha_changes_for_ATC(16105, 'C05BA')).to eq 'C05BA01' }
   end
@@ -311,9 +321,9 @@ if RunAllTests
       File.exists?(oddb_calc_xsd).should eq true
       xsd = Nokogiri::XML::Schema(File.read(oddb_calc_xsd))
       doc = Nokogiri::XML(File.read(xml_file_name))
+      # puts xml; binding.pry
       xsd.validate(doc).each do |error|  expect(error).to be_nil end
       doc = REXML::Document.new xml
-      # puts xml; binding.pry
       gtin = '7680540151009'
       ean12 = '7680' + sprintf('%05d',tst_naropin.iksnr_A) + sprintf('%03d',tst_naropin.pack_K)
       ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))

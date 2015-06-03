@@ -713,12 +713,14 @@ module Oddb2xml
                 info.compositions.each { |composition|
                   xml.COMPOSITION {
                     xml.EXCIPIENS { emit_substance(xml, composition.excipiens) } if composition.excipiens
-                    xml.CORRESP composition.corresp if composition.corresp
                     xml.LABEL composition.label if composition.label
                     xml.LABEL_DESCRIPTION composition.label_description if composition.label_description
-                    xml.SUBSTANCES {
-                        composition.substances.each { |substance| xml.SUBSTANCE { emit_substance(xml, substance, true) }}
-                    } if composition.substances
+                    xml.CORRESP composition.corresp if composition.corresp
+                    if composition.substances and composition.substances.size > 0
+                      xml.SUBSTANCES {
+                          composition.substances.each { |substance| xml.SUBSTANCE { emit_substance(xml, substance, true) }}
+                      }
+                    end
                   }
                 }
               }

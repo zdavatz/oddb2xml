@@ -441,6 +441,7 @@ class ParseComposition
       end
       result.label_description = label_description.gsub(/:+$/, '').strip if label_description
     end
+    result.corresp = ast[:corresp].to_s.sub(/:\s+/, '') if not result.corresp and ast.is_a?(Hash) and ast[:corresp]
     return result
   end
 end

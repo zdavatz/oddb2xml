@@ -24,23 +24,9 @@ to_add = %(
       pp composition; binding.pry
 )
 
-  context "should handle failed" do
-  strings = [
-    ]
-    strings.each{ |string|
-      composition = ParseComposition.from_string(string)
-      binding.pry if composition.substances.size == 0
-      specify { expect( composition.substances.size).not_to eq 0 }
-    }
-  end
-
 end
 
 if RunFailingSpec
-describe ParseComposition do
-
-end
-
 end
 
 describe ParseComposition do

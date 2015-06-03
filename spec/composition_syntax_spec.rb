@@ -23,12 +23,12 @@ let(:parser) { CompositionParser.new }
     let(:substance_name_parser) { parser.substance_name }
     let(:number_parser) { parser.number }
     let(:excipiens_parser) { parser.excipiens }
-    let(:composition_parser) { parser.composition }
+    let(:composition_parser) { parser }
 
     it "parses identifier" do
-      res1 = substance_parser.parse_with_debug('pollinis allergeni extractum (alnus glutinosa, betula alba, corylus avellana) 300 U.: excipiens ad solutionem pro 1 ml')
-      pp res1
-      # binding.pry
+      text = 'Solvens: conserv.: alcohol benzylicus 18 mg, aqua ad iniectabilia q.s. ad solutionem pro 2 ml.'
+      res1 = composition_parser.parse_with_debug(text)
+      pp res1; binding.pry
     end
   end
 end
