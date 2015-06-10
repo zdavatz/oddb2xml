@@ -1,3 +1,7 @@
+=== 2.1.6 / 10.06.2015
+
+* Avoid error when Packungen.xlsx does not contain a name for a product (upstream error, missing Combizym, Dragées)
+
 === 2.1.5 / 03.06.2015
 
 * Give substances for lines starting with Solvens
