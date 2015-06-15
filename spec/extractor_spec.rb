@@ -123,7 +123,6 @@ describe Oddb2xml::MedregbmExtractor do
 end
 
 describe Oddb2xml::ZurroseExtractor do
-if false
   context 'when transfer.dat is empty' do
     subject { Oddb2xml::ZurroseExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
@@ -200,11 +199,10 @@ if false
       DAT
       Oddb2xml::ZurroseExtractor.new(dat, true)
     end
-    #it { expect(subject.to_hash.keys.first).to eq("7680316950157") }
+    it { expect(subject.to_hash.keys.first).to eq("0000008807890") }
     it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("2") end
-    it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to eq("Ethacridin lactat 1 100ml") end
-  end if false
-end
+    it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to match(/Ethacridin lactat 1.+ 100ml/) end
+  end
   context 'when parsing examples' do
     subject do
       filename = File.expand_path(File.join(__FILE__, '..', 'data', 'zurrose_transfer.dat'))
