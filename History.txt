@@ -1,3 +1,9 @@
+=== 2.1.7 / 15.06.2015
+
+* Fixed option -o which did not produce any meaningful oddb_fi.xml
+* Added KOMPENDIUM_PRODUCT to xsd file
+* Added style for each KOMPENDIUM_PRODUCT
+
 === 2.1.6 / 10.06.2015
 
 * Avoid error when Packungen.xlsx does not contain a name for a product (upstream error, missing Combizym, Dragées)

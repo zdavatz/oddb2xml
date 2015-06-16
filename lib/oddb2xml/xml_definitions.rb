@@ -229,6 +229,7 @@ class MedicalInformationContent
   attribute :lang
   element :title
   element :authHolder
+  element :authNrs
   element :style
   element :content
 end

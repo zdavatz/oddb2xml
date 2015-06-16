@@ -32,7 +32,7 @@ def check_validation_via_xsd
   @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
   File.exists?(@oddb2xml_xsd).should eq true
   files = Dir.glob('*.xml')
-  xsd = Nokogiri::XML::Schema(File.read(@oddb2xml_xsd))                                        
+  xsd = Nokogiri::XML::Schema(File.read(@oddb2xml_xsd))
   files.each{
     |file|
     $stderr.puts "Validating file #{file} with #{File.size(file)} bytes" if $VERBOSE
@@ -55,6 +55,34 @@ describe Oddb2xml::Builder do
   after(:each) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
+  context 'fachinfo' do
+    let(:cli) do
+        opts = {}
+        @oddb_fi_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_fi.xml'))
+        @oddb_fi_product_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_fi_product.xml'))
+        options = Oddb2xml::Options.new
+        options.parser.parse!(['-o'])
+        Oddb2xml::Cli.new(options.opts)
+    end
+
+    it 'should return produce a correct oddb_fi.xml' do
+      # res = buildr_capture(:stdout){ cli.run }
+      cli.run
+      File.exists?(@oddb_fi_xml).should eq true
+      inhalt = IO.read(@oddb_fi_xml)
+      /<KMP/.match(inhalt.to_s).to_s.should eq '<KMP'
+      /<style><!\[CDATA\[p{margin-top/.match(inhalt.to_s).to_s.should eq '<style><![CDATA[p{margin-top'
+      m = /<paragraph><!\[CDATA\[(.+)\n(.*)/.match(inhalt.to_s)
+      m[1].should eq '<?xml version="1.0" encoding="utf-8"?><div xmlns="http://www.w3.org/1999/xhtml">'
+      expected = '<p class="s2"> </p>'
+      m[2].should eq '<p class="s2"> </p>'
+      File.exists?(@oddb_fi_product_xml).should eq true
+      inhalt = IO.read(@oddb_fi_product_xml)
+      skip "Niklaus does not know how to create a valid oddb_fi_product.xml"
+      check_validation_via_xsd
+    end
+  end
+
   context 'XSD-generation: ' do
     let(:cli) do
         opts = {}

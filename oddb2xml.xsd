@@ -1113,4 +1113,51 @@
       </xs:restriction>
     </xs:simpleType>
   </xs:element>
+  <xs:element name="KP">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="MONID" type="xs:string" />
+        <xs:element name="PRDNO" type="xs:string" />
+        <xs:element name="DEL" type="xs:boolean" />
+      </xs:sequence>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="KOMPENDIUM_PRODUCT">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:KP"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="KMP">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="owner" type="xs:string" />
+        <xs:element name="monid" type="xs:string" />
+        <xs:element name="style" type="xs:string" />
+        <xs:element name="paragraph" type="xs:string" />
+      </xs:sequence>
+      <xs:attribute name="MONTYPE" use="required"/>
+      <xs:attribute name="LANG" use="required"/>
+      <xs:attribute name="DT" use="required"/>
+    </xs:complexType>
+  </xs:element>
+	<xs:element name="KOMPENDIUM">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:KMP"/>
+        <xs:element ref="ns1:RESULT"/>
+      </xs:sequence>
+      <xs:attribute name="CREATION_DATETIME" use="required"/>
+      <xs:attribute name="PROD_DATE" use="required"/>
+      <xs:attribute name="VALID_DATE" use="required"/>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

@@ -354,25 +354,21 @@ module Oddb2xml
         item[:refdata] = true,
         item[:name]  = (name = pac.title) ? name : ''
         item[:owner] = (ownr = pac.authHolder) ? ownr : ''
-        if content = /cdata/.match(pac.content)
-          html = Nokogiri::HTML(content.to_s)
-          # all HTML contents without MonTitle and ownerCompany
-          item[:paragraph] =  "<title><p>#{item[:name]}</p></title>" +
-             ((paragraph = html.xpath("///div[@class='paragraph']")) ? paragraph.to_s : '')
-          if text = html.xpath("///div[@id='Section7750']/p").text
-            # 1 ~ 3 swissmedic number
-            if text =~ /(\d{5})[,\s]*(\d{5})?|(\d{5})[,\s]*(\d{5})?[,\s]*(\d{5})?/
+        item[:style] =  Nokogiri::HTML.fragment(pac.style).to_html(:encoding => 'UTF-8')
+        html = Nokogiri::HTML.fragment(pac.content.force_encoding('UTF-8'))
+        item[:paragraph] = html
+        numbers =  /(\d{5})[,\s]*(\d{5})?|(\d{5})[,\s]*(\d{5})?[,\s]*(\d{5})?/.match(html)
+        if numbers
               [$1, $2, $3].compact.each do |n| # plural
                 item[:monid] = n
                 data[lang] << item
               end
-            end
-          end
         end
       end
       data
     end
   end
+
   class EphaExtractor < Extractor
     def initialize(str)
       @io = StringIO.new(str)

@@ -62,10 +62,32 @@ describe Oddb2xml::MigelExtractor do
 end
 
 describe Oddb2xml::SwissmedicInfoExtractor do
+  include ServerMockHelper
+  before(:each) do
+    setup_swissmedic_info_server_mock
+    @downloader = Oddb2xml::SwissmedicInfoDownloader.new
+  end
+  context 'builds fachfinfo' do
+    it {
+        xml = @downloader.download
+        @infos = Oddb2xml::SwissmedicInfoExtractor.new(xml).to_hash
+        expect(@infos.size).to eq(1)
+        erbiumcitrat = nil
+        @infos['de'].each{|info|
+                    erbiumcitrat = info if /Erbiumcitrat/.match(info[:name])
+                   }
+        expect(erbiumcitrat[:owner]).to eq('CBI Medical Products Vertriebs GmbH')
+        expect(erbiumcitrat[:paragraph].to_s).to match(/Packungen/)
+        expect(erbiumcitrat[:paragraph].to_s).to match(/Stand der Information/)
+        expect(erbiumcitrat[:paragraph].to_s).to match(/Zulassungsinhaberin/)
+      }
+  end
+end
+
+describe Oddb2xml::SwissmedicExtractor do
   before(:each) do
     setup_epha_atc_csv_mock
   end
-
   context 'when transfer.dat is empty' do
     subject { Oddb2xml::SwissmedicInfoExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
@@ -225,7 +247,5 @@ describe Oddb2xml::ZurroseExtractor do
           }
 
   end
-
-
 
 end
