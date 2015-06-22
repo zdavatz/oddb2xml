@@ -1,9 +1,5 @@
 # encoding: utf-8
 
-begin
-require 'pry'
-rescue LoadError
-end
 require 'pp'
 VERBOSE_MESSAGES = false
 require 'spec_helper'
@@ -1375,8 +1371,6 @@ describe ParseComposition do
     rescue Parslet::ParseFailed
       @nrErrors += 1
       puts "#{File.basename(AllCompositionLines)}:#{nr} parse_error #{@nrErrors} in: #{line}"
-#      binding.pry
-#      binding.pry if nr > 300
     end
     }
     at_exit { puts "Testing whether #{nr} composition lines can be parsed. Found #{@nrErrors} errors in #{(Time.now - start_time).to_i} seconds" }

@@ -47,6 +47,7 @@ module Oddb2xml
   end
   
   def Oddb2xml.skip_download(file)
+    return false if defined?(VCR)
     dest = "#{Downloads}/#{File.basename(file)}"
     if File.exists?(dest)
       FileUtils.cp(dest, file, :verbose => false, :preserve => true) unless File.expand_path(file).eql?(dest)

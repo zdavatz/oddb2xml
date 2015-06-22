@@ -1,5 +1,7 @@
 # encoding: utf-8
 
+require 'net/ntlm/version' # needed to avoid error: uninitialized constant Net::NTLM::VERSION
+require 'rubyntlm'
 require 'mechanize'
 require 'zip'
 require 'savon'
@@ -34,7 +36,7 @@ module Oddb2xml
     end
   end
   class Downloader
-    attr_reader :type
+    attr_reader :type, :agent
     def initialize(options={}, url=nil)
       @options     = options
       @url         = url
@@ -55,6 +57,7 @@ module Oddb2xml
         cert_store.add_file(File.expand_path('../../../tools/cacert.pem', __FILE__))
         @agent.cert_store = cert_store
       end
+      @agent.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
     protected
     def retrievable?
@@ -133,14 +136,14 @@ module Oddb2xml
   class BMUpdateDownloader < Downloader
     include DownloadMethod
     def download
-      @url ||= 'https://raw.github.com/zdavatz/oddb2xml_files/master/BM_Update.txt'
+      @url ||= 'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/BM_Update.txt'
       download_as('oddb2xml_files_bm_update.txt', 'r')
     end
   end
   class LppvDownloader < Downloader
     include DownloadMethod
     def download
-      @url ||= 'https://raw.github.com/zdavatz/oddb2xml_files/master/LPPV.txt'
+      @url ||= 'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt'
       download_as('oddb2xml_files_lppv.txt', 'r')
     end
   end
@@ -282,7 +285,7 @@ XML
       begin
         FileUtils.rm(File.expand_path(file), :verbose => !defined?(RSpec)) if File.exists?(File.expand_path(file))
         page = @agent.get(@url)
-        if link_node = page.search(@xpath).first
+        if !page.class.is_a?(String) and link_node = page.search(@xpath).first
           link = Mechanize::Page::Link.new(link_node, @agent, page)
           response = link.click
           response.save_as(file)

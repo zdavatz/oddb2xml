@@ -8,7 +8,6 @@ require 'csv'
 require 'oddb2xml/xml_definitions'
 
 module Oddb2xml
-  Strip_For_Sax_Machine = '<?xml version="1.0" encoding="utf-8"?>'+"\n"
   module TxtExtractorMethods
     def initialize(str)
       @io = StringIO.new(str)

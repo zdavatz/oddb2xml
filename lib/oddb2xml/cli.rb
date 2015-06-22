@@ -76,7 +76,7 @@ module Oddb2xml
         end
       end
       begin
-        threads.map(&:join)
+        # threads.map(&:join) # TODO
       rescue SystemExit
         @mutex.synchronize do
           if @_message
@@ -170,7 +170,7 @@ module Oddb2xml
       case what
       when :company, :person
         var = (what == :company ? 'companies' : 'people')
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = MedregbmDownloader.new(what)
           str = downloader.download
           self.instance_variable_set(
@@ -179,7 +179,7 @@ module Oddb2xml
           )
         end
       when :fachinfo
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = SwissmedicInfoDownloader.new
           xml = downloader.download
           @mutex.synchronize do
@@ -190,7 +190,7 @@ module Oddb2xml
         end
       when :orphan, :fridge
         var = what.to_s + 's'
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = SwissmedicDownloader.new(what)
           bin = downloader.download
           self.instance_variable_set(
@@ -200,7 +200,7 @@ module Oddb2xml
 #          Oddb2xml.log("SwissmedicExtractor added #{self.instance_variable_get("@#{var}".intern).size} #{var}. File #{bin} was #{File.size(bin)} bytes")
         end
       when :interaction
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = EphaDownloader.new
           str = downloader.download
           @mutex.synchronize do
@@ -209,7 +209,7 @@ module Oddb2xml
           end
         end
       when :migel
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = MigelDownloader.new
           bin = downloader.download
           @mutex.synchronize do
@@ -218,7 +218,7 @@ module Oddb2xml
           end
         end
       when :package
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = SwissmedicDownloader.new(:package, @options)
           bin = downloader.download
           @mutex.synchronize do
@@ -228,7 +228,7 @@ module Oddb2xml
           end
         end
       when :bm_update
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = BMUpdateDownloader.new
           str = downloader.download
           @mutex.synchronize do
@@ -237,7 +237,7 @@ module Oddb2xml
           end
         end
       when :lppv
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = LppvDownloader.new
           str = downloader.download
           @mutex.synchronize do
@@ -246,7 +246,7 @@ module Oddb2xml
           end
         end
       when :bag
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = BagXmlDownloader.new(@options)
           xml = downloader.download
           @mutex.synchronize do
@@ -256,18 +256,18 @@ module Oddb2xml
           end
         end
       when :zurrose
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = ZurroseDownloader.new(@options, @options[:transfer_dat])
           xml = downloader.download
           Oddb2xml.log("zurrose xml #{xml.size} bytes")
           @mutex.synchronize do
             hsh = ZurroseExtractor.new(xml, @options[:extended]).to_hash
+            Oddb2xml.log("zurrose added #{hsh.size} items from xml with #{xml.size} bytes")
             @infos_zur_rose = hsh
-            Oddb2xml.log("zurrose added #{@infos_zur_rose.size} items from xml with #{xml.size} bytes")
           end
         end
       when :index
-        Thread.new do
+        begin # instead of Thread.new do
           downloader = SwissIndexDownloader.new(@options, type, lang)
           begin
             xml = downloader.download

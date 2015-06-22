@@ -149,9 +149,7 @@ def test_one_string(parser, string, expected)
   res1.delete(:unit)  if res1
   stringified = res1 ? res1.to_s.gsub(/@\d+/, '') : nil
   if res1 == nil or ! stringified.eql? expected.to_s
-    puts "Failed testing: #{string}"
-    pp res1
-    binding.pry
+    puts "Failed testing: #{string}"; binding.pry
   end
   expect(stringified).to eq expected.to_s if expected
 end

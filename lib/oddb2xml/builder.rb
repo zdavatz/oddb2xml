@@ -480,10 +480,10 @@ module Oddb2xml
             xml.PRD('DT' => '') {
             ean = obj[:ean].to_s
             xml.GTIN ean
-            xml.PRODNO obj[:prodno]                                 if obj[:prodno] and obj[:prodno].empty?
+            xml.PRODNO obj[:prodno]                                 if obj[:prodno]
             xml.DSCRD  obj[:sequence_name]                          if obj[:sequence_name]
             xml.DSCRF  obj[:sequence_name]                          if obj[:sequence_name]
-            xml.ATC obj[:atc_code]                                  if obj[:atc_code]
+            xml.ATC obj[:atc_code]                                  if obj[:atc_code] and !obj[:atc_code].empty?
             xml.IT  obj[:ith_swissmedic]                            if obj[:ith_swissmedic]
             xml.CPT
             xml.PackGrSwissmedic      obj[:package_size]            if obj[:package_size]

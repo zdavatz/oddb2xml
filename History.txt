@@ -1,3 +1,7 @@
+=== 2.1.8 / 22.06.2015
+
+* Use vcr to fake web traffic
+
 === 2.1.7 / 15.06.2015
 
 * Fixed option -o which did not produce any meaningful oddb_fi.xml

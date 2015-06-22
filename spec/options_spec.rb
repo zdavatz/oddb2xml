@@ -2,19 +2,6 @@
 
 require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/options"
-module Kernel
-  def cli_capture(stream)
-    begin
-      stream = stream.to_s
-      eval "$#{stream} = StringIO.new"
-      yield
-      result = eval("$#{stream}").string
-    ensure
-      eval "$#{stream} = #{stream.upcase}"
-    end
-    result
-  end
-end
 
 describe Oddb2xml::Options do
   include ServerMockHelper

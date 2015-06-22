@@ -11,6 +11,8 @@ require 'socket'
 
 def test_one_call(cmd)
   dest = File.join(Ausgabe, cmd.gsub(/[ -]/, '_'))
+  all_downloads = File.join(dest, 'downloads'))
+  FileUtils.makedirs(all_downloads) unless File.exists?(all_downloads)
   cmd.sub!('oddb2xml',  'oddb2xml --skip-download --log')
   files = (Dir.glob('%.xls*') + Dir.glob('*.dat*') + Dir.glob('*.xml'))
   FileUtils.rm(files, :verbose => true)
@@ -28,6 +30,9 @@ def test_one_call(cmd)
   FileUtils.cp(Dir.glob('*.dat'), dest, :preserve => true, :verbose => true) if Dir.glob('*.dat').size > 0
   FileUtils.cp(Dir.glob('*.xml'), dest, :preserve => true, :verbose => true) if Dir.glob('*.xml').size > 0
   FileUtils.cp(Dir.glob('*.gz'),  dest, :preserve => true, :verbose => true) if Dir.glob('*.gz').size > 0
+  downloaded_files = Dir.glob("#{dest}/*/downloads/*")
+  FileUtils.mv(downloaded_files,  all_downloads, :verbose => true) if downloaded_files.size > 0
+  FileUtils.rm(Dir.glob("#{dest}/*#{Time.now.year}*.xml"), :verbose => true)
 end
 
 def prepare_for_gem_test
