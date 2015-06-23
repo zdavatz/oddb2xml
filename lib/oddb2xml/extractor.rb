@@ -82,8 +82,9 @@ module Oddb2xml
           phar = pac.Pharmacode
           phar = correct_code(phar.to_s, 7)
           ean = pac.GTIN
+          binding.pry if pac.GTIN.to_s.eql? '7680324750190'  # lansoyl
           search_key = phar.to_i != 0 ? phar : ean
-          # as common key with swissINDEX
+          # as common key with RefData Pharma/NonPharma data
           item[:pharmacodes] << phar
           # packages
           exf = {:price => '', :valid_date => '', :price_code => ''}
@@ -177,38 +178,34 @@ module Oddb2xml
     end
   end
 
-  class SwissIndexExtractor < Extractor
+  class RefdataExtractor < Extractor
     def initialize(xml, type)
       @type = (type == :pharma ? 'PHARMA' : 'NONPHARMA')
       super(xml)
     end
     def to_hash
       data = {}
-      result = PharmaEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
-      items = result.PHARMA.ITEM
+      result = SwissRegArticleEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
+      items = result.ARTICLE.ITEM
       items.each do |pac|
         item = {}
         item[:refdata]         = true
-        item[:_type]           = @type.downcase.intern
+        item[:_type]           = (typ  = pac.ATYPE.downcase.to_sym)  ? typ: ''
         item[:ean]             = (gtin = pac.GTIN)   ? gtin: ''
         item[:pharmacode]      = (phar = pac.PHAR)   ? phar: ''
-        item[:stat_date]       = (date = pac.SDATE)  ? date: ''
-        item[:lang]            = (lang = pac.LANG)   ? lang: ''
-        item[:desc]            = (dscr = pac.DSCR)   ? dscr: ''
+        item[:last_change]     = (date = Time.parse(pac.DT).to_s)  ? date: ''  # Date and time of last data change
+        item[:desc_de]         = (dscr = pac.NAME_DE)   ? dscr: ''
+        item[:desc_fr]         = (dscr = pac.NAME_FR)   ? dscr: ''
         item[:atc_code]        = (code = pac.ATC)    ? code.to_s : ''
-        # as quantity text
-        item[:additional_desc] = (dscr = pac.ADDSCR) ? dscr: ''
-        if comp = pac.COMP
-          item[:company_name] = (nam = comp.NAME) ? nam: ''
-          item[:company_ean]  = (gln = comp.GLN)  ? gln: ''
-        end
+				item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam: ''
+				item[:company_ean]  = (gln = pac.AUTH_HOLDER_GLN)  ? gln: ''
         unless item[:pharmacode].empty?
           item[:pharmacode] = correct_code(item[:pharmacode].to_s, 7)
           unless data[item[:pharmacode]] # pharmacode => GTINs
-            data[item[:pharmacode]] = []
+            data[item[:ean]] = []
           end
-          data[item[:pharmacode]] << item
         end
+        data[item[:ean]] = item
       end
       data
     end
@@ -326,13 +323,15 @@ module Oddb2xml
       @sheet.each_with_index do |row, i|
         next if i.zero?
         phar = correct_code(row[1].to_s.gsub(/[^0-9]/, ''), 7)
-        data[phar] = {
+        ean = row[0].to_i.to_s
+        ean = '9999'+phar+'99' unless ean.length == 13
+        data[ean] = {
           :refdata         => true,
-          :ean             => row[0].to_i.to_s,
+          :ean             => ean,
           :pharmacode      => phar,
           :desc_de         => row[3],
           :desc_fr         => row[4],
-          :additional_desc => row[5], # quantity
+          :quantity        => row[5], # quantity
           :company_name    => row[6],
           :company_ean     => row[7].to_i.to_s,
         }
@@ -496,7 +495,7 @@ module Oddb2xml
           :ean   => ean13,
           :vat   => line[96],
           :description => line[10..59].sub(/\s+$/, ''),
-          :additional_desc => '',
+          :quantity => '',
           :pharmacode => pharma_code,
           :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
           :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),

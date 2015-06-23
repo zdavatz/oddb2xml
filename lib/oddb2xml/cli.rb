@@ -13,17 +13,17 @@ require 'date' # for today
 module Oddb2xml
   
   class Cli
+    attr_reader :options
     SUBJECTS  = %w[product article]
     ADDITIONS = %w[substance limitation interaction code]
     OPTIONALS = %w[fi fi_product]
-    LANGUAGES = %w[DE FR] # EN does not exist
     def initialize(args)
       @options = args
       Oddb2xml.save_options(@options)
       @mutex = Mutex.new
       # product
-      @items = {} # Items from Preparations.xml in BAG
-      @index = {} # Base index from swissINDEX
+      @items = {} # Items from Preparations.xml in BAG, using GTINs as key
+      @refdata_types = {} # Base index from refdata
       @flags = {} # narcotics flag files repo
       @lppvs = {} # lppv.txt from files repo
       @infos = {} # [option] FI from SwissmedicInfo
@@ -36,9 +36,6 @@ module Oddb2xml
       # addres
       @companies = [] # betrieb
       @people    = [] # medizinalperson
-      LANGUAGES.each do |lang|
-        @index[lang] = {}
-      end
       @_message = false
     end
     def run
@@ -69,10 +66,8 @@ module Oddb2xml
         threads << download(:bm_update) # oddb2xml_files
         threads << download(:lppv) # oddb2xml_files
         threads << download(:bag) # bag.e-mediat
-        LANGUAGES.each do |lang|
-          types.each do |type|
-            threads << download(:index, type, lang) # swissindex
-          end
+        types.each do |type|
+          threads << download(:refdata, type) # refdata
         end
       end
       begin
@@ -95,6 +90,7 @@ module Oddb2xml
     private
     def build
       Oddb2xml.log("Start build")
+      puts "#{File.basename(__FILE__)}:#{__LINE__}: @refdata_types.keys #{@refdata_types.keys}"
       begin
         # require 'pry'; binding.pry
         @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not @options[:extended]
@@ -109,14 +105,11 @@ module Oddb2xml
               builder.people    = @people
             else # product
               if @options[:format] != :dat
-                index = {}
-                LANGUAGES.each do |lang|
-                  index[lang] = {} unless index[lang]
-                  types.each do |type|
-                    index[lang].merge!(@index[lang][type]) if @index[lang][type]
-                  end
+                refdata = {}
+                types.each do |type|
+                  refdata.merge!(@refdata_types[type]) if @refdata_types[type]
                 end
-                builder.index = index
+                builder.refdata = refdata
                 builder.subject = sbj
               end
               # common sources
@@ -136,12 +129,9 @@ module Oddb2xml
           output = ''
           if !@options[:address] and (@options[:format] == :dat)
             types.each do |type|
-              index = {}
-              LANGUAGES.each do |lang|
-                index[lang] = @index[lang][type]
-              end
+              refdata1 = {}
               _sbj = (type == :pharma ? :dat : :with_migel_dat)
-              builder.index   = index
+              builder.refdata = @refdata_types[type]
               builder.subject = _sbj
               builder.ean14   = @options[:ean14]
               if type == :nonpharma
@@ -166,7 +156,7 @@ module Oddb2xml
         raise Interrupt
       end
     end
-    def download(what, type=nil, lang=nil)
+    def download(what, type=nil)
       case what
       when :company, :person
         var = (what == :company ? 'companies' : 'people')
@@ -252,7 +242,7 @@ module Oddb2xml
           @mutex.synchronize do
             hsh = BagXmlExtractor.new(xml).to_hash
             @items = hsh
-            Oddb2xml.log("BagXmlDownloader added #{@items.size} items")
+            Oddb2xml.log("BagXmlDownloader added #{@items.size} items. #{@items.keys}")
           end
         end
       when :zurrose
@@ -266,11 +256,13 @@ module Oddb2xml
             @infos_zur_rose = hsh
           end
         end
-      when :index
+      when :refdata
         begin # instead of Thread.new do
-          downloader = SwissIndexDownloader.new(@options, type, lang)
+          downloader = RefdataDownloader.new(@options, type)
           begin
             xml = downloader.download
+            Oddb2xml.log("refdata #{type} xml #{xml.size} bytes")
+            xml
           rescue SystemExit
             @mutex.synchronize do
               unless @_message # hook only one exit
@@ -280,8 +272,9 @@ module Oddb2xml
             end
           end
           @mutex.synchronize do
-            hsh = SwissIndexExtractor.new(xml, type).to_hash
-            @index[lang][type] = hsh
+            hsh = RefdataExtractor.new(xml, type).to_hash
+            @refdata_types[type] = hsh
+            Oddb2xml.log("refdata #{type} added #{hsh.size} keys now #{@refdata_types.keys} items from xml with #{xml.size} bytes")
           end
         end
       end
@@ -335,19 +328,16 @@ module Oddb2xml
         lines << ParseComposition.report
       end
       unless @options[:address]
-        LANGUAGES.each do |lang|
-          lines << lang
-          types.each do |type|
-            if @index[lang][type]
-              indices = @index[lang][type].values.flatten.length
-              if type == :nonpharma
-                migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode].empty? }.map{|m| m[:pharmacode] }
-                nonpharmas = @index[lang][type].keys
-                indices += (migel_xls - nonpharmas).length # ignore duplicates, null
-                lines << sprintf("\tNonPharma products: %i", indices)
-              else
-                lines << sprintf("\tPharma products: %i", indices)
-              end
+        types.each do |type|
+          if @refdata_types[type]
+            indices = @refdata_types[type].values.flatten.length
+            if type == :nonpharma
+              migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode].empty? }.map{|m| m[:pharmacode] }
+              nonpharmas = @refdata_types[type].keys
+              indices += (migel_xls - nonpharmas).length # ignore duplicates, null
+              lines << sprintf("\tNonPharma products: %i", indices)
+            else
+              lines << sprintf("\tPharma products: %i", indices)
             end
           end
         end
@@ -365,7 +355,7 @@ module Oddb2xml
       end
       puts lines.join("\n")
     end
-    def types # swissindex
+    def types # RefData
       @_types ||=
         if @options[:nonpharma]
           [:pharma, :nonpharma]

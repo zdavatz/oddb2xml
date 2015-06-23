@@ -206,11 +206,10 @@ module Oddb2xml
       content
     end
   end
-  class SwissIndexDownloader < Downloader
-    def initialize(options={}, type=:pharma, lang='DE')
+  class RefdataDownloader < Downloader
+    def initialize(options={}, type=:pharma)
       @type = (type == :pharma ? 'Pharma' : 'NonPharma')
-      @lang = lang
-      url = "https://index.ws.e-mediat.net/Swissindex/#{@type}/ws_#{@type}_V101.asmx?WSDL"
+      url = "http://refdatabase.refdata.ch/Service/Article.asmx?WSDL"
       super(options, url)
     end
     def init
@@ -225,19 +224,21 @@ module Oddb2xml
     end
     def download
       begin
-        filename =  "swissindex_#{@type}_#{@lang}.xml"
-        file2save = File.join(Downloads, "swissindex_#{@type}_#{@lang}.xml")
+        filename =  "refdata_#{@type}.xml"
+        file2save = File.join(Downloads, "refdata_#{@type}.xml")
+				soap = %(<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://refdatabase.refdata.ch/Article_in" xmlns:ns2="http://refdatabase.refdata.ch/">
+  <SOAP-ENV:Body>
+    <ns2:DownloadArticleInput>
+      <ns1:ATYPE>#{@type.upcase}</ns1:ATYPE>
+    </ns2:DownloadArticleInput>
+  </SOAP-ENV:Body>
+  </SOAP-ENV:Envelope>
+</ns1:ATYPE></ns2:DownloadArticleInput></SOAP-ENV:Body>
+)
         return IO.read(file2save) if Oddb2xml.skip_download? and File.exists?(file2save)
         FileUtils.rm_f(file2save, :verbose => false)
-        soap = <<XML
-<?xml version="1.0" encoding="utf-8"?>
-<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
-<soap:Body>
-  <lang xmlns="http://swissindex.e-mediat.net/Swissindex#{@type}_out_V101">#{@lang}</lang>
-</soap:Body>
-</soap:Envelope>
-XML
-        response = @client.call(:download_all, :xml => soap)
+        response = @client.call(:download, :xml => soap)
         if response.success?
           if xml = response.to_xml
             response = nil # win

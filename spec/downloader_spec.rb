@@ -59,7 +59,78 @@ ensure
   Dir.chdir(savedDir)
 end
 
-describe Oddb2xml::SwissmedicDownloader do
+describe Oddb2xml::RefdataDownloader do
+  include ServerMockHelper
+  before(:all) do
+    VCR.eject_cassette
+    VCR.configure do |c|
+      c.before_record(:Refdata_DE) do |i|
+        if not /WSDL$/.match(i.request.uri) and /refdatabase.refdata.ch\/Service/.match(i.request.uri) and i.response.body.size > 1024*1024
+          puts "#{Time.now}: #{__LINE__}: Parsing response.body (#{i.response.body.size} bytes) will take some time. URI was #{i.request.uri}"
+          doc = REXML::Document.new(i.response.body)
+          items = doc.root.children.first.elements.first
+          nrItems = doc.root.children.first.elements.first.elements.size
+          puts "#{Time.now}: #{__LINE__}: Removing most of the #{nrItems} items will take some time"
+          nrSearched = 0
+          items.elements.each{
+            |x|
+            nrSearched += 1
+            puts "#{Time.now}: #{__LINE__}: nrSearched #{nrSearched}/#{nrItems}" if nrSearched % 1000 == 0
+            items.delete x unless x.elements['GTIN'] and Oddb2xml::GTINS_DRUGS.index(x.elements['GTIN'].text)
+          }
+          i.response.body = doc.to_s
+          puts "#{Time.now}: response.body is now #{i.response.body.size} bytes long"
+          i.response.headers['Content-Length'] = i.response.body.size
+        end
+      end
+    end
+    VCR.insert_cassette('oddb2xml', :tag => :Refdata_DE)
+    common_before
+  end
+  after(:all) do
+    common_after
+  end
+  context 'Pharma' do
+    before(:all) do
+      @downloader = Oddb2xml::RefdataDownloader.new({}, :pharma)
+      @xml = @downloader.download
+    end
+    it_behaves_like 'any downloader'
+    context 'when download_by is called' do
+      it 'should parse response hash to xml' do
+        @xml.should be_a String
+        @xml.length.should_not == 0
+        @xml.should =~ XML_VERSION_1_0
+      end
+      it 'should return valid xml' do
+        @xml.should =~ /PHAR/
+        @xml.should =~ /ITEM/
+      end
+    end
+  end
+
+  context 'NonPharma' do
+    it_behaves_like 'any downloader'
+    before(:all) do
+      @downloader = Oddb2xml::RefdataDownloader.new({}, :nonpharma)
+      @xml = @downloader.download
+    end
+    context 'when download_by is ' do
+      it 'should parse response hash to xml' do
+        @xml.should be_a String
+        @xml.length.should_not == 0
+        @xml.should =~ XML_VERSION_1_0
+      end
+      it 'should return valid xml' do
+        @xml.should =~ /NONPHAR/
+        @xml.should =~ /ITEM/
+      end
+    end
+  end
+end
+
+if true
+	describe Oddb2xml::SwissmedicDownloader do
   include ServerMockHelper
   before(:all) do VCR.eject_cassette end
   before(:each) do
@@ -298,78 +369,14 @@ describe Oddb2xml::BagXmlDownloader do
   end
 end
 
-describe Oddb2xml::SwissIndexDownloader do
-  include ServerMockHelper
-  before(:all) do VCR.eject_cassette end
-  before(:each) do
-    VCR.configure do |c|
-      c.before_record(:SwissIndex_DE) do |i|
-        if not /WSDL$/.match(i.request.uri) and /index.ws.e-mediat.net\/Swissindex/.match(i.request.uri) and i.response.body.size > 1024*1024
-          puts "#{Time.now}: #{__LINE__}: Parsing response.body (#{i.response.body.size} bytes) will take some time. URI was #{i.request.uri}"
-          doc = REXML::Document.new(i.response.body)
-          doc.root.children.first.elements.first.elements.size
-          items = doc.root.children.first.elements.first
-          puts "#{Time.now}: Removing most of the #{items.elements.size} items will take some time"
-          # items.elements.each{ |x| puts x.elements['GTIN'].text if x.elements['GTIN'] }
-          items.elements.each{ |x| items.delete x unless x.elements['GTIN'] and Oddb2xml::GTINS_DRUGS.index(x.elements['GTIN'].text) }
-          i.response.body = doc.to_s
-          puts "#{Time.now}: response.body is now #{i.response.body.size} bytes long"
-          i.response.headers['Content-Length'] = i.response.body.size
-        end
-      end
-    end
-    VCR.insert_cassette('oddb2xml', :tag => :SwissIndex_DE)
-    common_before
-  end
-  after(:each) do
-    common_after
-  end
-  context 'Pharma with DE' do
-    it_behaves_like 'any downloader'
-    context 'when download_by is called with DE' do
-      let(:xml) {
-          @downloader = Oddb2xml::SwissIndexDownloader.new({}, :pharma, 'DE')
-          @downloader.download
-      }
-      it 'should parse response hash to xml' do
-        xml.should be_a String
-        xml.length.should_not == 0
-        xml.should =~ XML_VERSION_1_0
-      end
-      it 'should return valid xml' do
-        xml.should =~ /PHAR/
-        xml.should =~ /ITEM/
-      end
-    end
-  end
-
-  context 'NonPharma with FR' do
-    it_behaves_like 'any downloader'
-    context 'when download_by is called with FR' do
-      let(:xml) {
-        @downloader = Oddb2xml::SwissIndexDownloader.new({}, :nonpharma, 'FR')
-        @downloader.download
-      }
-      it 'should parse response hash to xml' do
-        xml.should be_a String
-        xml.length.should_not == 0
-        xml.should =~ XML_VERSION_1_0
-      end
-      it 'should return valid xml' do
-        xml.should =~ /NONPHAR/
-        xml.should =~ /ITEM/
-      end
-    end
-  end
-end
-
 describe Oddb2xml::LppvDownloader do
   include ServerMockHelper
   before(:all) do VCR.eject_cassette end
-  before(:each) do
-    @downloader = Oddb2xml::LppvDownloader.new
+  before(:all) do
     VCR.insert_cassette('oddb2xml', :tag => :lppv)
     common_before
+    @downloader = Oddb2xml::LppvDownloader.new
+    @text = @downloader.download
   end
   after(:each) do common_after end
 
@@ -377,12 +384,8 @@ describe Oddb2xml::LppvDownloader do
   context 'when download is called' do
     let(:txt) { @downloader.download }
     it 'should read txt as String' do
-      txt.should be_a String
-      txt.bytes.should_not nil
-    end
-    it 'should clean up current directory' do
-      expect { txt }.not_to raise_error
-#      File.exist?('oddb2xml_files_lppv.txt').should eq(false)
+      @text.should be_a String
+      @text.bytes.should_not nil
     end
   end
 end
@@ -398,7 +401,7 @@ describe Oddb2xml::MigelDownloader do
   after(:each) do common_after end
 
   it_behaves_like 'any downloader'
-  context 'when download is called' do
+    context 'when download is called' do
     let(:bin) { @downloader.download }
     it 'should read xls as Binary-String' do
       bin.should be_a String
@@ -580,4 +583,5 @@ describe Oddb2xml::SwissmedicInfoDownloader do
       File.exist?('swissmedic_info.zip').should eq(false)
     end
   end
+end
 end

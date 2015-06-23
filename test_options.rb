@@ -11,7 +11,7 @@ require 'socket'
 
 def test_one_call(cmd)
   dest = File.join(Ausgabe, cmd.gsub(/[ -]/, '_'))
-  all_downloads = File.join(dest, 'downloads'))
+  all_downloads = File.join(dest, 'downloads')
   FileUtils.makedirs(all_downloads) unless File.exists?(all_downloads)
   cmd.sub!('oddb2xml',  'oddb2xml --skip-download --log')
   files = (Dir.glob('%.xls*') + Dir.glob('*.dat*') + Dir.glob('*.xml'))
@@ -38,7 +38,7 @@ end
 def prepare_for_gem_test
   [ "rake clean gem install"      , # build  and install our gem first
 #    "gem uninstall --all --ignore-dependencies --executables",
-    "gem install pkg/*.gem"
+    "gem install --no-ri --no-rdoc pkg/*.gem"
   ].each {
     |cmd|
       puts "Running #{cmd}"
@@ -53,13 +53,13 @@ prepare_for_gem_test
 # we will skip some long running tests as travis jobs must finish in less than 50 minutes
 # unfortunately it returns a very common name
 unless 'localhost.localdomain'.eql?(Socket.gethostbyname(Socket.gethostname).first)
-  test_one_call('oddb2xml --calc')
   test_one_call('oddb2xml -e')
   test_one_call('oddb2xml -e -I80')
   test_one_call('oddb2xml -f dat --append -I 80')
   test_one_call('oddb2xml -f dat --append')
   test_one_call('oddb2xml --append')
 end
+test_one_call('oddb2xml --calc')
 test_one_call('oddb2xml -t md -c tar.gz')
 test_one_call('oddb2xml -o')
 test_one_call('oddb2xml -f xml')

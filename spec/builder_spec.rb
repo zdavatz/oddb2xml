@@ -3,14 +3,15 @@
 require 'spec_helper'
 require "rexml/document"
 include REXML
-
+RUN_ALL = false
 def checkItemForRefdata(doc, pharmacode, isRefdata)
   article = XPath.match( doc, "//ART[PHAR=#{pharmacode.to_s}]").first
-  name =  article.elements['DSCRD'].text
+  name =     article.elements['DSCRD'].text
   refdata =  article.elements['REF_DATA'].text
   smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
   puts "checking doc for gtin #{gtin} isRefdata #{isRefdata} == #{refdata}. SMNO: #{smno} #{name}" if $VERBOSE
   article.elements['REF_DATA'].text.should == isRefdata.to_s
+  article
 end
 
 def check_article_IGM_format(line, price_kendural=825, add_80_percents=false)
@@ -70,7 +71,6 @@ def check_validation_via_xsd
       |error|
         if error.message
           puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@oddb2xml_xsd}"
-          # binding.pry
         end
         error.message.should be_nil
     end
@@ -84,20 +84,20 @@ def checkPrices(increased = false)
   sofradex.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text.should eq Oddb2xml::SOFRADEX_PRICE_ZURROSE.to_s
   sofradex.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text.should eq Oddb2xml::SOFRADEX_PRICE_ZURROSEPUB.to_s
 
-  lansol = checkAndGetArticleWithGTIN(doc, Oddb2xml::LANSOL_GTIN)
-  lansol.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text.should eq Oddb2xml::LANSOL_PRICE_ZURROSE.to_s
-  lansol.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text.should eq Oddb2xml::LANSOL_PRICE_ZURROSEPUB.to_s
+  lansoyl = checkAndGetArticleWithGTIN(doc, Oddb2xml::LANSOYL_GTIN)
+  lansoyl.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text.should eq Oddb2xml::LANSOYL_PRICE_ZURROSE.to_s
+  lansoyl.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text.should eq Oddb2xml::LANSOYL_PRICE_ZURROSEPUB.to_s
 
   desitin = checkAndGetArticleWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
   desitin.elements["ARTPRI[PTYP='PPUB']/PRICE"].text.should eq Oddb2xml::LEVETIRACETAM_PRICE_PPUB.to_s
   desitin.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text.should eq Oddb2xml::LEVETIRACETAM_PRICE_ZURROSE.to_s
   desitin.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text.to_f.should eq Oddb2xml::LEVETIRACETAM_PRICE_PPUB.to_f
   if increased
-    lansol.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text.should eq Oddb2xml::LANSOL_PRICE_RESELLER_PUB.to_s
+    lansoyl.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text.should eq Oddb2xml::LANSOYL_PRICE_RESELLER_PUB.to_s
     sofradex.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text.should eq Oddb2xml::SOFRADEX_PRICE_RESELLER_PUB.to_s
     desitin.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text.should eq Oddb2xml::LEVETIRACETAM_PRICE_RESELLER_PUB.to_s
   else
-    lansol.elements["ARTPRI[PTYP='RESELLERPUB']"].should eq nil
+    lansoyl.elements["ARTPRI[PTYP='RESELLERPUB']"].should eq nil
     sofradex.elements["ARTPRI[PTYP='RESELLERPUB']"].should eq nil
     desitin.elements["ARTPRI[PTYP='RESELLERPUB']"].should eq nil
   end
@@ -106,7 +106,7 @@ end
 def checkAndGetArticleXmlName(tst=nil)
   article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
   File.exists?(article_xml).should eq true
-  FileUtils.cp(article_xml, File.join(Oddb2xml::WorkDir, 'tst-#{tst}.xml')) if tst
+  FileUtils.cp(article_xml, File.join(Oddb2xml::WorkDir, "tst-#{tst}.xml")) if tst
   article_xml
 end
 
@@ -138,22 +138,34 @@ def checkArticleXml
   desitin = checkAndGetArticleWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
   desitin.should_not eq nil
   # TODO: why is this now nil? desitin.elements['ATC'].text.should == 'N03AX14'
-  desitin.elements['DSCRD'].text.should ==  "LEVETIRACETAM DESITIN Mini Filmtab 250 mg"
-  # TODO: Why don't we have the french translation
-  # desitin.elements['DSCRF'].text.should == 'Levetiracetam DESITIN minipacks avec cpr pell mini 250 mg '
-  desitin.elements['ARTCOMP/COMPNO'].text.should == '7601001320451'
+  desitin.elements['DSCRD'].text.should ==  "LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk"
+  desitin.elements['DSCRF'].text.should == 'LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce'
+  desitin.elements['REF_DATA'].text.should == '1'
+  desitin.elements['PHAR'].text.should == '5819012'
+  desitin.elements['SMCAT'].text.should == 'B'
+  desitin.elements['SMNO'].text.should == '62069008'
+  desitin.elements['VAT'].text.should == '2'
+  desitin.elements['PRODNO'].text.should == '620691'
+  desitin.elements['SALECD'].text.should == 'A'
+  desitin.elements['CDBG'].text.should == 'N'
+  desitin.elements['BG'].text.should == 'N'
 
-  lansol = checkAndGetArticleWithGTIN(doc, Oddb2xml::LANSOL_GTIN)
-  lansol.elements['DSCRD'].text.should eq 'LANSOYL Gel'
-  lansol.elements['REF_DATA'].text.should eq '1'
-  lansol.elements['SMNO'].text.should eq '32475019'
-  lansol.elements['PHAR'].text.should eq '0023722'
+  erythrocin_gtin = '7680202580475' # picked up from zur rose
+  erythrocin = checkAndGetArticleWithGTIN(doc, erythrocin_gtin)
+  erythrocin.elements['DSCRD'].text.should ==  "ERYTHROCIN i.v. Trockensub 1000 mg Amp"
+
+  lansoyl = checkAndGetArticleWithGTIN(doc, Oddb2xml::LANSOYL_GTIN)
+  lansoyl.elements['DSCRD'].text.should eq 'LANSOYL Gel 225 g'
+  lansoyl.elements['REF_DATA'].text.should eq '1'
+  lansoyl.elements['SMNO'].text.should eq '32475019'
+  lansoyl.elements['PHAR'].text.should eq '0023722'
+  lansoyl.elements['ARTCOMP/COMPNO'].text.should == '7601001002012'
 
   zyvoxid = checkAndGetArticleWithGTIN(doc, Oddb2xml::ZYVOXID_GTIN)
-  zyvoxid.elements['DSCRD'].text.should eq 'ZYVOXID Filmtabl 600 mg'
+  zyvoxid.elements['DSCRD'].text.should eq 'ZYVOXID Filmtabl 600 mg 10 Stk'
 
   XPath.match( doc, "//LIMPTS" ).size.should >= 1
-
+  # TODO: desitin.elements['QTY'].text.should eq '250 mg'
 end
 
 def checkProductXml
@@ -166,10 +178,18 @@ def checkProductXml
   desitin.elements['ATC'].text.should == 'N03AX14'
   desitin.elements['DSCRD'].text.should == "Levetiracetam DESITIN Minipacks mit Mini-Filmtabl 250 mg "
   desitin.elements['DSCRF'].text.should == 'Levetiracetam DESITIN minipacks avec cpr pell mini 250 mg '
-#  desitin.elements['DSCRD'].text.should == 'Levetiracetam DESITIN Filmtabl 250 mg'
-#  desitin.elements['DSCRF'].text.should == 'Levetiracetam DESITIN cpr pell 250 mg'
+  desitin.elements['PRODNO'].text.should eq '620691'
+  desitin.elements['IT'].text.should eq '01.07.1.'
+  desitin.elements['PackGrSwissmedic'].text.should eq '30'
+  desitin.elements['EinheitSwissmedic'].text.should eq 'Tablette(n)'
   desitin.elements['SubstanceSwissmedic'].text.should eq 'levetiracetamum'
   desitin.elements['CompositionSwissmedic'].text.should eq 'levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.'
+
+  desitin.elements['CPT/CPTCMP/LINE'].text.should eq '0'
+  desitin.elements['CPT/CPTCMP/SUBNO'].text.should eq '8'
+  desitin.elements['CPT/CPTCMP/QTY'].text.should eq '250'
+  desitin.elements['CPT/CPTCMP/QTYU'].text.should eq 'mg'
+
   checkAndGetProductWithGTIN(doc, Oddb2xml::THREE_TC_GTIN)
   checkAndGetProductWithGTIN(doc, Oddb2xml::ZYVOXID_GTIN)
   if $VERBOSE
@@ -182,9 +202,8 @@ def checkProductXml
   XPath.match( doc, "//GTIN" ).find_all{|x| true}.size.should == NrPackages
   XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should == NrProdno
 
-  # TODO: Niklaus should find a real product whith a changed ATC. HIRUDOID_GTIN is not a product!
-  # hirudoid = checkAndGetProductWithGTIN(doc, Oddb2xml::HIRUDOID_GTIN)
-  # hirudoid.elements['ATC'].text.should == 'C05BA01' # modified by atc.csv!
+  hirudoid = checkAndGetProductWithGTIN(doc, Oddb2xml::HIRUDOID_GTIN)
+  hirudoid.elements['ATC'].text.should == 'C05BA01' # modified by atc.csv!
 end
 
 describe Oddb2xml::Builder do
@@ -206,7 +225,7 @@ describe Oddb2xml::Builder do
   after(:all) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
-
+if RUN_ALL
   context 'when -o for fachinfo is given' do
     before(:all) do
       common_run_init
@@ -266,15 +285,16 @@ describe Oddb2xml::Builder do
       common_run_init
       options = Oddb2xml::Options.new
       options.parser.parse!('--append -f dat'.split(' '))
+      # Oddb2xml::Cli.new(options.opts).run
       @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
     end
 
     it 'should generate a valid oddb_with_migel.dat' do
-      @res.should match(/products/)
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb_with_migel.dat')
       File.exists?(dat_filename).should eq true
       oddb_dat = IO.read(dat_filename)
       oddb_dat.should match(RegExpDesitin), "should have Desitin"
+      @res.should match(/products/)
     end
 
     it "should match EAN 76806206900842 of Desitin" do
@@ -306,8 +326,7 @@ describe Oddb2xml::Builder do
       checkPrices(true)
     end
   end
-
-
+end
   context 'when option -e is given' do
     before(:all) do
       common_run_init
@@ -322,8 +341,12 @@ describe Oddb2xml::Builder do
     end
 
     it 'should produce a correct oddb_product.xml' do
-      @res.should match(/products/)
       checkProductXml
+    end
+
+    it 'should report correct output on stdout' do
+      @res.should match(/NonPharma products/)
+      @res.should match(/NonPharma products: #{NrNonPharmaArticles}/)
     end
 
     it 'should contain the correct (normal) prices' do
@@ -335,8 +358,9 @@ describe Oddb2xml::Builder do
       XPath.match( doc, "//REF_DATA" ).size.should > 0
       checkItemForRefdata(doc, "1699947", 1) # 3TC Filmtabl 150 mg SMNO 53662013 IKSNR 53‘662, 53‘663
       checkItemForRefdata(doc, "0598003", 0) # SOFRADEX Gtt Auric 8 ml
-      checkItemForRefdata(doc, "3036984", 1) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
       checkItemForRefdata(doc, "5366964", 1) # 1-DAY ACUVUE moist jour
+      novopen = checkItemForRefdata(doc, "3036984", 0) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
+      expect(novopen.elements['ARTBAR/BC'].text).to eq '0'
     end
 
     it 'should generate SALECD A for migel (NINCD 13)' do
@@ -352,8 +376,6 @@ describe Oddb2xml::Builder do
     end
 
     it 'should not contain veterinary iksnr 47066 CANIPHEDRIN'  do
-      @res.should match(/NonPharma products/)
-      @res.should match(/NonPharma products: #{NrNonPharmaArticles}/)
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
       dscrds = XPath.match( doc, "//ART" )
       XPath.match( doc, "//BC" ).find_all{|x| x.text.match('47066') }.size.should == 0
@@ -361,8 +383,6 @@ describe Oddb2xml::Builder do
     end
 
     it 'should handle not duplicate pharmacode 5366964'  do
-      @res.should match(/Pharma product/)
-      @res.should match(/NonPharma products\: #{NrNonPharmaArticles}/)
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
       dscrds = XPath.match( doc, "//ART" )
       XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size.should == 1
@@ -372,14 +392,12 @@ describe Oddb2xml::Builder do
     end
 
     it 'should load correct number of nonpharma' do
-      @res.should match(/NonPharma/i)
-      @res.should match(/NonPharma products: #{NrNonPharmaArticles}/)
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
       dscrds = XPath.match( doc, "//ART" )
       dscrds.size.should == NrExtendedArticles
       XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('1699947') }.size.should == 1 # swissmedic_packages Cardio-Pulmo-Rénal Sérocytol, suppositoire
-      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('2465312') }.size.should == 1 # from swissindex_pharma.xml"
-      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size.should == 1 # from swissindex_pharma.xml
+      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('2465312') }.size.should == 1 # from refdata_pharma.xml"
+      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size.should == 1 # from refdata_pharma.xml
     end
 
     it 'should emit a correct oddb_limitation.xml' do
@@ -432,9 +450,8 @@ describe Oddb2xml::Builder do
       checkItemForSALECD(doc, Oddb2xml::FERRO_GRADUMET_GTIN, 'A') # FERRO-GRADUMET Depottabl 30 Stk
       checkItemForSALECD(doc, Oddb2xml::SOFRADEX_GTIN, 'I') # SOFRADEX
     end
-
   end
-
+if RUN_ALL
   context 'testing -e -I 80 option' do
     before(:all) do
       common_run_init
@@ -468,8 +485,11 @@ describe Oddb2xml::Builder do
       @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
     end
 
-    it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
+    it 'should report correct number of items' do
       @res.should match(/products/)
+    end
+
+    it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
       File.exists?(dat_filename).should eq true
       oddb_dat = IO.read(dat_filename)
@@ -488,8 +508,12 @@ describe Oddb2xml::Builder do
       options.parser.parse!('-f dat -I 80'.split(' '))
       @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
     end
-    it 'should contain the corect prices' do
+
+    it 'should report correct number of items' do
       @res.should match(/products/)
+    end
+
+    it 'should contain the corect prices' do
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
       File.exists?(dat_filename).should eq true
       oddb_dat = IO.read(dat_filename)
@@ -497,4 +521,5 @@ describe Oddb2xml::Builder do
       IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 883, true) }
     end
   end
+end
 end

@@ -1,5 +1,10 @@
-=== 2.1.8 / 22.06.2015
+=== 2.1.8 / 24.06.2015
 
+* Adapt to download refdata information from new URL using WSDL
+* Using GTIN instead of pharmacode as keys into the various exctracted information
+* Renamed SwissIndex -> Refdata
+* Some code cleanup
+* Improved spec tests for oddb_articles/products, downloaders and extractros
 * Use vcr to fake web traffic
 
 === 2.1.7 / 15.06.2015

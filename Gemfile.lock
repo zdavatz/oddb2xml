@@ -37,9 +37,8 @@ GEM
       builder (>= 2.1.2)
     http-cookie (1.0.2)
       domain_name (~> 0.5)
-    httpi (2.4.0)
+    httpi (2.4.1)
       rack
-    json (1.8.2)
     mechanize (2.7.3)
       domain_name (~> 0.5, >= 0.5.1)
       http-cookie (~> 1.0)
@@ -68,23 +67,25 @@ GEM
     pry-byebug (3.1.0)
       byebug (~> 4.0)
       pry (~> 0.10)
-    rack (1.6.2)
+    pry-doc (0.8.0)
+      pry (~> 0.9)
+      yard (~> 0.8)
+    rack (1.6.4)
     rake (10.4.2)
     rdoc (4.2.0)
-      json (~> 1.4)
-    rspec (3.2.0)
-      rspec-core (~> 3.2.0)
-      rspec-expectations (~> 3.2.0)
-      rspec-mocks (~> 3.2.0)
-    rspec-core (3.2.3)
-      rspec-support (~> 3.2.0)
-    rspec-expectations (3.2.1)
+    rspec (3.3.0)
+      rspec-core (~> 3.3.0)
+      rspec-expectations (~> 3.3.0)
+      rspec-mocks (~> 3.3.0)
+    rspec-core (3.3.1)
+      rspec-support (~> 3.3.0)
+    rspec-expectations (3.3.0)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.2.0)
-    rspec-mocks (3.2.1)
+      rspec-support (~> 3.3.0)
+    rspec-mocks (3.3.1)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.2.0)
-    rspec-support (3.2.2)
+      rspec-support (~> 3.3.0)
+    rspec-support (3.3.0)
     ruby-ole (1.2.11.8)
     rubyXL (3.3.8)
       nokogiri (>= 1.4.4)
@@ -116,6 +117,7 @@ GEM
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
     webrobots (0.1.1)
+    yard (0.8.7.6)
 
 PLATFORMS
   ruby
@@ -124,6 +126,7 @@ DEPENDENCIES
   bundler
   oddb2xml!
   pry-byebug
+  pry-doc
   rake
   rdoc
   rspec

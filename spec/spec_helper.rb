@@ -30,6 +30,7 @@ module Oddb2xml
   WorkDir        = File.join(File.dirname(__FILE__), 'run')
   Downloads      = File.join(WorkDir, 'downloads')
   SpecCompressor = File.join(Oddb2xml::SpecData, 'compressor')
+
   GTINS_CALC = [
                   '7680458820202', # for calc_spec.rb
                   '7680555940018', # for calc_spec.rb
@@ -67,10 +68,10 @@ module Oddb2xml
     FERRO_GRADUMET_GTIN           = '7680316440115'
     FIRST_DAY_ACUVUE_GTIN         = '733905577161'
     HIRUDOID_GTIN                 = '7680161050583'
-    LANSOL_GTIN                   = '7680324750190'
-    LANSOL_PRICE_RESELLER_PUB     = 18.95
-    LANSOL_PRICE_ZURROSE          = 10.54
-    LANSOL_PRICE_ZURROSEPUB       = 16.25
+    LANSOYL_GTIN                  = '7680324750190'
+    LANSOYL_PRICE_RESELLER_PUB    = 18.95
+    LANSOYL_PRICE_ZURROSE         = 10.54
+    LANSOYL_PRICE_ZURROSEPUB      = 16.25
     LEVETIRACETAM_GTIN            = '7680620690084'
     LEVETIRACETAM_PRICE_PPUB      = 27.8
     LEVETIRACETAM_PRICE_ZURROSE   = 13.49
@@ -106,7 +107,12 @@ VCR.configure do |config|
                                       :allow_playback_repeats => true,
                                       :serialize_with => :json,
                                       :decode_compressed_response => true,
+                                      :match_requests_on => [:method, :uri, :body],
                                     }
+#	 :match_requests_on (Array<Symbol, #call>) —
+#
+# List of request matchers to use to determine what recorded HTTP interaction to replay. Defaults to [:method, :uri]. The built-in matchers are :method, :uri, :host, :path, :headers and :body. You can also pass the name of a registered custom request matcher or any object that responds to #call.
+
   config.before_http_request(:real?) do |request|
     $stderr.puts("before real request: #{request.method} #{request.uri}")
     $stderr.flush

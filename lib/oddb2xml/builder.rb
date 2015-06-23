@@ -34,7 +34,7 @@ module Oddb2xml
   'VALID_DATE'        => Time.new.strftime('%FT%T%z'),
   }
   class Builder
-    attr_accessor :subject, :index, :items, :flags, :lppvs,
+    attr_accessor :subject, :refdata, :items, :flags, :lppvs,
                   :actions, :migel, :orphans, :fridges,
                   :infos, :packs, :infos_zur_rose,
                   :ean14, :tag_suffix,
@@ -43,8 +43,8 @@ module Oddb2xml
     def initialize(args = {})
       @options    = args
       @subject    = nil
-      @index      = {}
-      @items      = {}
+      @refdata    = {}
+      @items      = {} # Items from Preparations.xml in BAG, using GTINs as key
       @flags      = {}
       @lppvs      = {}
       @infos      = {}
@@ -83,60 +83,44 @@ module Oddb2xml
     def prepare_articles(reset=false)
       @articles = nil if reset
       unless @articles
-        Oddb2xml.log("prepare_articles starting with #{@articles ? @articles.size : 'no'} articles")
-        @articles = [] # base is 'DE'
-        @index['DE'].each_pair do |phar, indices|
-          obj = {
-            :de => indices,
-            :fr => @index['FR'][phar],
-          }
-          if migel = @migel[phar]
+        Oddb2xml.log("prepare_articles starting with #{@articles ? @articles.size : 'no'} articles.")
+        @articles = []
+        @refdata.each do |ean13, obj|
+          if migel = @migel[ean13]
             # delete duplicates
-            @migel[phar] = nil
+            @migel[ean13] = nil
           end
-          if seq = @items[phar]
+          if seq = @items[obj[:ean]]
             obj[:seq] = seq
           end
           @articles << obj
-          @pharmacode[phar] = obj
+          @pharmacode[obj[:pharmacode]] = obj
         end
         # add
         @migel.values.compact.each do |migel|
           next if migel[:pharmacode].empty?
-          obj = {}
-          %w[de fr].each do |lang|
-            entry = {
-              :ean             => migel[:ean],
-              :pharmacode      => migel[:pharmacode],
-              :stat_date       => '',
-              :lang            => lang.capitalize,
-              :desc            => migel["desc_#{lang}".intern],
-              :atc_code        => '',
-              :additional_desc => migel[:additional_desc],
-              :company_ean     => migel[:company_ean],
-              :company_name    => migel[:company_name],
-              :migel           => true,
-            }
-            obj[lang.intern] = [entry]
-          end
-          @articles << obj
+          entry = {
+            :ean             => migel[:ean],
+            :pharmacode      => migel[:pharmacode],
+            :stat_date       => '',
+            :desc_de            => migel[:desc_de],
+            :desc_fr            => migel[:desc_fr],
+            :atc_code        => '',
+            :quantity        => migel[:quantity],
+            :company_ean     => migel[:company_ean],
+            :company_name    => migel[:company_name],
+            :migel           => true,
+          }
+          @articles << entry
         end
         nrAdded = 0
         if @options[:extended]
-          Oddb2xml.log("prepare_articles prepare_local_index")
-          local_index = {}
-          %w[de fr].each { |lang| local_index[lang] = {} }
-          %w[de fr].each {
-            |lang|
-          @articles.each{|article|
-                         ean = article[lang.intern][0][:ean]
-                                                       next if ean == nil or ean.to_i == 0
-                                                      local_index[lang][ean] = article
-                                                      }
-                                                      }
-          Oddb2xml.log("prepare_articles extended")
+          Oddb2xml.log("prepare_articles extended prepare_local_index having already #{@articles.size} articles")
+          nrItems = 0
           @infos_zur_rose.each{
             |ean13, info|
+          nrItems += 1
+          Oddb2xml.log("prepare_articles: nrItems #{nrItems} nrAdded #{nrAdded} prices. Total #{@articles.size}") if nrItems % 100 == 0
           pharmacode = info[:pharmacode]
           if @pharmacode[pharmacode]
             @pharmacode[pharmacode][:price]     = info[:price]
@@ -145,31 +129,31 @@ module Oddb2xml
           end
           obj = {}
           found = false
-          %w[de fr].each do |lang|
-          #              existing = @articles.find{|art| art[lang.intern] and art[lang.intern][0][:ean] == ean13 }
-
-            existing = local_index[lang][ean13]
-            if existing
-              found = true
-              existing[:price]     = info[:price]
-              existing[:pub_price] = info[:pub_price]
+          existing = @refdata.values.find{ |x| x[:ean].eql? ean13 }
+          if existing
+            found = true
+            existing[:price]     = info[:price]
+            existing[:pub_price] = info[:pub_price]
+          else
+            entry = {
+                      :desc            => info[:description],
+                      :desc_de         => info[:description],
+                      :status          => info[:status] == '3' ? 'I' : 'A', # from ZurRose, we got 1,2 or 3 means aktive, aka available in trade
+                      :atc_code        => '',
+                      :ean             => ean13,
+                      :pharmacode      => pharmacode,
+                      :price           => info[:price],
+                      :pub_price       => info[:pub_price],
+                      :type            => info[:type],
+                      }
+            if pharmacode
+              @refdata[pharmacode] = entry
             else
-              entry = {
-                        :desc            => info[:description],
-                        :status          => info[:status] == '3' ? 'I' : 'A', # from ZurRose, we got 1,2 or 3 means aktive, aka available in trade
-                        :atc_code        => '',
-                        :ean             => ean13,
-                        :lang            => lang.capitalize,
-                       :pharmacode      => pharmacode,
-                        :price           => info[:price],
-                        :pub_price       => info[:pub_price],
-                        :type            => info[:type],
-                        }
-              obj[lang.intern] = [entry]
-              @index[lang.upcase][ean13] = entry
+              @refdata[ean13] = entry
             end
+            obj = entry
           end
-          unless found
+          if not found and obj.size > 0
             @articles << obj
             nrAdded += 1
           end
@@ -234,47 +218,41 @@ module Oddb2xml
     def prepare_products
       unless @products
         @products = []
-        @index['DE'].each_pair do |phar, indices|
-          indices.each_with_index do |index, i|
-            next if index and index.is_a?(Hash) and index[:atc_code] and /^Q/i.match(index[:atc_code])
-            obj = {
-              :seq => @items[phar] ? @items[phar] : @items[index[:ean]],
-              :pac => nil,
-              :no8 => nil,
-              :de  => index,
-              :fr  => @index['FR'][phar][i],
-              :st  => index[:status],
-              # swissINDEX and Packungen.xls(if swissINDEX does not have EAN)
-              :ean => index[:ean],
-              :atc => index[:atc_code],
-              :ith => '',
-              :siz => '',
-              :eht => '',
-              :sub => '',
-              :comp => '',
-            }
-            if obj[:ean] # via EAN-Code
-              obj[:no8] = obj[:ean][4..11]
+        @refdata.each_pair do |ean13, item|
+          next if item and item.is_a?(Hash) and item[:atc_code] and /^Q/i.match(item[:atc_code])
+          obj = {
+            :seq => @items[ean13] ? @items[ean13] : @items[item[:ean]],
+            :pac => nil,
+            :no8 => nil,
+            :ean => item[:ean],
+            :atc => item[:atc_code],
+            :ith => '',
+            :siz => '',
+            :eht => '',
+            :sub => '',
+            :comp => '',
+          }
+          if obj[:ean] # via EAN-Code
+            obj[:no8] = obj[:ean][4..11]
+          end
+          if obj[:no8] and ppac = @packs[obj[:no8].intern] and # Packungen.xls
+              !ppac[:is_tier]
+            # If RefData does not have EAN
+            if obj[:ean].nil? or obj[:ean].empty?
+              obj[:ean] = ppac[:ean].to_s
             end
-            if obj[:no8] and ppac = @packs[obj[:no8].intern] and # Packungen.xls
-               !ppac[:is_tier]
-              # If swissINDEX does not have EAN
-              if obj[:ean].nil? or obj[:ean].empty?
-                obj[:ean] = ppac[:ean].to_s
-              end
-              # If swissINDEX dose not have ATC-Code
-              if obj[:atc].nil? or obj[:atc].empty?
-                obj[:atc] = ppac[:atc_code].to_s
-              end
-              obj[:ith] = ppac[:ith_swissmedic]
-              obj[:siz] = ppac[:package_size]
-              obj[:eht] = ppac[:einheit_swissmedic]
-              obj[:sub] = ppac[:substance_swissmedic]
-              obj[:comp] = ppac[:composition_swissmedic]
+            # If RefData dose not have ATC-Code
+            if obj[:atc].nil? or obj[:atc].empty?
+              obj[:atc] = ppac[:atc_code].to_s
             end
-            if obj[:ean][0..3] == '7680'
-              @products << obj
-            end
+            obj[:ith] = ppac[:ith_swissmedic]
+            obj[:siz] = ppac[:package_size]
+            obj[:eht] = ppac[:einheit_swissmedic]
+            obj[:sub] = ppac[:substance_swissmedic]
+            obj[:comp] = ppac[:composition_swissmedic]
+          end
+          if obj[:ean][0..3] == '7680'
+            @products << obj
           end
         end
       end
@@ -477,7 +455,7 @@ module Oddb2xml
           @missing.each do |obj|
             next if /^Q/i.match(obj[:atc])
             length += 1
-            xml.PRD('DT' => '') {
+            xml.PRD('DT' => obj[:last_change]) {
             ean = obj[:ean].to_s
             xml.GTIN ean
             xml.PRODNO obj[:prodno]                                 if obj[:prodno]
@@ -492,11 +470,12 @@ module Oddb2xml
             xml.CompositionSwissmedic obj[:composition_swissmedic]  if obj[:composition_swissmedic]
                                }
           end
+          @products.sort! { |a,b| a[:ean] <=> b[:ean] }
           @products.each do |obj|
             next if /^Q/i.match(obj[:atc])
             seq = obj[:seq]
             length += 1
-              xml.PRD('DT' => '') {
+              xml.PRD('DT' => obj[:last_change]) {
               ean = obj[:ean].to_s
               xml.GTIN ean
               ppac = ((_ppac = @packs[ean[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
@@ -750,193 +729,196 @@ module Oddb2xml
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
         xml.ARTICLE(XML_OPTIONS) {
+        @articles.sort! { |a,b| a[:ean] <=> b[:ean] }
         @articles.each do |obj|
-            idx += 1
-        Oddb2xml.log "build_article #{idx} of #{@articles.size} articles" if idx % 500 == 0
-        obj[:de].each_with_index do |de_idx, i|
-              fr_idx = obj[:fr][i]              # swissindex FR
-              pac,no8 = nil,de_idx[:ean][4..11] # BAG-XML(SL/LS)
-              pack_info = nil
-              pack_info = @packs[no8.intern] if no8 # info from Packungen.xlsx from swissmedic_info
-              ppac = nil                        # Packungen
-              ean = de_idx[:ean]
-              next if pack_info and /Tierarzneimittel/.match(pack_info[:list_code])
-              next if de_idx[:desc] and /ad us vet/i.match(de_idx[:desc])
+          idx += 1
+          Oddb2xml.log "build_article #{idx} of #{@articles.size} articles" if idx % 500 == 0
+            item = @items[obj[:ean]]
+            pac,no8 = nil,obj[:ean][4..11] # BAG-XML(SL/LS)
+            pack_info = nil
+            pack_info = @packs[no8.intern] if no8 # info from Packungen.xlsx from swissmedic_info
+            ppac = nil                        # Packungen
+            ean = obj[:ean]
+            next if pack_info and /Tierarzneimittel/.match(pack_info[:list_code])
+            next if obj[:desc_de] and /ad us vet/i.match(obj[:desc_de])
 
-              pharma_code = de_idx[:pharmacode]
-              ean = nil if ean.match(/^000000/)
+            pharma_code = obj[:pharmacode]
+            ean = nil if ean.match(/^000000/)
+            if obj[:seq]
+              pac = obj[:seq][:packages][obj[:pharmacode]]
+              pac = obj[:seq][:packages][ean] unless pac
+            else
+              pac = @items[ean][:packages][ean] if @items and ean and @items[ean] and @items[ean][:packages]
+            end
+            if no8
+              ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
+            end
+            info_zur_rose = nil
+            if !@infos_zur_rose.empty? && ean && @infos_zur_rose[ean]
+              info_zur_rose = @infos_zur_rose[ean] # zurrose
+            end
+            xml.ART('DT' => obj[:last_change] ? obj[:last_change] : '') {
+              xml.REF_DATA (obj[:refdata] || @migel[pharma_code]) ? '1' : '0'
+              xml.PHAR  obj[:pharmacode] unless obj[:pharmacode].empty?
+              #xml.GRPCD
+              #xml.CDS01
+              #xml.CDS02
+              if ppac
+                xml.SMCAT ppac[:swissmedic_category] unless ppac[:swissmedic_category].empty?
+              end
+              if no8 and !no8.to_s.empty?
+                if ean and ean[0..3] == "7680"
+                  xml.SMNO no8.to_s
+                end
+              end
+              if ppac
+                xml.PRODNO ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
+              end
+              #xml.HOSPCD
+              #xml.CLINCD
+              #xml.ARTTYP
+              if info_zur_rose
+                xml.VAT info_zur_rose[:vat]
+              end
+
+              nincd = detect_nincd(obj)
+              (nincd and nincd == 13) ? xml.SALECD('A') : xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
+              if pac and pac[:limitation_points]
+                #xml.INSLIM
+                xml.LIMPTS pac[:limitation_points] unless pac[:limitation_points].empty?
+              end
+              #xml.GRDFR
+              if no8 and !no8.empty? and
+                  no8.to_s =~ /(\d{5})(\d{3})/
+                xml.COOL 1 if @fridges.include?($1.to_s)
+              end
+              #xml.TEMP
+              if ean and not ean.empty?
+                flag = @flags[ean]
+                # as same flag
+                xml.CDBG(flag ? 'Y' : 'N')
+                xml.BG(flag ? 'Y' : 'N')
+              end
+              #xml.EXP
+              if item and item[:substances] and substance = item[:substances].first
+                xml.QTY   "#{substance[:quantity]}#{substance[:unit] ? ' ' + substance[:unit] : ''}"
+              end if false # TODO: get qty/unit from refdata name
+              xml.DSCRD obj[:desc_de]            if obj[:desc_de] and not obj[:desc_de].empty?
+              xml.DSCRF obj[:desc_fr]            if obj[:desc_fr] and not obj[:desc_fr].empty?
+              xml.DSCRF obj[:desc_de]            if !obj[:desc_fr] or obj[:desc_fr].empty?
+              xml.SORTD obj[:desc_de].upcase     if obj[:desc_de] and not obj[:desc_de].empty?
+              xml.SORTF obj[:desc_fr].upcase     if obj[:desc_fr] and not obj[:desc_fr].empty?
+              xml.SORTF obj[:desc_de].upcase     if !obj[:desc_fr] or obj[:desc_fr].empty?
+              #xml.QTYUD
+              #xml.QTYUF
+              #xml.IMG
+              #xml.IMG2
+              #xml.PCKTYPD
+              #xml.PCKTYPF
+              #xml.MULT
               if obj[:seq]
-                pac = obj[:seq][:packages][de_idx[:pharmacode]]
-                pac = obj[:seq][:packages][ean] unless pac
-              else
-                pac = @items[ean][:packages][ean] if @items and ean and @items[ean] and @items[ean][:packages]
+                xml.SYN1D obj[:seq][:name_de] unless obj[:seq][:name_de].empty?
+                xml.SYN1F obj[:seq][:name_fr] unless obj[:seq][:name_fr].empty?
               end
-              if no8
-                ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
+              if obj[:seq]
+                case obj[:seq][:deductible]
+                when 'Y'; xml.SLOPLUS 1; # 20%
+                when 'N'; xml.SLOPLUS 2; # 10%
+                else      xml.SLOPLUS '' # k.A.
+                end
               end
-              info_zur_rose = nil
-              if !@infos_zur_rose.empty? && ean && @infos_zur_rose[ean]
-                info_zur_rose = @infos_zur_rose[ean] # zurrose
+              #xml.NOPCS
+              #xml.HSCD
+              #xml.MINI
+              #xml.DEPCD
+              #xml.DEPOT
+              #xml.BAGSL
+              #xml.BAGSLC
+              #xml.LOACD
+              if obj[:stat_date]
+                xml.OUTSAL obj[:stat_date] if obj[:stat_date] and not obj[:stat_date].empty?
               end
-              xml.ART('DT' => '') {
-                xml.REF_DATA (de_idx[:refdata] || @migel[pharma_code]) ? '1' : '0'
-                xml.PHAR  de_idx[:pharmacode] unless de_idx[:pharmacode].empty?
-                #xml.GRPCD
-                #xml.CDS01
-                #xml.CDS02
-                if ppac
-                  xml.SMCAT ppac[:swissmedic_category] unless ppac[:swissmedic_category].empty?
-                end
-                if no8 and !no8.to_s.empty?
-                  if ean and ean[0..3] == "7680"
-                    xml.SMNO no8.to_s
-                  end
-                end
-                if ppac
-                  xml.PRODNO ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
-                end
-                #xml.HOSPCD
-                #xml.CLINCD
-                #xml.ARTTYP
-                if info_zur_rose
-                  xml.VAT info_zur_rose[:vat]
-                end
-
-                nincd = detect_nincd(de_idx)
-                (nincd and nincd == 13) ? xml.SALECD('A') : xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
-                if pac and pac[:limitation_points]
-                  #xml.INSLIM
-                  xml.LIMPTS pac[:limitation_points] unless pac[:limitation_points].empty?
-                end
-                #xml.GRDFR
-                if no8 and !no8.empty? and
-                   no8.to_s =~ /(\d{5})(\d{3})/
-                  xml.COOL 1 if @fridges.include?($1.to_s)
-                end
-                #xml.TEMP
-                if ean and not ean.empty?
-                  flag = @flags[ean]
-                  # as same flag
-                  xml.CDBG(flag ? 'Y' : 'N')
-                  xml.BG(flag ? 'Y' : 'N')
-                end
-                #xml.EXP
-                xml.QTY   de_idx[:additional_desc] if de_idx[:additional_desc] and not de_idx[:additional_desc].empty?
-                xml.DSCRD de_idx[:desc]            if de_idx[:desc] and not de_idx[:desc].empty?
-                xml.DSCRF fr_idx[:desc]            if fr_idx[:desc] and not fr_idx[:desc].empty?
-                xml.SORTD de_idx[:desc].upcase     if de_idx[:desc] and not de_idx[:desc].empty?
-                xml.SORTF fr_idx[:desc].upcase     if fr_idx[:desc] and not fr_idx[:desc].empty?
-                #xml.QTYUD
-                #xml.QTYUF
-                #xml.IMG
-                #xml.IMG2
-                #xml.PCKTYPD
-                #xml.PCKTYPF
-                #xml.MULT
-                if obj[:seq]
-                  xml.SYN1D obj[:seq][:name_de] unless obj[:seq][:name_de].empty?
-                  xml.SYN1F obj[:seq][:name_fr] unless obj[:seq][:name_fr].empty?
-                end
-                if obj[:seq]
-                  case obj[:seq][:deductible]
-                  when 'Y'; xml.SLOPLUS 1; # 20%
-                  when 'N'; xml.SLOPLUS 2; # 10%
-                  else      xml.SLOPLUS '' # k.A.
-                  end
-                end
-                #xml.NOPCS
-                #xml.HSCD
-                #xml.MINI
-                #xml.DEPCD
-                #xml.DEPOT
-                #xml.BAGSL
-                #xml.BAGSLC
-                #xml.LOACD
-                if de_idx[:stat_date]
-                  xml.OUTSAL de_idx[:stat_date] if de_idx[:stat_date] and not de_idx[:stat_date].empty?
-                end
-                #xml.STTOX
-                #xml.NOTI
-                #xml.GGL
-                #xml.CE
-                #xml.SMDAT
-                #xml.SMCDAT
-                #xml.SIST
-                #xml.ESIST
-                #xml.BIOCID
-                #xml.BAGNO
-                #xml.LIGHT
-                #xml.DEL
-                xml.ARTCOMP {
-                  # use ean13(gln) as COMPNO
-                  xml.COMPNO de_idx[:company_ean] if de_idx[:company_ean] and not de_idx[:company_ean].empty?
-                  #xml.ROLE
-                  #xml.ARTNO1
-                  #xml.ARTNO2
-                  #xml.ARTNO3
-                }
-                xml.ARTBAR {
-                  xml.CDTYP  'E13'
-                  xml.BC     ean
-                  xml.BCSTAT 'A' # P is alternative
-                  #xml.PHAR2
-                } if ean and not ean.empty?
-                #xml.ARTCH {
-                  #xml.PHAR2
-                  #xml.CHTYPE
-                  #xml.LINENO
-                  #xml.NOUNITS
-                #}
-                if pac and pac[:prices]
-                  pac[:prices].each_pair do |key, price|
-                    xml.ARTPRI {
-                     xml.VDAT  price[:valid_date] unless price[:valid_date].empty?
-                     xml.PTYP  price[:price_code] unless price[:price_code].empty?
-                     xml.PRICE price[:price]      unless price[:price].empty?
-                    }
-                  end
-                end
-                if info_zur_rose
-                  price = info_zur_rose[:price]
-                  vdat  = Time.parse(datetime).strftime("%d.%m.%Y")
-                  xml.ARTPRI {
-                    xml.VDAT  vdat
-                    xml.PTYP  "ZURROSE"
-                    xml.PRICE price
-                  }
-                  xml.ARTPRI {
-                    xml.VDAT  vdat
-                    xml.PTYP  "ZURROSEPUB"
-                    xml.PRICE info_zur_rose[:pub_price]
-                  }
-                  xml.ARTPRI {
-                    xml.VDAT  vdat
-                    xml.PTYP  "RESELLERPUB"
-                    xml.PRICE (price.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2)
-                  } if @options[:percent] != nil
-                end
-                #xml.ARTMIG {
-                  #xml.VDAT
-                  #xml.MIGCD
-                  #xml.LINENO
-                #}
-                #xml.ARTDAN {
-                  #xml.CDTYP
-                  #xml.LINENO
-                  #xml.CDVAL
-                #}
-                #xml.ARTLIM {
-                #  xml.LIMCD
-                #}
-                if nincd
-                  xml.ARTINS {
-                    #xml.VDAT
-                    #xml.INCD
-                    xml.NINCD nincd
-                  }
-                end
+              #xml.STTOX
+              #xml.NOTI
+              #xml.GGL
+              #xml.CE
+              #xml.SMDAT
+              #xml.SMCDAT
+              #xml.SIST
+              #xml.ESIST
+              #xml.BIOCID
+              #xml.BAGNO
+              #xml.LIGHT
+              #xml.DEL
+              xml.ARTCOMP {
+                # use ean13(gln) as COMPNO
+                xml.COMPNO obj[:company_ean] if obj[:company_ean] and not obj[:company_ean].empty?
+                #xml.ROLE
+                #xml.ARTNO1
+                #xml.ARTNO2
+                #xml.ARTNO3
               }
-            end if obj[:de]
+              xml.ARTBAR {
+                xml.CDTYP  'E13'
+                xml.BC     /^9999/.match(ean) ? 0 : ean
+                xml.BCSTAT 'A' # P is alternative
+                #xml.PHAR2
+              } if ean and not ean.empty?
+              #xml.ARTCH {
+                #xml.PHAR2
+                #xml.CHTYPE
+                #xml.LINENO
+                #xml.NOUNITS
+              #}
+              if pac and pac[:prices]
+                pac[:prices].each_pair do |key, price|
+                  xml.ARTPRI {
+                    xml.VDAT  price[:valid_date] unless price[:valid_date].empty?
+                    xml.PTYP  price[:price_code] unless price[:price_code].empty?
+                    xml.PRICE price[:price]      unless price[:price].empty?
+                  }
+                end
+              end
+              if info_zur_rose
+                price = info_zur_rose[:price]
+                vdat  = Time.parse(datetime).strftime("%d.%m.%Y")
+                xml.ARTPRI {
+                  xml.VDAT  vdat
+                  xml.PTYP  "ZURROSE"
+                  xml.PRICE price
+                }
+                xml.ARTPRI {
+                  xml.VDAT  vdat
+                  xml.PTYP  "ZURROSEPUB"
+                  xml.PRICE info_zur_rose[:pub_price]
+                }
+                xml.ARTPRI {
+                  xml.VDAT  vdat
+                  xml.PTYP  "RESELLERPUB"
+                  xml.PRICE (price.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2)
+                } if @options[:percent] != nil
+              end
+              #xml.ARTMIG {
+                #xml.VDAT
+                #xml.MIGCD
+                #xml.LINENO
+              #}
+              #xml.ARTDAN {
+                #xml.CDTYP
+                #xml.LINENO
+                #xml.CDVAL
+              #}
+              #xml.ARTLIM {
+              #  xml.LIMCD
+              #}
+              if nincd
+                xml.ARTINS {
+                  #xml.VDAT
+                  #xml.INCD
+                  xml.NINCD nincd
+                }
+              end
+            }
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
@@ -1170,16 +1152,15 @@ module Oddb2xml
       prepare_articles
       rows = []
       @articles.each do |obj|
-        obj[:de].each_with_index do |idx, i|
-          ean = idx[:ean]
+          ean = obj[:ean]
           next if ((ean.to_s.length != 13) and !ean14)
-          next if idx[:type] == :nonpharma
+          next if obj[:type] == :nonpharma
           row = ''
           pack_info = nil
           # Oddb2tdat.parse
           pac,no8 = nil,nil
           if obj[:seq] and obj[:seq][:packages]
-            pac = obj[:seq][:packages][idx[:pharmacode]]
+            pac = obj[:seq][:packages][obj[:pharmacode]]
             pac = obj[:seq][:packages][ean] unless pac
           else
             pac = @items[ean][:packages][ean] if @items and @items[ean] and @items[ean][:packages]
@@ -1200,11 +1181,11 @@ module Oddb2xml
           else
             row << '1'
           end
-          row << "%0#{DAT_LEN[:PHAR]}d" % idx[:pharmacode].to_i
+          row << "%0#{DAT_LEN[:PHAR]}d" % obj[:pharmacode].to_i
           abez = ( # de name
-            idx[:desc].to_s + " " +
+            obj[:desc_de].to_s + " " +
             (pac ? pac[:name_de].to_s : '') +
-            (idx[:additional_desc] ? idx[:additional_desc] : '')
+            (obj[:quantity] ? obj[:quantity] : '')
           ).gsub(/"/, '')
           if @infos_zur_rose[ean]
             price_exf = sprintf('%06i', ((@infos_zur_rose[ean][:price].to_f)*100).to_i)
@@ -1251,7 +1232,6 @@ module Oddb2xml
           row << "%0#{DAT_LEN[:CEAN]}d" % (ean.match(/^000000/) ? 0 : ean.to_i)
           row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
           rows << row
-        end
       end
       rows.join("\n")
     end
@@ -1260,20 +1240,19 @@ module Oddb2xml
       prepare_articles(reset)
       rows = []
       @articles.each do |obj|
-        obj[:de].each_with_index do |idx, i|
           row = ''
-          next if ((idx[:ean].to_s.length != 13) and !ean14)
+          next if ((obj[:ean].to_s.length != 13) and !ean14)
           # Oddb2tdat.parse_migel
           row << "%#{DAT_LEN[:RECA]}s"  % '11'
-          row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = idx[:pharmacode] and phar.size > 3)
+          row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = obj[:pharmacode] and phar.size > 3)
                                             '1'
                                           else
                                             '3'
                                           end
-          row << "%0#{DAT_LEN[:PHAR]}d" % idx[:pharmacode].to_i
+          row << "%0#{DAT_LEN[:PHAR]}d" % obj[:pharmacode].to_i
           abez = ( # de name
-            idx[:desc].to_s + " " +
-          (idx[:additional_desc] ? idx[:additional_desc] : '')
+            obj[:desc_de].to_s + " " +
+          (obj[:quantity] ? obj[:quantity] : '')
           ).gsub(/"/, '')
           row << format_name(abez)
           row << "%#{DAT_LEN[:PRMO]}s"  % ('0' * DAT_LEN[:PRMO])
@@ -1283,11 +1262,10 @@ module Oddb2xml
           row << "%#{DAT_LEN[:CBGG]}s"  % '0'
           row << "%#{DAT_LEN[:CIKS]}s"  % ' ' # no category
           row << "%0#{DAT_LEN[:ITHE]}d" %  0
-          row << idx[:ean].to_s.rjust(DAT_LEN[:CEAN], '0')
+          row << obj[:ean].to_s.rjust(DAT_LEN[:CEAN], '0')
           row << "%#{DAT_LEN[:CMWS]}s"  % '1' # nonpharma
           rows << row
         end
-      end
       rows.join("\n")
     end
   end

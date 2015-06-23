@@ -3,16 +3,104 @@
 require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/downloader"
 
-describe Oddb2xml::Extractor do
+describe Oddb2xml::BMUpdateExtractor do
   before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
   after(:all) { VCR.eject_cassette }
-  it "pending"
+  before(:all) {
+    VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
+    @downloader = Oddb2xml::BMUpdateDownloader.new
+    xml = @downloader.download
+    @items = Oddb2xml::BMUpdateExtractor.new(xml).to_hash
+  }
+  it "should have at least one item" do
+    expect(@items.size).not_to eq 0
+  end
 end
 
-describe Oddb2xml::TxtExtractorMethods do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
+describe Oddb2xml::LppvExtractor do
+  before(:all) {
+    VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
+    @downloader = Oddb2xml::LppvDownloader.new
+    @content = @downloader.download
+    @lppvs = Oddb2xml::LppvExtractor.new(@content).to_hash
+  }
   after(:all) { VCR.eject_cassette }
-  it "pending"
+  it "should have at least one item" do
+    expect(@lppvs.size).not_to eq 0
+  end
+end
+
+describe Oddb2xml::MigelExtractor do
+  before(:all) {
+    VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
+    @downloader = Oddb2xml::MigelDownloader.new
+    xml = @downloader.download
+    @items = Oddb2xml::MigelExtractor.new(xml).to_hash
+  }
+  after(:all) { VCR.eject_cassette }
+  it "should have at some items" do
+    expect(@items.size).not_to eq 0
+    expect(@items.find{|k,v| /3248410/i.match(v[:pharmacode]) }).not_to be_nil
+    expect(@items.find{|k,v| /Novopen/i.match(v[:desc_de]) }).not_to be_nil
+    expect(@items.find{|k,v| /3036984/i.match(v[:pharmacode]) }).not_to be_nil
+  end
+end
+
+describe Oddb2xml::RefdataExtractor do
+  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
+  after(:all)  { VCR.eject_cassette }
+  context 'should handle pharma articles' do
+    subject do
+      @downloader = Oddb2xml::RefdataDownloader.new({}, :pharma)
+      xml = @downloader.download
+      @pharma_items = Oddb2xml::RefdataExtractor.new(xml, 'PHARMA').to_hash
+    end
+
+    it "should have correct info for pharmacode 1699947 correctly" do
+      @pharma_items = subject.to_hash
+      pharma_code_LEVETIRACETAM = "5819012"
+      item_found = @pharma_items.values.find{ |x| x[:pharmacode].eql?(pharma_code_LEVETIRACETAM)}
+      expect(item_found).not_to be nil
+      expected = { :refdata=>true,
+        :_type=>:pharma,
+        :ean=> Oddb2xml::LEVETIRACETAM_GTIN,
+        :pharmacode=> pharma_code_LEVETIRACETAM,
+        :last_change => "2015-06-04 00:00:00 +0200",
+        :desc_de=>"LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
+        :desc_fr=>"LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce",
+        :atc_code=>"N03AX14",
+        :company_name=>"Desitin Pharma GmbH",
+        :company_ean=>"7601001320451"}
+      expect(item_found).to eq(expected)
+      expect(@pharma_items.size).to eq(15)
+    end
+	end
+  context 'should handle nonpharma articles' do
+    subject do
+      @downloader = Oddb2xml::RefdataDownloader.new({}, :nonpharma)
+      xml = @downloader.download
+      @non_pharma_items = Oddb2xml::RefdataExtractor.new(xml, :non_pharma).to_hash
+    end
+
+    it "should have correct info for nonpharma with pharmacode 0058502 correctly" do
+      @non_pharma_items = subject.to_hash
+      pharma_code_TUBEGAZE = '0058519'
+      item_found = @non_pharma_items.values.find{ |x| x[:pharmacode].eql?(pharma_code_TUBEGAZE)}
+      expect(item_found).not_to be nil
+      expected = {:refdata=>true,
+      :_type=>:nonpharma,
+      :ean=>"7611600441020",
+      :pharmacode=>pharma_code_TUBEGAZE,
+      :last_change => "2015-06-04 00:00:00 +0200",
+      :desc_de=>"TUBEGAZE Verband weiss Nr 12 20m Finger gross",
+      :desc_fr=>"TUBEGAZE pans tubul blanc Nr 12 20m doigts grands",
+      :atc_code=>"",
+      :company_name=>"IVF HARTMANN AG",
+      :company_ean=>"7601001000896"}
+      expect(item_found).to eq(expected)
+      expect(@non_pharma_items.size).to eq(9)
+    end
+  end
 end
 
 describe Oddb2xml::BagXmlExtractor do
@@ -45,36 +133,6 @@ describe Oddb2xml::BagXmlExtractor do
       expect(no_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('27.8')
     end
   end
-end
-
-describe Oddb2xml::SwissIndexExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all)  { VCR.eject_cassette }
-  it "pending"
-end
-
-describe Oddb2xml::BMUpdateExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
-  it "pending"
-end
-
-describe Oddb2xml::LppvExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
-  it "pending"
-end
-
-describe Oddb2xml::SwissIndexExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
-  it "pending"
-end
-
-describe Oddb2xml::MigelExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
-  it "pending"
 end
 
 describe Oddb2xml::SwissmedicInfoExtractor do
@@ -204,7 +262,6 @@ describe Oddb2xml::ZurroseExtractor do
       DAT
       Oddb2xml::ZurroseExtractor.new(dat)
     end
-    #it { expect(pp subject.to_hash) }
     it { expect(subject.to_hash.keys.length).to eq(1) }
     it { expect(subject.to_hash.keys.first).to eq("7680284070840") }
     it { expect(subject.to_hash.values.first[:vat]).to eq("2") }
