@@ -33,7 +33,7 @@ module Oddb2xml
   end
 
   def Oddb2xml.log(msg)
-    # return unless @options[:log]
+    return unless @options[:log]
     $stdout.puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}: #{msg}"
     $stdout.flush
   end
