@@ -1,14 +1,15 @@
 PATH
   remote: .
   specs:
-    oddb2xml (2.1.8)
+    oddb2xml (2.1.9)
       archive-tar-minitar
+      httpi (>= 2.4.1)
       mechanize
       multi_json
       nokogiri
       parslet
       rubyXL
-      rubyntlm
+      rubyntlm (= 0.5.1)
       rubyzip
       savon
       sax-machine
@@ -39,6 +40,7 @@ GEM
       domain_name (~> 0.5)
     httpi (2.4.1)
       rack
+    json (1.8.3)
     mechanize (2.7.3)
       domain_name (~> 0.5, >= 0.5.1)
       http-cookie (~> 1.0)
@@ -73,6 +75,7 @@ GEM
     rack (1.6.4)
     rake (10.4.2)
     rdoc (4.2.0)
+      json (~> 1.4)
     rspec (3.3.0)
       rspec-core (~> 3.3.0)
       rspec-expectations (~> 3.3.0)
@@ -90,7 +93,7 @@ GEM
     rubyXL (3.3.8)
       nokogiri (>= 1.4.4)
       rubyzip (>= 1.1.6)
-    rubyntlm (0.5.0)
+    rubyntlm (0.5.1)
     rubyzip (1.1.7)
     safe_yaml (1.0.4)
     savon (2.11.1)
@@ -135,4 +138,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.10.3
+   1.10.4

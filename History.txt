@@ -1,3 +1,7 @@
+=== 2.1.9 / 24.06.2015
+
+* Force version of rubyntlm to 0.5.0. Still warning: already initialized constant Net::NTLM::VERSION::MAJOR, but no error
+
 === 2.1.8 / 24.06.2015
 
 * Adapt to download refdata information from new URL using WSDL
