@@ -163,19 +163,24 @@ module Oddb2xml
         begin # instead of Thread.new do
           downloader = MedregbmDownloader.new(what)
           str = downloader.download
+          Oddb2xml.log("SwissmedicInfoDownloader #{what} str #{str.size} bytes")
           self.instance_variable_set(
             "@#{var}".intern,
-            MedregbmExtractor.new(str, what).to_arry
+            items = MedregbmExtractor.new(str, what).to_arry
           )
+          Oddb2xml.log("MedregbmExtractor #{what} added #{items.size} fachinfo")
+          items
         end
       when :fachinfo
         begin # instead of Thread.new do
           downloader = SwissmedicInfoDownloader.new
           xml = downloader.download
+          Oddb2xml.log("SwissmedicInfoDownloader #{var} xml #{xml.size} bytes")
           @mutex.synchronize do
             hsh = SwissmedicInfoExtractor.new(xml).to_hash
             @infos = hsh
             Oddb2xml.log("SwissmedicInfoExtractor added #{@infos.size} fachinfo")
+            @infos
           end
         end
       when :orphan, :fridge
@@ -183,34 +188,41 @@ module Oddb2xml
         begin # instead of Thread.new do
           downloader = SwissmedicDownloader.new(what)
           bin = downloader.download
+          Oddb2xml.log("SwissmedicDownloader #{var} bin #{bin.size} bytes")
           self.instance_variable_set(
             "@#{var}".intern,
-            SwissmedicExtractor.new(bin, what).to_arry
+            items = SwissmedicExtractor.new(bin, what).to_arry
           )
-#          Oddb2xml.log("SwissmedicExtractor added #{self.instance_variable_get("@#{var}".intern).size} #{var}. File #{bin} was #{File.size(bin)} bytes")
+          Oddb2xml.log("SwissmedicExtractor added #{items.size} #{var}. File #{bin} was #{File.size(bin)} bytes")
+          items
         end
       when :interaction
         begin # instead of Thread.new do
           downloader = EphaDownloader.new
           str = downloader.download
+          Oddb2xml.log("EphaDownloader str #{str.size} bytes")
           @mutex.synchronize do
             @actions = EphaExtractor.new(str).to_arry
             Oddb2xml.log("EphaExtractor added #{@actions.size} interactions")
+            @actions
           end
         end
       when :migel
         begin # instead of Thread.new do
           downloader = MigelDownloader.new
           bin = downloader.download
+          Oddb2xml.log("MigelDownloader bin #{bin.size} bytes")
           @mutex.synchronize do
             @migel = MigelExtractor.new(bin).to_hash
             Oddb2xml.log("MigelExtractor added #{@migel.size} migel items")
+            @migel
           end
         end
       when :package
         begin # instead of Thread.new do
           downloader = SwissmedicDownloader.new(:package, @options)
           bin = downloader.download
+          Oddb2xml.log("SwissmedicDownloader bin #{bin.size} bytes")
           @mutex.synchronize do
             @packs = SwissmedicExtractor.new(bin, :package).to_hash
             Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs from #{bin}")
@@ -221,38 +233,44 @@ module Oddb2xml
         begin # instead of Thread.new do
           downloader = BMUpdateDownloader.new
           str = downloader.download
+          Oddb2xml.log("BMUpdateDownloader str #{str.size} bytes")
           @mutex.synchronize do
             @flags = BMUpdateExtractor.new(str).to_hash
             Oddb2xml.log("BMUpdateExtractor added #{@flags.size} flags")
+            @flags
           end
         end
       when :lppv
         begin # instead of Thread.new do
           downloader = LppvDownloader.new
           str = downloader.download
+          Oddb2xml.log("LppvDownloader str #{str.size} bytes")
           @mutex.synchronize do
             @lppvs = LppvExtractor.new(str).to_hash
             Oddb2xml.log("LppvExtractor added #{@lppvs.size} lppvs")
+            @lppvs
           end
         end
       when :bag
         begin # instead of Thread.new do
           downloader = BagXmlDownloader.new(@options)
           xml = downloader.download
+          Oddb2xml.log("BagXmlDownloader xml #{xml.size} bytes")
           @mutex.synchronize do
             hsh = BagXmlExtractor.new(xml).to_hash
             @items = hsh
-            Oddb2xml.log("BagXmlDownloader added #{@items.size} items. #{@items.keys}")
+            Oddb2xml.log("BagXmlExtractor added #{@items.size} items.")
+            @items
           end
         end
       when :zurrose
         begin # instead of Thread.new do
           downloader = ZurroseDownloader.new(@options, @options[:transfer_dat])
           xml = downloader.download
-          Oddb2xml.log("zurrose xml #{xml.size} bytes")
+          Oddb2xml.log("ZurroseDownloader xml #{xml.size} bytes")
           @mutex.synchronize do
             hsh = ZurroseExtractor.new(xml, @options[:extended]).to_hash
-            Oddb2xml.log("zurrose added #{hsh.size} items from xml with #{xml.size} bytes")
+            Oddb2xml.log("ZurroseExtractor added #{hsh.size} items from xml with #{xml.size} bytes")
             @infos_zur_rose = hsh
           end
         end
@@ -261,7 +279,7 @@ module Oddb2xml
           downloader = RefdataDownloader.new(@options, type)
           begin
             xml = downloader.download
-            Oddb2xml.log("refdata #{type} xml #{xml.size} bytes")
+            Oddb2xml.log("RefdataDownloader #{type} xml #{xml.size} bytes")
             xml
           rescue SystemExit
             @mutex.synchronize do
@@ -274,7 +292,8 @@ module Oddb2xml
           @mutex.synchronize do
             hsh = RefdataExtractor.new(xml, type).to_hash
             @refdata_types[type] = hsh
-            Oddb2xml.log("refdata #{type} added #{hsh.size} keys now #{@refdata_types.keys} items from xml with #{xml.size} bytes")
+            Oddb2xml.log("RefdataExtractor #{type} added #{hsh.size} keys now #{@refdata_types.keys} items from xml with #{xml.size} bytes")
+            @refdata_types[type]
           end
         end
       end
