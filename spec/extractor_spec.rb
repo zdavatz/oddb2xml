@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/downloader"
+ENV['TZ'] = 'UTC' # needed for last_change
 
 describe Oddb2xml::BMUpdateExtractor do
   before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
@@ -65,7 +66,7 @@ describe Oddb2xml::RefdataExtractor do
         :_type=>:pharma,
         :ean=> Oddb2xml::LEVETIRACETAM_GTIN,
         :pharmacode=> pharma_code_LEVETIRACETAM,
-        :last_change => "2015-06-04 00:00:00 +0200",
+        :last_change => "2015-06-04 00:00:00 +0000",
         :desc_de=>"LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
         :desc_fr=>"LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce",
         :atc_code=>"N03AX14",
@@ -91,7 +92,7 @@ describe Oddb2xml::RefdataExtractor do
       :_type=>:nonpharma,
       :ean=>"7611600441020",
       :pharmacode=>pharma_code_TUBEGAZE,
-      :last_change => "2015-06-04 00:00:00 +0200",
+      :last_change => "2015-06-04 00:00:00 +0000",
       :desc_de=>"TUBEGAZE Verband weiss Nr 12 20m Finger gross",
       :desc_fr=>"TUBEGAZE pans tubul blanc Nr 12 20m doigts grands",
       :atc_code=>"",
