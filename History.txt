@@ -1,3 +1,8 @@
+=== 2.2.0 / 24.06.2015
+
+* Use FixNum instead of String for EAN-keys into hashes
+* Improved speed (oddb2xml -e takes now less than 1 hour here)
+
 === 2.1.9 / 24.06.2015
 
 * Force version of rubyntlm to 0.5.0. Still warning: already initialized constant Net::NTLM::VERSION::MAJOR, but no error

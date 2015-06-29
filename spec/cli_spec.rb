@@ -44,6 +44,16 @@ describe Oddb2xml::Cli do
     cleanup_compressor
   end
 
+  context 'when -x address option is given' do
+    before(:all) do
+      cleanup_directories_before_run
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-e --log'.split(' '))
+      @cli = Oddb2xml::Cli.new(options.opts)
+      @cli_output = buildr_capture(:stdout) { @cli.run }
+    end
+  end
+if true
   context 'when -t md option is given' do
     before(:all) do
       cleanup_directories_before_run
@@ -287,4 +297,5 @@ describe Oddb2xml::Cli do
       end.to_a.length.should equal expected
     end
   end
+end
 end

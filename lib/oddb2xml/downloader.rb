@@ -202,7 +202,7 @@ module Oddb2xml
         end
       end
       content = read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
-      FileUtils.rm_f(file, :verbose => false) unless defined?(Rspec)
+      FileUtils.rm_f(file, :verbose => false) unless defined?(RSpec)
       content
     end
   end

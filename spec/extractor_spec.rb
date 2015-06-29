@@ -41,9 +41,10 @@ describe Oddb2xml::MigelExtractor do
   after(:all) { VCR.eject_cassette }
   it "should have at some items" do
     expect(@items.size).not_to eq 0
-    expect(@items.find{|k,v| /3248410/i.match(v[:pharmacode]) }).not_to be_nil
+    expect(@items.find{|k,v| 3248410 == v[:pharmacode] }).not_to be_nil
     expect(@items.find{|k,v| /Novopen/i.match(v[:desc_de]) }).not_to be_nil
-    expect(@items.find{|k,v| /3036984/i.match(v[:pharmacode]) }).not_to be_nil
+    expect(@items.find{|k,v| 3036984 == v[:pharmacode] }).not_to be_nil
+    expect(@items.find{|k,v| /Epimineral/i.match(v[:desc_de]) }).not_to be_nil
   end
 end
 
@@ -59,12 +60,12 @@ describe Oddb2xml::RefdataExtractor do
 
     it "should have correct info for pharmacode 1699947 correctly" do
       @pharma_items = subject.to_hash
-      pharma_code_LEVETIRACETAM = "5819012"
+      pharma_code_LEVETIRACETAM = 5819012
       item_found = @pharma_items.values.find{ |x| x[:pharmacode].eql?(pharma_code_LEVETIRACETAM)}
       expect(item_found).not_to be nil
       expected = { :refdata=>true,
         :_type=>:pharma,
-        :ean=> Oddb2xml::LEVETIRACETAM_GTIN,
+        :ean=> Oddb2xml::LEVETIRACETAM_GTIN.to_i,
         :pharmacode=> pharma_code_LEVETIRACETAM,
         :last_change => "2015-06-04 00:00:00 +0000",
         :desc_de=>"LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
@@ -85,12 +86,12 @@ describe Oddb2xml::RefdataExtractor do
 
     it "should have correct info for nonpharma with pharmacode 0058502 correctly" do
       @non_pharma_items = subject.to_hash
-      pharma_code_TUBEGAZE = '0058519'
+      pharma_code_TUBEGAZE = 58519
       item_found = @non_pharma_items.values.find{ |x| x[:pharmacode].eql?(pharma_code_TUBEGAZE)}
       expect(item_found).not_to be nil
       expected = {:refdata=>true,
       :_type=>:nonpharma,
-      :ean=>"7611600441020",
+      :ean=>7611600441020,
       :pharmacode=>pharma_code_TUBEGAZE,
       :last_change => "2015-06-04 00:00:00 +0000",
       :desc_de=>"TUBEGAZE Verband weiss Nr 12 20m Finger gross",
@@ -114,23 +115,24 @@ describe Oddb2xml::BagXmlExtractor do
     end
     it "should handle pub_price for 1699947 correctly" do
       @items = subject.to_hash
-      with_pharma = @items['1699947']
+      with_pharma = @items[Oddb2xml::THREE_TC_GTIN]
       expect(with_pharma).not_to be_nil
+      expect(with_pharma[:name_de]).to eq '3TC'
       expect(with_pharma[:atc_code]).not_to be_nil
-      expect(with_pharma[:pharmacodes]).not_to be_nil
+      expect(with_pharma[:pharmacodes]).to eq [1699947]
       expect(with_pharma[:packages].size).to eq(1)
-      expect(with_pharma[:packages].first[0]).to eq('1699947')
+      expect(with_pharma[:packages].first[0]).to eq(Oddb2xml::THREE_TC_GTIN)
       expect(with_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('205.3')
       expect(@items.size).to eq(5)
     end
     it "should handle pub_price for 7680620690084 correctly" do
       @items = subject.to_hash
-      no_pharma = @items['7680620690084']
+      no_pharma = @items[7680620690084]
       expect(no_pharma).not_to be_nil
       expect(no_pharma[:atc_code]).not_to be_nil
       expect(no_pharma[:pharmacodes]).not_to be_nil
       expect(no_pharma[:packages].size).to eq(1)
-      expect(no_pharma[:packages].first[0]).to eq('7680620690084')
+      expect(no_pharma[:packages].first[0]).to eq(7680620690084)
       expect(no_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('27.8')
     end
   end
@@ -253,7 +255,7 @@ describe Oddb2xml::ZurroseExtractor do
       Oddb2xml::ZurroseExtractor.new(dat)
     end
     it { expect(subject.to_hash.keys.length).to eq(1) }
-    it { expect(subject.to_hash.keys.first).to eq("7680316440115") }
+    it { expect(subject.to_hash.keys.first).to eq(7680316440115) }
     it { expect(subject.to_hash.values.first[:price]).to eq("8.95") }
   end
   context 'when Estradiol Creme is given' do
@@ -264,11 +266,11 @@ describe Oddb2xml::ZurroseExtractor do
       Oddb2xml::ZurroseExtractor.new(dat)
     end
     it { expect(subject.to_hash.keys.length).to eq(1) }
-    it { expect(subject.to_hash.keys.first).to eq("7680284070840") }
+    it { expect(subject.to_hash.keys.first).to eq(7680284070840) }
     it { expect(subject.to_hash.values.first[:vat]).to eq("2") }
     it { expect(subject.to_hash.values.first[:price]).to eq("9.40") }
     it { expect(subject.to_hash.values.first[:pub_price]).to eq("16.30") }
-    it { expect(subject.to_hash.values.first[:pharmacode]).to eq("0921929") }
+    it { expect(subject.to_hash.values.first[:pharmacode]).to eq(921929) }
   end
   context 'when SELSUN Shampoo is given' do
     subject do
@@ -278,11 +280,11 @@ describe Oddb2xml::ZurroseExtractor do
       Oddb2xml::ZurroseExtractor.new(dat)
     end
     it { expect(subject.to_hash.keys.length).to eq(1) }
-    it { expect(subject.to_hash.keys.first).to eq("7680172330681") }
+    it { expect(subject.to_hash.keys.first).to eq(7680172330681) }
     it { expect(subject.to_hash.values.first[:vat]).to eq("2") }
     it { expect(subject.to_hash.values.first[:price]).to eq("15.76") }
     it { expect(subject.to_hash.values.first[:pub_price]).to eq("24.30") }
-    it { expect(subject.to_hash.values.first[:pharmacode]).to eq("0020652") }
+    it { expect(subject.to_hash.values.first[:pharmacode]).to eq(20652) }
     it 'should set the correct SALECD cmut code' do expect(subject.to_hash.values.first[:cmut]).to eq("2")  end
   end
   context 'when SOFRADEX is given' do
@@ -303,7 +305,7 @@ describe Oddb2xml::ZurroseExtractor do
       DAT
       Oddb2xml::ZurroseExtractor.new(dat, true)
     end
-    it { expect(subject.to_hash.keys.first).to eq("0000008807890") }
+    it { expect(subject.to_hash.keys.first).to eq(8807890) }
     it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("2") end
     it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to match(/Ethacridin lactat 1.+ 100ml/) end
   end

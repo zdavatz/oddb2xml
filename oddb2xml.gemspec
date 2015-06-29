@@ -40,5 +40,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rdoc"
   spec.add_development_dependency "vcr"
   spec.add_development_dependency "timecop"
+  # spec.add_development_dependency "ruby-prof"
 end
 

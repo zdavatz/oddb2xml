@@ -140,7 +140,6 @@ if true
           puts "#{Time.now}: URI was #{i.request.uri}"
           m = /filename=.([^\d]+)/.match(i.response.headers['Content-Disposition'][0])
           puts "#{Time.now}: SwissmedicDownloader #{m[1]} (#{i.response.body.size} bytes)."
-          # binding.pry
           if m and true
             name = m[1].chomp('_')
             swissmedic_dir = File.join(Oddb2xml::WorkDir, 'swissmedic')

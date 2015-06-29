@@ -27,13 +27,6 @@ module Oddb2xml
     def initialize(xml)
       @xml = xml
     end
-    def correct_code(pharmacode, length=7)
-      if pharmacode.length != length # restore zero at the beginnig
-        ("%0#{length}i" % pharmacode.to_i)
-      else
-        pharmacode
-      end
-    end
   end
   class BMUpdateExtractor < Extractor
     include TxtExtractorMethods
@@ -79,11 +72,10 @@ module Oddb2xml
         item[:pharmacodes] = []
         item[:packages]    = {} # pharmacode => package
         seq.Packs.Pack.each do |pac|
-          phar = pac.Pharmacode
-          phar = correct_code(phar.to_s, 7)
-          ean = pac.GTIN
-          binding.pry if pac.GTIN.to_s.eql? '7680324750190'  # lansoyl
-          search_key = phar.to_i != 0 ? phar : ean
+          phar = pac.Pharmacode.to_i
+          ean = pac.GTIN.to_i
+          # search_key = phar.to_i != 0 ? phar : ean
+          search_key = ean != 0 ? ean : phar
           # as common key with RefData Pharma/NonPharma data
           item[:pharmacodes] << phar
           # packages
@@ -141,7 +133,7 @@ module Oddb2xml
             end
             if id.empty? or id == '0'
               key = :pharmacode
-              id  = phar.to_s
+              id  = phar.to_i
             end
             lims.each do |lim|
               limitation = {
@@ -191,16 +183,16 @@ module Oddb2xml
         item = {}
         item[:refdata]         = true
         item[:_type]           = (typ  = pac.ATYPE.downcase.to_sym)  ? typ: ''
-        item[:ean]             = (gtin = pac.GTIN)   ? gtin: ''
-        item[:pharmacode]      = (phar = pac.PHAR)   ? phar: ''
+        item[:ean]             = (gtin = pac.GTIN.to_i)   ? gtin: 0
+        item[:pharmacode]      = (phar = pac.PHAR.to_i)   ? phar: 0
         item[:last_change]     = (date = Time.parse(pac.DT).to_s)  ? date: ''  # Date and time of last data change
         item[:desc_de]         = (dscr = pac.NAME_DE)   ? dscr: ''
         item[:desc_fr]         = (dscr = pac.NAME_FR)   ? dscr: ''
         item[:atc_code]        = (code = pac.ATC)    ? code.to_s : ''
 				item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam: ''
 				item[:company_ean]  = (gln = pac.AUTH_HOLDER_GLN)  ? gln: ''
-        unless item[:pharmacode].empty?
-          item[:pharmacode] = correct_code(item[:pharmacode].to_s, 7)
+        unless item[:pharmacode]
+          item[:pharmacode] = phar
           unless data[item[:pharmacode]] # pharmacode => GTINs
             data[item[:ean]] = []
           end
@@ -322,18 +314,18 @@ module Oddb2xml
       data = {}
       @sheet.each_with_index do |row, i|
         next if i.zero?
-        phar = correct_code(row[1].to_s.gsub(/[^0-9]/, ''), 7)
-        ean = row[0].to_i.to_s
-        ean = '9999'+phar+'99' unless ean.length == 13
+        phar = row[1].to_i
+        ean = row[0].to_i
+        ean = phar unless ean.to_s.length == 13
         data[ean] = {
           :refdata         => true,
           :ean             => ean,
-          :pharmacode      => phar,
+          :pharmacode      => phar.to_i,
           :desc_de         => row[3],
           :desc_fr         => row[4],
           :quantity        => row[5], # quantity
           :company_name    => row[6],
-          :company_ean     => row[7].to_i.to_s,
+          :company_ean     => row[7].to_i,
         }
       end
       data
@@ -476,12 +468,12 @@ module Oddb2xml
         else
           next unless line =~ /(7680\d{9})(\d{1})$/
         end
-        pharma_code = line[3..9]
+        pharma_code = line[3..9].to_i
         if $1.to_s == '0000000000000'
           @@items_without_ean13s += 1
-          ean13 = '000000' + pharma_code # dummy ean13
+          ean13 = pharma_code # dummy ean13
         else
-          ean13 = $1.to_s
+          ean13 = $1.to_i
         end
         if data[ean13]
           @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"

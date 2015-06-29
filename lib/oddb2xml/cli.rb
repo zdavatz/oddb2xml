@@ -90,7 +90,6 @@ module Oddb2xml
     private
     def build
       Oddb2xml.log("Start build")
-      puts "#{File.basename(__FILE__)}:#{__LINE__}: @refdata_types.keys #{@refdata_types.keys}"
       begin
         # require 'pry'; binding.pry
         @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not @options[:extended]
@@ -351,7 +350,7 @@ module Oddb2xml
           if @refdata_types[type]
             indices = @refdata_types[type].values.flatten.length
             if type == :nonpharma
-              migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode].empty? }.map{|m| m[:pharmacode] }
+              migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode]}.map{|m| m[:pharmacode] }
               nonpharmas = @refdata_types[type].keys
               indices += (migel_xls - nonpharmas).length # ignore duplicates, null
               lines << sprintf("\tNonPharma products: %i", indices)

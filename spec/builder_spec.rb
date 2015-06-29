@@ -3,7 +3,7 @@
 require 'spec_helper'
 require "rexml/document"
 include REXML
-RUN_ALL = false
+RUN_ALL = true
 def checkItemForRefdata(doc, pharmacode, isRefdata)
   article = XPath.match( doc, "//ART[PHAR=#{pharmacode.to_s}]").first
   name =     article.elements['DSCRD'].text
@@ -113,6 +113,7 @@ end
 def checkAndGetProductWithGTIN(doc, gtin)
   products = XPath.match( doc, "//PRD[GTIN=#{gtin.to_s}]")
   gtins    = XPath.match( doc, "//PRD[GTIN=#{gtin.to_s}]/GTIN")
+  binding.pry unless gtins.size == 1
   gtins.size.should eq 1
   gtins.first.text.should eq gtin.to_s
   # return product
@@ -176,8 +177,8 @@ def checkProductXml
   doc = REXML::Document.new IO.read(product_filename)
   desitin = checkAndGetProductWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
   desitin.elements['ATC'].text.should == 'N03AX14'
-  desitin.elements['DSCRD'].text.should == "Levetiracetam DESITIN Minipacks mit Mini-Filmtabl 250 mg "
-  desitin.elements['DSCRF'].text.should == 'Levetiracetam DESITIN minipacks avec cpr pell mini 250 mg '
+  desitin.elements['DSCRD'].text.should == "LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk"
+  desitin.elements['DSCRF'].text.should == 'LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce'
   desitin.elements['PRODNO'].text.should eq '620691'
   desitin.elements['IT'].text.should eq '01.07.1.'
   desitin.elements['PackGrSwissmedic'].text.should eq '30'
@@ -208,11 +209,9 @@ end
 
 describe Oddb2xml::Builder do
   NrExtendedArticles = 86
-  NrNonPharmaArticles = 66
-  NrPharmaArticles = 8
   NrSubstances = 12
-  NrProdno = 20
-  NrPackages = 21
+  NrProdno = 19
+  NrPackages = 20
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init
@@ -333,7 +332,11 @@ end
       options = Oddb2xml::Options.new
       options.parser.parse!('-e'.split(' '))
       Oddb2xml::Cli.new(options.opts)
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      if RUN_ALL
+        @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      else
+        Oddb2xml::Cli.new(options.opts).run
+      end
     end
 
     it 'should emit a correct oddb_article.xml' do
@@ -345,9 +348,9 @@ end
     end
 
     it 'should report correct output on stdout' do
-      @res.should match(/NonPharma products/)
-      @res.should match(/NonPharma products: #{NrNonPharmaArticles}/)
-    end
+      @res.should match(/\sPharma products: \d+/)
+      @res.should match(/\sNonPharma products: \d+/)
+    end if RUN_ALL
 
     it 'should contain the correct (normal) prices' do
       checkPrices(false)
@@ -359,7 +362,7 @@ end
       checkItemForRefdata(doc, "1699947", 1) # 3TC Filmtabl 150 mg SMNO 53662013 IKSNR 53‘662, 53‘663
       checkItemForRefdata(doc, "0598003", 0) # SOFRADEX Gtt Auric 8 ml
       checkItemForRefdata(doc, "5366964", 1) # 1-DAY ACUVUE moist jour
-      novopen = checkItemForRefdata(doc, "3036984", 0) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
+      novopen = checkItemForRefdata(doc, "3036984", 1) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
       expect(novopen.elements['ARTBAR/BC'].text).to eq '0'
     end
 
@@ -388,6 +391,7 @@ end
       XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size.should == 1
       dscrds.size.should == NrExtendedArticles
       XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should >= 1
+      XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('002771') }.size.should == 0
       XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('620691') }.size.should == 1
     end
 
