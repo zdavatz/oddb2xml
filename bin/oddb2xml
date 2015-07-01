@@ -6,6 +6,7 @@ root = Pathname.new(__FILE__).realpath.parent.parent
 $:.unshift root.join('lib') if $0 == __FILE__
 
 require 'optparse'
+require 'mechanize'
 require 'oddb2xml'
 require 'oddb2xml/options'
 
