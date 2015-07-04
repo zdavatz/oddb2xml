@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (2.2.0)
+    oddb2xml (2.2.2)
       archive-tar-minitar
       httpi (>= 2.4.1)
       mechanize
@@ -90,7 +90,7 @@ GEM
       rspec-support (~> 3.3.0)
     rspec-support (3.3.0)
     ruby-ole (1.2.11.8)
-    rubyXL (3.3.8)
+    rubyXL (3.3.10)
       nokogiri (>= 1.4.4)
       rubyzip (>= 1.1.6)
     rubyntlm (0.5.1)
@@ -138,4 +138,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   1.10.4
+   1.10.5

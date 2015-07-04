@@ -1,3 +1,7 @@
+=== 2.2.1 / 04.07.2015
+
+* Adapt to new version of swissmedic Packungen.xlsx
+
 === 2.2.1 / 01.07.2015
 
 * Add a require 'mechanize' in bin/oddb2xml to avoid 'Invalid version of rubyntlm'

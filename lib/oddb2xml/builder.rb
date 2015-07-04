@@ -669,14 +669,26 @@ module Oddb2xml
                 puts "#{Time.now}: At row #{row_nr} iksnr #{iksnr}";
                 $stdout.flush
             end
-            no8                 = sprintf('%05d',row.cells[0].value.to_i) + sprintf('%03d',row.cells[10].value.to_i)
-            name                = row.cells[2]  ? row.cells[2].value  : nil
-            atc_code            = row.cells[5]  ? row.cells[5].value  : nil
-            list_code           = row.cells[6]  ? row.cells[6].value  : nil
-            package_size        = row.cells[11] ? row.cells[11].value : nil
-            unit                = row.cells[12] ? row.cells[12].value : nil
-            active_substance    = row.cells[14] ? row.cells[14].value : nil
-            composition         = row.cells[15] ? row.cells[15].value : nil
+            ith       = COLUMNS_JULY_2015.keys.index(:index_therapeuticus)
+            seq_name  = COLUMNS_JULY_2015.keys.index(:name_base)
+            i_3       = COLUMNS_JULY_2015.keys.index(:ikscd)
+            p_1_2     = COLUMNS_JULY_2015.keys.index(:seqnr)
+            cat       = COLUMNS_JULY_2015.keys.index(:ikscat)
+            siz       = COLUMNS_JULY_2015.keys.index(:size)
+            atc       = COLUMNS_JULY_2015.keys.index(:atc_class)
+            list_code = COLUMNS_JULY_2015.keys.index(:production_science)
+            unit      = COLUMNS_JULY_2015.keys.index(:unit)
+            sub       = COLUMNS_JULY_2015.keys.index(:substances)
+            comp      = COLUMNS_JULY_2015.keys.index(:composition)
+
+            no8                 = iksnr + sprintf('%03d',row.cells[i_3].value.to_i)
+            name                = row.cells[seq_name]  ? row.cells[seq_name].value  : nil
+            atc_code            = row.cells[atc]  ? row.cells[atc].value  : nil
+            list_code           = row.cells[list_code]  ? row.cells[list_code].value  : nil
+            package_size        = row.cells[siz] ? row.cells[siz].value : nil
+            unit                = row.cells[unit] ? row.cells[unit].value : nil
+            active_substance    = row.cells[sub] ? row.cells[sub].value : nil
+            composition         = row.cells[comp] ? row.cells[comp].value : nil
 
             # skip veterinary product
             next if atc_code  and /^Q/i.match(atc_code)

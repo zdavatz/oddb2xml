@@ -217,6 +217,7 @@ module Oddb2xml
       when :orphan
         i = 1
         @sheet.each do |row|
+          next unless row[1]
           number = row[1].value.to_i
           if number != 0
             data << sprintf("%05d", number)
@@ -233,19 +234,27 @@ module Oddb2xml
       cleanup_file
       data.uniq
     end
-    def to_hash # Packungen.xls
+
+    def to_hash # Packungen.xlsx COLUMNS_JULY_2015
       data = {}
       return data unless @sheet
       case @type
       when :package
-        typ = 6 # Heilmittelcode
-        i_5,i_3   = 0,10 # :swissmedic_numbers
-        p_5,p_1_2 = 0,1  # :prodno
-        cat       = 13   # :swissmedic_category
-        seq_name  = 2
-        ith       = 4    # :ith_swissmedic IT-Code (swissmedic-diff)
-        atc       = 5    # :atc_code
-        list_code = 6    #  Heilmittelcode, possible values are
+        Oddb2xml.check_column_indices(@sheet)
+        ith       = COLUMNS_JULY_2015.keys.index(:index_therapeuticus)
+        i_5       = COLUMNS_JULY_2015.keys.index(:iksnr)
+        seq_name  = COLUMNS_JULY_2015.keys.index(:name_base)
+        i_3       = COLUMNS_JULY_2015.keys.index(:ikscd)
+        p_1_2     = COLUMNS_JULY_2015.keys.index(:seqnr)
+        cat       = COLUMNS_JULY_2015.keys.index(:ikscat)
+        siz       = COLUMNS_JULY_2015.keys.index(:size)
+        atc       = COLUMNS_JULY_2015.keys.index(:atc_class)
+        list_code = COLUMNS_JULY_2015.keys.index(:production_science)
+        eht       = COLUMNS_JULY_2015.keys.index(:unit)
+        sub       = COLUMNS_JULY_2015.keys.index(:substances)
+        comp      = COLUMNS_JULY_2015.keys.index(:composition)
+
+        # production_science Heilmittelcode, possible values are
         # Allergene
         # Anthroposophika
         # ayurvedische Arzneimittel
@@ -262,14 +271,10 @@ module Oddb2xml
         # tibetische Arzneimittel
         # Tierarzneimittel
         # Transplantat: Gewebeprodukt
-        siz       = 11   # :package_size
-        eht       = 12   # :einheit_swissmedic
-        sub       = 14   # :substance_swissmedic
-        comp      = 15   # :composition_swissmedic
         @sheet.each_with_index do |row, i|
 
           next if (i <= 1)
-          next unless row[i_5] and row[i_3]
+          next unless row and row[i_5] and row[i_3]
           no8 = sprintf('%05d',row[i_5].value.to_i) + sprintf('%03d',row[i_3].value.to_i)
           prodno = sprintf('%05d',row[i_5].value.to_i) + row[p_1_2].value.to_i.to_s
           unless no8.empty?
@@ -287,7 +292,7 @@ module Oddb2xml
               :substance_swissmedic => row[sub] ? row[sub].value.to_s : '',
               :composition_swissmedic => row[comp] ? row[comp].value.to_s : '',
               :sequence_name        => row[seq_name] ? row[seq_name].value.to_s : '',
-              :is_tier              => (row[typ] == 'Tierarzneimittel' ? true : false),
+              :is_tier              => (row[list_code] == 'Tierarzneimittel' ? true : false),
             }
           end
         end

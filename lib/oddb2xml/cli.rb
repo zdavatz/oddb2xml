@@ -187,7 +187,7 @@ module Oddb2xml
         begin # instead of Thread.new do
           downloader = SwissmedicDownloader.new(what)
           bin = downloader.download
-          Oddb2xml.log("SwissmedicDownloader #{var} bin #{bin.size} bytes")
+          Oddb2xml.log("SwissmedicDownloader #{var} #{bin} #{File.size(bin)} bytes")
           self.instance_variable_set(
             "@#{var}".intern,
             items = SwissmedicExtractor.new(bin, what).to_arry
@@ -221,7 +221,7 @@ module Oddb2xml
         begin # instead of Thread.new do
           downloader = SwissmedicDownloader.new(:package, @options)
           bin = downloader.download
-          Oddb2xml.log("SwissmedicDownloader bin #{bin.size} bytes")
+          Oddb2xml.log("SwissmedicDownloader package #{bin} #{File.size(bin)} bytes")
           @mutex.synchronize do
             @packs = SwissmedicExtractor.new(bin, :package).to_hash
             Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs from #{bin}")
