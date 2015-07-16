@@ -247,6 +247,43 @@ product.xml has relation to substance as `<SUBNO>`.
 </SUBSTANCE>
 ```
 
+## Data sources
+
+We use the following files:
+
+* https://www.swissmedic.ch/arzneimittel/00156/00221/00222/00230/index.html?lang=de (Präparateliste und zugelassene Packungen)
+* https://download.epha.ch/cleaned/matrix.csv (Interactions from epha)
+* http://refdatabase.refdata.ch/Service/Article.asmx
+* http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip
+* https://www.medregbm.admin.ch/Publikation/CreateExcelListBetriebs
+* https://www.medregbm.admin.ch/Publikation/CreateExcelListMedizinalPersons
+* http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat
+* https://index.ws.e-mediat.net/Swissindex/NonPharma/ws_NonPharma_V101.asmx
+* https://index.ws.e-mediat.net/Swissindex/NonPharma/ws_Pharma_V101.asmx
+* http://download.swissmedicinfo.ch/ (AipsDownload)
+* https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt
+* https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/BM_Update.txt
+* https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv
+
+## Rules for matching GTIN (aka EAN13), product number and IKSNR
+
+For drugs which appear in Packungen.xlsx file published by Swissmedic the following rule is used to create the GTIN
+* First 4 digits identify SwissMedic and are fixed to 7680
+* next 5 digits corresponding to IKSNR (authorization) number
+* next 3 digits corresponding to Packungscode
+* last digit is checksum
+
+The product number is calculated as
+* 5 digits corresponding to IKSNR (authorization) number
+* 2 digits corresponding to Dosisstärke (aka sequence number)
+
+In oddb_article.xml you find
+* GTIN is found as "BC" inside "ARTBAR"
+* The product number as field PRODNO
+
+Example given. For the IKSNR 48305 sequence number 1 named "Felden, Gel" with Packungscode "024" we get GTIN 7680483050247 and a product number 483051.
+
+
 ## SSLv3 cert for Windows Users
 
 Some websites need SSLv3 connection.
