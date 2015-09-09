@@ -1,3 +1,8 @@
+=== 2.2.5 / 09.09.2015
+
+* Added field GEN_PRODUCTION, INSULIN_CATEGORY and DRUG_INDEX
+* Removed downloads of old BM_update from ywesee, as we have a better info about the drugs now
+
 === 2.2.4 / 09.09.2015
 
 * Fixed unit tests error introduced by the new column order of Packungen.xlsx

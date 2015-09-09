@@ -284,7 +284,6 @@ We use the following files:
 * https://index.ws.e-mediat.net/Swissindex/NonPharma/ws_Pharma_V101.asmx
 * http://download.swissmedicinfo.ch/ (AipsDownload)
 * https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt
-* https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/BM_Update.txt
 * https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv
 
 ## Rules for matching GTIN (aka EAN13), product number and IKSNR
