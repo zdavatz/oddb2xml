@@ -1,3 +1,8 @@
+=== 2.2.4 / 09.09.2015
+
+* Fixed unit tests error introduced by the new column order of Packungen.xlsx
+* Add a SHA256 hash  for all top elements in the generated XSD-files
+
 === 2.2.3 / 16.07.2015
 
 * Document data sources and some rule in README.md

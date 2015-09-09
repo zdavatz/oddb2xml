@@ -38,6 +38,9 @@ The following additional data is in the files:
 * [Betäubungsmittel](http://www.swissmedic.ch/produktbereiche/00447/00536/index.html?lang=de&download=NHzLpZeg7t,lnp6I0NTU042l2Z6ln1acy4Zn4Z2qZpnO2Yuq2Z6gpJCDdH1,fWym162epYbg2c_JjKbNoKSn6A--&.pdf) und psychotrope Stoffe (Swissmedic)
 * Non-Pharma from Refdata and Suppliers (swissINDEX)
 
+The top elements of all XML files have a SHA256 attribute over their content. The content corresponds to Nokogiris text method of the node which is essentially join by "\n" + some whitespaces of each element.
+Consumers of the data file may use it to check whether they have to replace the corresponding nodes.
+
 ## usage
 
 see `--help`.
@@ -138,37 +141,55 @@ oddb2xml creates article.xml as oddb_article.xml by default.
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
-<ARTICLE xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration" CREATION_DATETIME="2012-11-21T13:09:23.6787110+0900" PROD_DATE="2012-11-21T13:09:23.6787110+0900" VALID_DATE="2012-11-21T13:09:23.6787110+0900">
-  <ART DT="">
-    <PHAR>31532</PHAR>
-    <PRDNO>4123</PRDNO>
+<ARTICLE xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration" CREATION_DATETIME="2015-09-09T09:50:28+0000" PROD_DATE="2015-09-09T09:50:28+0000" VALID_DATE="2015-09-09T09:50:28+0000">
+  <ART DT="2015-09-09 00:00:00 +0000" SHA256="896dd24bfb4cfd56dcfd3709150da9b652626a430adefbe57cb405a9d46684c6">
+    <REF_DATA>1</REF_DATA>
+    <PHAR>2731179</PHAR>
     <SMCAT>D</SMCAT>
-    <SMNO>29152039</SMNO>
+    <SMNO>16105058</SMNO>
+    <PRODNO>161051</PRODNO>
+    <VAT>2</VAT>
     <SALECD>A</SALECD>
-    <QTY>10 Stk</QTY>
-    <DSCRD>BEN-U-RON Supp 250 mg Kind</DSCRD>
-    <DSCRF>BEN-U-RON supp 250 mg enf</DSCRF>
-    <SORTD>BEN-U-RON SUPP 250 MG KIND</SORTD>
-    <SORTF>BEN-U-RON SUPP 250 MG ENF</SORTF>
-    <SYN1D>Ben-u-ron</SYN1D>
-    <SYN1F>Ben-u-ron</SYN1F>
+    <CDBG>N</CDBG>
+    <BG>N</BG>
+    <DSCRD>HIRUDOID Creme 3 mg/g 40 g</DSCRD>
+    <DSCRF>HIRUDOID crème 3 mg/g 40 g</DSCRF>
+    <SORTD>HIRUDOID CREME 3 MG/G 40 G</SORTD>
+    <SORTF>HIRUDOID CRèME 3 MG/G 40 G</SORTF>
+    <SYN1D>Hirudoid</SYN1D>
+    <SYN1F>Hirudoid</SYN1F>
     <SLOPLUS>2</SLOPLUS>
-    <ARTCOMP/>
+    <ARTCOMP>
+      <COMPNO>7601001002258</COMPNO>
+    </ARTCOMP>
     <ARTBAR>
       <CDTYP>E13</CDTYP>
-      <BC>7680291520390</BC>
+      <BC>7680161050583</BC>
       <BCSTAT>A</BCSTAT>
     </ARTBAR>
     <ARTPRI>
       <VDAT>01.11.2012</VDAT>
       <PTYP>PEXF</PTYP>
-      <PRICE>1.780086</PRICE>
+      <PRICE>4.768575</PRICE>
     </ARTPRI>
     <ARTPRI>
       <VDAT>01.11.2012</VDAT>
       <PTYP>PPUB</PTYP>
-      <PRICE>3.3</PRICE>
+      <PRICE>8.8</PRICE>
     </ARTPRI>
+    <ARTPRI>
+      <VDAT>09.09.2015</VDAT>
+      <PTYP>ZURROSE</PTYP>
+      <PRICE>4.77</PRICE>
+    </ARTPRI>
+    <ARTPRI>
+      <VDAT>09.09.2015</VDAT>
+      <PTYP>ZURROSEPUB</PTYP>
+      <PRICE>8.80</PRICE>
+    </ARTPRI>
+    <ARTINS>
+      <NINCD>10</NINCD>
+    </ARTINS>
   </ART>
   ...
   <RESULT>
@@ -187,31 +208,32 @@ For example, if `-t _swiss` is given then oddb2xml creates product.xml as swiss_
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <PRODUCT_SWISS xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration" CREATION_DATETIME="2012-11-21T13:01:29.5903756+0900" PROD_DATE="2012-11-21T13:01:29.5903756+0900" VALID_DATE="2012-11-21T13:01:29.5903756+0900">
-  <PRD_SWISS DT="">
-    <GTIN_SWISS>7680353660163</GTIN_SWISS>
-    <PRODNO_SWISS>353661</PRODNO_SWISS>
-    <DSCRD_SWISS>Kendural Depottabl </DSCRD_SWISS>
-    <DSCRF_SWISS>Kendural cpr dépôt </DSCRF_SWISS>
-    <ATC_SWISS>B03AE10</ATC_SWISS>
-    <IT_SWISS>06.07.1.</IT_SWISS>
-    <CPT_SWISS>
-      <CPTCMP_SWISS>
-        <LINE_SWISS>0</LINE_SWISS>
-        <SUBNO_SWISS>507</SUBNO_SWISS>
-        <QTY_SWISS>105</QTY_SWISS>
-        <QTYU_SWISS>mg</QTYU_SWISS>
-      </CPTCMP_SWISS>
-      <CPTCMP_SWISS>
-        <LINE_SWISS>1</LINE_SWISS>
-        <SUBNO_SWISS>23</SUBNO_SWISS>
-        <QTY_SWISS>500</QTY_SWISS>
-        <QTYU_SWISS>mg</QTYU_SWISS>
-      </CPTCMP_SWISS>
-    </CPT_SWISS>
-    <PackGrSwissmedic_SWISS>30</PackGrSwissmedic_SWISS>
-    <EinheitSwissmedic_SWISS>Tablette(n)</EinheitSwissmedic_SWISS>
-    <SubstanceSwissmedic_SWISS>ferrum(II), acidum ascorbicum</SubstanceSwissmedic_SWISS>
-  </PRD_SWISS>
+  <PRD_SWISS DT="" SHA256="aa82eee2d542787cf2cb8b7f17d748223ec723b935ce20cd29d89e284d16fea1">
+    <GTIN>7680353660163</GTIN>
+    <PRODNO>353661</PRODNO>
+    <DSCRD>KENDURAL Depottabl 30 Stk</DSCRD>
+    <DSCRF>KENDURAL cpr dépot 30 pce</DSCRF>
+    <ATC>B03AE10</ATC>
+    <IT>06.07.1.</IT>
+    <CPT>
+      <CPTCMP>
+        <LINE>0</LINE>
+        <SUBNO>5</SUBNO>
+        <QTY>105</QTY>
+        <QTYU>mg</QTYU>
+      </CPTCMP>
+      <CPTCMP>
+        <LINE>1</LINE>
+        <SUBNO>1</SUBNO>
+        <QTY>500</QTY>
+        <QTYU>mg</QTYU>
+      </CPTCMP>
+    </CPT>
+    <PackGrSwissmedic>30</PackGrSwissmedic>
+    <EinheitSwissmedic>Tablette(n)</EinheitSwissmedic>
+    <SubstanceSwissmedic>ferrum(II), acidum ascorbicum</SubstanceSwissmedic>
+    <CompositionSwissmedic>ferrum(II) 105 mg ut ferrosi sulfas dessiccatus, acidum ascorbicum 500 mg ut natrii ascorbas, color.: E 124, excipiens pro compresso obducto.</CompositionSwissmedic>
+  </PRD>
   ...
   <RESULT_SWISS>
     <OK_ERROR_SWISS>OK</OK_ERROR_SWISS>
@@ -229,13 +251,13 @@ product.xml has relation to substance as `<SUBNO>`.
 ```
 <?xml version="1.0" encoding="utf-8"?>
 <SUBSTANCE xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://wiki.oddb.org/wiki.php?pagename=Swissmedic.Datendeklaration" CREATION_DATETIME="2012-12-11T14:27:17.4444763+0900" PROD_DATE="2012-12-11T14:27:17.4444763+0900" VALID_DATE="2012-12-11T14:27:17.4444763+0900">
-  <SB DT="">
+  <SB DT="" SHA256="a510f9b1e7216cda2d5e0c3b82bacef96da963e14f36c97e0e1a8baf55d00287">
     <SUBNO>1</SUBNO>
-    <NAML>3-Methoxy-butylis acetas</NAML>
+    <NAML>Acidum ascorbicum (Vitamin C, E300)</NAML>
   </SB>
-  <SB DT="">
+  <SB DT="" SHA256="de64fcc718b7f30bfe4283fb40c8b558cf2f30a8acc4a7bf6a643e82dfe82931">
     <SUBNO>2</SUBNO>
-    <NAML>4-Methylbenzylidene camphor</NAML>
+    <NAML>Alprostadilum</NAML>
   </SB>
   ...
   <RESULT>
