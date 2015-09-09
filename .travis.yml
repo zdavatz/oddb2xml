@@ -3,6 +3,7 @@ language: ruby
 bundler_args: --without debugger
 
 cache: bundler
+sudo: false
 
 before_install:
   - gem --version
