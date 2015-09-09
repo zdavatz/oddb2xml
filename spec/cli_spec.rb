@@ -100,9 +100,8 @@ describe Oddb2xml::Cli do
         tst_size = File.size(tst_file)
         if tst_size < 1024
           puts "File #{name} is only #{tst_size} bytes long"
-          require 'pry'; binding.pry
         end
-        expect(tst_size).to be >= 1024
+        expect(tst_size).to be >= 400
       }
     end
     it 'should produce a correct report' do
