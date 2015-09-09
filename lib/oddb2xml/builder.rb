@@ -290,7 +290,7 @@ module Oddb2xml
           }
         }
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_limitation
       prepare_limitations
@@ -330,7 +330,7 @@ module Oddb2xml
           }
         }
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_interaction
       prepare_interactions
@@ -388,7 +388,7 @@ module Oddb2xml
           }
         }
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_code
       prepare_codes
@@ -418,7 +418,7 @@ module Oddb2xml
           }
         }
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def add_missing_products_from_swissmedic
       Oddb2xml.log "build_product add_missing_products_from_swissmedic. Starting with #{@products.size} products and #{@packs.size} @packs"
@@ -618,7 +618,7 @@ module Oddb2xml
           }
         }
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
 
     def build_calc
@@ -741,7 +741,7 @@ module Oddb2xml
           csv <<  [key] + value.to_array
         end
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_article
       prepare_limitations
@@ -952,7 +952,7 @@ module Oddb2xml
         }
       end
       Oddb2xml.log "build_article. Done #{idx} of #{@articles.size} articles"
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_fi
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
@@ -989,7 +989,7 @@ module Oddb2xml
           }
         }
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_fi_product
       prepare_products
@@ -1032,7 +1032,7 @@ module Oddb2xml
           }
         }
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_company
       Oddb2xml.log "build_company #{@companies.size} companies"
@@ -1063,7 +1063,7 @@ module Oddb2xml
           }
         }
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_person
       Oddb2xml.log "build_person #{@people.size} persons"
@@ -1093,7 +1093,7 @@ module Oddb2xml
           }
         }
       end
-      _builder.to_xml
+      Oddb2xml.add_hash(_builder.to_xml)
     end
     def detect_nincd(de_idx)
       if @lppvs[de_idx[:ean]] # LPPV

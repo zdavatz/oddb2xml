@@ -224,6 +224,37 @@ describe Oddb2xml::Builder do
   after(:all) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
+  context 'when default options are given' do
+    before(:all) do
+      common_run_init
+      options = Oddb2xml::Options.new
+      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+    end
+
+    it 'should return produce a oddb_article.xml' do
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      File.exists?(@article_xml).should eq true
+    end
+
+    it 'oddb_article.xml should contain a SHA256' do
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      content = IO.read(@article_xml)
+      doc = REXML::Document.new File.new(@article_xml)
+      expect( XPath.match( doc, "//ART").first.attributes['DT']).to match /\d{4}-\d{2}-\d{2}/
+      expect( XPath.match( doc, "//ART").first.attributes['SHA256'].size).to eq 64
+    end
+
+    it 'should be possible to verify the oddb_article.xml' do
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      result = Oddb2xml.verify_sha256(@article_xml)
+      expect(result)
+    end
+
+    it 'should be possible to verify all xml files against our XSD' do
+      check_validation_via_xsd
+    end
+  end
+
   context 'when -o for fachinfo is given' do
     before(:all) do
       common_run_init

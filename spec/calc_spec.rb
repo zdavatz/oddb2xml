@@ -315,7 +315,6 @@ if RunAllTests
       File.exists?(oddb_calc_xsd).should eq true
       xsd = Nokogiri::XML::Schema(File.read(oddb_calc_xsd))
       doc = Nokogiri::XML(File.read(xml_file_name))
-      # puts xml; binding.pry
       xsd.validate(doc).each do |error|  expect(error).to be_nil end
       doc = REXML::Document.new xml
       gtin = '7680540151009'

@@ -81,9 +81,9 @@ def common_after
   vcr_file = File.expand_path(File.join(Oddb2xml::SpecData, '..', 'fixtures', 'vcr_cassettes', 'oddb2xml.json'))
   puts "Pretty-printing #{vcr_file} exists? #{File.exists?(vcr_file)}"
   vcr_file_new = vcr_file.sub('.json', '.new')
-  cmd = "date; cat #{vcr_file} | python -mjson.tool > #{vcr_file_new}; date"
+  cmd = "cat #{vcr_file} | python -mjson.tool > #{vcr_file_new}"
   res = system(cmd)
-  FileUtils.mv(vcr_file_new, vcr_file, :verbose => true)
+  FileUtils.mv(vcr_file_new, vcr_file)
 end
 
 # Zips input_filenames (using the basename)
@@ -237,6 +237,7 @@ end
 
   context 'orphan' do
     before(:each) do
+      VCR.eject_cassette
       VCR.insert_cassette('oddb2xml', :tag => :swissmedic, :exclusive => false)
       common_before
       @downloader = Oddb2xml::SwissmedicDownloader.new(:orphan)
@@ -263,6 +264,7 @@ end
   end
   context 'fridge' do
     before(:each) do
+      VCR.eject_cassette
       VCR.insert_cassette('oddb2xml', :tag => :swissmedic, :exclusive => false)
       common_before
       @downloader = Oddb2xml::SwissmedicDownloader.new(:fridge)
@@ -280,6 +282,7 @@ end
   end
   context 'package' do
     before(:each) do
+      VCR.eject_cassette
       VCR.insert_cassette('oddb2xml', :tag => :swissmedic, :exclusive => false)
       common_before
       @downloader = Oddb2xml::SwissmedicDownloader.new(:package)

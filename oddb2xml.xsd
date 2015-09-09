@@ -137,6 +137,7 @@
         <xs:element minOccurs="0" ref="ns1:ARTINS"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="PHAR" type="xs:integer"/>
@@ -323,6 +324,7 @@
         <xs:element minOccurs="0" ref="ns1:ARTINSMD"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="PHARMD" type="xs:integer"/>
@@ -459,6 +461,7 @@
         <xs:element ref="ns1:BTM_Berechtigung"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="GLN_Betrieb" type="xs:integer"/>
@@ -507,6 +510,7 @@
         <xs:element ref="ns1:DEL"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="CODEMD">
@@ -529,6 +533,7 @@
         <xs:element ref="ns1:DELMD"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="DSCRSDMD" type="xs:string"/>
@@ -560,6 +565,7 @@
         <xs:element ref="ns1:DEL"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="IXNO" type="xs:integer"/>
@@ -619,6 +625,7 @@
         <xs:element ref="ns1:DELMD"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="IXNOMD" type="xs:integer"/>
@@ -679,6 +686,7 @@
         <xs:element ref="ns1:VDAT"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Pharmacode" type="xs:integer"/>
@@ -735,6 +743,7 @@
         <xs:element ref="ns1:VDATMD"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="PharmacodeMD" type="xs:integer"/>
@@ -809,6 +818,7 @@
         <xs:element minOccurs="0" ref="ns1:CompositionSwissmedic"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="GTIN" type="xs:integer"/>
@@ -880,6 +890,7 @@
         <xs:element minOccurs="0" ref="ns1:SubstanceSwissmedicMD"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="GTINMD" type="xs:integer"/>
@@ -941,6 +952,7 @@
         </xs:element>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="GLN_Person" type="xs:integer"/>
@@ -973,6 +985,7 @@
         <xs:element ref="ns1:SUBNO"/>
         <xs:element ref="ns1:NAML"/>
       </xs:sequence>
+      <xs:attribute type="xs:string" name="SHA256" use="required"/>
       <xs:attribute name="DT" use="required"/>
     </xs:complexType>
   </xs:element>

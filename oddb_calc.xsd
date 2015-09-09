@@ -129,6 +129,7 @@
                 </xs:complexType>
               </xs:element>
             </xs:sequence>
+            <xs:attribute type="xs:string" name="SHA256"/>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
@@ -138,3 +139,4 @@
     </xs:complexType>
   </xs:element>
 </xs:schema>
+

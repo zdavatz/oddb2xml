@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'open-uri'
 module Oddb2xml
   def Oddb2xml.calc_checksum(str)
@@ -110,4 +111,31 @@ module Oddb2xml
       :insulin_category => /Kategorie bei Insulinen/i,
       :drug_index       => /Verz. bei betäubunsmittel-haltigen Präparaten/i,
   }
+
+  def Oddb2xml.add_hash(string)
+    doc = Nokogiri::XML.parse(string)
+    nr = 0
+    doc.root.elements.each do |node|
+      nr += 1
+      next if node.name.eql?('RESULT')
+      node['SHA256'] = Digest::SHA256.hexdigest node.text
+    end
+    doc.to_xml
+  end
+
+  def Oddb2xml.verify_sha256(file)
+    f = File.open(file)
+    doc = Nokogiri::XML(f)
+    nr = 0
+    doc.root.elements.each do |node|
+      nr += 1
+      next if node.name.eql?('RESULT')
+      sha256 = Digest::SHA256.hexdigest node.text
+      unless node['SHA256'].eql?(sha256)
+        puts "Verifiying #{node['SHA256']} != expectd #{sha256} against node #{node.text} failed"
+        exit (3)
+      end
+    end
+    return true
+  end
 end

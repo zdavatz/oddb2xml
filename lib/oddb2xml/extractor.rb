@@ -232,6 +232,7 @@ module Oddb2xml
         end
       end
       cleanup_file
+      # puts "found #{data.uniq.size} entities for type #{@type}"
       data.uniq
     end
 
