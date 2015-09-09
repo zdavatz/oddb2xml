@@ -4,19 +4,7 @@ require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/downloader"
 ENV['TZ'] = 'UTC' # needed for last_change
 LAST_CHANGE = "2015-07-03 00:00:00 +0000"
-describe Oddb2xml::BMUpdateExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
-  before(:all) {
-    VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
-    @downloader = Oddb2xml::BMUpdateDownloader.new
-    xml = @downloader.download
-    @items = Oddb2xml::BMUpdateExtractor.new(xml).to_hash
-  }
-  it "should have at least one item" do
-    expect(@items.size).not_to eq 0
-  end
-end
+NR_PACKS = 17
 
 describe Oddb2xml::LppvExtractor do
   before(:all) {
@@ -76,7 +64,7 @@ describe Oddb2xml::RefdataExtractor do
         :company_name=>"Desitin Pharma GmbH",
         :company_ean=>"7601001320451"}
       expect(item_found).to eq(expected)
-      expect(@pharma_items.size).to eq(15)
+      expect(@pharma_items.size).to eq(NR_PACKS)
     end
 	end
   context 'should handle nonpharma articles' do
@@ -165,44 +153,72 @@ describe Oddb2xml::SwissmedicInfoExtractor do
 end
 
 describe Oddb2xml::SwissmedicExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
+  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml'); cleanup_directories_before_run }
   after(:all) { VCR.eject_cassette }
   context 'when transfer.dat is empty' do
     subject { Oddb2xml::SwissmedicInfoExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
   end
   context 'can parse swissmedic_package.xlsx' do
-    it {
-        cleanup_directories_before_run
-        filename = File.join(Oddb2xml::SpecData, 'swissmedic_package.xlsx')
-        @packs = Oddb2xml::SwissmedicExtractor.new(filename, :package).to_hash
-        expect(@packs.size).to eq(15)
-        serocytol = nil
-        @packs.each{|pack|
-                    serocytol = pack[1] if pack[1][:ean] == '7680620690084'
-                   }
-        expect(serocytol[:atc_code]).to eq('N03AX14')
-        expect(serocytol[:swissmedic_category]).to eq('B')
-        expect(serocytol[:package_size]).to eq('30')
-        expect(serocytol[:einheit_swissmedic]).to eq('Tablette(n)')
-        expect(serocytol[:substance_swissmedic]).to eq('levetiracetamum')
-      }
+    before(:all) do
+        @filename = File.join(Oddb2xml::SpecData, 'swissmedic_package.xlsx')
+        @packs = Oddb2xml::SwissmedicExtractor.new(@filename, :package).to_hash
+    end
+
+    def get_pack_by_ean13(ean13)
+      @packs.find{|pack| pack[1][:ean] == ean13.to_s }[1]
+    end
+    it 'should have correct nr of packages' do
+      expect(@packs.size).to eq(NR_PACKS)
+    end
+
+    it 'should have serocytol' do
+      serocytol = get_pack_by_ean13(7680620690084)
+      expect(serocytol[:atc_code]).to eq('N03AX14')
+      expect(serocytol[:swissmedic_category]).to eq('B')
+      expect(serocytol[:package_size]).to eq('30')
+      expect(serocytol[:einheit_swissmedic]).to eq('Tablette(n)')
+      expect(serocytol[:substance_swissmedic]).to eq('levetiracetamum')
+    end
+
+    it 'should have a correct insulin (gentechnik)' do
+      humalog = get_pack_by_ean13(7680532900196)
+      expect(humalog[:atc_code]).to eq('A10AB04')
+      expect(humalog[:swissmedic_category]).to eq('B')
+      expect(humalog[:package_size]).to eq('1 x 10 ml')
+      expect(humalog[:einheit_swissmedic]).to eq('Flasche(n)')
+      expect(humalog[:substance_swissmedic]).to eq('insulinum lisprum')
+      expect(humalog[:gen_production]).to eq('X')
+      expect(humalog[:insulin_category]).to eq('Insulinanalog: schnell wirkend')
+      expect(humalog[:drug_index]).to eq('')
+    end
+
+    it 'should have a correct drug information' do
+      humalog = get_pack_by_ean13(7680555610041)
+      expect(humalog[:atc_code]).to eq('N07BC06')
+      expect(humalog[:swissmedic_category]).to eq('A')
+      expect(humalog[:sequence_name]).to eq('Diaphin 10 g i.v., Injektionspräparat')
+      expect(humalog[:gen_production]).to eq('')
+      expect(humalog[:insulin_category]).to eq('')
+      expect(humalog[:drug_index]).to eq('d')
+    end
   end
+
   context 'can parse swissmedic_fridge.xlsx' do
     it {
-        filename = File.join(Oddb2xml::SpecData, 'swissmedic_fridge.xlsx')
-        @packs = Oddb2xml::SwissmedicExtractor.new(filename, :fridge).to_arry
-        expect(@packs.size >= 17).to eq true
+        @filename = File.join(Oddb2xml::SpecData, 'swissmedic_fridge.xlsx')
+        @packs = Oddb2xml::SwissmedicExtractor.new(@filename, :fridge).to_arry
+        expect(@packs.size).to eq NR_PACKS
         expect(@packs[0]).to eq("58618")
         expect(@packs[1]).to eq("00696")
       }
   end
   context 'can parse swissmedic_orphans.xls' do
     it {
-        filename = File.join(Oddb2xml::SpecData, 'swissmedic_orphan.xlsx')
-        expect(File.exists?(filename)).to eq(true), "File #{filename} must exists"
-        @packs = Oddb2xml::SwissmedicExtractor.new(filename, :orphan).to_arry
-        expect(@packs.size >= 78).to eq true
+        @filename = File.join(Oddb2xml::SpecData, 'swissmedic_orphan.xlsx')
+        expect(File.exists?(@filename)).to eq(true), "File #{@filename} must exists"
+        @packs = Oddb2xml::SwissmedicExtractor.new(@filename, :orphan).to_arry
+        expect(@packs.size).to eq 78
         expect(@packs.first).to eq("62132")
         expect(@packs[7]).to eq("00687")
       }

@@ -109,6 +109,9 @@
         </xs:element>
         <xs:element ref="ns1:PHAR"/>
         <xs:element minOccurs="0" ref="ns1:SMCAT"/>
+        <xs:element minOccurs="0" name="GEN_PRODUCTION" type="xs:string" />
+        <xs:element minOccurs="0" name="INSULIN_CATEGORY" type="xs:string" />
+        <xs:element minOccurs="0" name="DRUG_INDEX" type="xs:string" />
         <xs:element minOccurs="0" ref="ns1:SMNO"/>
         <xs:element minOccurs="0" ref="ns1:PRODNO"/>
         <xs:element minOccurs="0" ref="ns1:VAT"/>

@@ -43,6 +43,8 @@ module Oddb2xml
                   '7680556740075', # for calc_spec.rb
                   '7680540151009', # for calc_spec.rb
                   '7680560890018', # for calc_spec.rb
+                  '7680532900196', # Insulin, gentechnik
+                  '7680555610041', # Diaphin 10 g i.v. drug
     ]
   GTINS_DRUGS = [ '733905577161', # 1-DAY ACUVUE Moist Tag -2.00dpt BC 8.5
                   '4042809018288',

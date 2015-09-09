@@ -28,9 +28,6 @@ module Oddb2xml
       @xml = xml
     end
   end
-  class BMUpdateExtractor < Extractor
-    include TxtExtractorMethods
-  end
   class LppvExtractor < Extractor
     include TxtExtractorMethods
   end
@@ -96,7 +93,6 @@ module Oddb2xml
             :ean                 => (ean) ? ean : '',
             :swissmedic_category => (cat = pac.SwissmedicCategory) ? cat : '',
             :swissmedic_number8  => (num = pac.SwissmedicNo8)      ? num.rjust(8, '0') : '',
-            :narcosis_flag       => (flg = pac.FlagNarcosis)       ? flg : '',
             :prices              => { :exf_price => exf, :pub_price => pub },
           }
           # related all limitations
@@ -294,6 +290,9 @@ module Oddb2xml
               :composition_swissmedic => row[comp] ? row[comp].value.to_s : '',
               :sequence_name        => row[seq_name] ? row[seq_name].value.to_s : '',
               :is_tier              => (row[list_code] == 'Tierarzneimittel' ? true : false),
+              :gen_production       => row[COLUMNS_JULY_2015.keys.index(:gen_production)].value.to_s,
+              :insulin_category     => row[COLUMNS_JULY_2015.keys.index(:insulin_category)].value.to_s,
+              :drug_index           => row[COLUMNS_JULY_2015.keys.index(:drug_index)].value.to_s,
             }
           end
         end

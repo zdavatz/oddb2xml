@@ -24,7 +24,6 @@ module Oddb2xml
       # product
       @items = {} # Items from Preparations.xml in BAG, using GTINs as key
       @refdata_types = {} # Base index from refdata
-      @flags = {} # narcotics flag files repo
       @lppvs = {} # lppv.txt from files repo
       @infos = {} # [option] FI from SwissmedicInfo
       @packs = {} # [option] Packungen from Swissmedic for dat
@@ -63,7 +62,6 @@ module Oddb2xml
         end
         threads << download(:zurrose)
         threads << download(:package) # swissmedic
-        threads << download(:bm_update) # oddb2xml_files
         threads << download(:lppv) # oddb2xml_files
         threads << download(:bag) # bag.e-mediat
         types.each do |type|
@@ -226,17 +224,6 @@ module Oddb2xml
             @packs = SwissmedicExtractor.new(bin, :package).to_hash
             Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs from #{bin}")
             @packs
-          end
-        end
-      when :bm_update
-        begin # instead of Thread.new do
-          downloader = BMUpdateDownloader.new
-          str = downloader.download
-          Oddb2xml.log("BMUpdateDownloader str #{str.size} bytes")
-          @mutex.synchronize do
-            @flags = BMUpdateExtractor.new(str).to_hash
-            Oddb2xml.log("BMUpdateExtractor added #{@flags.size} flags")
-            @flags
           end
         end
       when :lppv

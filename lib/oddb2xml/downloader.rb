@@ -133,13 +133,6 @@ module Oddb2xml
       download_as('epha_interactions.csv', 'r')
     end
   end
-  class BMUpdateDownloader < Downloader
-    include DownloadMethod
-    def download
-      @url ||= 'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/BM_Update.txt'
-      download_as('oddb2xml_files_bm_update.txt', 'r')
-    end
-  end
   class LppvDownloader < Downloader
     include DownloadMethod
     def download

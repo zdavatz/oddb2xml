@@ -79,7 +79,7 @@ def common_after
   Dir.chdir(@savedDir) if @savedDir and File.directory?(@savedDir)
   VCR.eject_cassette
   vcr_file = File.expand_path(File.join(Oddb2xml::SpecData, '..', 'fixtures', 'vcr_cassettes', 'oddb2xml.json'))
-  puts "Pretty-printing #{vcr_file} exists? #{File.exists?(vcr_file)}"
+  puts "Pretty-printing #{vcr_file} exists? #{File.exists?(vcr_file)}" if $VERBOSE
   vcr_file_new = vcr_file.sub('.json', '.new')
   cmd = "cat #{vcr_file} | python -mjson.tool > #{vcr_file_new}"
   res = system(cmd)
@@ -339,34 +339,6 @@ describe Oddb2xml::EphaDownloader do
     it 'should clean up current directory' do
       expect { csv }.not_to raise_error
       # File.exist?('epha_interactions.csv').should eq(false)
-    end
-  end
-end
-
-describe Oddb2xml::BMUpdateDownloader do
-  include ServerMockHelper
-  before(:all) do VCR.eject_cassette end
-  before(:each) do
-    @downloader = Oddb2xml::BMUpdateDownloader.new
-    VCR.insert_cassette('oddb2xml', :tag => :BMUpdate)
-    common_before
-  end
-  after(:each) do
-    common_after
-  end
-
-  it_behaves_like 'any downloader'
-  context 'when download is called' do
-    let(:txt) {
-      @downloader.download
-    }
-    it 'should read txt as String' do
-      txt.should be_a String
-      txt.bytes.should_not nil
-    end
-    it 'should clean up current directory' do
-      expect { txt }.not_to raise_error
-      # File.exist?('oddb2xml_files_bm_update.txt').should eq(false)
     end
   end
 end

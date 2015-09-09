@@ -187,7 +187,7 @@ def checkProductXml
   desitin.elements['CompositionSwissmedic'].text.should eq 'levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.'
 
   desitin.elements['CPT/CPTCMP/LINE'].text.should eq '0'
-  desitin.elements['CPT/CPTCMP/SUBNO'].text.should eq '8'
+  desitin.elements['CPT/CPTCMP/SUBNO'].text.should eq '9'
   desitin.elements['CPT/CPTCMP/QTY'].text.should eq '250'
   desitin.elements['CPT/CPTCMP/QTYU'].text.should eq 'mg'
 
@@ -210,8 +210,8 @@ end
 describe Oddb2xml::Builder do
   NrExtendedArticles = 86
   NrSubstances = 12
-  NrProdno = 19
-  NrPackages = 20
+  NrProdno = 21
+  NrPackages = 22
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init
@@ -229,23 +229,22 @@ describe Oddb2xml::Builder do
       common_run_init
       options = Oddb2xml::Options.new
       @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      # Oddb2xml::Cli.new(options.opts).run # to debug
+      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
+      @doc = Nokogiri::XML(File.open(@article_xml))
+      @rexml = REXML::Document.new File.read(@article_xml)
     end
 
     it 'should return produce a oddb_article.xml' do
-      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
       File.exists?(@article_xml).should eq true
     end
 
     it 'oddb_article.xml should contain a SHA256' do
-      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      content = IO.read(@article_xml)
-      doc = REXML::Document.new File.new(@article_xml)
-      expect( XPath.match( doc, "//ART").first.attributes['DT']).to match /\d{4}-\d{2}-\d{2}/
-      expect( XPath.match( doc, "//ART").first.attributes['SHA256'].size).to eq 64
+      expect(XPath.match(@rexml, "//ART" ).first.attributes['SHA256'].size).to eq 64
+      expect(XPath.match(@rexml, "//ART" ).size).to eq XPath.match(@rexml, "//ART" ).size
     end
 
     it 'should be possible to verify the oddb_article.xml' do
-      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
       result = Oddb2xml.verify_sha256(@article_xml)
       expect(result)
     end
@@ -253,6 +252,30 @@ describe Oddb2xml::Builder do
     it 'should be possible to verify all xml files against our XSD' do
       check_validation_via_xsd
     end
+
+    it 'should have a correct insulin (gentechnik) for 7680532900196' do
+      expect(XPath.match( @rexml, "//ART/[BC='7680532900196']").size).to eq 1
+      expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").size).to eq 1
+      expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").first.text).to eq 'X'
+      expect(XPath.match( @rexml, "//ART//INSULIN_CATEGORY").size).to eq 1
+      expect(XPath.match( @rexml, "//ART//INSULIN_CATEGORY").first.text).to eq 'Insulinanalog: schnell wirkend'
+    end
+
+    it 'should have a correct drug information for 7680555610041' do
+      expect(XPath.match( @rexml, "//ART/[BC='7680555610041']").size).to eq 1
+      expect(XPath.match( @rexml, "//ART//DRUG_INDEX").size).to eq 1
+      expect(XPath.match( @rexml, "//ART//DRUG_INDEX").first.text).to eq 'd'
+      found = false
+      XPath.match( @rexml, "//ART//CDBG").each{
+        |flag|
+          if  flag.text.eql?('Y')
+            found = true
+            break
+          end
+      }
+      expect(found)
+    end
+
   end
 
   context 'when -o for fachinfo is given' do
@@ -296,6 +319,7 @@ if RUN_ALL
       options = Oddb2xml::Options.new
       options.parser.parse!('-f dat --log'.split(' '))
       @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      # Oddb2xml::Cli.new(options.opts).run # to debug
     end
 
     it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
@@ -307,6 +331,9 @@ if RUN_ALL
       oddb_dat.should match(/^..3/), "should have a record with '3' in CMUT field"
       oddb_dat.should match(RegExpDesitin), "should have Desitin"
       IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line) }
+      m = /.+DIAPHIN Trocke.*7680555610041.+/.match(oddb_dat)
+      expect(m[0].size).to eq 97 # size of IGM 1 record
+      expect(m[0][74]).to eq '3'
     end
   end
 
@@ -340,7 +367,8 @@ if RUN_ALL
       common_run_init
       options = Oddb2xml::Options.new
       options.parser.parse!('--append -I 80 -e'.split(' '))
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      Oddb2xml::Cli.new(options.opts).run
+      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
     end
 
     it "oddb_article with stuf from ZurRose", :skip => "ZurRose contains ERYTHROCIN i.v. Troc*esteekensub 1000 mg Amp [!]" do

@@ -703,11 +703,12 @@ module Oddb2xml
             ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
             items[ean13] = info
             xml.ARTICLE {
-              xml.GTIN          ean13
-              xml.NAME          info.column_c
-              xml.PKG_SIZE      info.pkg_size
-              xml.SELLING_UNITS info.selling_units
-              xml.MEASURE       info.measure # Nur wenn Lösung wen Spalte M ml, Spritze
+              xml.GTIN              ean13
+              xml.NAME              info.column_c
+              xml.PKG_SIZE          info.pkg_size
+              xml.SELLING_UNITS     info.selling_units
+              xml.MEASURE           info.measure # Nur wenn Lösung wen Spalte M ml, Spritze
+
               if  info.galenic_form.is_a?(String)
                 xml.GALENIC_FORM  info.galenic_form
                 xml.GALENIC_GROUP "Unknown"
@@ -764,7 +765,6 @@ module Oddb2xml
             ean = obj[:ean]
             next if pack_info and /Tierarzneimittel/.match(pack_info[:list_code])
             next if obj[:desc_de] and /ad us vet/i.match(obj[:desc_de])
-
             pharma_code = obj[:pharmacode]
             ean = 0 if sprintf('%013d', ean).match(/^000000/)
             if obj[:seq]
@@ -787,7 +787,10 @@ module Oddb2xml
               #xml.CDS01
               #xml.CDS02
               if ppac
-                xml.SMCAT ppac[:swissmedic_category] unless ppac[:swissmedic_category].empty?
+                xml.SMCAT             ppac[:swissmedic_category] unless ppac[:swissmedic_category].empty?
+                xml.GEN_PRODUCTION    ppac[:gen_production] unless ppac[:gen_production].empty?
+                xml.INSULIN_CATEGORY  ppac[:insulin_category] unless ppac[:insulin_category].empty?
+                xml.DRUG_INDEX        ppac[:drug_index] unless ppac[:drug_index].empty?
               end
               if no8 and !no8.to_s.empty?
                 if ean and ean.to_s[0..3] == "7680"
@@ -817,7 +820,7 @@ module Oddb2xml
               end
               #xml.TEMP
               if ean
-                flag = @flags[ean.to_s]
+                flag = (ppac && !ppac[:drug_index].empty?) ? true : false
                 # as same flag
                 xml.CDBG(flag ? 'Y' : 'N')
                 xml.BG(flag ? 'Y' : 'N')
@@ -1180,6 +1183,9 @@ module Oddb2xml
           next if obj[:type] == :nonpharma
           row = ''
           pack_info = nil
+          if (x = @packs.find{|k,v| v[:ean].to_i == ean})
+            pack_info = x[1]
+          end
           # Oddb2tdat.parse
           pac,no8 = nil,nil
           if obj[:seq] and obj[:seq][:packages]
@@ -1191,7 +1197,6 @@ module Oddb2xml
             # :swissmedic_numbers
           if pac
             no8 = pac[:swissmedic_number8].intern
-            pack_info = @packs[no8.intern] if no8
           end
           if pac and pac[:prices] == nil and no8
             ppac = ((ppac = pack_info and ppac[:is_tier]) ? ppac : nil)
@@ -1236,8 +1241,7 @@ module Oddb2xml
                                           else
                                             '0'
                                           end
-          row << "%#{DAT_LEN[:CBGG]}s"  % if ((pac && pac[:narcosis_flag] == 'Y') or # BAGXml
-                                              (@flags[ean]))                   # ywesee BM_update
+          row << "%#{DAT_LEN[:CBGG]}s"  % if (pack_info && pack_info[:drug_index])
                                             '3'
                                           else
                                             '0'
