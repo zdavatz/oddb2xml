@@ -8,7 +8,6 @@ require "#{Dir.pwd}/lib/oddb2xml/calc"
 include Oddb2xml
 
 describe Oddb2xml::Calc do
-  RunAllTests = true
   before(:all) do  VCR.eject_cassette; VCR.insert_cassette('oddb2xml') end
   after(:all) do   VCR.eject_cassette end
 
@@ -102,7 +101,7 @@ describe Oddb2xml::Calc do
                                   # :count => 10, :multi => 1,  :dose => ''
                                   }
                             )
-  tst_nutriflex = TestExample.new('Nutriflex Lipid plus ohne Elektrolyte, Infusionsemulsion 1250ml',
+  Tst_nutriflex = TestExample.new('Nutriflex Lipid plus ohne Elektrolyte, Infusionsemulsion 1250ml',
                                 56089, 1, 1, 'Nutriflex Lipid plus, Infusionsemulsion, 1250ml',
                                 '5 x 1250', 'ml',
                                 'glucosum anhydricum, isoleucinum, leucinum, lysinum anhydricum, methioninum, phenylalaninum, threoninum, tryptophanum, valinum, argininum, histidinum, alaninum, acidum asparticum, acidum glutamicum, glycinum, prolinum, serinum, aminoacida, carbohydrata, materia crassa, sojae oleum, triglycerida saturata media',
@@ -128,7 +127,7 @@ Corresp. 5300 kJ.",
                                   }
                               )
 
-  tst_naropin = TestExample.new('Das ist eine Injektionslösung von einer Packung mit 5 x 100 ml',
+  Tst_naropin = TestExample.new('Das ist eine Injektionslösung von einer Packung mit 5 x 100 ml',
                              54015, 01, 100, "Naropin 0,2 %, Infusionslösung / Injektionslösung",
                              '1 x 5 x 100', 'ml',
                              'ropivacainum',
@@ -139,7 +138,7 @@ Corresp. 5300 kJ.",
                                }
                             )
 
-if RunAllTests
+
   context 'should parse Solvens:' do
     text = 'Solvens: conserv.: alcohol benzylicus 18 mg, aqua ad iniectabilia q.s. ad solutionem pro 2 ml.'
     info = Calc.new('Solu-Cortef 100 mg, Injektions-/Infusionspräparat', nil, nil,
@@ -197,6 +196,7 @@ if RunAllTests
     specify { expect(result.selling_units).to eq 10 }
     specify { expect(result.measure).to eq 'ml' }
   end
+
   context 'should return correct value for Diamox, comprimés' do
     pkg_size_L = '1 x 25'
     einheit_M  = 'Tablette(n)'
@@ -254,7 +254,7 @@ if RunAllTests
   end
   [tst_fluorglukose,
    tst_kamillin,
-   tst_naropin,
+   Tst_naropin,
    tst_diamox,
    tst_mutagrip,
   ].each {
@@ -272,8 +272,8 @@ if RunAllTests
   }
 
   context 'find correct result for Injektionslösung' do
-    info = Calc.new(tst_naropin.name_C, tst_naropin.package_size_L, tst_naropin.einheit_M, tst_naropin.active_substance_0, tst_naropin.composition_P)
-    specify { expect(tst_naropin.url).to eq 'http://ch.oddb.org/de/gcc/drug/reg/54015/seq/01/pack/100' }
+    info = Calc.new(Tst_naropin.name_C, Tst_naropin.package_size_L, Tst_naropin.einheit_M, Tst_naropin.active_substance_0, Tst_naropin.composition_P)
+    specify { expect(Tst_naropin.url).to eq 'http://ch.oddb.org/de/gcc/drug/reg/54015/seq/01/pack/100' }
     specify { expect(info.galenic_form.description).to eq  'Infusionslösung/Injektionslösung' }
     specify { expect(info.galenic_group.description).to eq  'Injektion/Infusion' }
     specify { expect(info.pkg_size).to eq '1 x 5 x 100' }
@@ -288,103 +288,6 @@ if RunAllTests
     specify { expect(info.pkg_size).to eq '2x10' }
     specify { expect(info.selling_units).to eq  20 }
     specify { expect(info.measure).to eq  'Kapsel(n)' }
-  end
-
-  run_time_options = '--calc --skip-download'
-  context "when passing #{run_time_options}" do
-    let(:cli) do
-      options = Oddb2xml::Options.new
-      options.parser.parse!(run_time_options.split(' '))
-      Oddb2xml::Cli.new(options.opts)
-    end
-    it 'should create a correct xml and a csv file' do
-      src = File.expand_path(File.join(File.dirname(__FILE__), 'data', 'swissmedic_package-galenic.xlsx'))
-      dest =  File.join(Oddb2xml::WorkDir, 'swissmedic_package.xlsx')
-      FileUtils.makedirs(Oddb2xml::WorkDir)
-      cli.run
-      expected = [
-        'oddb_calc.xml',
-        'oddb_calc.csv',
-      ].each { |file|
-              full = File.join(Oddb2xml::WorkDir, file)
-              expect(File.exists?(full)).to eq true
-             }
-      xml_file_name = File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')
-      xml = File.read(xml_file_name)
-      oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
-      File.exists?(oddb_calc_xsd).should eq true
-      xsd = Nokogiri::XML::Schema(File.read(oddb_calc_xsd))
-      doc = Nokogiri::XML(File.read(xml_file_name))
-      xsd.validate(doc).each do |error|  expect(error).to be_nil end
-      doc = REXML::Document.new xml
-      gtin = '7680540151009'
-      ean12 = '7680' + sprintf('%05d',tst_naropin.iksnr_A) + sprintf('%03d',tst_naropin.pack_K)
-      ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
-      ean13.should eq gtin
-
-      tst_naropin.values_to_compare.each{
-        | key, value |
-          result = XPath.match( doc, "//ARTICLE[GTIN='#{gtin}']/#{key.to_s.upcase}").first.text
-          puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
-          result.should eq value.to_s
-      }
-
-      gtin = '7680560890018'
-      ean12 = '7680' + sprintf('%05d',tst_nutriflex.iksnr_A) + sprintf('%03d',tst_nutriflex.pack_K)
-      ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
-      ean13.should eq gtin
-      tst_nutriflex.values_to_compare.each{
-        | key, value |
-          result = XPath.match( doc, "//ARTICLE[GTIN='#{gtin}']/#{key.to_s.upcase}").first.text
-          puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
-          result.should eq value.to_s
-      }
-      matri_name = 'Matricariae Extractum Isopropanolicum Liquidum'
-      XPath.match( doc, "//ARTICLE[GTIN='7680002770014']/NAME").first.text.should eq "Coeur-Vaisseaux Sérocytol, suppositoire"
-      XPath.match( doc, "//ARTICLE[GTIN='7680545250363']").first.should eq nil
-#      XPath.match( doc, "//ARTICLE[GTIN='7680545250363']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME")
-#        find{|x| x.text.eql?("Alprostadilum")}.text.should eq 'Alprostadilum'
-      XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
-      XPath.match( doc, "//ARTICLE[GTIN='7680458820202']/GALENIC_FORM").last.text.should match /Ampulle/i
-      XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").first.text.should eq 'I'
-      XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL_DESCRIPTION").first.text.should eq 'Glucoselösung'
-      XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").each{ |x| puts x.text }
-      XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").last.text.should eq 'III'
-      XPath.match( doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/CORRESP").last.text.should eq '4240 kJ pro 1 l'
-
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").
-        find{|x| x.text.eql?(matri_name)}.text.should eq matri_name
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/NAME").last.text.should eq 'Kamillin Medipharm, Bad'
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/GALENIC_FORM").last.text.should eq 'Bad'
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY").first.text.should eq '98.9'
-      XPath.match( doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Lidocaini Hydrochloridum'
-      XPath.match( doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT").first.text.should eq 'mg/ml'
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Levomenolum'
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/MORE_INFO").first.text.should eq 'ratio: 1:2-2.8'
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/DOSE_TEXT").first.text.should eq '10-50 mg'
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/QTY").first.should eq nil
-      XPath.match( doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/UNIT").first.should eq nil
-
-      XPath.match( doc, "//ARTICLE[GTIN='7680446250592']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SALTS/SALT/SUBSTANCE_NAME").first.text.should eq 'Ceftriaxonum Natricum'
-
-      XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/NAME").first.text.should eq 'Nutriflex Omega special, Infusionsemulsion 2500 ml'
-      XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/GALENIC_FORM").first.text.should eq 'Infusionsemulsion'
-      XPath.match( doc, "//ARTICLE[GTIN='7680611860045']/SELLING_UNITS").first.text.should eq '5'
-
-      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq 'Excipiens ad solutionem'
-      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/QTY").first.text.should eq '1'
-      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/UNIT").first.text.should eq 'ml'
-      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/NAME").first.text.should eq 'W-Tropfen'
-      XPath.match( doc, "//ARTICLE[GTIN='7680165980114']/GALENIC_FORM").last.text.should eq 'Tropfen'
-
-      XPath.match( doc, "//ARTICLE[GTIN='7680589430011']/NAME").first.text.should eq 'Apligraf'
-      XPath.match( doc, "//ARTICLE[GTIN='7680589430011']/GALENIC_FORM").last.text.should eq 'Unbekannt' # TODO?? 'Scheibe(n)/disque(s)'
-
-      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/NAME").first.text.should eq "Caverject DC 20, Injektionspräparat"
-      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size.should eq 6
-      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq "pro Vitro"
-
-    end
   end
 
   context 'find correct result for Kamillin' do
@@ -413,7 +316,7 @@ if RunAllTests
   end
 
   context 'find correct result for Nutriflex' do
-    info = Calc.new(tst_nutriflex.name_C, tst_nutriflex.package_size_L, tst_nutriflex.einheit_M, tst_nutriflex.active_substance_0, tst_nutriflex.composition_P)
+    info = Calc.new(Tst_nutriflex.name_C, Tst_nutriflex.package_size_L, Tst_nutriflex.einheit_M, Tst_nutriflex.active_substance_0, Tst_nutriflex.composition_P)
     specify { expect(info.selling_units).to eq  5 }
     specify { expect(info.galenic_form.description).to eq  "Infusionsemulsion" }
   end
@@ -706,4 +609,148 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
     end
   end
 end
+
+describe Oddb2xml::Calc do
+
+  before(:all) do
+    @savedDir = Dir.pwd
+    cleanup_directories_before_run
+    FileUtils.makedirs(Oddb2xml::WorkDir)
+    Dir.chdir Oddb2xml::WorkDir
+    VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
+    @run_time_options = '--calc --skip-download'
+    @options = Oddb2xml::Options.new
+    @options.parser.parse!(@run_time_options.split(' '))
+    @oddb_calc_xml = File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')
+    @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(@options.opts).run }
+    expect(File.exists?(@oddb_calc_xml)).to eq true
+    @doc = REXML::Document.new File.read(@oddb_calc_xml)
+  end
+
+  after(:all) do
+    Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
+  end
+
+  context "when passing #{@run_time_options}" do
+    it 'should contain the new fields as per July 2015' do
+      #         xml.GEN_PRODUCTION    gen_production
+      #          xml.INSULIN_CATEGORY  insulin_category
+      #          xml.DRUG_INDEX        drug_index
+      expect(File.exists?(@oddb_calc_xml)).to eq true
+    end
+
+    it 'should create a correct xml and a csv file' do
+      src = File.expand_path(File.join(File.dirname(__FILE__), 'data', 'swissmedic_package-galenic.xlsx'))
+      dest =  File.join(Oddb2xml::WorkDir, 'swissmedic_package.xlsx')
+      expected = [
+        'oddb_calc.xml',
+        'oddb_calc.csv',
+      ].each { |file|
+              full = File.join(Oddb2xml::WorkDir, file)
+              expect(File.exists?(full)).to eq true
+             }
+      oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
+      File.exists?(oddb_calc_xsd).should eq true
+      xsd = Nokogiri::XML::Schema(File.read(oddb_calc_xsd))
+      doc = Nokogiri::XML(File.read(@oddb_calc_xml))
+      xsd.validate(doc).each do |error|  expect(error).to be_nil end
+    end
+
+    it 'should create correct entries for narotin' do
+      gtin = '7680540151009'
+      ean12 = '7680' + sprintf('%05d',Tst_naropin.iksnr_A) + sprintf('%03d',Tst_naropin.pack_K)
+      ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
+      ean13.should eq gtin
+
+      Tst_naropin.values_to_compare.each{
+        | key, value |
+          result = XPath.match( @doc, "//ARTICLE[GTIN='#{gtin}']/#{key.to_s.upcase}").first.text
+          puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
+          result.should eq value.to_s
+      }
+    end
+
+    it 'should create correct entries for narotin' do
+      gtin = '7680560890018'
+      ean12 = '7680' + sprintf('%05d',Tst_nutriflex.iksnr_A) + sprintf('%03d',Tst_nutriflex.pack_K)
+      ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
+      ean13.should eq gtin
+      Tst_nutriflex.values_to_compare.each{
+        | key, value |
+          result = XPath.match( @doc, "//ARTICLE[GTIN='#{gtin}']/#{key.to_s.upcase}").first.text
+          puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
+          result.should eq value.to_s
+      }
+    end
+
+    it 'should create correct entries for 7680555940018' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").first.text.should eq 'I'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL_DESCRIPTION").first.text.should eq 'Glucoselösung'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").each{ |x| puts x.text }
+      XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").last.text.should eq 'III'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/CORRESP").last.text.should eq '4240 kJ pro 1 l'
+    end
+
+    it 'should create correct entries for Lidocaini' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Lidocaini Hydrochloridum'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT").first.text.should eq 'mg/ml'
+    end
+
+    it 'should create correct entries for Levomenolum' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Levomenolum'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/MORE_INFO").first.text.should eq 'ratio: 1:2-2.8'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/DOSE_TEXT").first.text.should eq '10-50 mg'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/QTY").first.should eq nil
+      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/UNIT").first.should eq nil
+      matri_name = 'Matricariae Extractum Isopropanolicum Liquidum'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").
+        find{|x| x.text.eql?(matri_name)}.text.should eq matri_name
+      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/NAME").last.text.should eq 'Kamillin Medipharm, Bad'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/GALENIC_FORM").last.text.should eq 'Bad'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY").first.text.should eq '98.9'
+    end
+
+    it 'should create correct entries for Magnesiumchlorid' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680458820202']/GALENIC_FORM").last.text.should match /Ampulle/i
+    end
+
+    it 'should create correct entries for W-Tropfen' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq 'Excipiens ad solutionem'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/QTY").first.text.should eq '1'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/UNIT").first.text.should eq 'ml'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/NAME").first.text.should eq 'W-Tropfen'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/GALENIC_FORM").last.text.should eq 'Tropfen'
+    end
+
+    it 'should create correct entries for Coeur-Vaisseaux Sérocytol' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680002770014']/NAME").first.text.should eq "Coeur-Vaisseaux Sérocytol, suppositoire"
+    end
+
+    it 'should not have Alprostadilum' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680545250363']").first.should eq nil
+    end
+
+    it 'should create correct entries for Ceftriaxonum' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680446250592']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SALTS/SALT/SUBSTANCE_NAME").first.text.should eq 'Ceftriaxonum Natricum'
+
+    end
+
+    it 'should create correct entries for Nutriflex' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680611860045']/NAME").first.text.should eq 'Nutriflex Omega special, Infusionsemulsion 2500 ml'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680611860045']/GALENIC_FORM").first.text.should eq 'Infusionsemulsion'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680611860045']/SELLING_UNITS").first.text.should eq '5'
+    end
+
+    it 'should create correct entries for Apligraf' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680589430011']/NAME").first.text.should eq 'Apligraf'
+      XPath.match( @doc, "//ARTICLE[GTIN='7680589430011']/GALENIC_FORM").last.text.should eq 'Unbekannt' # TODO?? 'Scheibe(n)/disque(s)'
+    end
+
+    it 'should create correct entries for Caverject' do
+      XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/NAME").first.text.should eq "Caverject DC 20, Injektionspräparat"
+      XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size.should eq 6
+      XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq "pro Vitro"
+    end
+  end
 end
