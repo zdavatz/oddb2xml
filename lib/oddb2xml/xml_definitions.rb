@@ -220,7 +220,6 @@ class MedicalInformationContent
   element :title
   element :authHolder
   element :authNrs
-  element :authNrs
   element :style
   element :content
 end

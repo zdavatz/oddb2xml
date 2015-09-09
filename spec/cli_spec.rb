@@ -53,7 +53,21 @@ describe Oddb2xml::Cli do
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
   end
-if true
+  context 'when -o fi option is given' do
+    before(:all) do
+      cleanup_directories_before_run
+      options = Oddb2xml::Options.new
+      options.parser.parse!('-o fi'.split(' '))
+      @cli = Oddb2xml::Cli.new(options.opts)
+ #     @cli_output = buildr_capture(:stdout) { @cli.run }
+      @cli.run
+    end
+#    it_behaves_like 'any interface for product'
+    it 'should have nonpharma option' do
+      @cli.should have_option(:fi => true)
+    end
+  end
+
   context 'when -t md option is given' do
     before(:all) do
       cleanup_directories_before_run
@@ -81,8 +95,14 @@ if true
       ]
       expected.each{
           |name|
-        expect(Dir.glob(File.join(Oddb2xml::WorkDir, name)).size).to eq 1
-        expect(File.size(File.join(Oddb2xml::WorkDir, name))).to be >= 1024
+        tst_file = File.join(Oddb2xml::WorkDir, name)
+        expect(Dir.glob(tst_file).size).to eq 1
+        tst_size = File.size(tst_file)
+        if tst_size < 1024
+          puts "File #{name} is only #{tst_size} bytes long"
+          require 'pry'; binding.pry
+        end
+        expect(tst_size).to be >= 1024
       }
     end
     it 'should produce a correct report' do
@@ -297,5 +317,4 @@ if true
       end.to_a.length.should equal expected
     end
   end
-end
 end

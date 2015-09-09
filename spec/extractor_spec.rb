@@ -3,7 +3,7 @@
 require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/downloader"
 ENV['TZ'] = 'UTC' # needed for last_change
-
+LAST_CHANGE = "2015-07-03 00:00:00 +0000"
 describe Oddb2xml::BMUpdateExtractor do
   before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
   after(:all) { VCR.eject_cassette }
@@ -51,6 +51,8 @@ end
 describe Oddb2xml::RefdataExtractor do
   before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
   after(:all)  { VCR.eject_cassette }
+  @@last_change = '2015-09-09 00:00:00 +0000'
+
   context 'should handle pharma articles' do
     subject do
       @downloader = Oddb2xml::RefdataDownloader.new({}, :pharma)
@@ -67,7 +69,7 @@ describe Oddb2xml::RefdataExtractor do
         :_type=>:pharma,
         :ean=> Oddb2xml::LEVETIRACETAM_GTIN.to_i,
         :pharmacode=> pharma_code_LEVETIRACETAM,
-        :last_change => "2015-06-04 00:00:00 +0000",
+        :last_change => @@last_change,
         :desc_de=>"LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
         :desc_fr=>"LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce",
         :atc_code=>"N03AX14",
@@ -93,7 +95,7 @@ describe Oddb2xml::RefdataExtractor do
       :_type=>:nonpharma,
       :ean=>7611600441020,
       :pharmacode=>pharma_code_TUBEGAZE,
-      :last_change => "2015-06-04 00:00:00 +0000",
+      :last_change => @@last_change,
       :desc_de=>"TUBEGAZE Verband weiss Nr 12 20m Finger gross",
       :desc_fr=>"TUBEGAZE pans tubul blanc Nr 12 20m doigts grands",
       :atc_code=>"",
@@ -149,9 +151,8 @@ describe Oddb2xml::SwissmedicInfoExtractor do
     it {
         xml = @downloader.download
         @infos = Oddb2xml::SwissmedicInfoExtractor.new(xml).to_hash
-        expect(@infos.keys).to eq ['de', 'fr']
-        expect(@infos['de'].size).to eq 5
-        expect(@infos['fr'].size).to eq 2
+        expect(@infos.keys).to eq ['de']
+        expect(@infos['de'].size).to eq 2
         levetiracetam = nil
         @infos['de'].each{|info|
                     levetiracetam = info if /Levetiracetam/.match(info[:name])
@@ -175,7 +176,7 @@ describe Oddb2xml::SwissmedicExtractor do
         cleanup_directories_before_run
         filename = File.join(Oddb2xml::SpecData, 'swissmedic_package.xlsx')
         @packs = Oddb2xml::SwissmedicExtractor.new(filename, :package).to_hash
-        expect(@packs.size).to eq(17)
+        expect(@packs.size).to eq(15)
         serocytol = nil
         @packs.each{|pack|
                     serocytol = pack[1] if pack[1][:ean] == '7680620690084'
@@ -331,5 +332,4 @@ describe Oddb2xml::ZurroseExtractor do
           }
 
   end
-
 end

@@ -114,7 +114,7 @@ VCR.configure do |config|
 # List of request matchers to use to determine what recorded HTTP interaction to replay. Defaults to [:method, :uri]. The built-in matchers are :method, :uri, :host, :path, :headers and :body. You can also pass the name of a registered custom request matcher or any object that responds to #call.
 
   config.before_http_request(:real?) do |request|
-    $stderr.puts("before real request: #{request.method} #{request.uri}")
+    $stderr.puts("before real request: #{request.method} #{request.uri} #{caller[0..5].join("\n")}")
     $stderr.flush
   end
 end

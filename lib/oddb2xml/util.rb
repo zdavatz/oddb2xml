@@ -74,7 +74,7 @@ module Oddb2xml
     error_2015 = nil
     COLUMNS_JULY_2015.each{
       |key, value|
-      header_name = row[COLUMNS_JULY_2015.keys.index(key)].value
+      header_name = row[COLUMNS_JULY_2015.keys.index(key)].value.to_s
       unless value.match(header_name)
         puts "#{__LINE__}: #{key} ->  #{COLUMNS_JULY_2015.keys.index(key)} #{value}\nbut was  #{header_name}" if $VERBOSE
         error_2015 = "Packungen.xlslx_has_unexpected_column_#{COLUMNS_JULY_2015.keys.index(key)}_#{key}_#{value.to_s}_but_was_#{header_name}"

@@ -382,8 +382,8 @@ if RunAllTests
       XPath.match( doc, "//ARTICLE[GTIN='7680589430011']/GALENIC_FORM").last.text.should eq 'Unbekannt' # TODO?? 'Scheibe(n)/disque(s)'
 
       XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/NAME").first.text.should eq "Caverject DC 20, Injektionspräparat"
-      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size.should eq 5
-      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq "aqua ad iniectabilia q.s. ad solutionem"
+      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size.should eq 6
+      XPath.match( doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq "pro Vitro"
 
     end
   end
