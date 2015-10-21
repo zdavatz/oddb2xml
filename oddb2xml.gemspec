@@ -6,8 +6,8 @@ require 'oddb2xml/version'
 Gem::Specification.new do |spec|
   spec.name        = "oddb2xml"
   spec.version     = Oddb2xml::VERSION
-  spec.author      = "Yasuhiro Asaka, Zeno R.R. Davatz"
-  spec.email       = "yasaka@ywesee.com, zdavatz@ywesee.com"
+  spec.author      = "Yasuhiro Asaka, Zeno R.R. Davatz, Niklaus Giger"
+  spec.email       = "yasaka@ywesee.com, zdavatz@ywesee.com, ngiger@ywesee.com"
   spec.description = "oddb2xml creates xml files using swissINDEX, BAG-XML and Swissmedic."
   spec.summary     = "oddb2xml creates xml files."
   spec.homepage    = "https://github.com/zdavatz/oddb2xml"

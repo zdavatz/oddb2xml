@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (2.2.5)
+    oddb2xml (2.2.6)
       archive-tar-minitar
       httpi (>= 2.4.1)
       mechanize
@@ -51,7 +51,7 @@ GEM
       ntlm-http (~> 0.1, >= 0.1.1)
       webrobots (>= 0.0.9, < 0.2)
     method_source (0.8.2)
-    mime-types (2.6.1)
+    mime-types (2.6.2)
     mini_portile (0.6.2)
     multi_json (1.11.1)
     net-http-digest_auth (1.4)
