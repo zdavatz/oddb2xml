@@ -739,7 +739,11 @@ module Oddb2xml
       CSV.open(csv_name, "w+", :col_sep => ';') do |csv|
         csv << ['gtin'] + items.values.first.headers
         items.each do |key, value|
-          csv <<  [key] + value.to_array
+          if value and value.to_array
+            csv <<  [key] + value.to_array
+          else
+            puts "key #{key.inspect} WITHOUT #{value.inspect}"
+          end
         end
       end
       Oddb2xml.add_hash(_builder.to_xml)
