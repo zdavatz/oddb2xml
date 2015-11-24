@@ -523,7 +523,7 @@ Solvens: aqua ad iniectabilia q.s. ad suspensionem pro 1 ml."
     specify { expect(info.compositions.size).to eq  2 }
     specify { expect(info.compositions.first.label).to eq  "Praeparatio cryodesiccata:" }
     substance1 =  info.compositions.first.substances.find{ |x| x.name.match(/virus rabiei inactivatu/i) }
-    specify { expect(substance1).should_not be  nil }
+    specify { expect(expect(substance1)).not_to be  nil }
     if substance1
       specify { expect(substance1.name).to eq  'Virus Rabiei Inactivatum (stamm: Wistar Rabies Pm/wi 38-1503-3m)' }
     end
@@ -650,7 +650,7 @@ describe Oddb2xml::Calc do
               expect(File.exists?(full)).to eq true
              }
       oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
-      File.exists?(oddb_calc_xsd).should eq true
+      expect(File.exists?(oddb_calc_xsd)).to eq true
       xsd = Nokogiri::XML::Schema(File.read(oddb_calc_xsd))
       doc = Nokogiri::XML(File.read(@oddb_calc_xml))
       xsd.validate(doc).each do |error|  expect(error).to be_nil end
@@ -660,13 +660,13 @@ describe Oddb2xml::Calc do
       gtin = '7680540151009'
       ean12 = '7680' + sprintf('%05d',Tst_naropin.iksnr_A) + sprintf('%03d',Tst_naropin.pack_K)
       ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
-      ean13.should eq gtin
+      expect(ean13).to eq gtin
 
       Tst_naropin.values_to_compare.each{
         | key, value |
           result = XPath.match( @doc, "//ARTICLE[GTIN='#{gtin}']/#{key.to_s.upcase}").first.text
           puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
-          result.should eq value.to_s
+          expect(result).to eq value.to_s
       }
     end
 
@@ -674,83 +674,83 @@ describe Oddb2xml::Calc do
       gtin = '7680560890018'
       ean12 = '7680' + sprintf('%05d',Tst_nutriflex.iksnr_A) + sprintf('%03d',Tst_nutriflex.pack_K)
       ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
-      ean13.should eq gtin
+      expect(ean13).to eq gtin
       Tst_nutriflex.values_to_compare.each{
         | key, value |
           result = XPath.match( @doc, "//ARTICLE[GTIN='#{gtin}']/#{key.to_s.upcase}").first.text
           puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
-          result.should eq value.to_s
+          expect(result).to eq value.to_s
       }
     end
 
     it 'should create correct entries for 7680555940018' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").first.text.should eq 'I'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL_DESCRIPTION").first.text.should eq 'Glucoselösung'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").first.text).to eq 'I'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL_DESCRIPTION").first.text).to eq 'Glucoselösung'
       XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").each{ |x| puts x.text }
-      XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").last.text.should eq 'III'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/CORRESP").last.text.should eq '4240 kJ pro 1 l'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/LABEL").last.text).to eq 'III'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680555940018']/COMPOSITIONS/COMPOSITION/CORRESP").last.text).to eq '4240 kJ pro 1 l'
     end
 
     it 'should create correct entries for Lidocaini' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Lidocaini Hydrochloridum'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT").first.text.should eq 'mg/ml'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").first.text).to eq 'Lidocaini Hydrochloridum'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680300150105']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT").first.text).to eq 'mg/ml'
     end
 
     it 'should create correct entries for Levomenolum' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/SUBSTANCE_NAME").first.text.should eq 'Levomenolum'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/MORE_INFO").first.text.should eq 'ratio: 1:2-2.8'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/DOSE_TEXT").first.text.should eq '10-50 mg'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/QTY").first.should eq nil
-      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/UNIT").first.should eq nil
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/SUBSTANCE_NAME").first.text).to eq 'Levomenolum'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/MORE_INFO").first.text).to eq 'ratio: 1:2-2.8'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/DOSE_TEXT").first.text).to eq '10-50 mg'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/QTY").first).to eq nil
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/UNIT").first).to eq nil
       matri_name = 'Matricariae Extractum Isopropanolicum Liquidum'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").
-        find{|x| x.text.eql?(matri_name)}.text.should eq matri_name
-      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/NAME").last.text.should eq 'Kamillin Medipharm, Bad'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/GALENIC_FORM").last.text.should eq 'Bad'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY").first.text.should eq '98.9'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME").
+        find{|x| x.text.eql?(matri_name)}.text).to eq matri_name
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/NAME").last.text).to eq 'Kamillin Medipharm, Bad'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/GALENIC_FORM").last.text).to eq 'Bad'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680434541015']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY").first.text).to eq '98.9'
     end
 
     it 'should create correct entries for Magnesiumchlorid' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text.should eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680458820202']/GALENIC_FORM").last.text.should match /Ampulle/i
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680458820202']/NAME").last.text).to eq 'Magnesiumchlorid 0,5 molar B. Braun, Zusatzampulle für Infusionslösungen'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680458820202']/GALENIC_FORM").last.text).to match /Ampulle/i
     end
 
     it 'should create correct entries for W-Tropfen' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq 'Excipiens ad solutionem'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/QTY").first.text.should eq '1'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/UNIT").first.text.should eq 'ml'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/NAME").first.text.should eq 'W-Tropfen'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/GALENIC_FORM").last.text.should eq 'Tropfen'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text).to eq 'Excipiens ad solutionem'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/QTY").first.text).to eq '1'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/COMPOSITIONS/COMPOSITION/EXCIPIENS/UNIT").first.text).to eq 'ml'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/NAME").first.text).to eq 'W-Tropfen'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680165980114']/GALENIC_FORM").last.text).to eq 'Tropfen'
     end
 
     it 'should create correct entries for Coeur-Vaisseaux Sérocytol' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680002770014']/NAME").first.text.should eq "Coeur-Vaisseaux Sérocytol, suppositoire"
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680002770014']/NAME").first.text).to eq "Coeur-Vaisseaux Sérocytol, suppositoire"
     end
 
     it 'should not have Alprostadilum' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680545250363']").first.should eq nil
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680545250363']").first).to eq nil
     end
 
     it 'should create correct entries for Ceftriaxonum' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680446250592']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SALTS/SALT/SUBSTANCE_NAME").first.text.should eq 'Ceftriaxonum Natricum'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680446250592']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SALTS/SALT/SUBSTANCE_NAME").first.text).to eq 'Ceftriaxonum Natricum'
 
     end
 
     it 'should create correct entries for Nutriflex' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680611860045']/NAME").first.text.should eq 'Nutriflex Omega special, Infusionsemulsion 2500 ml'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680611860045']/GALENIC_FORM").first.text.should eq 'Infusionsemulsion'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680611860045']/SELLING_UNITS").first.text.should eq '5'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680611860045']/NAME").first.text).to eq 'Nutriflex Omega special, Infusionsemulsion 2500 ml'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680611860045']/GALENIC_FORM").first.text).to eq 'Infusionsemulsion'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680611860045']/SELLING_UNITS").first.text).to eq '5'
     end
 
     it 'should create correct entries for Apligraf' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680589430011']/NAME").first.text.should eq 'Apligraf'
-      XPath.match( @doc, "//ARTICLE[GTIN='7680589430011']/GALENIC_FORM").last.text.should eq 'Unbekannt' # TODO?? 'Scheibe(n)/disque(s)'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680589430011']/NAME").first.text).to eq 'Apligraf'
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680589430011']/GALENIC_FORM").last.text).to eq 'Unbekannt' # TODO?? 'Scheibe(n)/disque(s)'
     end
 
     it 'should create correct entries for Caverject' do
-      XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/NAME").first.text.should eq "Caverject DC 20, Injektionspräparat"
-      XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size.should eq 6
-      XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text.should eq "pro Vitro"
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/NAME").first.text).to eq "Caverject DC 20, Injektionspräparat"
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size).to eq 6
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text).to eq "pro Vitro"
     end
   end
 end

@@ -60,7 +60,7 @@ shared_examples_for 'any downloader' do
     expect {
       Array.new(3).map do
         Thread.new do
-          @downloader.send(:retrievable?).should be(true)
+          expect(@downloader.send(:retrievable?)).to be(true)
         end
       end.map(&:join)
     }.to change {
@@ -155,13 +155,13 @@ describe Oddb2xml::RefdataDownloader do
     it_behaves_like 'any downloader'
     context 'when download_by is called' do
       it 'should parse response hash to xml' do
-        @xml.should be_a String
-        @xml.length.should_not == 0
-        @xml.should =~ XML_VERSION_1_0
+        expect(@xml).to be_a String
+        expect(@xml.length).not_to eq(0)
+        expect(@xml).to match(XML_VERSION_1_0)
       end
       it 'should return valid xml' do
-        @xml.should =~ /PHAR/
-        @xml.should =~ /ITEM/
+        expect(@xml).to match(/PHAR/)
+        expect(@xml).to match(/ITEM/)
       end
     end
   end
@@ -174,13 +174,13 @@ describe Oddb2xml::RefdataDownloader do
     end
     context 'when download_by is ' do
       it 'should parse response hash to xml' do
-        @xml.should be_a String
-        @xml.length.should_not == 0
-        @xml.should =~ XML_VERSION_1_0
+        expect(@xml).to be_a String
+        expect(@xml.length).not_to eq(0)
+        expect(@xml).to match(XML_VERSION_1_0)
       end
       it 'should return valid xml' do
-        @xml.should =~ /NONPHAR/
-        @xml.should =~ /ITEM/
+        expect(@xml).to match(/NONPHAR/)
+        expect(@xml).to match(/ITEM/)
       end
     end
   end
@@ -250,14 +250,14 @@ end
       }
       it 'should return valid Binary-String' do
         # unless [:orphan, :package].index(@downloader.type)
-          bin.should be_a String
-          bin.bytes.should_not nil
+          expect(bin).to be_a String
+          expect(bin.bytes).not_to be nil
         # end
       end
       it 'should clean up current directory' do
         unless [:orphan, :package].index(@downloader.type)
           expect { bin }.not_to raise_error
-          File.exist?('oddb_orphan.xls').should eq(false)
+          expect(File.exist?('oddb_orphan.xls')).to eq(false)
         end
       end
     end
@@ -275,8 +275,8 @@ end
         @downloader.download
       }
       it 'should return valid Binary-String' do
-        bin.should be_a String
-        bin.bytes.should_not nil
+        expect(bin).to be_a String
+        expect(bin.bytes).not_to be nil
       end
     end
   end
@@ -293,8 +293,8 @@ end
         @downloader.download
       }
       it 'should return valid Binary-String' do
-        bin.should be_a String
-        bin.bytes.should_not nil
+        expect(bin).to be_a String
+        expect(bin.bytes).not_to be nil
       end
     end
   end
@@ -333,8 +333,8 @@ describe Oddb2xml::EphaDownloader do
       @downloader.download
     }
     it 'should read csv as String' do
-      csv.should be_a String
-      csv.bytes.should_not nil
+      expect(csv).to be_a String
+      expect(csv.bytes).not_to be nil
     end
     it 'should clean up current directory' do
       expect { csv }.not_to raise_error
@@ -389,13 +389,13 @@ describe Oddb2xml::BagXmlDownloader do
       end
     }
     it 'should parse zip to string' do
-      xml.should be_a String
-      xml.length.should_not == 0
+      expect(xml).to be_a String
+      expect(xml.length).not_to eq(0)
     end
     it 'should return valid xml' do
-      xml.should =~ XML_VERSION_1_0
-      xml.should =~ /Preparations/
-      xml.should =~ /DescriptionDe/
+      expect(xml).to match(XML_VERSION_1_0)
+      expect(xml).to match(/Preparations/)
+      expect(xml).to match(/DescriptionDe/)
     end
   end
 end
@@ -415,8 +415,8 @@ describe Oddb2xml::LppvDownloader do
   context 'when download is called' do
     let(:txt) { @downloader.download }
     it 'should read txt as String' do
-      @text.should be_a String
-      @text.bytes.should_not nil
+      expect(@text).to be_a String
+      expect(@text.bytes).not_to be nil
     end
   end
 end
@@ -435,12 +435,12 @@ describe Oddb2xml::MigelDownloader do
     context 'when download is called' do
     let(:bin) { @downloader.download }
     it 'should read xls as Binary-String' do
-      bin.should be_a String
-      bin.bytes.should_not nil
+      expect(bin).to be_a String
+      expect(bin.bytes).not_to be nil
     end
     it 'should clean up current directory' do
       expect { bin }.not_to raise_error
-      File.exist?('oddb2xml_files_nonpharma.txt').should eq(false)
+      expect(File.exist?('oddb2xml_files_nonpharma.txt')).to eq(false)
     end
   end
 end
@@ -471,12 +471,12 @@ describe Oddb2xml::ZurroseDownloader do
   context 'when download is called' do
     let(:dat) { @downloader.download }
     it 'should read dat as String' do
-      dat.should be_a String
-      dat.bytes.should_not nil
+      expect(dat).to be_a String
+      expect(dat.bytes).not_to be nil
     end
     it 'should clean up current directory' do
       expect { dat }.not_to raise_error
-      File.exist?('oddb2xml_zurrose_transfer.dat').should eq(false)
+      expect(File.exist?('oddb2xml_zurrose_transfer.dat')).to eq(false)
     end
   end
 end
@@ -528,12 +528,12 @@ describe Oddb2xml::MedregbmDownloader do
     context 'download betrieb txt' do
       let(:txt) { @downloader.download }
       it 'should return valid String' do
-        txt.should be_a String
-        txt.bytes.should_not nil
+        expect(txt).to be_a String
+        expect(txt.bytes).not_to be nil
       end
       it 'should clean up current directory' do
         expect { txt }.not_to raise_error
-        File.exist?('oddb_company.xls').should eq(false)
+        expect(File.exist?('oddb_company.xls')).to eq(false)
       end
     end
   end
@@ -551,12 +551,12 @@ describe Oddb2xml::MedregbmDownloader do
         @downloader.download
       }
       it 'should return valid String' do
-        txt.should be_a String
-        txt.bytes.should_not nil
+        expect(txt).to be_a String
+        expect(txt.bytes).not_to be nil
       end
       it 'should clean up current directory' do
         expect { txt }.not_to raise_error
-        File.exist?('oddb_person.xls').should eq(false)
+        expect(File.exist?('oddb_person.xls')).to eq(false)
       end
     end
   end
@@ -594,17 +594,17 @@ describe Oddb2xml::SwissmedicInfoDownloader do
   context 'when download is called' do
     let(:xml) { @downloader.download  }
     it 'should parse zip to String' do
-      xml.should be_a String
-      xml.length.should_not == 0
+      expect(xml).to be_a String
+      expect(xml.length).not_to eq(0)
     end
     it 'should return valid xml' do
-      xml.should =~ XML_VERSION_1_0
-      xml.should =~ /medicalInformations/
-      xml.should =~ /content/
+      expect(xml).to match(XML_VERSION_1_0)
+      expect(xml).to match(/medicalInformations/)
+      expect(xml).to match(/content/)
     end
     it 'should clean up current directory' do
       expect { xml }.not_to raise_error
-      File.exist?('swissmedic_info.zip').should eq(false)
+      expect(File.exist?('swissmedic_info.zip')).to eq(false)
     end
   end
 end

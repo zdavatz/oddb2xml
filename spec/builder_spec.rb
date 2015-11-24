@@ -10,7 +10,7 @@ def checkItemForRefdata(doc, pharmacode, isRefdata)
   refdata =  article.elements['REF_DATA'].text
   smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
   puts "checking doc for gtin #{gtin} isRefdata #{isRefdata} == #{refdata}. SMNO: #{smno} #{name}" if $VERBOSE
-  article.elements['REF_DATA'].text.should == isRefdata.to_s
+  expect(article.elements['REF_DATA'].text).to eq(isRefdata.to_s)
   article
 end
 
@@ -22,7 +22,7 @@ def check_article_IGM_format(line, price_kendural=825, add_80_percents=false)
   price_exf      = line[60..65].to_i
   price_reseller = line[66..71].to_i
   price_public   = line[66..71].to_i
-  typ.should    eq '11'
+  expect(typ).to    eq '11'
   puts "check_article_IGM_format: #{price_exf} #{price_public} CKZL is #{ckzl} CIKS is #{ciks} name  #{name} " if $VERBOSE
   found_SL = false
   found_non_SL = false
@@ -30,26 +30,26 @@ def check_article_IGM_format(line, price_kendural=825, add_80_percents=false)
   if /7680353660163\d$/.match(line) # KENDURAL Depottabl 30 Stk
     puts "found_SL for #{line}" if $VERBOSE
     found_SL = true
-    line[60..65].should eq '000491'
-    price_exf.should eq 491
-    ckzl.should eq '1'
-    price_public.should eq price_kendural     # this is a SL-product. Therefore we may not have a price increase
-    line[66..71].should eq '000'+price_kendural.to_s  # the dat format requires leading zeroes and not point
+    expect(line[60..65]).to eq '000491'
+    expect(price_exf).to eq 491
+    expect(ckzl).to eq '1'
+    expect(price_public).to eq price_kendural     # this is a SL-product. Therefore we may not have a price increase
+    expect(line[66..71]).to eq '000'+price_kendural.to_s  # the dat format requires leading zeroes and not point
   end
 
   if /7680403330459\d$/.match(line) # CARBADERM
     found_non_SL = true
     puts "found_non_SL for #{line}" if $VERBOSE
-    ckzl.should eq '3'
+    expect(ckzl).to eq '3'
     if add_80_percents
-      price_reseller.should eq    2919  # = 1545*1.8 this is a non  SL-product. Therefore we must increase its price as requsted
-      line[66..71].should eq '002919' # dat format requires leading zeroes and not poin
+      expect(price_reseller).to eq    2919  # = 1545*1.8 this is a non  SL-product. Therefore we must increase its price as requsted
+      expect(line[66..71]).to eq '002919' # dat format requires leading zeroes and not poin
     else
-      price_reseller.should eq     2770  # this is a non  SL-product, but no price increase was requested
-      line[66..71].should eq '002770' # the dat format requires leading zeroes and not point
+      expect(price_reseller).to eq     2770  # this is a non  SL-product, but no price increase was requested
+      expect(line[66..71]).to eq '002770' # the dat format requires leading zeroes and not point
     end
-    line[60..65].should eq '001622' # the dat format requires leading zeroes and not point
-    price_exf.should eq    1622      # this is a non  SL-product, but no price increase was requested
+    expect(line[60..65]).to eq '001622' # the dat format requires leading zeroes and not point
+    expect(price_exf).to eq    1622      # this is a non  SL-product, but no price increase was requested
   end
   return [found_SL, found_non_SL]
 end
@@ -57,8 +57,8 @@ end
 def check_validation_via_xsd
   @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
   @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
-  File.exists?(@oddb2xml_xsd).should eq true
-  File.exists?(@oddb_calc_xsd).should eq true
+  expect(File.exists?(@oddb2xml_xsd)).to eq true
+  expect(File.exists?(@oddb_calc_xsd)).to eq true
   files = Dir.glob('*.xml')
   xsd_oddb2xml = Nokogiri::XML::Schema(File.read(@oddb2xml_xsd))
   xsd_oddb_calc = Nokogiri::XML::Schema(File.read(@oddb_calc_xsd))
@@ -72,7 +72,7 @@ def check_validation_via_xsd
         if error.message
           puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@oddb2xml_xsd}"
         end
-        error.message.should be_nil
+        expect(error.message).to be_nil
     end
   }
 end
@@ -81,31 +81,31 @@ def checkPrices(increased = false)
   doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
 
   sofradex = checkAndGetArticleWithGTIN(doc, Oddb2xml::SOFRADEX_GTIN)
-  sofradex.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text.should eq Oddb2xml::SOFRADEX_PRICE_ZURROSE.to_s
-  sofradex.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text.should eq Oddb2xml::SOFRADEX_PRICE_ZURROSEPUB.to_s
+  expect(sofradex.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text).to eq Oddb2xml::SOFRADEX_PRICE_ZURROSE.to_s
+  expect(sofradex.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text).to eq Oddb2xml::SOFRADEX_PRICE_ZURROSEPUB.to_s
 
   lansoyl = checkAndGetArticleWithGTIN(doc, Oddb2xml::LANSOYL_GTIN)
-  lansoyl.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text.should eq Oddb2xml::LANSOYL_PRICE_ZURROSE.to_s
-  lansoyl.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text.should eq Oddb2xml::LANSOYL_PRICE_ZURROSEPUB.to_s
+  expect(lansoyl.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text).to eq Oddb2xml::LANSOYL_PRICE_ZURROSE.to_s
+  expect(lansoyl.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text).to eq Oddb2xml::LANSOYL_PRICE_ZURROSEPUB.to_s
 
   desitin = checkAndGetArticleWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
-  desitin.elements["ARTPRI[PTYP='PPUB']/PRICE"].text.should eq Oddb2xml::LEVETIRACETAM_PRICE_PPUB.to_s
-  desitin.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text.should eq Oddb2xml::LEVETIRACETAM_PRICE_ZURROSE.to_s
-  desitin.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text.to_f.should eq Oddb2xml::LEVETIRACETAM_PRICE_PPUB.to_f
+  expect(desitin.elements["ARTPRI[PTYP='PPUB']/PRICE"].text).to eq Oddb2xml::LEVETIRACETAM_PRICE_PPUB.to_s
+  expect(desitin.elements["ARTPRI[PTYP='ZURROSE']/PRICE"].text).to eq Oddb2xml::LEVETIRACETAM_PRICE_ZURROSE.to_s
+  expect(desitin.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text.to_f).to eq Oddb2xml::LEVETIRACETAM_PRICE_PPUB.to_f
   if increased
-    lansoyl.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text.should eq Oddb2xml::LANSOYL_PRICE_RESELLER_PUB.to_s
-    sofradex.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text.should eq Oddb2xml::SOFRADEX_PRICE_RESELLER_PUB.to_s
-    desitin.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text.should eq Oddb2xml::LEVETIRACETAM_PRICE_RESELLER_PUB.to_s
+    expect(lansoyl.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text).to eq Oddb2xml::LANSOYL_PRICE_RESELLER_PUB.to_s
+    expect(sofradex.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text).to eq Oddb2xml::SOFRADEX_PRICE_RESELLER_PUB.to_s
+    expect(desitin.elements["ARTPRI[PTYP='RESELLERPUB']/PRICE"].text).to eq Oddb2xml::LEVETIRACETAM_PRICE_RESELLER_PUB.to_s
   else
-    lansoyl.elements["ARTPRI[PTYP='RESELLERPUB']"].should eq nil
-    sofradex.elements["ARTPRI[PTYP='RESELLERPUB']"].should eq nil
-    desitin.elements["ARTPRI[PTYP='RESELLERPUB']"].should eq nil
+    expect(lansoyl.elements["ARTPRI[PTYP='RESELLERPUB']"]).to eq nil
+    expect(sofradex.elements["ARTPRI[PTYP='RESELLERPUB']"]).to eq nil
+    expect(desitin.elements["ARTPRI[PTYP='RESELLERPUB']"]).to eq nil
   end
 end
 
 def checkAndGetArticleXmlName(tst=nil)
   article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-  File.exists?(article_xml).should eq true
+  expect(File.exists?(article_xml)).to eq true
   FileUtils.cp(article_xml, File.join(Oddb2xml::WorkDir, "tst-#{tst}.xml")) if tst
   article_xml
 end
@@ -114,8 +114,8 @@ def checkAndGetProductWithGTIN(doc, gtin)
   products = XPath.match( doc, "//PRD[GTIN=#{gtin.to_s}]")
   gtins    = XPath.match( doc, "//PRD[GTIN=#{gtin.to_s}]/GTIN")
   binding.pry unless gtins.size == 1
-  gtins.size.should eq 1
-  gtins.first.text.should eq gtin.to_s
+  expect(gtins.size).to eq 1
+  expect(gtins.first.text).to eq gtin.to_s
   # return product
   return products.size == 1 ? products.first : nil
 end
@@ -123,8 +123,8 @@ end
 def checkAndGetArticleWithGTIN(doc, gtin)
   articles = XPath.match( doc, "//ART[ARTBAR/BC=#{gtin}]")
   gtins    = XPath.match( doc, "//ART[ARTBAR/BC=#{gtin}]/ARTBAR/BC")
-  gtins.size.should eq 1
-  gtins.first.text.should eq gtin.to_s
+  expect(gtins.size).to eq 1
+  expect(gtins.first.text).to eq gtin.to_s
   gtins.first
   # return article
   return articles.size == 1 ? articles.first : nil
@@ -137,59 +137,59 @@ def checkArticleXml(checkERYTHROCIN = true)
   doc = REXML::Document.new IO.read(article_filename)
   checkAndGetArticleWithGTIN(doc, Oddb2xml::THREE_TC_GTIN)
   desitin = checkAndGetArticleWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
-  desitin.should_not eq nil
+  expect(desitin).not_to eq nil
   # TODO: why is this now nil? desitin.elements['ATC'].text.should == 'N03AX14'
-  desitin.elements['DSCRD'].text.should ==  "LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk"
-  desitin.elements['DSCRF'].text.should == 'LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce'
-  desitin.elements['REF_DATA'].text.should == '1'
-  desitin.elements['PHAR'].text.should == '5819012'
-  desitin.elements['SMCAT'].text.should == 'B'
-  desitin.elements['SMNO'].text.should == '62069008'
-  desitin.elements['VAT'].text.should == '2'
-  desitin.elements['PRODNO'].text.should == '620691'
-  desitin.elements['SALECD'].text.should == 'A'
-  desitin.elements['CDBG'].text.should == 'N'
-  desitin.elements['BG'].text.should == 'N'
+  expect(desitin.elements['DSCRD'].text).to eq("LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk")
+  expect(desitin.elements['DSCRF'].text).to eq('LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce')
+  expect(desitin.elements['REF_DATA'].text).to eq('1')
+  expect(desitin.elements['PHAR'].text).to eq('5819012')
+  expect(desitin.elements['SMCAT'].text).to eq('B')
+  expect(desitin.elements['SMNO'].text).to eq('62069008')
+  expect(desitin.elements['VAT'].text).to eq('2')
+  expect(desitin.elements['PRODNO'].text).to eq('620691')
+  expect(desitin.elements['SALECD'].text).to eq('A')
+  expect(desitin.elements['CDBG'].text).to eq('N')
+  expect(desitin.elements['BG'].text).to eq('N')
 
   erythrocin_gtin = '7680202580475' # picked up from zur rose
   erythrocin = checkAndGetArticleWithGTIN(doc, erythrocin_gtin)
-  erythrocin.elements['DSCRD'].text.should ==  "ERYTHROCIN i.v. Trockensub 1000 mg Amp" if checkERYTHROCIN
+  expect(erythrocin.elements['DSCRD'].text).to eq("ERYTHROCIN i.v. Trockensub 1000 mg Amp") if checkERYTHROCIN
 
   lansoyl = checkAndGetArticleWithGTIN(doc, Oddb2xml::LANSOYL_GTIN)
-  lansoyl.elements['DSCRD'].text.should eq 'LANSOYL Gel 225 g'
-  lansoyl.elements['REF_DATA'].text.should eq '1'
-  lansoyl.elements['SMNO'].text.should eq '32475019'
-  lansoyl.elements['PHAR'].text.should eq '0023722'
-  lansoyl.elements['ARTCOMP/COMPNO'].text.should == '7601001002012'
+  expect(lansoyl.elements['DSCRD'].text).to eq 'LANSOYL Gel 225 g'
+  expect(lansoyl.elements['REF_DATA'].text).to eq '1'
+  expect(lansoyl.elements['SMNO'].text).to eq '32475019'
+  expect(lansoyl.elements['PHAR'].text).to eq '0023722'
+  expect(lansoyl.elements['ARTCOMP/COMPNO'].text).to eq('7601001002012')
 
   zyvoxid = checkAndGetArticleWithGTIN(doc, Oddb2xml::ZYVOXID_GTIN)
-  zyvoxid.elements['DSCRD'].text.should eq 'ZYVOXID Filmtabl 600 mg 10 Stk'
+  expect(zyvoxid.elements['DSCRD'].text).to eq 'ZYVOXID Filmtabl 600 mg 10 Stk'
 
-  XPath.match( doc, "//LIMPTS" ).size.should >= 1
+  expect(XPath.match( doc, "//LIMPTS" ).size).to be >= 1
   # TODO: desitin.elements['QTY'].text.should eq '250 mg'
 end
 
 def checkProductXml
   product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
-  File.exists?(product_filename).should eq true
+  expect(File.exists?(product_filename)).to eq true
 
   # check products
   doc = REXML::Document.new IO.read(product_filename)
   desitin = checkAndGetProductWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
-  desitin.elements['ATC'].text.should == 'N03AX14'
-  desitin.elements['DSCRD'].text.should == "LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk"
-  desitin.elements['DSCRF'].text.should == 'LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce'
-  desitin.elements['PRODNO'].text.should eq '620691'
-  desitin.elements['IT'].text.should eq '01.07.1.'
-  desitin.elements['PackGrSwissmedic'].text.should eq '30'
-  desitin.elements['EinheitSwissmedic'].text.should eq 'Tablette(n)'
-  desitin.elements['SubstanceSwissmedic'].text.should eq 'levetiracetamum'
-  desitin.elements['CompositionSwissmedic'].text.should eq 'levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.'
+  expect(desitin.elements['ATC'].text).to eq('N03AX14')
+  expect(desitin.elements['DSCRD'].text).to eq("LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk")
+  expect(desitin.elements['DSCRF'].text).to eq('LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce')
+  expect(desitin.elements['PRODNO'].text).to eq '620691'
+  expect(desitin.elements['IT'].text).to eq '01.07.1.'
+  expect(desitin.elements['PackGrSwissmedic'].text).to eq '30'
+  expect(desitin.elements['EinheitSwissmedic'].text).to eq 'Tablette(n)'
+  expect(desitin.elements['SubstanceSwissmedic'].text).to eq 'levetiracetamum'
+  expect(desitin.elements['CompositionSwissmedic'].text).to eq 'levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.'
 
-  desitin.elements['CPT/CPTCMP/LINE'].text.should eq '0'
-  desitin.elements['CPT/CPTCMP/SUBNO'].text.should eq '9'
-  desitin.elements['CPT/CPTCMP/QTY'].text.should eq '250'
-  desitin.elements['CPT/CPTCMP/QTYU'].text.should eq 'mg'
+  expect(desitin.elements['CPT/CPTCMP/LINE'].text).to eq '0'
+  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '9'
+  expect(desitin.elements['CPT/CPTCMP/QTY'].text).to eq '250'
+  expect(desitin.elements['CPT/CPTCMP/QTYU'].text).to eq 'mg'
 
   checkAndGetProductWithGTIN(doc, Oddb2xml::THREE_TC_GTIN)
   checkAndGetProductWithGTIN(doc, Oddb2xml::ZYVOXID_GTIN)
@@ -199,12 +199,12 @@ def checkProductXml
     puts "checkProductXml has #{XPath.match( doc, "//GTIN" ).find_all{|x| true}.size} GTIN"
     puts "checkProductXml has #{XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size} PRODNO"
   end
-  XPath.match( doc, "//PRD" ).find_all{|x| true}.size.should == NrPackages
-  XPath.match( doc, "//GTIN" ).find_all{|x| true}.size.should == NrPackages
-  XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should == NrProdno
+  expect(XPath.match( doc, "//PRD" ).find_all{|x| true}.size).to eq(NrPackages)
+  expect(XPath.match( doc, "//GTIN" ).find_all{|x| true}.size).to eq(NrPackages)
+  expect(XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size).to eq(NrProdno)
 
   hirudoid = checkAndGetProductWithGTIN(doc, Oddb2xml::HIRUDOID_GTIN)
-  hirudoid.elements['ATC'].text.should == 'C05BA01' # modified by atc.csv!
+  expect(hirudoid.elements['ATC'].text).to eq('C05BA01') # modified by atc.csv!
 end
 
 describe Oddb2xml::Builder do
@@ -236,7 +236,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should return produce a oddb_article.xml' do
-      File.exists?(@article_xml).should eq true
+      expect(File.exists?(@article_xml)).to eq true
     end
 
     it 'oddb_article.xml should contain a SHA256' do
@@ -289,15 +289,15 @@ describe Oddb2xml::Builder do
     end
 
     it 'should return produce a correct oddb_fi.xml' do
-      File.exists?(@oddb_fi_xml).should eq true
+      expect(File.exists?(@oddb_fi_xml)).to eq true
       inhalt = IO.read(@oddb_fi_xml)
-      /<KMP/.match(inhalt.to_s).to_s.should eq '<KMP'
-      /<style><!\[CDATA\[p{margin-top/.match(inhalt.to_s).to_s.should eq '<style><![CDATA[p{margin-top'
+      expect(/<KMP/.match(inhalt.to_s).to_s).to eq '<KMP'
+      expect(/<style><!\[CDATA\[p{margin-top/.match(inhalt.to_s).to_s).to eq '<style><![CDATA[p{margin-top'
       m = /<paragraph><!\[CDATA\[(.+)\n(.*)/.match(inhalt.to_s)
-      m[1].should eq '<?xml version="1.0" encoding="utf-8"?><div xmlns="http://www.w3.org/1999/xhtml">'
+      expect(m[1]).to eq '<?xml version="1.0" encoding="utf-8"?><div xmlns="http://www.w3.org/1999/xhtml">'
       expected = '<p class="s2"> </p>'
       skip { m[2].should eq '<p class="s4" id="section1"><span class="s2"><span>Zyvoxid</span></span><sup class="s3"><span>®</span></sup></p>'  }
-      File.exists?(@oddb_fi_product_xml).should eq true
+      expect(File.exists?(@oddb_fi_product_xml)).to eq true
       inhalt = IO.read(@oddb_fi_product_xml)
     end
 
@@ -308,7 +308,7 @@ if RUN_ALL
     end
 
     it 'should generate a valid oddb_product.xml' do
-      @res.should match(/products/)
+      expect(@res).to match(/products/)
       checkProductXml
     end
   end
@@ -323,13 +323,13 @@ if RUN_ALL
     end
 
     it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
-      @res.should match(/products/)
+      expect(@res).to match(/products/)
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
-      File.exists?(dat_filename).should eq true
+      expect(File.exists?(dat_filename)).to eq true
       oddb_dat = IO.read(dat_filename)
-      oddb_dat.should match(/^..2/), "should have a record with '2' in CMUT field"
-      oddb_dat.should match(/^..3/), "should have a record with '3' in CMUT field"
-      oddb_dat.should match(RegExpDesitin), "should have Desitin"
+      expect(oddb_dat).to match(/^..2/), "should have a record with '2' in CMUT field"
+      expect(oddb_dat).to match(/^..3/), "should have a record with '3' in CMUT field"
+      expect(oddb_dat).to match(RegExpDesitin), "should have Desitin"
       IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line) }
       m = /.+DIAPHIN Trocke.*7680555610041.+/.match(oddb_dat)
       expect(m[0].size).to eq 97 # size of IGM 1 record
@@ -348,17 +348,17 @@ if RUN_ALL
 
     it 'should generate a valid oddb_with_migel.dat' do
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb_with_migel.dat')
-      File.exists?(dat_filename).should eq true
+      expect(File.exists?(dat_filename)).to eq true
       oddb_dat = IO.read(dat_filename)
-      oddb_dat.should match(RegExpDesitin), "should have Desitin"
-      @res.should match(/products/)
+      expect(oddb_dat).to match(RegExpDesitin), "should have Desitin"
+      expect(@res).to match(/products/)
     end
 
     it "should match EAN 76806206900842 of Desitin" do
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb_with_migel.dat')
-      File.exists?(dat_filename).should eq true
+      expect(File.exists?(dat_filename)).to eq true
       oddb_dat = IO.read(dat_filename)
-      oddb_dat.should match(/76806206900842/), "should match EAN of Desitin"
+      expect(oddb_dat).to match(/76806206900842/), "should match EAN of Desitin"
     end
   end
 
@@ -380,7 +380,7 @@ if RUN_ALL
     end
 
     it 'should generate a valid oddb_product.xml' do
-      @res.should match(/products/)
+      expect(@res).to match(/products/)
       checkProductXml
     end
 
@@ -413,8 +413,8 @@ if RUN_ALL
     end
 
     it 'should report correct output on stdout' do
-      @res.should match(/\sPharma products: \d+/)
-      @res.should match(/\sNonPharma products: \d+/)
+      expect(@res).to match(/\sPharma products: \d+/)
+      expect(@res).to match(/\sNonPharma products: \d+/)
     end if RUN_ALL
 
     it 'should contain the correct (normal) prices' do
@@ -423,7 +423,7 @@ if RUN_ALL
 
     it 'should generate the flag non-refdata' do
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName('non-refdata'))
-      XPath.match( doc, "//REF_DATA" ).size.should > 0
+      expect(XPath.match( doc, "//REF_DATA" ).size).to be > 0
       checkItemForRefdata(doc, "1699947", 1) # 3TC Filmtabl 150 mg SMNO 53662013 IKSNR 53‘662, 53‘663
       checkItemForRefdata(doc, "0598003", 0) # SOFRADEX Gtt Auric 8 ml
       checkItemForRefdata(doc, "5366964", 1) # 1-DAY ACUVUE moist jour
@@ -435,8 +435,8 @@ if RUN_ALL
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
       article = XPath.match( doc, "//ART[ARTINS/NINCD=13]").first
       article = XPath.match( doc, "//ART[PHAR=5366964]").first
-      article.elements['SALECD'].text.should == 'A'
-      article.elements['ARTINS/NINCD'].text.should == '13'
+      expect(article.elements['SALECD'].text).to eq('A')
+      expect(article.elements['ARTINS/NINCD'].text).to eq('13')
     end
 
     it 'should pass validating via oddb2xml.xsd' do
@@ -446,56 +446,56 @@ if RUN_ALL
     it 'should not contain veterinary iksnr 47066 CANIPHEDRIN'  do
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
       dscrds = XPath.match( doc, "//ART" )
-      XPath.match( doc, "//BC" ).find_all{|x| x.text.match('47066') }.size.should == 0
-      XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/CANIPHEDRIN/) }.size.should == 0
+      expect(XPath.match( doc, "//BC" ).find_all{|x| x.text.match('47066') }.size).to eq(0)
+      expect(XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/CANIPHEDRIN/) }.size).to eq(0)
     end
 
     it 'should handle not duplicate pharmacode 5366964'  do
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
       dscrds = XPath.match( doc, "//ART" )
-      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size.should == 1
-      dscrds.size.should == NrExtendedArticles
-      XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size.should >= 1
-      XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('002771') }.size.should == 0
-      XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('620691') }.size.should == 1
+      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size).to eq(1)
+      expect(dscrds.size).to eq(NrExtendedArticles)
+      expect(XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size).to be >= 1
+      expect(XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('002771') }.size).to eq(0)
+      expect(XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('620691') }.size).to eq(1)
     end
 
     it 'should load correct number of nonpharma' do
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
       dscrds = XPath.match( doc, "//ART" )
-      dscrds.size.should == NrExtendedArticles
-      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('1699947') }.size.should == 1 # swissmedic_packages Cardio-Pulmo-Rénal Sérocytol, suppositoire
-      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('2465312') }.size.should == 1 # from refdata_pharma.xml"
-      XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size.should == 1 # from refdata_pharma.xml
+      expect(dscrds.size).to eq(NrExtendedArticles)
+      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('1699947') }.size).to eq(1) # swissmedic_packages Cardio-Pulmo-Rénal Sérocytol, suppositoire
+      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('2465312') }.size).to eq(1) # from refdata_pharma.xml"
+      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size).to eq(1) # from refdata_pharma.xml
     end
 
     it 'should emit a correct oddb_limitation.xml' do
       # check limitations
       limitation_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_limitation.xml'))
-      File.exists?(limitation_filename).should eq true
+      expect(File.exists?(limitation_filename)).to eq true
       doc = REXML::Document.new File.new(limitation_filename)
       limitations = XPath.match( doc, "//LIM" )
-      limitations.size.should >= 4
-      XPath.match( doc, "//SwissmedicNo5" ).find_all{|x| x.text.match('28486') }.size.should == 1
-      XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('ZYVOXID') }.size.should == 1
-      XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('070240') }.size.should == 1
-      XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/^Gesamthaft zugelassen/) }.size.should == 1
-      XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/^Behandlung nosokomialer Pneumonien/) }.size.should == 1
+      expect(limitations.size).to be >= 4
+      expect(XPath.match( doc, "//SwissmedicNo5" ).find_all{|x| x.text.match('28486') }.size).to eq(1)
+      expect(XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('ZYVOXID') }.size).to eq(1)
+      expect(XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('070240') }.size).to eq(1)
+      expect(XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/^Gesamthaft zugelassen/) }.size).to eq(1)
+      expect(XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/^Behandlung nosokomialer Pneumonien/) }.size).to eq(1)
     end
 
     it 'should emit a correct oddb_substance.xml' do
       doc = REXML::Document.new File.new(File.join(Oddb2xml::WorkDir, 'oddb_substance.xml'))
       names = XPath.match( doc, "//NAML" )
-      names.size.should == NrSubstances
-      names.find_all{|x| x.text.match('Lamivudinum') }.size.should == 1
+      expect(names.size).to eq(NrSubstances)
+      expect(names.find_all{|x| x.text.match('Lamivudinum') }.size).to eq(1)
     end
 
     it 'should emit a correct oddb_interaction.xml' do
       doc = REXML::Document.new File.new(File.join(Oddb2xml::WorkDir, 'oddb_interaction.xml'))
       titles = XPath.match( doc, "//TITD" )
-      titles.size.should eq 5
-      titles.find_all{|x| x.text.match('Keine Interaktion') }.size.should >= 1
-      titles.find_all{|x| x.text.match('Erhöhtes Risiko für Myopathie und Rhabdomyolyse') }.size.should == 1
+      expect(titles.size).to eq 5
+      expect(titles.find_all{|x| x.text.match('Keine Interaktion') }.size).to be >= 1
+      expect(titles.find_all{|x| x.text.match('Erhöhtes Risiko für Myopathie und Rhabdomyolyse') }.size).to eq(1)
     end
 
     def checkItemForSALECD(doc, ean13, expected)
@@ -506,16 +506,16 @@ if RUN_ALL
         puts "checking doc for ean13 #{ean13} expected #{expected} == #{salecd}. #{name}"
         puts article.text
       end
-      article.elements['SALECD'].text.should == expected.to_s
+      expect(article.elements['SALECD'].text).to eq(expected.to_s)
     end
 
     it 'should generate the flag SALECD' do
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(@article_xml).should eq true
+      expect(File.exists?(@article_xml)).to eq true
       FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-SALECD.xml'))
       article_xml = IO.read(@article_xml)
       doc = REXML::Document.new File.new(@article_xml)
-      XPath.match( doc, "//REF_DATA" ).size.should > 0
+      expect(XPath.match( doc, "//REF_DATA" ).size).to be > 0
       checkItemForSALECD(doc, Oddb2xml::FERRO_GRADUMET_GTIN, 'A') # FERRO-GRADUMET Depottabl 30 Stk
       checkItemForSALECD(doc, Oddb2xml::SOFRADEX_GTIN, 'I') # SOFRADEX
     end
@@ -531,7 +531,7 @@ if RUN_ALL
 
     it 'should add 80 percent to zur_rose pubbprice' do
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      File.exists?(@article_xml).should eq true
+      expect(File.exists?(@article_xml)).to eq true
       FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-e80.xml'))
       checkProductXml
       checkArticleXml
@@ -555,16 +555,16 @@ if RUN_ALL
     end
 
     it 'should report correct number of items' do
-      @res.should match(/products/)
+      expect(@res).to match(/products/)
     end
 
     it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
-      File.exists?(dat_filename).should eq true
+      expect(File.exists?(dat_filename)).to eq true
       oddb_dat = IO.read(dat_filename)
-      oddb_dat.should match(/^..2/), "should have a record with '2' in CMUT field"
-      oddb_dat.should match(/^..3/), "should have a record with '3' in CMUT field"
-      oddb_dat.should match(RegExpDesitin), "should have Desitin"
+      expect(oddb_dat).to match(/^..2/), "should have a record with '2' in CMUT field"
+      expect(oddb_dat).to match(/^..3/), "should have a record with '3' in CMUT field"
+      expect(oddb_dat).to match(RegExpDesitin), "should have Desitin"
       IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line) }
       # oddb_dat.should match(/^..1/), "should have a record with '1' in CMUT field" # we have no
     end
@@ -579,12 +579,12 @@ if RUN_ALL
     end
 
     it 'should report correct number of items' do
-      @res.should match(/products/)
+      expect(@res).to match(/products/)
     end
 
     it 'should contain the corect prices' do
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
-      File.exists?(dat_filename).should eq true
+      expect(File.exists?(dat_filename)).to eq true
       oddb_dat = IO.read(dat_filename)
       oddb_dat_lines = IO.readlines(dat_filename)
       IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 883, true) }

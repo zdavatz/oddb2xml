@@ -262,7 +262,7 @@ describe Oddb2xml::ZurroseExtractor do
       DAT
       Oddb2xml::ZurroseExtractor.new(dat)
     end
-    it { subject.to_hash.size.should eq(1) }
+    it { expect(subject.to_hash.size).to eq(1) }
   end
   context 'when expected line is given' do
     subject do

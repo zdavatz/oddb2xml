@@ -4,17 +4,17 @@ require 'spec_helper'
 
 shared_examples_for 'any compressor' do
   it 'should create compress file' do
-    File.stub(:unlink).and_return(false)
+    allow(File).to receive(:unlink).and_return(false)
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_article.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_product.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_substance.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_limitation.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_fi.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_fi_product.xml')
-    @compressor.finalize!.should eq(true)
+    expect(@compressor.finalize!).to eq(true)
     compress_file = @compressor.instance_variable_get(:@compress_file)
-    File.exists?(compress_file).should == true
-    File.unstub(:unlink)
+    expect(File.exists?(compress_file)).to eq(true)
+    allow(File).to receive(:unlink).and_call_original
     @compressor = nil
   end
 end
@@ -37,12 +37,12 @@ describe Oddb2xml::Compressor do
         @compressor = Oddb2xml::Compressor.new
       end
       it 'should have empty contents as array' do
-        @compressor.contents.should be_a Array
-        @compressor.contents.should be_empty
+        expect(@compressor.contents).to be_a Array
+        expect(@compressor.contents).to be_empty
       end
       it 'should have formated filename with datetime' do
-        @compressor.instance_variable_get(:@compress_file).
-          should =~ /oddb_xml_\d{2}.\d{2}.\d{4}_\d{2}.\d{2}.tar\.gz/
+        expect(@compressor.instance_variable_get(:@compress_file)).
+          to match(/oddb_xml_\d{2}.\d{2}.\d{4}_\d{2}.\d{2}.tar\.gz/)
       end
     end
     context "when swiss prefix is given" do
@@ -51,8 +51,8 @@ describe Oddb2xml::Compressor do
         @compressor = Oddb2xml::Compressor.new('swiss', {:compress_ext => 'tar.gz'})
       end
       it 'should have formated filename with datetime' do
-        @compressor.instance_variable_get(:@compress_file).
-          should =~ /swiss_xml_\d{2}.\d{2}.\d{4}_\d{2}.\d{2}.tar\.gz/
+        expect(@compressor.instance_variable_get(:@compress_file)).
+          to match(/swiss_xml_\d{2}.\d{2}.\d{4}_\d{2}.\d{2}.tar\.gz/)
       end
     end
     context "when tar.gz ext is given" do
@@ -61,8 +61,8 @@ describe Oddb2xml::Compressor do
         @compressor = Oddb2xml::Compressor.new('oddb', {:compress_ext => 'tar.gz'})
       end
       it 'should have formated filename with datetime' do
-        @compressor.instance_variable_get(:@compress_file).
-          should =~ /oddb_xml_\d{2}.\d{2}.\d{4}_\d{2}.\d{2}.tar\.gz/
+        expect(@compressor.instance_variable_get(:@compress_file)).
+          to match(/oddb_xml_\d{2}.\d{2}.\d{4}_\d{2}.\d{2}.tar\.gz/)
       end
     end
     context "when zip ext is given" do
@@ -71,8 +71,8 @@ describe Oddb2xml::Compressor do
         @compressor = Oddb2xml::Compressor.new('oddb', {:compress_ext => 'zip'})
       end
       it 'should have formated filename with datetime' do
-        @compressor.instance_variable_get(:@compress_file).
-          should =~ /oddb_xml_\d{2}.\d{2}.\d{4}_\d{2}.\d{2}.zip/
+        expect(@compressor.instance_variable_get(:@compress_file)).
+          to match(/oddb_xml_\d{2}.\d{2}.\d{4}_\d{2}.\d{2}.zip/)
       end
     end
   end
@@ -88,11 +88,11 @@ describe Oddb2xml::Compressor do
         Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
       end
       it 'should fail with no contents' do
-        @compressor.finalize!.should == false
+        expect(@compressor.finalize!).to eq(false)
       end
       it 'should fail with invalid file' do
         @compressor.contents << '../invalid_file'
-        @compressor.finalize!.should == false
+        expect(@compressor.finalize!).to eq(false)
       end
     end
     context 'successfully' do
