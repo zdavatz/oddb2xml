@@ -15,3 +15,21 @@ test/tmp
 test/version_tmp
 tmp
 .ruby-version
+*#
+# Ignore downloaded files
+.project
+.buildpath
+/*.xlsx
+/oddb_*.xml
+/oddb_*.txt
+/oddb2xml*.txt
+/spec/run
+/*tar.gz
+/*.patch
+/ausgabe
+/downloads
+/duplicate_ean13_from_zur_rose.txt
+/epha_interactions.csv
+/missing_in_refdata.txt
+/oddb2xml_files_nonpharma.xls
+/oddb_calc.csv
