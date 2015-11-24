@@ -46,7 +46,11 @@ module Oddb2xml
                   '7680532900196', # Insulin, gentechnik
                   '7680555610041', # Diaphin 10 g i.v. drug
     ]
+  FRIDGE_GTIN = '7680586180018'   # fridge drug IKSNR 58618: ARTISS 2 ml, tiefgefrorene Lösung
+  ORPHAN_GTIN = '7680621320010'   # orphan drug IKSNR 62132: Adcetris, Pulver zur Herstellung einer Infusionslösung
   GTINS_DRUGS = [ '733905577161', # 1-DAY ACUVUE Moist Tag -2.00dpt BC 8.5
+                  FRIDGE_GTIN,
+                  ORPHAN_GTIN,
                   '4042809018288',
                   '4042809018400',
                   '4042809018493',
@@ -101,7 +105,7 @@ end
 
 VCR.configure do |config|
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
-  config.hook_into :webmock # or :fakeweb
+  config.hook_into :webmock
   config.debug_logger = File.open(File.join(File.dirname(File.dirname(__FILE__)), 'vcr.log'), 'w+')
   config.debug_logger.sync = true
   config.default_cassette_options = { :record => ARGV.join(' ').index('downloader_spec') ? :new_episodes : :once ,

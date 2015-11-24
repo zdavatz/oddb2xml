@@ -4,7 +4,7 @@ require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/downloader"
 ENV['TZ'] = 'UTC' # needed for last_change
 LAST_CHANGE = "2015-07-03 00:00:00 +0000"
-NR_PACKS = 17
+NR_PACKS = 23
 
 describe Oddb2xml::LppvExtractor do
   before(:all) {
@@ -39,7 +39,7 @@ end
 describe Oddb2xml::RefdataExtractor do
   before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
   after(:all)  { VCR.eject_cassette }
-  @@last_change = '2015-09-09 00:00:00 +0000'
+  @@last_change = '2015-11-24 00:00:00 +0000'
 
   context 'should handle pharma articles' do
     subject do
@@ -64,7 +64,7 @@ describe Oddb2xml::RefdataExtractor do
         :company_name=>"Desitin Pharma GmbH",
         :company_ean=>"7601001320451"}
       expect(item_found).to eq(expected)
-      expect(@pharma_items.size).to eq(NR_PACKS)
+      expect(@pharma_items.size).to eq(19)
     end
 	end
   context 'should handle nonpharma articles' do
@@ -208,7 +208,7 @@ describe Oddb2xml::SwissmedicExtractor do
     it {
         @filename = File.join(Oddb2xml::SpecData, 'swissmedic_fridge.xlsx')
         @packs = Oddb2xml::SwissmedicExtractor.new(@filename, :fridge).to_arry
-        expect(@packs.size).to eq NR_PACKS
+        expect(@packs.size).to eq 16
         expect(@packs[0]).to eq("58618")
         expect(@packs[1]).to eq("00696")
       }
@@ -218,7 +218,7 @@ describe Oddb2xml::SwissmedicExtractor do
         @filename = File.join(Oddb2xml::SpecData, 'swissmedic_orphan.xlsx')
         expect(File.exists?(@filename)).to eq(true), "File #{@filename} must exists"
         @packs = Oddb2xml::SwissmedicExtractor.new(@filename, :orphan).to_arry
-        expect(@packs.size).to eq 78
+        expect(@packs.size).to eq 95
         expect(@packs.first).to eq("62132")
         expect(@packs[7]).to eq("00687")
       }
@@ -239,8 +239,8 @@ describe Oddb2xml::EphaExtractor do
 end
 
 describe Oddb2xml::MedregbmExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
+  # before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
+  # after(:all) { VCR.eject_cassette }
   it "pending"
 end
 

@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'spec_helper'
+require "rexml/document"
 
 VCR.eject_cassette # we use insert/eject around each example
 
@@ -528,10 +529,12 @@ describe Oddb2xml::MedregbmDownloader do
     context 'download betrieb txt' do
       let(:txt) { @downloader.download }
       it 'should return valid String' do
+        pending 'Should handle SSL issues'
         expect(txt).to be_a String
         expect(txt.bytes).not_to be nil
       end
       it 'should clean up current directory' do
+        pending 'Should handle SSL issues'
         expect { txt }.not_to raise_error
         expect(File.exist?('oddb_company.xls')).to eq(false)
       end
@@ -551,10 +554,12 @@ describe Oddb2xml::MedregbmDownloader do
         @downloader.download
       }
       it 'should return valid String' do
+        pending 'Should handle SSL issues'
         expect(txt).to be_a String
         expect(txt.bytes).not_to be nil
       end
       it 'should clean up current directory' do
+        pending 'Should handle SSL issues'
         expect { txt }.not_to raise_error
         expect(File.exist?('oddb_person.xls')).to eq(false)
       end

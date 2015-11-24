@@ -54,6 +54,8 @@
       * Bezeichnung (DE / FR)
       * QTY  Quantity, e.g. 3 Flaschen 5 ml. The EAN13 specified that this package contains 3 bottles. Think of it as
         as description of volume/size of the content.
+        The QTY is present in the oddb_product.xml, but not in the oddb_article.xml
+        In oddb_calc.xml you find QTY/UNIT, where QTY is a float and unit something like ml, mg, etc.
       * ATC
       * company_name (only for migel)
       * GLN company_ean, field COMPNO in oddb_article
@@ -124,7 +126,6 @@
           <xs:element ref="ns1:CDBG"/>
           <xs:element ref="ns1:BG"/>
         </xs:sequence>
-        <xs:element minOccurs="0" ref="ns1:QTY"/>
         <xs:element ref="ns1:DSCRD"/>
         <xs:element ref="ns1:DSCRF"/>
         <xs:element ref="ns1:SORTD"/>

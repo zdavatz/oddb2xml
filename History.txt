@@ -1,3 +1,9 @@
+=== 2.2.7 / 24.11.2015
+
+* Removed no more emitted QTY from definition of ART in oddb2xml.xsd
+* Fixed generating COOL in oddb_article.xml
+* Fixed generating ORPH in oddb_product.xml
+
 === 2.2.6 / 09.11.2015
 
 * Fixed an error when generating oddb_calc.xml and we have no information for a given EAN, eg. 7680653150012

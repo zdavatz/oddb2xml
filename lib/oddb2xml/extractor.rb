@@ -212,17 +212,24 @@ module Oddb2xml
       case @type
       when :orphan
         i = 1
+        col_zulassung = 5
+        raise "Could not find Zulassungsnummer in column #{col_zulassung} of #{@filename}" unless /Zulassungs.*nummer/.match(@sheet[3][col_zulassung].value)
         @sheet.each do |row|
-          next unless row[1]
-          number = row[1].value.to_i
+          next unless row[col_zulassung]
+          number = row[col_zulassung].value.to_i
           if number != 0
             data << sprintf("%05d", number)
           end
         end
       when :fridge
-        i,c = 1,7
+        row_explanation = 9
+        col_zulassung = 0
+        col_cool = 12
+        explanation = @sheet[row_explanation]
+        raise "Could not find Zulassungsnummer in column #{col_zulassung} of #{@filename}" unless /Zul.*Nr/.match(explanation[col_zulassung].value)
+        raise "Could not find Kühlkette in column #{col_cool}" unless /Kühlkette/.match(explanation[col_cool].value)
         @sheet.each do |row|
-          if row[i] and number = row[i].value and row[c] and row[c].value.to_s.downcase == 'x'
+          if row[col_zulassung] and number = row[col_zulassung].value and row[col_cool] and row[col_cool].value.to_s.downcase == 'x'
             data << sprintf("%05d", number)
           end
         end
@@ -272,6 +279,7 @@ module Oddb2xml
 
           next if (i <= 1)
           next unless row and row[i_5] and row[i_3]
+          next unless row[i_5].value.to_i > 0 and row[i_3].value.to_i > 0
           no8 = sprintf('%05d',row[i_5].value.to_i) + sprintf('%03d',row[i_3].value.to_i)
           prodno = sprintf('%05d',row[i_5].value.to_i) + row[p_1_2].value.to_i.to_s
           unless no8.empty?

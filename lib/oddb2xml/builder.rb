@@ -35,7 +35,7 @@ module Oddb2xml
   }
   class Builder
     attr_accessor :subject, :refdata, :items, :flags, :lppvs,
-                  :actions, :migel, :orphans, :fridges,
+                  :actions, :migel, :orphan, :fridge,
                   :infos, :packs, :infos_zur_rose,
                   :ean14, :tag_suffix,
                   :companies, :people,
@@ -52,8 +52,8 @@ module Oddb2xml
       @migel      = {}
       @infos_zur_rose     = {} # zurrose
       @actions    = []
-      @orphans    = []
-      @fridges    = []
+      @orphan    = []
+      @fridge    = []
       @ean14      = false
       @companies  = []
       @people     = []
@@ -533,7 +533,7 @@ module Oddb2xml
               #xml.DRGFD
               #xml.DRGFF
               obj[:no8] =~ /(\d{5})(\d{3})/
-              if @orphans.include?($1.to_s)
+              if @orphan.include?($1.to_s)
                 xml.ORPH true
               end
               #xml.BIOPHA
@@ -820,7 +820,7 @@ module Oddb2xml
               #xml.GRDFR
               if no8 and !no8.empty? and
                   no8.to_s =~ /(\d{5})(\d{3})/
-                xml.COOL 1 if @fridges.include?($1.to_s)
+                xml.COOL 1 if @fridge.include?($1.to_s)
               end
               #xml.TEMP
               if ean
@@ -1025,8 +1025,8 @@ module Oddb2xml
                                          xml.KP('DT' => '') {
                                           xml.MONID @infos[lang][idx][:monid]
                                           xml.PRDNO seq[:product_key] unless seq[:product_key].empty?
-                                          # as orphans ?
-                                          xml.DEL   @orphans.include?(number) ? true : false
+                                          # as orphan ?
+                                          xml.DEL   @orphan.include?(number) ? true : false
                                         }
                   }
               end
@@ -1240,7 +1240,7 @@ module Oddb2xml
                                             '3'
                                           end
           row << "%#{DAT_LEN[:CLAG]}s"  % if ((no8 && no8.to_s =~ /(\d{5})(\d{3})/) and
-                                              @fridges.include?($1.to_s))
+                                              @fridge.include?($1.to_s))
                                             '1'
                                           else
                                             '0'

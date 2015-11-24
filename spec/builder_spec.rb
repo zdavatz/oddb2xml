@@ -136,6 +136,7 @@ def checkArticleXml(checkERYTHROCIN = true)
   # check articles
   doc = REXML::Document.new IO.read(article_filename)
   checkAndGetArticleWithGTIN(doc, Oddb2xml::THREE_TC_GTIN)
+
   desitin = checkAndGetArticleWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
   expect(desitin).not_to eq nil
   # TODO: why is this now nil? desitin.elements['ATC'].text.should == 'N03AX14'
@@ -175,6 +176,7 @@ def checkProductXml
 
   # check products
   doc = REXML::Document.new IO.read(product_filename)
+
   desitin = checkAndGetProductWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
   expect(desitin.elements['ATC'].text).to eq('N03AX14')
   expect(desitin.elements['DSCRD'].text).to eq("LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk")
@@ -187,7 +189,7 @@ def checkProductXml
   expect(desitin.elements['CompositionSwissmedic'].text).to eq 'levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.'
 
   expect(desitin.elements['CPT/CPTCMP/LINE'].text).to eq '0'
-  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '9'
+  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '10'
   expect(desitin.elements['CPT/CPTCMP/QTY'].text).to eq '250'
   expect(desitin.elements['CPT/CPTCMP/QTYU'].text).to eq 'mg'
 
@@ -210,8 +212,8 @@ end
 describe Oddb2xml::Builder do
   NrExtendedArticles = 86
   NrSubstances = 12
-  NrProdno = 21
-  NrPackages = 22
+  NrProdno = 23
+  NrPackages = 24
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init
@@ -228,8 +230,8 @@ describe Oddb2xml::Builder do
     before(:all) do
       common_run_init
       options = Oddb2xml::Options.new
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
-      # Oddb2xml::Cli.new(options.opts).run # to debug
+      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      Oddb2xml::Cli.new(options.opts).run # to debug
       @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
       @doc = Nokogiri::XML(File.open(@article_xml))
       @rexml = REXML::Document.new File.read(@article_xml)
@@ -255,10 +257,16 @@ describe Oddb2xml::Builder do
 
     it 'should have a correct insulin (gentechnik) for 7680532900196' do
       expect(XPath.match( @rexml, "//ART/[BC='7680532900196']").size).to eq 1
-      expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").size).to eq 1
+      expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").size).to eq 2
       expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").first.text).to eq 'X'
       expect(XPath.match( @rexml, "//ART//INSULIN_CATEGORY").size).to eq 1
       expect(XPath.match( @rexml, "//ART//INSULIN_CATEGORY").first.text).to eq 'Insulinanalog: schnell wirkend'
+    end
+
+    it 'should flag fridge drugs correctly' do
+      doc = REXML::Document.new IO.read(checkAndGetArticleXmlName)
+      checkAndGetArticleWithGTIN(doc, Oddb2xml::FRIDGE_GTIN)
+      expect(XPath.match( doc, "//COOL='1']").size).to eq 1
     end
 
     it 'should have a correct drug information for 7680555610041' do
@@ -285,7 +293,8 @@ describe Oddb2xml::Builder do
       @oddb_fi_product_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_fi_product.xml'))
       options = Oddb2xml::Options.new
       options.parser.parse!(['-o'])
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      Oddb2xml::Cli.new(options.opts).run
     end
 
     it 'should return produce a correct oddb_fi.xml' do
@@ -380,7 +389,7 @@ if RUN_ALL
     end
 
     it 'should generate a valid oddb_product.xml' do
-      expect(@res).to match(/products/)
+      expect(@res).to match(/products/) if @res != nil
       checkProductXml
     end
 
@@ -419,6 +428,13 @@ if RUN_ALL
 
     it 'should contain the correct (normal) prices' do
       checkPrices(false)
+    end
+
+    it 'should generate the flag ORPH for orphan' do
+      doc = REXML::Document.new File.new(checkAndGetArticleXmlName('non-refdata'))
+      orphan = checkAndGetArticleWithGTIN(doc, Oddb2xml::ORPHAN_GTIN)
+      expect(orphan).not_to eq nil
+      expect(orphan.elements['ORPH'].text).to eq("true")
     end
 
     it 'should generate the flag non-refdata' do
@@ -541,6 +557,12 @@ if RUN_ALL
     it 'should generate a correct oddb_product.xml' do
       checkProductXml
     end
+
+    it 'should generate a product with the COOL (fridge) attribute' do
+        fridge_product = checkAndGetProductWithGTIN(doc, Oddb2xml::FRIDGE_GTIN)
+        fridge_product.elements['COOL'].text.should == '1'
+    end
+
     it 'should generate a correct oddb_article.xml' do
       checkArticleXml
     end

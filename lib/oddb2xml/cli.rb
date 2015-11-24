@@ -30,8 +30,8 @@ module Oddb2xml
       @infos_zur_rose  = {} # [addition] infos_zur_rose and other infos from zurrose transfer.txt
       @migel   = {} # [addition] additional Non Pharma products from files repo
       @actions = [] # [addition] interactions from epha
-      @orphans = [] # [addition] Orphaned drugs from Swissmedic xls
-      @fridges = [] # [addition] ReFridge drugs from Swissmedic xls
+      @orphan = [] # [addition] Orphaned drugs from Swissmedic xls
+      @fridge = [] # [addition] ReFridge drugs from Swissmedic xls
       # addres
       @companies = [] # betrieb
       @people    = [] # medizinalperson
@@ -89,7 +89,6 @@ module Oddb2xml
     def build
       Oddb2xml.log("Start build")
       begin
-        # require 'pry'; binding.pry
         @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not @options[:extended]
         files.each_pair do |sbj, file|
           builder = Builder.new(@options) do |builder|
@@ -117,7 +116,7 @@ module Oddb2xml
               builder.infos = @infos
               builder.packs = @packs
               # additional sources
-              %w[actions orphans fridges migel infos_zur_rose].each do |addition|
+              %w[actions orphan fridge migel infos_zur_rose].each do |addition|
                 builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
               end
             end
@@ -181,13 +180,13 @@ module Oddb2xml
           end
         end
       when :orphan, :fridge
-        var = what.to_s + 's'
+        var = what.to_s
         begin # instead of Thread.new do
           downloader = SwissmedicDownloader.new(what)
           bin = downloader.download
           Oddb2xml.log("SwissmedicDownloader #{var} #{bin} #{File.size(bin)} bytes")
           self.instance_variable_set(
-            "@#{var}".intern,
+            "@#{var}",
             items = SwissmedicExtractor.new(bin, what).to_arry
           )
           Oddb2xml.log("SwissmedicExtractor added #{items.size} #{var}. File #{bin} was #{File.size(bin)} bytes")
