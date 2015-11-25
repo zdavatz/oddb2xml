@@ -1,4 +1,4 @@
-=== 2.2.8 / ?????
+=== 2.2.8 / 25.11.2015
 
 * Improved spec tests against all XSD elements
 * Fixed NINCD for LPPV items
