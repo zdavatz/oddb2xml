@@ -6,14 +6,25 @@ ENV['TZ'] = 'UTC' # needed for last_change
 LAST_CHANGE = "2015-07-03 00:00:00 +0000"
 NR_PACKS = 23
 
+def common_before
+  @savedDir = Dir.pwd
+  Dir.chdir(Oddb2xml::WorkDir)
+  VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
+end
+
+def common_after
+  VCR.eject_cassette
+  Dir.chdir(@savedDir) if @savedDir and File.directory?(@savedDir)
+end
+
 describe Oddb2xml::LppvExtractor do
   before(:all) {
-    VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
+    common_before
     @downloader = Oddb2xml::LppvDownloader.new
     @content = @downloader.download
     @lppvs = Oddb2xml::LppvExtractor.new(@content).to_hash
   }
-  after(:all) { VCR.eject_cassette }
+  after(:all) { common_after }
   it "should have at least one item" do
     expect(@lppvs.size).not_to eq 0
   end
@@ -21,12 +32,12 @@ end
 
 describe Oddb2xml::MigelExtractor do
   before(:all) {
-    VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
+    common_before
     @downloader = Oddb2xml::MigelDownloader.new
     xml = @downloader.download
     @items = Oddb2xml::MigelExtractor.new(xml).to_hash
   }
-  after(:all) { VCR.eject_cassette }
+  after(:all) { common_after }
   it "should have at some items" do
     expect(@items.size).not_to eq 0
     expect(@items.find{|k,v| 3248410 == v[:pharmacode] }).not_to be_nil
@@ -37,8 +48,8 @@ describe Oddb2xml::MigelExtractor do
 end
 
 describe Oddb2xml::RefdataExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all)  { VCR.eject_cassette }
+  before(:all) { common_before }
+  after(:all) { common_after }
   @@last_change = '2015-11-24 00:00:00 +0000'
 
   context 'should handle pharma articles' do
@@ -96,8 +107,8 @@ describe Oddb2xml::RefdataExtractor do
 end
 
 describe Oddb2xml::BagXmlExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
+  before(:all) { common_before }
+  after(:all) { common_after }
   context 'should handle articles with and without pharmacode' do
     subject do
       dat = File.read(File.join(Oddb2xml::SpecData, 'Preparations.xml'))
@@ -129,8 +140,8 @@ describe Oddb2xml::BagXmlExtractor do
 end
 
 describe Oddb2xml::SwissmedicInfoExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
+  before(:all) { common_before }
+  after(:all) { common_after }
   include ServerMockHelper
   before(:each) do
     @downloader = Oddb2xml::SwissmedicInfoDownloader.new
@@ -153,8 +164,8 @@ describe Oddb2xml::SwissmedicInfoExtractor do
 end
 
 describe Oddb2xml::SwissmedicExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml'); cleanup_directories_before_run }
-  after(:all) { VCR.eject_cassette }
+  before(:all) { common_before; cleanup_directories_before_run  }
+  after(:all) { common_after }
   context 'when transfer.dat is empty' do
     subject { Oddb2xml::SwissmedicInfoExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
@@ -226,8 +237,8 @@ describe Oddb2xml::SwissmedicExtractor do
 end
 
 describe Oddb2xml::EphaExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
+  before(:all) { common_before }
+  after(:all) { common_after }
   context 'can parse epha_interactions.csv' do
     it {
         filename = File.join(Oddb2xml::SpecData, 'epha_interactions.csv')
@@ -239,14 +250,14 @@ describe Oddb2xml::EphaExtractor do
 end
 
 describe Oddb2xml::MedregbmExtractor do
-  # before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  # after(:all) { VCR.eject_cassette }
+  # before(:all) { common_before }
+  # after(:all) { common_after }
   it "pending"
 end
 
 describe Oddb2xml::ZurroseExtractor do
-  before(:all) { VCR.eject_cassette; VCR.insert_cassette('oddb2xml') }
-  after(:all) { VCR.eject_cassette }
+  before(:all) { common_before }
+  after(:all) { common_after }
   context 'when transfer.dat is empty' do
     subject { Oddb2xml::ZurroseExtractor.new("") }
     it { expect(subject.to_hash).to be_empty }
