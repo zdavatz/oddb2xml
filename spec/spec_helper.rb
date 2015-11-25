@@ -167,6 +167,41 @@ module ServerMockHelper
   end
 end
 
+def check_elements(nokogiri_doc, tests)
+  tests.each do |test|
+    field = test[0]
+    value = test[1]
+    it "should have correct entries #{value} for field #{field}" do
+      found = false
+      nokogiri_doc.search(field, nil, nil).each do |x|
+        if value.match(x.text)
+          found= true
+          break
+        end
+      end
+      expect(found).to be true
+    end
+  end
+end
+
+def check_attributes(nokogiri_doc, tests)
+  tests.each do |test|
+    path = test[0]
+    attribute = test[1]
+    value = test[2]
+    it "should have correct value #{value} for attribute #{attribute} in #{path}" do
+      found = false
+      nokogiri_doc.search(path, nil, nil).each do |x|
+        if value.match(x["#{attribute}"])
+          found= true
+          break
+        end
+      end
+      expect(found).to be true
+    end
+  end
+end
+
 RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.filter_run :focus

@@ -611,6 +611,8 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
 end
 
 describe Oddb2xml::Calc do
+  @@oddb_calc_xml = File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')
+  puts "@@oddb_calc_xml ist now #{@@oddb_calc_xml}"
 
   before(:all) do
     @savedDir = Dir.pwd
@@ -621,22 +623,80 @@ describe Oddb2xml::Calc do
     @run_time_options = '--calc --skip-download'
     @options = Oddb2xml::Options.new
     @options.parser.parse!(@run_time_options.split(' '))
-    @oddb_calc_xml = File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')
     @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(@options.opts).run }
-    expect(File.exists?(@oddb_calc_xml)).to eq true
-    @doc = REXML::Document.new File.read(@oddb_calc_xml)
+    expect(File.exists?(@@oddb_calc_xml)).to eq true
+    @doc = REXML::Document.new File.read(@@oddb_calc_xml)
+    @nokogiri = Nokogiri::XML(File.read(@@oddb_calc_xml))
+    binding.pry unless @nokogiri
+    puts "nokogiri before all: #{@nokogiri.to_s.size}"
   end
 
   after(:all) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
 
+  context "Verify elements from XSD" do
+    date_regexp = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[-+]\d{4}/
+    attribute_tests =   [
+      ['ARTICLES', 'CREATION_DATETIME', date_regexp],
+      ['ARTICLES', 'PROD_DATE', date_regexp],
+      ['ARTICLES', 'VALID_DATE', date_regexp],
+      ['ARTICLES/ARTICLE', 'SHA256', /[a-f0-9]{32}/],
+      ]
+
+    check_attributes(Nokogiri::XML(File.read(@@oddb_calc_xml)), attribute_tests)
+
+    element_tests =    [
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/EXCIPIENS', /.*pro Vitro.*/],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/EXCIPIENS', /.Excipiens ad solutionem.*/],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/LABEL', 'I'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/LABEL', 'Solvens'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/LABEL_DESCRIPTION', 'Aminosäurenlösung'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/LABEL_DESCRIPTION', 'Fettemulsion'],
+#      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/DOSE_TEXT', 'mg'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SALTS/SALT/SUBSTANCE_NAME', 'Ceftriaxonum Natricum'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/CORRESP', /4240 kJ pro 1 l/],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/CORRESP', /I\) et II\) et III\) corresp.*/],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/DOSE_TEXT', '10-50 mg'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/MORE_INFO', 'ratio: 1:2-2.8'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/SUBSTANCE_NAME', 'Levomenolum'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/IS_ACTIVE_AGENT', 'false'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/IS_ACTIVE_AGENT', 'true'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/MORE_INFO', 'Praeparatio sicca'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/MORE_INFO', 'antiox.'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY', '100'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY', /4\.08/],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME', 'E 124'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME', 'Lamivudinum'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT', 'mg'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT', 'mg'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT', 'µg'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/UNIT', /U\.I\.\/ml/],
+      ['ARTICLES/ARTICLE/GALENIC_FORM', 'Infusionsemulsion'],
+      ['ARTICLES/ARTICLE/GALENIC_FORM', 'Tropfen'],
+      ['ARTICLES/ARTICLE/GALENIC_GROUP', 'Lösungsmittel'],
+      ['ARTICLES/ARTICLE/GALENIC_GROUP', 'Tabletten'],
+      ['ARTICLES/ARTICLE/GTIN', Oddb2xml::FRIDGE_GTIN],
+      ['ARTICLES/ARTICLE/GTIN', Oddb2xml::ORPHAN_GTIN],
+      ['ARTICLES/ARTICLE/MEASURE', 'Suppositorien'],
+      ['ARTICLES/ARTICLE/MEASURE', /Ampulle\(n\)/],
+      ['ARTICLES/ARTICLE/NAME', 'Apligraf'],
+      ['ARTICLES/ARTICLE/NAME', 'Lansoyl, gelée'],
+      ['ARTICLES/ARTICLE/PKG_SIZE', '1'],
+      ['ARTICLES/ARTICLE/PKG_SIZE', '5 x 2500 ml'],
+      ['ARTICLES/ARTICLE/PKG_SIZE', '75 mm'],
+      ['ARTICLES/ARTICLE/SELLING_UNITS', '1'],
+      ['ARTICLES/ARTICLE/SELLING_UNITS', '60'],
+      ['ARTICLES/ARTICLE/SELLING_UNITS', 'unbekannt'],
+      ]
+    check_elements( Nokogiri::XML(File.read(@@oddb_calc_xml)), element_tests)
+  end
   context "when passing #{@run_time_options}" do
     it 'should contain the new fields as per July 2015' do
       #         xml.GEN_PRODUCTION    gen_production
       #          xml.INSULIN_CATEGORY  insulin_category
       #          xml.DRUG_INDEX        drug_index
-      expect(File.exists?(@oddb_calc_xml)).to eq true
+      expect(File.exists?(@@oddb_calc_xml)).to eq true
     end
 
     it 'should create a correct xml and a csv file' do
@@ -652,22 +712,7 @@ describe Oddb2xml::Calc do
       oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
       expect(File.exists?(oddb_calc_xsd)).to eq true
       xsd = Nokogiri::XML::Schema(File.read(oddb_calc_xsd))
-      doc = Nokogiri::XML(File.read(@oddb_calc_xml))
-      xsd.validate(doc).each do |error|  expect(error).to be_nil end
-    end
-
-    it 'should create correct entries for narotin' do
-      gtin = '7680540151009'
-      ean12 = '7680' + sprintf('%05d',Tst_naropin.iksnr_A) + sprintf('%03d',Tst_naropin.pack_K)
-      ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
-      expect(ean13).to eq gtin
-
-      Tst_naropin.values_to_compare.each{
-        | key, value |
-          result = XPath.match( @doc, "//ARTICLE[GTIN='#{gtin}']/#{key.to_s.upcase}").first.text
-          puts "Testing key #{key.inspect} #{value.inspect} against #{result} seems to fail" unless result == value.to_s
-          expect(result).to eq value.to_s
-      }
+      xsd.validate(@nokogiri).each do |error|  expect(error).to be_nil end
     end
 
     it 'should create correct entries for narotin' do
