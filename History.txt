@@ -1,3 +1,8 @@
+=== 2.2.8 / ?????
+
+* Improved spec tests against all XSD elements
+* NINCD with value 20 LPPV is never generated
+
 === 2.2.7 / 24.11.2015
 
 * Removed no more emitted QTY from definition of ART in oddb2xml.xsd
