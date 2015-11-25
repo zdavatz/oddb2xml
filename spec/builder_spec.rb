@@ -3,7 +3,232 @@
 require 'spec_helper'
 require "rexml/document"
 include REXML
-RUN_ALL = false
+RUN_ALL = true
+
+# TODO: Add articles which contain these values
+# not done, because it was easy to verify this by running on the command line grep 'LIMPTS' oddb_article.xml | sort | uniq
+ARTICLE_ATTRIBUTE_TESTS =   [
+  ['ARTICLE', 'CREATION_DATETIME', Oddb2xml::DATE_REGEXP],
+  ['ARTICLE', 'PROD_DATE', Oddb2xml::DATE_REGEXP],
+  ['ARTICLE', 'VALID_DATE', Oddb2xml::DATE_REGEXP],
+  ['ARTICLE/ART', 'SHA256', /[a-f0-9]{32}/],
+  ['ARTICLE/ART', 'DT', /\d{4}-\d{2}-\d{2}/],
+]
+
+ARTICLE_MISSING_ELEMENTS =    [
+  ['ARTICLE/ART/LIMPTS', '10'],
+  ['ARTICLE/ART/LIMPTS', '30'],
+  ['ARTICLE/ART/LIMPTS', '40'],
+  ['ARTICLE/ART/LIMPTS', '50'],
+  ['ARTICLE/ART/LIMPTS', '60'],
+  ['ARTICLE/ART/LIMPTS', '80'],
+  ['ARTICLE/ART/LIMPTS', '100'],
+  ['ARTICLE/ART/SLOPLUS', '1'],
+]
+
+ARTICLE_ZURROSE_ELEMENTS =    [
+  ['ARTICLE/ART/REF_DATA', '0'],
+  ['ARTICLE/ART/ARTCOMP/COMPNO', '7601001000858'],
+  ['ARTICLE/ART/ARTPRI/VDAT', Date.today.strftime('%d.%m.%Y')], # TODO:
+  ['ARTICLE/ART/ARTPRI/PTYP', 'PEXF'],
+  ['ARTICLE/ART/ARTPRI/PTYP', 'PPUB'],
+  ['ARTICLE/ART/ARTPRI/PTYP', 'ZURROSE'],
+  ['ARTICLE/ART/ARTPRI/PTYP', 'ZURROSEPUB'],
+  ['ARTICLE/ART/ARTINS/NINCD', '13'],
+  ['ARTICLE/ART/ARTINS/NINCD', '20'],
+]
+
+ARTICLE_COMMON_ELEMENTS =    [
+  ['ARTICLE/ART/REF_DATA', '1'],
+  ['ARTICLE/ART/SMCAT', 'A'],
+  ['ARTICLE/ART/SMCAT', 'B'],
+  ['ARTICLE/ART/SMCAT', 'C'],
+  ['ARTICLE/ART/SMCAT', 'D'],
+  ['ARTICLE/ART/GEN_PRODUCTION', 'X'],
+  ['ARTICLE/ART/DRUG_INDEX', 'd'],
+  ['ARTICLE/ART/INSULIN_CATEGORY', 'Insulinanalog: schnell wirkend'],
+  ['ARTICLE/ART/SMNO', '16105058'],
+  ['ARTICLE/ART/PRODNO', '161051'],
+  ['ARTICLE/ART/VAT', '2'],
+  ['ARTICLE/ART/SALECD', 'A'],
+  ['ARTICLE/ART/SALECD', 'I'],
+  ['ARTICLE/ART/COOL', '1'],
+  ['ARTICLE/ART/LIMPTS', '20'],
+  ['ARTICLE/ART/CDBG', 'Y'],
+  ['ARTICLE/ART/CDBG', 'N'],
+  ['ARTICLE/ART/BG', 'Y'],
+  ['ARTICLE/ART/BG', 'N'],
+  ['ARTICLE/ART/ARTBAR/BC', Oddb2xml::ORPHAN_GTIN.to_s],
+  ['ARTICLE/ART/ARTBAR/BC', Oddb2xml::FRIDGE_GTIN.to_s],
+  ['ARTICLE/ART/DSCRD', 'NAROPIN Inj Lös 0.2 % 5 Polybag 100 ml'],
+  ['ARTICLE/ART/DSCRF', 'NAROPIN sol inj 0.2 % 5 polybag 100 ml"'],
+  ['ARTICLE/ART/SORTD', 'NAROPIN INJ LöS 0.2 % 5 POLYBAG 100 ML'],
+  ['ARTICLE/ART/SORTF', 'NAROPIN SOL INJ 0.2 % 5 POLYBAG 100 ML'],
+  ['ARTICLE/ART/SYN1D', 'Hirudoid'],
+  ['ARTICLE/ART/SYN1F', 'Hirudoid'],
+  ['ARTICLE/ART/SLOPLUS', '2'],
+  ['ARTICLE/ART/ARTINS/NINCD', '10'],
+]
+
+CODE_ATTRIBUTE_TESTS =   [
+  ['CODE', 'CREATION_DATETIME', Oddb2xml::DATE_REGEXP],
+  ['CODE', 'PROD_DATE', Oddb2xml::DATE_REGEXP],
+  ['CODE', 'VALID_DATE', Oddb2xml::DATE_REGEXP],
+  ['CODE/CD', 'DT', ''],
+]
+
+CODE_MISSING_ELEMENT_TESTS = [
+]
+
+CODE_ELEMENT_TESTS = [
+  ['CODE/CD/CDTYP', '11'],
+  ['CODE/CD/CDTYP', '12'],
+  ['CODE/CD/CDTYP', '13'],
+  ['CODE/CD/CDTYP', '14'],
+  ['CODE/CD/CDTYP', '15'],
+  ['CODE/CD/CDTYP', '16'],
+  ['CODE/CD/CDVAL', 'A'],
+  ['CODE/CD/CDVAL', 'B'],
+  ['CODE/CD/CDVAL', 'C'],
+  ['CODE/CD/CDVAL', 'D'],
+  ['CODE/CD/CDVAL', 'E'],
+  ['CODE/CD/CDVAL', 'X'],
+  ['CODE/CD/DSCRSD', 'Kontraindiziert'],
+  ['CODE/CD/DSCRSD', 'Kombination meiden'],
+  ['CODE/CD/DSCRSD', 'Monitorisieren'],
+  ['CODE/CD/DSCRSD', 'Vorsichtsmassnahmen'],
+  ['CODE/CD/DSCRSD', 'keine Massnahmen'],
+  ['CODE/CD/DEL', 'false'],
+]
+
+INTERACTION_ATTRIBUTE_TESTS =   [
+  ['INTERACTION', 'CREATION_DATETIME', Oddb2xml::DATE_REGEXP],
+  ['INTERACTION', 'PROD_DATE', Oddb2xml::DATE_REGEXP],
+  ['INTERACTION', 'VALID_DATE', Oddb2xml::DATE_REGEXP],
+  ['INTERACTION/IX', 'SHA256', /[a-f0-9]{32}/],
+  ['INTERACTION/IX', 'DT', ''],
+]
+
+INTERACTION_MISSING_ELEMENT_TESTS = [
+  ['INTERACTION/IX/EFFD', 'Kombination meiden'],
+  ['INTERACTION/IX/EFFD', 'Kontraindiziert'],
+  ['INTERACTION/IX/EFFD', 'Monitorisieren'],
+  ['INTERACTION/IX/EFFD', 'Vorsichtsmassnahmen'],
+  ['INTERACTION/IX/DEL', 'true'], # Never found???
+]
+
+INTERACTION_ELEMENT_TESTS = [
+  ['INTERACTION/IX/IXNO', '2'],
+  ['INTERACTION/IX/TITD', 'Keine Interaktion'],
+  ['INTERACTION/IX/GRP1D', 'N06AB06'],
+  ['INTERACTION/IX/GRP2D', 'M03BX02'],
+  ['INTERACTION/IX/EFFD', 'Keine Interaktion.'],
+  ['INTERACTION/IX/MECHD', /Tizanidin wird über CYP1A2 metabolisiert/],
+  ['INTERACTION/IX/MEASD', /Die Kombination aus Sertralin und Tizanidin/],
+  ['INTERACTION/IX/DEL', 'false'],
+  ]
+
+LIMITATION_ATTRIBUTE_TESTS =   [
+  ['LIMITATION', 'CREATION_DATETIME', Oddb2xml::DATE_REGEXP],
+  ['LIMITATION', 'PROD_DATE', Oddb2xml::DATE_REGEXP],
+  ['LIMITATION', 'VALID_DATE', Oddb2xml::DATE_REGEXP],
+  ['LIMITATION/LIM', 'SHA256', /[a-f0-9]{32}/],
+  ['LIMITATION/LIM', 'DT', ''],
+]
+
+# Found by  grep LIMTYP oddb_limitation.xml | sort | uniq
+LIMITATION_MISSING_ELEMENT_TESTS = [
+  ['LIMITATION/LIM/SwissmedicNo8', '62089002'],
+  ['LIMITATION/LIM/Pharmacode', '0'],
+  ['LIMITATION/LIM/LIMTYP', 'AUD'],
+  ['LIMITATION/LIM/LIMTYP', 'KOM'],
+  ['LIMITATION/LIM/LIMTYP', 'ZEI'],
+]
+
+LIMITATION_ELEMENT_TESTS = [
+  ['LIMITATION/LIM/LIMVAL', '10'],
+  ['LIMITATION/LIM/LIMVAL', '20'],
+  ['LIMITATION/LIM/LIMVAL', '30'],
+  ['LIMITATION/LIM/LIMVAL', '40'],
+  ['LIMITATION/LIM/LIMVAL', '50'],
+  ['LIMITATION/LIM/LIMVAL', '60'],
+  ['LIMITATION/LIM/LIMVAL', '80'],
+  ['LIMITATION/LIM/LIMVAL', '100'],
+  ['LIMITATION/LIM/IT', '07.02.40.'],
+  ['LIMITATION/LIM/LIMTYP', 'DIA'],
+  ['LIMITATION/LIM/LIMTYP', 'PKT'],
+  ['LIMITATION/LIM/LIMNAMEBAG', '070240'],
+  ['LIMITATION/LIM/LIMNIV', 'IP'],
+  ['LIMITATION/LIM/VDAT', /\d{2}\.\d{2}\.\d{4}/],
+  ['LIMITATION/LIM/DSCRD', /Therapiedauer/],
+  ['LIMITATION/LIM/DSCRF',  /Traitement de la pneumonie/],
+  ['LIMITATION/LIM/SwissmedicNo5', '28486'],
+  ]
+
+SUBSTANCE_ATTRIBUTE_TESTS =   [
+  ['SUBSTANCE', 'CREATION_DATETIME', Oddb2xml::DATE_REGEXP],
+  ['SUBSTANCE', 'PROD_DATE', Oddb2xml::DATE_REGEXP],
+  ['SUBSTANCE', 'VALID_DATE', Oddb2xml::DATE_REGEXP],
+  ['SUBSTANCE/SB', 'SHA256', /[a-f0-9]{32}/],
+  ['SUBSTANCE/SB', 'DT', ''],
+]
+
+SUBSTANCE_MISSING_ELEMENT_TESTS = [
+]
+
+SUBSTANCE_ELEMENT_TESTS = [
+  ['SUBSTANCE/SB/SUBNO', '1'],
+  ['SUBSTANCE/SB/NAML', 'Linezolidum'],
+]
+
+# Betriebe and Medizinalpersonen don't work at the moment
+BETRIEB_ATTRIBUTE_TESTS =   [
+  ['Betriebe', 'CREATION_DATETIME', Oddb2xml::DATE_REGEXP],
+  ['Betriebe', 'PROD_DATE', Oddb2xml::DATE_REGEXP],
+  ['Betriebe', 'VALID_DATE', Oddb2xml::DATE_REGEXP],
+  ['Betriebe/Betrieb', 'DT', ''],
+]
+
+BETRIEB_MISSING_ELEMENT_TESTS = [
+]
+
+BETRIEB_ELEMENT_TESTS = [
+  ['Betriebe/Betrieb/GLN_Betrieb', '974633'],
+  ['Betriebe/Betrieb/Betriebsname_1', 'Betriebsname_1'],
+  ['Betriebe/Betrieb/Betriebsname_2', 'Betriebsname_2'],
+  ['Betriebe/Betrieb/Strasse', 'Strasse'],
+  ['Betriebe/Betrieb/Nummer', 'Nummer'],
+  ['Betriebe/Betrieb/PLZ', 'PLZ'],
+  ['Betriebe/Betrieb/Ort', 'Ort'],
+  ['Betriebe/Betrieb/Bewilligungskanton', 'Bewilligungskanton'],
+  ['Betriebe/Betrieb/Land', 'Land'],
+  ['Betriebe/Betrieb/Betriebstyp', 'Betriebstyp'],
+  ['Betriebe/Betrieb/BTM_Berechtigung', 'BTM_Berechtigung'],
+]
+
+MEDIZINALPERSON_ATTRIBUTE_TESTS =   [
+  ['Personen', 'CREATION_DATETIME', Oddb2xml::DATE_REGEXP],
+  ['Personen', 'PROD_DATE', Oddb2xml::DATE_REGEXP],
+  ['Personen', 'VALID_DATE', Oddb2xml::DATE_REGEXP],
+  ['Personen/Person', 'DT', ''],
+]
+
+MEDIZINALPERSON_MISSING_ELEMENT_TESTS = [
+]
+
+MEDIZINALPERSON_ELEMENT_TESTS = [
+  ['Personen/Person/GLN_Person', '56459'],
+  ['Personen/Person/Name', 'Name'],
+  ['Personen/Person/Vorname', 'Vorname'],
+  ['Personen/Person/PLZ', 'PLZ'],
+  ['Personen/Person/Ort', 'Ort'],
+  ['Personen/Person/Bewilligungskanton', 'Bewilligungskanton'],
+  ['Personen/Person/Land', 'Land'],
+  ['Personen/Person/Bewilligung_Selbstdispensation', 'Bewilligung_Selbstdispensation'],
+  ['Personen/Person/Diplom', 'Diplom'],
+  ['Personen/Person/BTM_Berechtigung', 'BTM_Berechtigung'],
+]
+
 def checkItemForRefdata(doc, pharmacode, isRefdata)
   article = XPath.match( doc, "//ART[PHAR=#{pharmacode.to_s}]").first
   name =     article.elements['DSCRD'].text
@@ -12,6 +237,14 @@ def checkItemForRefdata(doc, pharmacode, isRefdata)
   puts "checking doc for gtin #{gtin} isRefdata #{isRefdata} == #{refdata}. SMNO: #{smno} #{name}" if $VERBOSE
   expect(article.elements['REF_DATA'].text).to eq(isRefdata.to_s)
   article
+end
+
+['article', 'betrieb', 'code', 'interaction', 'limitation', 'medizinalperson', 'product', 'substance'].each do |cat|
+  eval "
+    def oddb_#{cat}_xml
+      File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_#{cat}.xml'))
+    end
+  "
 end
 
 def check_article_IGM_format(line, price_kendural=825, add_80_percents=false)
@@ -154,7 +387,7 @@ def checkArticleXml(checkERYTHROCIN = true)
 
   erythrocin_gtin = '7680202580475' # picked up from zur rose
   erythrocin = checkAndGetArticleWithGTIN(doc, erythrocin_gtin)
-  expect(erythrocin.elements['DSCRD'].text).to eq("ERYTHROCIN i.v. Trockensub 1000 mg Amp") if checkERYTHROCIN
+  expect(erythrocin.elements['DSCRD'].text).to eq("ERYTHROCIN i.v. Trockensub 1000 mg Amp [!]") if checkERYTHROCIN
 
   lansoyl = checkAndGetArticleWithGTIN(doc, Oddb2xml::LANSOYL_GTIN)
   expect(lansoyl.elements['DSCRD'].text).to eq 'LANSOYL Gel 225 g'
@@ -210,8 +443,8 @@ def checkProductXml
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 86
-  NrSubstances = 12
+  NrExtendedArticles = 90
+  NrSubstances = 14
   NrProdno = 23
   NrPackages = 24
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
@@ -232,13 +465,12 @@ describe Oddb2xml::Builder do
       options = Oddb2xml::Options.new
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
       Oddb2xml::Cli.new(options.opts).run # to debug
-      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      @doc = Nokogiri::XML(File.open(@article_xml))
-      @rexml = REXML::Document.new File.read(@article_xml)
+      @doc = Nokogiri::XML(File.open(oddb_article_xml))
+      @rexml = REXML::Document.new File.read(oddb_article_xml)
     end
 
     it 'should return produce a oddb_article.xml' do
-      expect(File.exists?(@article_xml)).to eq true
+      expect(File.exists?(oddb_article_xml)).to eq true
     end
 
     it 'oddb_article.xml should contain a SHA256' do
@@ -247,12 +479,29 @@ describe Oddb2xml::Builder do
     end
 
     it 'should be possible to verify the oddb_article.xml' do
-      result = Oddb2xml.verify_sha256(@article_xml)
+      result = Oddb2xml.verify_sha256(oddb_article_xml)
       expect(result)
     end
 
     it 'should be possible to verify all xml files against our XSD' do
       check_validation_via_xsd
+    end
+
+    context 'XSD article' do
+      check_attributes(oddb_article_xml, ARTICLE_ATTRIBUTE_TESTS)
+      check_elements(oddb_article_xml, ARTICLE_COMMON_ELEMENTS)
+    end
+
+    context 'XSD betrieb' do
+      skip 'At the moment downloading and extractiong the medreg is broken!'
+      # check_attributes(oddb_betrieb_xml, BETRIEB_ATTRIBUTE_TESTS)
+      # check_elements(oddb_betrieb_xml, BETRIEB_COMMON_ELEMENTS)
+    end
+
+    context 'XSD medizinalperson' do
+      skip 'At the moment downloading and extractiong the medreg is broken!'
+      # check_attributes(oddb_medizinalperson_xml, MEDIZINAPERSON_ATTRIBUTE_TESTS)
+      # check_elements(oddb_medizinalperson_xml, MEDIZINAPERSON_COMMON_ELEMENTS)
     end
 
     it 'should have a correct insulin (gentechnik) for 7680532900196' do
@@ -317,7 +566,7 @@ if RUN_ALL
     end
 
     it 'should generate a valid oddb_product.xml' do
-      expect(@res).to match(/products/)
+      expect(@res).to match(/products/) if @res
       checkProductXml
     end
   end
@@ -384,6 +633,12 @@ if RUN_ALL
       checkArticleXml
     end
 
+    context 'XSD' do
+      check_attributes(oddb_article_xml, ARTICLE_ATTRIBUTE_TESTS)
+      check_elements(oddb_article_xml, ARTICLE_COMMON_ELEMENTS)
+      check_elements(oddb_article_xml, ARTICLE_ZURROSE_ELEMENTS)
+    end
+
     it 'should emit a correct oddb_article.xml' do
       checkArticleXml(false)
     end
@@ -413,6 +668,26 @@ if RUN_ALL
       end
     end
 
+    context 'XSD limitation' do
+      check_attributes(oddb_limitation_xml, LIMITATION_ATTRIBUTE_TESTS)
+      check_elements(oddb_limitation_xml, LIMITATION_ELEMENT_TESTS)
+    end
+
+    context 'XSD code' do
+      check_attributes(oddb_code_xml, CODE_ATTRIBUTE_TESTS)
+      check_elements(oddb_code_xml, CODE_ELEMENT_TESTS)
+    end
+
+    context 'XSD interaction' do
+      check_attributes(oddb_interaction_xml, INTERACTION_ATTRIBUTE_TESTS)
+      check_elements(oddb_interaction_xml, INTERACTION_ELEMENT_TESTS)
+    end
+
+    context 'XSD substance' do
+      check_attributes(oddb_substance_xml, SUBSTANCE_ATTRIBUTE_TESTS)
+      check_elements(oddb_substance_xml, SUBSTANCE_ELEMENT_TESTS)
+    end
+
     it 'should emit a correct oddb_article.xml' do
       checkArticleXml
     end
@@ -431,8 +706,8 @@ if RUN_ALL
     end
 
     it 'should generate the flag ORPH for orphan' do
-      doc = REXML::Document.new File.new(checkAndGetArticleXmlName('non-refdata'))
-      orphan = checkAndGetArticleWithGTIN(doc, Oddb2xml::ORPHAN_GTIN)
+      doc = REXML::Document.new File.new(oddb_product_xml)
+      orphan = checkAndGetProductWithGTIN(doc, Oddb2xml::ORPHAN_GTIN)
       expect(orphan).not_to eq nil
       expect(orphan.elements['ORPH'].text).to eq("true")
     end
@@ -526,11 +801,10 @@ if RUN_ALL
     end
 
     it 'should generate the flag SALECD' do
-      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      expect(File.exists?(@article_xml)).to eq true
-      FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-SALECD.xml'))
-      article_xml = IO.read(@article_xml)
-      doc = REXML::Document.new File.new(@article_xml)
+      expect(File.exists?(oddb_article_xml)).to eq true
+      FileUtils.cp(oddb_article_xml, File.join(Oddb2xml::WorkDir, 'tst-SALECD.xml'))
+      article_xml = IO.read(oddb_article_xml)
+      doc = REXML::Document.new File.new(oddb_article_xml)
       expect(XPath.match( doc, "//REF_DATA" ).size).to be > 0
       checkItemForSALECD(doc, Oddb2xml::FERRO_GRADUMET_GTIN, 'A') # FERRO-GRADUMET Depottabl 30 Stk
       checkItemForSALECD(doc, Oddb2xml::SOFRADEX_GTIN, 'I') # SOFRADEX
@@ -546,9 +820,8 @@ if RUN_ALL
     end
 
     it 'should add 80 percent to zur_rose pubbprice' do
-      @article_xml = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_article.xml'))
-      expect(File.exists?(@article_xml)).to eq true
-      FileUtils.cp(@article_xml, File.join(Oddb2xml::WorkDir, 'tst-e80.xml'))
+      expect(File.exists?(oddb_article_xml)).to eq true
+      FileUtils.cp(oddb_article_xml, File.join(Oddb2xml::WorkDir, 'tst-e80.xml'))
       checkProductXml
       checkArticleXml
       checkPrices(true)
@@ -558,9 +831,10 @@ if RUN_ALL
       checkProductXml
     end
 
-    it 'should generate a product with the COOL (fridge) attribute' do
-        fridge_product = checkAndGetProductWithGTIN(doc, Oddb2xml::FRIDGE_GTIN)
-        fridge_product.elements['COOL'].text.should == '1'
+    it 'should generate an article with the COOL (fridge) attribute' do
+      doc = REXML::Document.new File.new(oddb_article_xml)
+      fridge_product = checkAndGetArticleWithGTIN(doc, Oddb2xml::FRIDGE_GTIN)
+      fridge_product.elements['COOL'].text.should == '1'
     end
 
     it 'should generate a correct oddb_article.xml' do

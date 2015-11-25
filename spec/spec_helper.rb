@@ -30,6 +30,7 @@ module Oddb2xml
   WorkDir        = File.join(File.dirname(__FILE__), 'run')
   Downloads      = File.join(WorkDir, 'downloads')
   SpecCompressor = File.join(Oddb2xml::SpecData, 'compressor')
+  DATE_REGEXP    = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[-+]\d{4}/
 
   GTINS_CALC = [
                   '7680458820202', # for calc_spec.rb
@@ -167,13 +168,13 @@ module ServerMockHelper
   end
 end
 
-def check_elements(nokogiri_doc, tests)
+def check_elements(xml_name, tests)
   tests.each do |test|
-    field = test[0]
+    path = test[0]
     value = test[1]
-    it "should have correct entries #{value} for field #{field}" do
+    it "should have correct entries #{value} for path #{path}" do
       found = false
-      nokogiri_doc.search(field, nil, nil).each do |x|
+        Nokogiri::XML(File.read(xml_name)).search(path, nil, nil).each do |x|
         if value.match(x.text)
           found= true
           break
@@ -184,14 +185,14 @@ def check_elements(nokogiri_doc, tests)
   end
 end
 
-def check_attributes(nokogiri_doc, tests)
+def check_attributes(xml_name, tests)
   tests.each do |test|
     path = test[0]
     attribute = test[1]
     value = test[2]
     it "should have correct value #{value} for attribute #{attribute} in #{path}" do
       found = false
-      nokogiri_doc.search(path, nil, nil).each do |x|
+      Nokogiri::XML(File.read(xml_name)).search(path, nil, nil).each do |x|
         if value.match(x["#{attribute}"])
           found= true
           break

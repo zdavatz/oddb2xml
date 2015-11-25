@@ -184,12 +184,12 @@
   <xs:element name="LIMPTS">
     <xs:simpleType>
       <xs:restriction base="xs:byte">
+        <xs:enumeration value="10" />
         <xs:enumeration value="20" />
         <xs:enumeration value="30" />
-        <xs:enumeration value="60" />
-        <xs:enumeration value="10" />
         <xs:enumeration value="40" />
         <xs:enumeration value="50" />
+        <xs:enumeration value="60" />
         <xs:enumeration value="80" />
         <xs:enumeration value="100" />
       </xs:restriction>
@@ -1084,12 +1084,12 @@
   <xs:element name="CDVALMD">
     <xs:simpleType>
       <xs:restriction base="xs:string">
-        <xs:enumeration value="X" />
-        <xs:enumeration value="E" />
-        <xs:enumeration value="D" />
-        <xs:enumeration value="C" />
-        <xs:enumeration value="B" />
         <xs:enumeration value="A" />
+        <xs:enumeration value="B" />
+        <xs:enumeration value="C" />
+        <xs:enumeration value="D" />
+        <xs:enumeration value="E" />
+        <xs:enumeration value="X" />
       </xs:restriction>
     </xs:simpleType>
   </xs:element>

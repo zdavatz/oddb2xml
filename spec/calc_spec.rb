@@ -612,7 +612,6 @@ end
 
 describe Oddb2xml::Calc do
   @@oddb_calc_xml = File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')
-  puts "@@oddb_calc_xml ist now #{@@oddb_calc_xml}"
 
   before(:all) do
     @savedDir = Dir.pwd
@@ -627,8 +626,6 @@ describe Oddb2xml::Calc do
     expect(File.exists?(@@oddb_calc_xml)).to eq true
     @doc = REXML::Document.new File.read(@@oddb_calc_xml)
     @nokogiri = Nokogiri::XML(File.read(@@oddb_calc_xml))
-    binding.pry unless @nokogiri
-    puts "nokogiri before all: #{@nokogiri.to_s.size}"
   end
 
   after(:all) do
@@ -636,15 +633,14 @@ describe Oddb2xml::Calc do
   end
 
   context "Verify elements from XSD" do
-    date_regexp = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[-+]\d{4}/
     attribute_tests =   [
-      ['ARTICLES', 'CREATION_DATETIME', date_regexp],
-      ['ARTICLES', 'PROD_DATE', date_regexp],
-      ['ARTICLES', 'VALID_DATE', date_regexp],
+      ['ARTICLES', 'CREATION_DATETIME', Oddb2xml::DATE_REGEXP],
+      ['ARTICLES', 'PROD_DATE', Oddb2xml::DATE_REGEXP],
+      ['ARTICLES', 'VALID_DATE', Oddb2xml::DATE_REGEXP],
       ['ARTICLES/ARTICLE', 'SHA256', /[a-f0-9]{32}/],
       ]
 
-    check_attributes(Nokogiri::XML(File.read(@@oddb_calc_xml)), attribute_tests)
+    check_attributes(@@oddb_calc_xml, attribute_tests)
 
     element_tests =    [
       ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/EXCIPIENS', /.*pro Vitro.*/],
@@ -662,8 +658,9 @@ describe Oddb2xml::Calc do
       ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/CHEMICAL_SUBSTANCE/SUBSTANCE_NAME', 'Levomenolum'],
       ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/IS_ACTIVE_AGENT', 'false'],
       ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/IS_ACTIVE_AGENT', 'true'],
-      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/MORE_INFO', 'Praeparatio sicca'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/MORE_INFO', 'conserv.'],
       ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/MORE_INFO', 'antiox.'],
+      ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/MORE_INFO', 'Praeparatio sicca'],
       ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY', '100'],
       ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/QTY', /4\.08/],
       ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE/SUBSTANCE_NAME', 'E 124'],
@@ -689,7 +686,7 @@ describe Oddb2xml::Calc do
       ['ARTICLES/ARTICLE/SELLING_UNITS', '60'],
       ['ARTICLES/ARTICLE/SELLING_UNITS', 'unbekannt'],
       ]
-    check_elements( Nokogiri::XML(File.read(@@oddb_calc_xml)), element_tests)
+    check_elements(@@oddb_calc_xml, element_tests)
   end
   context "when passing #{@run_time_options}" do
     it 'should contain the new fields as per July 2015' do
