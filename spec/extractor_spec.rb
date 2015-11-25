@@ -8,6 +8,7 @@ NR_PACKS = 24
 
 def common_before
   @savedDir = Dir.pwd
+  FileUtils.makedirs(Oddb2xml::WorkDir)
   Dir.chdir(Oddb2xml::WorkDir)
   VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
 end

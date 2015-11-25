@@ -37,6 +37,7 @@ describe Oddb2xml::Cli do
     VCR.insert_cassette('oddb2xml')
     @savedDir = Dir.pwd
     cleanup_directories_before_run
+    FileUtils.makedirs(Oddb2xml::WorkDir)
     Dir.chdir(Oddb2xml::WorkDir)
   end
   after(:all) do

@@ -73,6 +73,7 @@ end
 def common_before
   @savedDir = Dir.pwd
   cleanup_directories_before_run
+  FileUtils.makedirs(Oddb2xml::WorkDir)
   Dir.chdir(Oddb2xml::WorkDir)
 end
 

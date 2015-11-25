@@ -617,7 +617,7 @@ describe Oddb2xml::Calc do
     @savedDir = Dir.pwd
     cleanup_directories_before_run
     FileUtils.makedirs(Oddb2xml::WorkDir)
-    Dir.chdir Oddb2xml::WorkDir
+    Dir.chdir(Oddb2xml::WorkDir)
     VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
     @run_time_options = '--calc --skip-download'
     @options = Oddb2xml::Options.new

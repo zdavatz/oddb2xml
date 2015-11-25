@@ -452,7 +452,8 @@ describe Oddb2xml::Builder do
   def common_run_init
     @savedDir = Dir.pwd
     cleanup_directories_before_run
-    Dir.chdir Oddb2xml::WorkDir
+    FileUtils.makedirs(Oddb2xml::WorkDir)
+    Dir.chdir(Oddb2xml::WorkDir)
     VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
   end
 
