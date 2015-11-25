@@ -4,7 +4,7 @@ require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/downloader"
 ENV['TZ'] = 'UTC' # needed for last_change
 LAST_CHANGE = "2015-07-03 00:00:00 +0000"
-NR_PACKS = 23
+NR_PACKS = 24
 
 def common_before
   @savedDir = Dir.pwd

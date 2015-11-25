@@ -183,7 +183,7 @@ module Oddb2xml
       file = File.join(WorkDir, 'XMLPublications.zip')
       Oddb2xml.log "BagXmlDownloader #{__LINE__}: #{file}"
       unless Oddb2xml.skip_download(file)
-        Oddb2xml.log "BagXmlDownloader #{__LINE__}: #{file}"                                       
+        Oddb2xml.log "BagXmlDownloader #{__LINE__}: #{file}"
         begin
           response = @agent.get(@url)
           response.save_as(file)

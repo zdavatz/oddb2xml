@@ -1103,7 +1103,7 @@ module Oddb2xml
       Oddb2xml.add_hash(_builder.to_xml)
     end
     def detect_nincd(de_idx)
-      if @lppvs[de_idx[:ean]] # LPPV
+      if @lppvs[de_idx[:ean].to_s] # LPPV
         20
       elsif @items[de_idx[:pharmacode]] # BAG-XML (SL/LS)
         10

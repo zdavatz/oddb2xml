@@ -385,6 +385,7 @@ describe Oddb2xml::BagXmlDownloader do
   it_behaves_like 'any downloader'
   context 'when download is called' do
     let(:xml) {
+      VCR.eject_cassette
       VCR.use_cassette('oddb2xml', :tag => :bag_xml) do
         @downloader.download
       end
