@@ -35,6 +35,7 @@
       Some comments for invidual fields:
       NINCD: possible values are 10 => BAG-XML (SL/LS), 13 -> MiGel, 20 => (LPPV) Limitation, empty => NonPharma)
       GENCD: possible values are 'O' for original and 'G' for generic, 'K' for Komplementärmedizin.
+             Since decembre 2015 we found some products with a 'C' which probably stands for Co-Marketing
              We don't have a list of possible generics for a given original.
              It is however possible find generics via ch.oddb.org where a sophisticated algorithm searches for similar medicaments
              taking into account all ATC-codes and galenic information.
@@ -831,6 +832,7 @@
   <xs:element name="GENCD">
     <xs:simpleType>
       <xs:restriction base="xs:string">
+        <xs:enumeration value="C" />
         <xs:enumeration value="O" />
         <xs:enumeration value="K" />
         <xs:enumeration value="G" />
