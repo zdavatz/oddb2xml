@@ -44,7 +44,8 @@ describe Oddb2xml::MigelExtractor do
     expect(@items.find{|k,v| 3248410 == v[:pharmacode] }).not_to be_nil
     expect(@items.find{|k,v| /Novopen/i.match(v[:desc_de]) }).not_to be_nil
     expect(@items.find{|k,v| 3036984 == v[:pharmacode] }).not_to be_nil
-    expect(@items.find{|k,v| /Epimineral/i.match(v[:desc_de]) }).not_to be_nil
+    # Epimineral without pharmacode nor GTIN should not appear
+    expect(@items.find{|k,v| /Epimineral/i.match(v[:desc_de]) }).to be_nil
   end
 end
 
@@ -115,17 +116,16 @@ describe Oddb2xml::BagXmlExtractor do
       dat = File.read(File.join(Oddb2xml::SpecData, 'Preparations.xml'))
       Oddb2xml::BagXmlExtractor.new(dat).to_hash
     end
-    it "should handle pub_price for 1699947 correctly" do
+    it "should handle pub_price for 3TC correctly" do
       @items = subject.to_hash
       with_pharma = @items[Oddb2xml::THREE_TC_GTIN]
       expect(with_pharma).not_to be_nil
       expect(with_pharma[:name_de]).to eq '3TC'
       expect(with_pharma[:atc_code]).not_to be_nil
-      expect(with_pharma[:pharmacodes]).to eq [1699947]
       expect(with_pharma[:packages].size).to eq(1)
       expect(with_pharma[:packages].first[0]).to eq(Oddb2xml::THREE_TC_GTIN)
       expect(with_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('205.3')
-      expect(@items.size).to eq(5)
+      expect(@items.size).to eq(4)
     end
     it "should handle pub_price for 7680620690084 correctly" do
       @items = subject.to_hash
@@ -343,6 +343,12 @@ describe Oddb2xml::ZurroseExtractor do
       filename = File.expand_path(File.join(__FILE__, '..', 'data', 'zurrose_transfer.dat'))
       Oddb2xml::ZurroseExtractor.new(filename, true)
     end
+
+    it "should extract EPIMINERAL" do
+        ethacridin = subject.to_hash.values.find{ |x| /EPIMINERAL/i.match(x[:description])}
+        expect(ethacridin[:description]).to eq("EPIMINERAL Paste 20 g")
+    end
+
     it "should set the correct Ethacridin description" do
         ethacridin = subject.to_hash.values.find{ |x| /Ethacridin/i.match(x[:description])}
         expect(ethacridin[:description]).to eq("Ethacridin lactat 1‰ 100ml")

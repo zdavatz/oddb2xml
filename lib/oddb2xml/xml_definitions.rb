@@ -69,7 +69,6 @@ end
 class PackContent
   include SAXMachine
   attribute :ProductKey
-  attribute :Pharmacode
   attribute :PackId
   element :DescriptionDe
   element :DescriptionFr

@@ -309,7 +309,7 @@
     <CommentIt />
     <VatInEXF>N</VatInEXF>
     <Packs>
-      <Pack ProductKey="8620" Pharmacode="1699947" PackId="12442">
+      <Pack ProductKey="8620" PackId="12442">
         <DescriptionDe>60 Stk</DescriptionDe>
         <DescriptionFr>60 pce</DescriptionFr>
         <DescriptionIt>60 pce</DescriptionIt>

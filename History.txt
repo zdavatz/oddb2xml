@@ -1,5 +1,6 @@
 === 2.3.1 /15.12.2015
 
+* Don't emit PEXF for drugs not listed with a GTIN in BAG Preparations.xml
 * revert Gemfile.lock to use spreadsheet.1.1.0, as 1.1.1 is not yet released
 
 === 2.3.0 /15.12.2015

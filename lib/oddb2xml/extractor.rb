@@ -1,5 +1,4 @@
 # encoding: utf-8
-
 require 'nokogiri'
 require 'spreadsheet'
 require 'stringio'
@@ -69,12 +68,11 @@ module Oddb2xml
         item[:pharmacodes] = []
         item[:packages]    = {} # pharmacode => package
         seq.Packs.Pack.each do |pac|
-          phar = pac.Pharmacode.to_i
+          unless pac.GTIN
+            puts "BagXmlExtractor: Skipping as missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId}. Skipping"
+            next
+          end
           ean = pac.GTIN.to_i
-          # search_key = phar.to_i != 0 ? phar : ean
-          search_key = ean != 0 ? ean : phar
-          # as common key with RefData Pharma/NonPharma data
-          item[:pharmacodes] << phar
           # packages
           exf = {:price => '', :valid_date => '', :price_code => ''}
           if pac.Prices and pac.Prices.ExFactoryPrice
@@ -88,15 +86,14 @@ module Oddb2xml
             pub[:valid_date] =  pac.Prices.PublicPrice.ValidFromDate if pac.Prices.PublicPrice.ValidFromDate
             pub[:price_code] =  pac.Prices.PublicPrice.PriceTypeCode if pac.Prices.PublicPrice.PriceTypeCode
           end
-          item[:packages][search_key] = {
-            :pharmacode          => phar,
-            :ean                 => (ean) ? ean : '',
+          item[:packages][ean] = {
+            :ean                 => ean,
             :swissmedic_category => (cat = pac.SwissmedicCategory) ? cat : '',
             :swissmedic_number8  => (num = pac.SwissmedicNo8)      ? num.rjust(8, '0') : '',
             :prices              => { :exf_price => exf, :pub_price => pub },
           }
           # related all limitations
-          item[:packages][search_key][:limitations] = []
+          item[:packages][ean][:limitations] = []
           limitations = Hash.new{|h,k| h[k] = [] }
           if seq.Limitations
             limitations[:seq] = seq.Limitations.Limitation.collect { |x| x }
@@ -125,11 +122,7 @@ module Oddb2xml
               id  = item[key].to_s
             when :pac
               key = :swissmedic_number8
-              id  = item[:packages][search_key][key].to_s
-            end
-            if id.empty? or id == '0'
-              key = :pharmacode
-              id  = phar.to_i
+              id  = item[:packages][ean][key].to_s
             end
             lims.each do |lim|
               limitation = {
@@ -153,13 +146,13 @@ module Oddb2xml
                 end
               end
               limitation[:del] = deleted
-              item[:packages][search_key][:limitations] << limitation
+              item[:packages][ean][:limitations] << limitation
             end if lims
           end
           # limitation points
           pts = pac.PointLimitations.PointLimitation.first # only first points
-          item[:packages][search_key][:limitation_points] = pts ? pts.Points : ''
-          data[search_key] = item
+          item[:packages][ean][:limitation_points] = pts ? pts.Points : ''
+          data[ean] = item
         end
       end
       data
@@ -328,6 +321,7 @@ module Oddb2xml
       @sheet.each_with_index do |row, i|
         next if i.zero?
         phar = row[1].to_i
+        next if phar == 0
         ean = row[0].to_i
         ean = phar unless ean.to_s.length == 13
         data[ean] = {

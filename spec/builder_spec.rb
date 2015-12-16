@@ -452,7 +452,7 @@ def checkProductXml(nbr_record = -1)
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 90
+  NrExtendedArticles = 89
   NrSubstances = 14
   NrLimitations = 5
   NrInteractions = 5
@@ -801,7 +801,7 @@ if RUN_ALL
       expect(dscrds.size).to eq(NrExtendedArticles)
       expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('1699947') }.size).to eq(1) # swissmedic_packages Cardio-Pulmo-Rénal Sérocytol, suppositoire
       expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('2465312') }.size).to eq(1) # from refdata_pharma.xml"
-      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size).to eq(1) # from refdata_pharma.xml
+      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size).to eq(0) # 0 is not a valid pharmacode
     end
 
     it 'should have a correct NBR_RECORD in oddb_limitation.xml' do

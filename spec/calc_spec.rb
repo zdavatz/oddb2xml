@@ -611,7 +611,7 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
 end
 
 describe Oddb2xml::Calc do
-  @@oddb_calc_xml = File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')
+  Oddb_calc_xml = File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')
 
   before(:all) do
     @savedDir = Dir.pwd
@@ -623,9 +623,9 @@ describe Oddb2xml::Calc do
     @options = Oddb2xml::Options.new
     @options.parser.parse!(@run_time_options.split(' '))
     @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(@options.opts).run }
-    expect(File.exists?(@@oddb_calc_xml)).to eq true
-    @doc = REXML::Document.new File.read(@@oddb_calc_xml)
-    @nokogiri = Nokogiri::XML(File.read(@@oddb_calc_xml))
+    expect(File.exists?(Oddb_calc_xml)).to eq true
+    @doc = REXML::Document.new File.read(Oddb_calc_xml)
+    @nokogiri = Nokogiri::XML(File.read(Oddb_calc_xml))
   end
 
   after(:all) do
@@ -640,7 +640,7 @@ describe Oddb2xml::Calc do
       ['ARTICLES/ARTICLE', 'SHA256', /[a-f0-9]{32}/],
       ]
 
-    check_attributes(@@oddb_calc_xml, attribute_tests)
+    check_attributes(Oddb_calc_xml, attribute_tests)
 
     element_tests =    [
       ['ARTICLES/ARTICLE/COMPOSITIONS/COMPOSITION/EXCIPIENS', /.*pro Vitro.*/],
@@ -686,14 +686,14 @@ describe Oddb2xml::Calc do
       ['ARTICLES/ARTICLE/SELLING_UNITS', '60'],
       ['ARTICLES/ARTICLE/SELLING_UNITS', 'unbekannt'],
       ]
-    check_elements(@@oddb_calc_xml, element_tests)
+    check_elements(Oddb_calc_xml, element_tests)
   end
   context "when passing #{@run_time_options}" do
     it 'should contain the new fields as per July 2015' do
       #         xml.GEN_PRODUCTION    gen_production
       #          xml.INSULIN_CATEGORY  insulin_category
       #          xml.DRUG_INDEX        drug_index
-      expect(File.exists?(@@oddb_calc_xml)).to eq true
+      expect(File.exists?(Oddb_calc_xml)).to eq true
     end
 
     it 'should create a correct xml and a csv file' do
