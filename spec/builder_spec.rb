@@ -229,6 +229,14 @@ MEDIZINALPERSON_ELEMENT_TESTS = [
   ['Personen/Person/BTM_Berechtigung', 'BTM_Berechtigung'],
 ]
 
+def check_result(rexml, nbr_record)
+  expect(XPath.match(rexml, '//RESULT/NBR_RECORD').size).to eq 1
+  expect(XPath.match(rexml, '//RESULT/NBR_RECORD').first.text.to_i).to eq nbr_record
+  expect(XPath.match(rexml, '//RESULT/OK_ERROR').first.text).to eq 'OK'
+  expect(XPath.match(rexml, '//RESULT/ERROR_CODE').first.text).to eq nil
+  expect(XPath.match(rexml, '//RESULT/MESSAGE').first.text).to eq nil
+end
+
 def checkItemForRefdata(doc, pharmacode, isRefdata)
   article = XPath.match( doc, "//ART[PHAR=#{pharmacode.to_s}]").first
   name =     article.elements['DSCRD'].text
@@ -403,12 +411,13 @@ def checkArticleXml(checkERYTHROCIN = true)
   # TODO: desitin.elements['QTY'].text.should eq '250 mg'
 end
 
-def checkProductXml
+def checkProductXml(nbr_record = -1)
   product_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
   expect(File.exists?(product_filename)).to eq true
 
   # check products
   doc = REXML::Document.new IO.read(product_filename)
+  check_result(doc, nbr_record)
 
   desitin = checkAndGetProductWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
   expect(desitin.elements['ATC'].text).to eq('N03AX14')
@@ -445,8 +454,12 @@ end
 describe Oddb2xml::Builder do
   NrExtendedArticles = 90
   NrSubstances = 14
+  NrLimitations = 5
+  NrInteractions = 5
+  NrCodes = 6
   NrProdno = 23
   NrPackages = 24
+  NrProducts = 19
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init
@@ -472,6 +485,10 @@ describe Oddb2xml::Builder do
 
     it 'should return produce a oddb_article.xml' do
       expect(File.exists?(oddb_article_xml)).to eq true
+    end
+
+    it 'should have a correct NBR_RECORD in oddb_article.xml' do
+      check_result(@rexml, NrProducts)
     end
 
     it 'oddb_article.xml should contain a SHA256' do
@@ -547,6 +564,16 @@ describe Oddb2xml::Builder do
       Oddb2xml::Cli.new(options.opts).run
     end
 
+    it 'should have a correct NBR_RECORD in oddb_fi_product.xml' do
+      rexml = REXML::Document.new File.read('oddb_fi_product.xml')
+      check_result(rexml, 0)
+    end
+
+    it 'should have a correct NBR_RECORD in oddb_fi.xml' do
+      rexml = REXML::Document.new File.read('oddb_fi.xml')
+      check_result(rexml, 2)
+    end
+
     it 'should return produce a correct oddb_fi.xml' do
       expect(File.exists?(@oddb_fi_xml)).to eq true
       inhalt = IO.read(@oddb_fi_xml)
@@ -568,8 +595,9 @@ if RUN_ALL
 
     it 'should generate a valid oddb_product.xml' do
       expect(@res).to match(/products/) if @res
-      checkProductXml
+      checkProductXml(NrProducts)
     end
+
   end
 
   context 'when -f dat is given' do
@@ -646,7 +674,7 @@ if RUN_ALL
 
     it 'should generate a valid oddb_product.xml' do
       expect(@res).to match(/products/) if @res != nil
-      checkProductXml
+      checkProductXml(NrProducts)
     end
 
     it 'should contain the correct (increased) prices' do
@@ -679,9 +707,19 @@ if RUN_ALL
       check_elements(oddb_code_xml, CODE_ELEMENT_TESTS)
     end
 
+    it 'should have a correct NBR_RECORD in oddb_code.xml' do
+      rexml = REXML::Document.new File.read(oddb_code_xml)
+      check_result(rexml, NrCodes)
+    end
+
     context 'XSD interaction' do
       check_attributes(oddb_interaction_xml, INTERACTION_ATTRIBUTE_TESTS)
       check_elements(oddb_interaction_xml, INTERACTION_ELEMENT_TESTS)
+    end
+
+    it 'should have a correct NBR_RECORD in oddb_interaction.xml' do
+      rexml = REXML::Document.new File.read(oddb_interaction_xml)
+      check_result(rexml, NrInteractions)
     end
 
     context 'XSD substance' do
@@ -689,12 +727,17 @@ if RUN_ALL
       check_elements(oddb_substance_xml, SUBSTANCE_ELEMENT_TESTS)
     end
 
+    it 'should have a correct NBR_RECORD in oddb_substance.xml' do
+      rexml = REXML::Document.new File.read('oddb_substance.xml')
+      check_result(rexml, NrSubstances)
+    end
+
     it 'should emit a correct oddb_article.xml' do
       checkArticleXml
     end
 
     it 'should produce a correct oddb_product.xml' do
-      checkProductXml
+      checkProductXml(NrProducts)
     end
 
     it 'should report correct output on stdout' do
@@ -761,13 +804,18 @@ if RUN_ALL
       expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size).to eq(1) # from refdata_pharma.xml
     end
 
+    it 'should have a correct NBR_RECORD in oddb_limitation.xml' do
+      rexml = REXML::Document.new File.read('oddb_limitation.xml')
+      check_result(rexml, NrLimitations)
+    end
+
     it 'should emit a correct oddb_limitation.xml' do
       # check limitations
       limitation_filename = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_limitation.xml'))
       expect(File.exists?(limitation_filename)).to eq true
       doc = REXML::Document.new File.new(limitation_filename)
       limitations = XPath.match( doc, "//LIM" )
-      expect(limitations.size).to be >= 4
+      expect(limitations.size).to eql NrLimitations
       expect(XPath.match( doc, "//SwissmedicNo5" ).find_all{|x| x.text.match('28486') }.size).to eq(1)
       expect(XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('ZYVOXID') }.size).to eq(1)
       expect(XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('070240') }.size).to eq(1)
@@ -823,13 +871,13 @@ if RUN_ALL
     it 'should add 80 percent to zur_rose pubbprice' do
       expect(File.exists?(oddb_article_xml)).to eq true
       FileUtils.cp(oddb_article_xml, File.join(Oddb2xml::WorkDir, 'tst-e80.xml'))
-      checkProductXml
+      checkProductXml(NrProducts)
       checkArticleXml
       checkPrices(true)
     end
 
     it 'should generate a correct oddb_product.xml' do
-      checkProductXml
+      checkProductXml(NrProducts)
     end
 
     it 'should generate an article with the COOL (fridge) attribute' do

@@ -273,18 +273,20 @@ module Oddb2xml
         ) {
           Oddb2xml.log "build_substance #{@substances.size} substances"
         exit 2 if @options[:extended] and @substances.size == 0
+        nbr_records = 0
         @substances.each_with_index do |sub_name, i|
-            xml.SB('DT' => '') {
+            xml.SB('DT' => '') do
               xml.SUBNO((i + 1).to_i)
               #xml.NAMD
               #xml.ANAMD
               #xml.NAMF
               xml.NAML sub_name
-            }
+              nbr_records += 1
+            end
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @substances.length.to_s
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -299,6 +301,7 @@ module Oddb2xml
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
         xml.LIMITATION(XML_OPTIONS) {
+        nbr_records = 0
         @limitations.each do |lim|
             xml.LIM('DT' => '') {
               case lim[:key]
@@ -320,11 +323,13 @@ module Oddb2xml
               if lim[:del]
                 xml.DEL 3
               end
+              nbr_records += 1
+
             }
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @limitations.length.to_s
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -335,6 +340,7 @@ module Oddb2xml
     def build_interaction
       prepare_interactions
       prepare_codes
+      nbr_records = 0
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -378,11 +384,12 @@ module Oddb2xml
               #  xml.TXTD
               #  xml.TXTF
               #}
+              nbr_records += 1
             }
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @interactions.length.to_s
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -392,6 +399,7 @@ module Oddb2xml
     end
     def build_code
       prepare_codes
+      nbr_records = 0
       Oddb2xml.log "build_code #{@codes.size} codes"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
@@ -408,11 +416,12 @@ module Oddb2xml
               #xml.DSCRD
               #xml.DSCRF
               xml.DEL     false
+              nbr_records += 1
             }
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @codes.keys.length
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -451,6 +460,7 @@ module Oddb2xml
       prepare_interactions
       prepare_codes
       add_missing_products_from_swissmedic
+      nbr_records = 0
       Oddb2xml.log "build_product #{@products.size+@missing.size} products"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
@@ -491,7 +501,7 @@ module Oddb2xml
             next if /^Q/i.match(obj[:atc])
             seq = obj[:seq]
             length += 1
-              xml.PRD('DT' => obj[:last_change]) {
+              xml.PRD('DT' => obj[:last_change]) do
               ean = obj[:ean]
               xml.GTIN ean
               ppac = ((_ppac = @packs[ean.to_s[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
@@ -608,11 +618,12 @@ module Oddb2xml
               xml.EinheitSwissmedic   obj[:eht] unless obj[:eht].empty?
               xml.SubstanceSwissmedic obj[:sub] unless obj[:sub].empty?
               xml.CompositionSwissmedic obj[:comp] unless obj[:comp].empty?
-            }
+              nbr_records += 1
+            end
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD length.to_s
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -752,6 +763,7 @@ module Oddb2xml
       prepare_limitations
       prepare_articles
       idx = 0
+      nbr_records = 0
       Oddb2xml.log "build_article #{idx} of #{@articles.size} articles"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
@@ -784,7 +796,8 @@ module Oddb2xml
             if !@infos_zur_rose.empty? && ean && @infos_zur_rose[ean]
               info_zur_rose = @infos_zur_rose[ean] # zurrose
             end
-            xml.ART('DT' => obj[:last_change] ? obj[:last_change] : '') {
+            xml.ART('DT' => obj[:last_change] ? obj[:last_change] : '') do
+              nbr_records += 1
               xml.REF_DATA (obj[:refdata] || @migel[pharma_code]) ? '1' : '0'
               xml.PHAR  sprintf('%07d', obj[:pharmacode]) if obj[:pharmacode]
               #xml.GRPCD
@@ -948,11 +961,11 @@ module Oddb2xml
                   xml.NINCD nincd
                 }
               end
-            }
+            end
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @articles.length.to_s
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -962,6 +975,7 @@ module Oddb2xml
       Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_fi
+      nbr_records = 0
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -985,12 +999,13 @@ module Oddb2xml
                 xml.monid     info[:monid]                    unless info[:monid].empty?
                 xml.style { xml.cdata(info[:style]) } if info[:style]
                 xml.paragraph { xml.cdata(Nokogiri::HTML.fragment(info[:paragraph].to_html).to_html(:encoding => 'UTF-8')) } if info[:paragraph]
+                nbr_records += 1
               }
             end
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD length
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -1000,6 +1015,7 @@ module Oddb2xml
     end
     def build_fi_product
       prepare_products
+      nbr_records = 0
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -1027,13 +1043,14 @@ module Oddb2xml
                                           xml.PRDNO seq[:product_key] unless seq[:product_key].empty?
                                           # as orphan ?
                                           xml.DEL   @orphan.include?(number) ? true : false
+                                          nbr_records += 1
                                         }
                   }
               end
             end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD length
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -1042,6 +1059,7 @@ module Oddb2xml
       Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_company
+      nbr_records = 0
       Oddb2xml.log "build_company #{@companies.size} companies"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
@@ -1060,11 +1078,12 @@ module Oddb2xml
               xml.Land               c[:country]       unless c[:country].empty?
               xml.Betriebstyp        c[:type]          unless c[:type].empty?
               xml.BTM_Berechtigung   c[:authorization] unless c[:authorization].empty?
+              nbr_records += 1
             }
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @companies.length
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -1073,6 +1092,7 @@ module Oddb2xml
       Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_person
+      nbr_records = 0
       Oddb2xml.log "build_person #{@people.size} persons"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
@@ -1090,11 +1110,12 @@ module Oddb2xml
               xml.Bewilligung_Selbstdispensation p[:license] unless p[:license].empty?
               xml.Diplom             p[:certificate]   unless p[:certificate].empty?
               xml.BTM_Berechtigung   p[:authorization] unless p[:authorization].empty?
+              nbr_records += 1
             }
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD @people.length
+            xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
