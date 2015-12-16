@@ -213,7 +213,7 @@ module Oddb2xml
             Oddb2xml.log("MigelExtractor added #{@migel.size} migel items")
             @migel
           end
-        end
+        end unless SkipMigelDownloader
       when :package
         begin # instead of Thread.new do
           downloader = SwissmedicDownloader.new(:package, @options)
@@ -336,9 +336,13 @@ module Oddb2xml
           if @refdata_types[type]
             indices = @refdata_types[type].values.flatten.length
             if type == :nonpharma
-              migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode]}.map{|m| m[:pharmacode] }
               nonpharmas = @refdata_types[type].keys
-              indices += (migel_xls - nonpharmas).length # ignore duplicates, null
+              if SkipMigelDownloader
+                indices + nonpharmas.length
+              else
+                migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode]}.map{|m| m[:pharmacode] }
+                indices += (migel_xls - nonpharmas).length # ignore duplicates, null
+              end
               lines << sprintf("\tNonPharma products: %i", indices)
             else
               lines << sprintf("\tPharma products: %i", indices)

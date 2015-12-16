@@ -6,6 +6,8 @@ require 'mechanize'
 require 'zip'
 require 'savon'
 
+SkipMigelDownloader = true  # https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls
+
 module Oddb2xml
   module DownloadMethod
     private
@@ -125,7 +127,7 @@ module Oddb2xml
       @url ||= 'https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls'
       download_as('oddb2xml_files_nonpharma.xls', 'rb')
     end
-  end
+  end unless SkipMigelDownloader
   class EphaDownloader < Downloader
     include DownloadMethod
     def download

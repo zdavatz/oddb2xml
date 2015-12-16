@@ -47,7 +47,7 @@ describe Oddb2xml::MigelExtractor do
     # Epimineral without pharmacode nor GTIN should not appear
     expect(@items.find{|k,v| /Epimineral/i.match(v[:desc_de]) }).to be_nil
   end
-end
+end unless SkipMigelDownloader
 
 describe Oddb2xml::RefdataExtractor do
   before(:all) { common_before }

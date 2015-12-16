@@ -446,7 +446,7 @@ describe Oddb2xml::MigelDownloader do
       expect(File.exist?('oddb2xml_files_nonpharma.txt')).to eq(false)
     end
   end
-end
+end unless SkipMigelDownloader
 
 describe Oddb2xml::ZurroseDownloader do
   include ServerMockHelper
@@ -458,7 +458,7 @@ describe Oddb2xml::ZurroseDownloader do
           puts "#{Time.now}: #{__LINE__}: URI was #{i.request.uri}"
           lines = i.response.body.clone.split("\n")
           to_add = lines[0..5]
-          Oddb2xml::GTINS_DRUGS.each{ |ean| to_add << lines.find{ |x| x.index(ean.to_s) } }
+          Oddb2xml::GTINS_DRUGS.each{ |ean| to_add << lines.find{ |line| line.index(ean.to_s) || /EPIMINERAL/i.match(line) } }
           i.response.body = to_add.compact.join("\n")
           i.response.headers['Content-Length'] = i.response.body.size
         end

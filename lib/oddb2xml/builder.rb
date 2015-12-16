@@ -89,7 +89,7 @@ module Oddb2xml
           if migel = @migel[ean13]
             # delete duplicates
             @migel[ean13] = nil
-          end
+          end unless SkipMigelDownloader
           if seq = @items[obj[:ean]]
             obj[:seq] = seq
           end
@@ -110,9 +110,9 @@ module Oddb2xml
             :company_ean     => migel[:company_ean],
             :company_name    => migel[:company_name],
             :migel           => true,
-          }
+            }
           @articles << entry
-        end
+        end unless SkipMigelDownloader
         nrAdded = 0
         if @options[:extended]
           Oddb2xml.log("prepare_articles extended prepare_local_index having already #{@articles.size} articles")

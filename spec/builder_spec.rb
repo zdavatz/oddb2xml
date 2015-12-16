@@ -271,8 +271,8 @@ def check_article_IGM_format(line, price_kendural=825, add_80_percents=false)
   if /7680353660163\d$/.match(line) # KENDURAL Depottabl 30 Stk
     puts "found_SL for #{line}" if $VERBOSE
     found_SL = true
-    expect(line[60..65]).to eq '000491'
-    expect(price_exf).to eq 491
+    expect(line[60..65]).to eq '000495'
+    expect(price_exf).to eq 495
     expect(ckzl).to eq '1'
     expect(price_public).to eq price_kendural     # this is a SL-product. Therefore we may not have a price increase
     expect(line[66..71]).to eq '000'+price_kendural.to_s  # the dat format requires leading zeroes and not point
@@ -452,7 +452,7 @@ def checkProductXml(nbr_record = -1)
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 89
+  NrExtendedArticles = 34
   NrSubstances = 14
   NrLimitations = 5
   NrInteractions = 5
@@ -762,8 +762,10 @@ if RUN_ALL
       checkItemForRefdata(doc, "1699947", 1) # 3TC Filmtabl 150 mg SMNO 53662013 IKSNR 53‘662, 53‘663
       checkItemForRefdata(doc, "0598003", 0) # SOFRADEX Gtt Auric 8 ml
       checkItemForRefdata(doc, "5366964", 1) # 1-DAY ACUVUE moist jour
-      novopen = checkItemForRefdata(doc, "3036984", 1) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
-      expect(novopen.elements['ARTBAR/BC'].text).to eq '0'
+      unless SkipMigelDownloader
+        novopen = checkItemForRefdata(doc, "3036984", 1) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
+        expect(novopen.elements['ARTBAR/BC'].text).to eq '0'
+      end
     end
 
     it 'should generate SALECD A for migel (NINCD 13)' do
@@ -876,6 +878,13 @@ if RUN_ALL
       checkPrices(true)
     end
 
+    it 'should generate an article for EPIMINERAL' do
+      expect(File.exists?(oddb_article_xml)).to eq true
+      doc = REXML::Document.new IO.read(oddb_article_xml)
+      article = XPath.match( doc, "//ART[PHAR=5822801]").first
+      article.elements['DSCRD'].text.should match /EPIMINERAL/i
+    end
+
     it 'should generate a correct oddb_product.xml' do
       checkProductXml(NrProducts)
     end
@@ -932,7 +941,7 @@ if RUN_ALL
       expect(File.exists?(dat_filename)).to eq true
       oddb_dat = IO.read(dat_filename)
       oddb_dat_lines = IO.readlines(dat_filename)
-      IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 883, true) }
+      IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 891, true) }
     end
   end
 end
