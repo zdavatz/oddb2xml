@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (2.3.1)
+    oddb2xml (2.3.2)
       archive-tar-minitar
       httpi (>= 2.4.1)
       mechanize
