@@ -264,24 +264,6 @@ end
       end
     end
   end
-  context 'fridge' do
-    before(:each) do
-      VCR.eject_cassette
-      VCR.insert_cassette('oddb2xml', :tag => :swissmedic, :exclusive => false)
-      common_before
-      @downloader = Oddb2xml::SwissmedicDownloader.new(:fridge)
-    end
-    after(:each) do common_after end
-    context 'download_by for fridge xls' do
-      let(:bin) {
-        @downloader.download
-      }
-      it 'should return valid Binary-String' do
-        expect(bin).to be_a String
-        expect(bin.bytes).not_to be nil
-      end
-    end
-  end
   context 'package' do
     before(:each) do
       VCR.eject_cassette

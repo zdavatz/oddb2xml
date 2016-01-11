@@ -262,9 +262,6 @@ module Oddb2xml
       when :orphan
         action = "arzneimittel/00156/00221/00222/00223/00224/00227/00228/index.html?lang=de"
         @xpath = "//div[@id='sprungmarke10_3']//a[@title='Humanarzneimittel']"
-      when :fridge
-        action = "arzneimittel/00156/00221/00222/00235/index.html?lang=de"
-        @xpath = "//div[@id='sprungmarke10_2']//a[@title='Excel-Version']"
       when :package
         action = "arzneimittel/00156/00221/00222/00230/index.html?lang=de"
         @xpath = "//div[@id='sprungmarke10_7']//a[@title='Excel-Version Zugelassene Verpackungen*']"

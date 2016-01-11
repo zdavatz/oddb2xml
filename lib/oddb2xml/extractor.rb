@@ -214,18 +214,6 @@ module Oddb2xml
             data << sprintf("%05d", number)
           end
         end
-      when :fridge
-        row_explanation = 9
-        col_zulassung = 0
-        col_cool = 12
-        explanation = @sheet[row_explanation]
-        raise "Could not find Zulassungsnummer in column #{col_zulassung} of #{@filename}" unless /Zul.*Nr/.match(explanation[col_zulassung].value)
-        raise "Could not find Kühlkette in column #{col_cool}" unless /Kühlkette/.match(explanation[col_cool].value)
-        @sheet.each do |row|
-          if row[col_zulassung] and number = row[col_zulassung].value and row[col_cool] and row[col_cool].value.to_s.downcase == 'x'
-            data << sprintf("%05d", number)
-          end
-        end
       end
       cleanup_file
       # puts "found #{data.uniq.size} entities for type #{@type}"
@@ -492,6 +480,7 @@ module Oddb2xml
         data[ean13] = {
           :line   => line.chomp,
           :ean   => ean13,
+          :clag  => line[73],
           :vat   => line[96],
           :description => line[10..59].sub(/\s+$/, ''),
           :quantity => '',

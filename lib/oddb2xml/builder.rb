@@ -35,7 +35,7 @@ module Oddb2xml
   }
   class Builder
     attr_accessor :subject, :refdata, :items, :flags, :lppvs,
-                  :actions, :migel, :orphan, :fridge,
+                  :actions, :migel, :orphan,
                   :infos, :packs, :infos_zur_rose,
                   :ean14, :tag_suffix,
                   :companies, :people,
@@ -53,7 +53,6 @@ module Oddb2xml
       @infos_zur_rose     = {} # zurrose
       @actions    = []
       @orphan    = []
-      @fridge    = []
       @ean14      = false
       @companies  = []
       @people     = []
@@ -831,10 +830,7 @@ module Oddb2xml
                 xml.LIMPTS pac[:limitation_points] unless pac[:limitation_points].empty?
               end
               #xml.GRDFR
-              if no8 and !no8.empty? and
-                  no8.to_s =~ /(\d{5})(\d{3})/
-                xml.COOL 1 if @fridge.include?($1.to_s)
-              end
+              xml.COOL 1 if ppac && /Blutprodukte|impfstoffe/.match(ppac[:list_code])
               #xml.TEMP
               if ean
                 flag = (ppac && !ppac[:drug_index].empty?) ? true : false
@@ -1260,8 +1256,7 @@ module Oddb2xml
                                           else
                                             '3'
                                           end
-          row << "%#{DAT_LEN[:CLAG]}s"  % if ((no8 && no8.to_s =~ /(\d{5})(\d{3})/) and
-                                              @fridge.include?($1.to_s))
+          row << "%#{DAT_LEN[:CLAG]}s"  % if ppac && /Blutproduct|impfstoffe/.match(ppac[:list_code]) # COOL
                                             '1'
                                           else
                                             '0'

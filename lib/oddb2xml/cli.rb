@@ -31,8 +31,7 @@ module Oddb2xml
       @migel   = {} # [addition] additional Non Pharma products from files repo
       @actions = [] # [addition] interactions from epha
       @orphan = [] # [addition] Orphaned drugs from Swissmedic xls
-      @fridge = [] # [addition] ReFridge drugs from Swissmedic xls
-      # addres
+      # addresses
       @companies = [] # betrieb
       @people    = [] # medizinalperson
       @_message = false
@@ -52,9 +51,7 @@ module Oddb2xml
           if @options[:fi]
             threads << download(:fachinfo) # swissmedic-info
           end
-          [:orphan, :fridge].each do |type|
-            threads << download(type) # swissmedic
-          end
+          threads << download(:orphan) # swissmedic
           threads << download(:interaction) # epha
         end
         if @options[:nonpharma]
@@ -116,7 +113,7 @@ module Oddb2xml
               builder.infos = @infos
               builder.packs = @packs
               # additional sources
-              %w[actions orphan fridge migel infos_zur_rose].each do |addition|
+              %w[actions orphan migel infos_zur_rose].each do |addition|
                 builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
               end
             end
@@ -179,7 +176,7 @@ module Oddb2xml
             @infos
           end
         end
-      when :orphan, :fridge
+      when :orphan
         var = what.to_s
         begin # instead of Thread.new do
           downloader = SwissmedicDownloader.new(what)

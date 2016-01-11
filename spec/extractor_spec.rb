@@ -216,15 +216,6 @@ describe Oddb2xml::SwissmedicExtractor do
     end
   end
 
-  context 'can parse swissmedic_fridge.xlsx' do
-    it {
-        @filename = File.join(Oddb2xml::SpecData, 'swissmedic_fridge.xlsx')
-        @packs = Oddb2xml::SwissmedicExtractor.new(@filename, :fridge).to_arry
-        expect(@packs.size).to eq 16
-        expect(@packs[0]).to eq("58618")
-        expect(@packs[1]).to eq("00696")
-      }
-  end
   context 'can parse swissmedic_orphans.xls' do
     it {
         @filename = File.join(Oddb2xml::SpecData, 'swissmedic_orphan.xlsx')
