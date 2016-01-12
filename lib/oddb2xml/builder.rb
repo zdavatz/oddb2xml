@@ -206,7 +206,6 @@ module Oddb2xml
       unless @codes
         @codes = {
           'X' => {:int => 11, :txt => 'Kontraindiziert'},
-          'E' => {:int => 12, :txt => 'Kontraindiziert'},
           'D' => {:int => 13, :txt => 'Kombination meiden'},
           'C' => {:int => 14, :txt => 'Monitorisieren'},
           'B' => {:int => 15, :txt => 'Vorsichtsmassnahmen'},

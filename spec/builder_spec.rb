@@ -82,7 +82,6 @@ CODE_MISSING_ELEMENT_TESTS = [
 
 CODE_ELEMENT_TESTS = [
   ['CODE/CD/CDTYP', '11'],
-  ['CODE/CD/CDTYP', '12'],
   ['CODE/CD/CDTYP', '13'],
   ['CODE/CD/CDTYP', '14'],
   ['CODE/CD/CDTYP', '15'],
@@ -91,7 +90,6 @@ CODE_ELEMENT_TESTS = [
   ['CODE/CD/CDVAL', 'B'],
   ['CODE/CD/CDVAL', 'C'],
   ['CODE/CD/CDVAL', 'D'],
-  ['CODE/CD/CDVAL', 'E'],
   ['CODE/CD/CDVAL', 'X'],
   ['CODE/CD/DSCRSD', 'Kontraindiziert'],
   ['CODE/CD/DSCRSD', 'Kombination meiden'],
@@ -456,7 +454,7 @@ describe Oddb2xml::Builder do
   NrSubstances = 14
   NrLimitations = 5
   NrInteractions = 5
-  NrCodes = 6
+  NrCodes = 5
   NrProdno = 23
   NrPackages = 24
   NrProducts = 19

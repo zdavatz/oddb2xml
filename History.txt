@@ -1,3 +1,7 @@
+=== 2.3.3 /12.01.2016
+
+* Remove unused value 'E' from oddb_codes.xml. Thanks to Julian Sgier how reported this error
+
 === 2.3.2 /11.01.2016
 
 * File from swissmedic for blood products and vaccines has no longer a field Kühlkette. Therefore no longer downloading it.
