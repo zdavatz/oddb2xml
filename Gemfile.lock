@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (2.3.3)
+    oddb2xml (2.3.4)
       archive-tar-minitar
       httpi (>= 2.4.1)
       mechanize
@@ -55,7 +55,7 @@ GEM
     multi_json (1.11.2)
     net-http-digest_auth (1.4)
     net-http-persistent (2.9.4)
-    nokogiri (1.6.7)
+    nokogiri (1.6.7.1)
       mini_portile2 (~> 2.0.0.rc2)
     nori (2.6.0)
     ntlm-http (0.1.1)
