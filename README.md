@@ -168,22 +168,18 @@ oddb2xml creates article.xml as oddb_article.xml by default.
       <BCSTAT>A</BCSTAT>
     </ARTBAR>
     <ARTPRI>
-      <VDAT>01.11.2012</VDAT>
       <PTYP>PEXF</PTYP>
       <PRICE>4.768575</PRICE>
     </ARTPRI>
     <ARTPRI>
-      <VDAT>01.11.2012</VDAT>
       <PTYP>PPUB</PTYP>
       <PRICE>8.8</PRICE>
     </ARTPRI>
     <ARTPRI>
-      <VDAT>09.09.2015</VDAT>
       <PTYP>ZURROSE</PTYP>
       <PRICE>4.77</PRICE>
     </ARTPRI>
     <ARTPRI>
-      <VDAT>09.09.2015</VDAT>
       <PTYP>ZURROSEPUB</PTYP>
       <PRICE>8.80</PRICE>
     </ARTPRI>

@@ -911,7 +911,6 @@ module Oddb2xml
               if pac and pac[:prices]
                 pac[:prices].each_pair do |key, price|
                   xml.ARTPRI {
-                    xml.VDAT  price[:valid_date] unless price[:valid_date].empty?
                     xml.PTYP  price[:price_code] unless price[:price_code].empty?
                     xml.PRICE price[:price]      unless price[:price].empty?
                   }
@@ -919,40 +918,21 @@ module Oddb2xml
               end
               if info_zur_rose
                 price = info_zur_rose[:price]
-                vdat  = Time.parse(datetime).strftime("%d.%m.%Y")
                 xml.ARTPRI {
-                  xml.VDAT  vdat
                   xml.PTYP  "ZURROSE"
                   xml.PRICE price
                 }
                 xml.ARTPRI {
-                  xml.VDAT  vdat
                   xml.PTYP  "ZURROSEPUB"
                   xml.PRICE info_zur_rose[:pub_price]
                 }
                 xml.ARTPRI {
-                  xml.VDAT  vdat
                   xml.PTYP  "RESELLERPUB"
                   xml.PRICE (price.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2)
                 } if @options[:percent] != nil
               end
-              #xml.ARTMIG {
-                #xml.VDAT
-                #xml.MIGCD
-                #xml.LINENO
-              #}
-              #xml.ARTDAN {
-                #xml.CDTYP
-                #xml.LINENO
-                #xml.CDVAL
-              #}
-              #xml.ARTLIM {
-              #  xml.LIMCD
-              #}
               if nincd
                 xml.ARTINS {
-                  #xml.VDAT
-                  #xml.INCD
                   xml.NINCD nincd
                 }
               end

@@ -1,3 +1,7 @@
+=== 2.3.4 /20.01.2016
+
+* Remove VDAT from oddb_article.xml as this is always updated to the current date and therefore changes the SHA256 attribute
+
 === 2.3.3 /12.01.2016
 
 * Remove unused value 'E' from oddb_codes.xml. Thanks to Julian Sgier how reported this error

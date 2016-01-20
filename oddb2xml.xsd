@@ -248,7 +248,6 @@
     <xs:complexType>
       <xs:sequence>
         <xs:sequence minOccurs="0">
-          <xs:element ref="ns1:VDAT"/>
           <xs:element ref="ns1:PTYP"/>
         </xs:sequence>
         <xs:element minOccurs="0" ref="ns1:PRICE"/>
@@ -325,7 +324,6 @@
         </xs:sequence>
         <xs:element ref="ns1:ARTCOMPMD"/>
         <xs:element ref="ns1:ARTBARMD"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:ARTPRIMD"/>
         <xs:element minOccurs="0" ref="ns1:ARTINSMD"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
@@ -409,7 +407,6 @@
     <xs:complexType>
       <xs:sequence>
         <xs:sequence minOccurs="0">
-          <xs:element ref="ns1:VDATMD"/>
           <xs:element ref="ns1:PTYPMD"/>
         </xs:sequence>
         <xs:element minOccurs="0" ref="ns1:PRICEMD"/>
