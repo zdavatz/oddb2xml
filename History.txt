@@ -1,3 +1,7 @@
+=== 2.3.5 /21.01.2016
+
+* Readded VDAT in oddb_article.xml for prices not from ZurRose
+
 === 2.3.4 /20.01.2016
 
 * Remove VDAT from oddb_article.xml as this is always updated to the current date and therefore changes the SHA256 attribute

@@ -911,6 +911,7 @@ module Oddb2xml
               if pac and pac[:prices]
                 pac[:prices].each_pair do |key, price|
                   xml.ARTPRI {
+                    xml.VDAT  price[:valid_date] unless price[:valid_date].empty?
                     xml.PTYP  price[:price_code] unless price[:price_code].empty?
                     xml.PRICE price[:price]      unless price[:price].empty?
                   }
