@@ -248,6 +248,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:sequence minOccurs="0">
+          <xs:element minOccurs="0" ref="ns1:VDAT"/>
           <xs:element ref="ns1:PTYP"/>
         </xs:sequence>
         <xs:element minOccurs="0" ref="ns1:PRICE"/>
