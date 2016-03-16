@@ -85,6 +85,11 @@
       * Packungsgrösse (column 'L') -> Field PackGrSwissmedic in oddb_article.xml
       * Packungseinheit(column 'L') -> Field EinheitSwissmedic in oddb_article.xml
       
+      In oddb_product.xml PRODNO must be exactly 7 digits long. For all drugs appearing in the Packungen.xlsx the
+      PRODNO is defined as IKSNR (column A Zulassungsnummer) + SEQ (column b Dosisstärkenummer) and the DSCRD is
+      taken vom refdata.
+
+
     </xs:documentation>
   </xs:annotation>
   
@@ -1015,7 +1020,13 @@
     </xs:complexType>
   </xs:element>
   <xs:element name="NAMLMD" type="xs:string"/>
-  <xs:element name="PRODNO" type="xs:integer"/>
+  <xs:element name="PRODNO">
+    <xs:simpleType>
+      <xs:restriction base="xs:integer">
+        <xs:pattern value="\d{7}"/>
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
   <xs:element name="DSCRD" type="xs:string"/>
   <xs:element name="DSCRF" type="xs:string"/>
   <xs:element name="IT" type="xs:string"/>

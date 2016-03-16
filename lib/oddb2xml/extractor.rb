@@ -262,7 +262,7 @@ module Oddb2xml
           next unless row and row[i_5] and row[i_3]
           next unless row[i_5].value.to_i > 0 and row[i_3].value.to_i > 0
           no8 = sprintf('%05d',row[i_5].value.to_i) + sprintf('%03d',row[i_3].value.to_i)
-          prodno = sprintf('%05d',row[i_5].value.to_i) + row[p_1_2].value.to_i.to_s
+          prodno = sprintf('%05d',row[i_5].value.to_i) + sprintf('%02d', row[p_1_2].value.to_i).to_s
           unless no8.empty?
             next if no8.to_i == 0
             ean_base12 = "7680#{no8}"

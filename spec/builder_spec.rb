@@ -47,7 +47,7 @@ ARTICLE_COMMON_ELEMENTS =    [
   ['ARTICLE/ART/DRUG_INDEX', 'd'],
   ['ARTICLE/ART/INSULIN_CATEGORY', 'Insulinanalog: schnell wirkend'],
   ['ARTICLE/ART/SMNO', '16105058'],
-  ['ARTICLE/ART/PRODNO', '161051'],
+  ['ARTICLE/ART/PRODNO', '1610501'],
   ['ARTICLE/ART/VAT', '2'],
   ['ARTICLE/ART/SALECD', 'A'],
   ['ARTICLE/ART/SALECD', 'I'],
@@ -385,7 +385,7 @@ def checkArticleXml(checkERYTHROCIN = true)
   expect(desitin.elements['SMCAT'].text).to eq('B')
   expect(desitin.elements['SMNO'].text).to eq('62069008')
   expect(desitin.elements['VAT'].text).to eq('2')
-  expect(desitin.elements['PRODNO'].text).to eq('620691')
+  expect(desitin.elements['PRODNO'].text).to eq('6206901')
   expect(desitin.elements['SALECD'].text).to eq('A')
   expect(desitin.elements['CDBG'].text).to eq('N')
   expect(desitin.elements['BG'].text).to eq('N')
@@ -420,7 +420,7 @@ def checkProductXml(nbr_record = -1)
   expect(desitin.elements['ATC'].text).to eq('N03AX14')
   expect(desitin.elements['DSCRD'].text).to eq("LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk")
   expect(desitin.elements['DSCRF'].text).to eq('LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce')
-  expect(desitin.elements['PRODNO'].text).to eq '620691'
+  expect(desitin.elements['PRODNO'].text).to eq '6206901'
   expect(desitin.elements['IT'].text).to eq '01.07.1.'
   expect(desitin.elements['PackGrSwissmedic'].text).to eq '30'
   expect(desitin.elements['EinheitSwissmedic'].text).to eq 'Tablette(n)'
@@ -790,8 +790,8 @@ if RUN_ALL
       expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size).to eq(1)
       expect(dscrds.size).to eq(NrExtendedArticles)
       expect(XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size).to be >= 1
-      expect(XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('002771') }.size).to eq(0)
-      expect(XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('620691') }.size).to eq(1)
+      expect(XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('0027701') }.size).to eq(0)
+      expect(XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('6206901') }.size).to eq(1)
     end
 
     it 'should load correct number of nonpharma' do
