@@ -1,3 +1,9 @@
+=== 2.3.7 /4.04.2016
+
+* Emit version of oddb2xml which generated the XML-file
+* Fix NBR_RECORD in generated oddb_product.xml
+* Remove unused variables length in builder.rb
+
 === 2.3.6 /16.03.2016
 
 * Generate always a PRODNO with 7 digits (5 from ISKNR, 2 from SEQNR)
