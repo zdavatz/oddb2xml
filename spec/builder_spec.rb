@@ -413,8 +413,10 @@ def checkProductXml(nbr_record = -1)
   expect(File.exists?(product_filename)).to eq true
 
   # check products
-  doc = REXML::Document.new IO.read(product_filename)
+  content = IO.read(product_filename)
+  doc = REXML::Document.new content
   check_result(doc, nbr_record)
+  expect(nbr_record).to eq  content.scan(/<PRD/).size if nbr_record != -1
 
   desitin = checkAndGetProductWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
   expect(desitin.elements['ATC'].text).to eq('N03AX14')
@@ -592,7 +594,7 @@ if RUN_ALL
 
     it 'should generate a valid oddb_product.xml' do
       expect(@res).to match(/products/) if @res
-      checkProductXml(NrProducts)
+      checkProductXml(NrPackages)
     end
 
   end
@@ -671,7 +673,7 @@ if RUN_ALL
 
     it 'should generate a valid oddb_product.xml' do
       expect(@res).to match(/products/) if @res != nil
-      checkProductXml(NrProducts)
+      checkProductXml(NrPackages)
     end
 
     it 'should contain the correct (increased) prices' do
@@ -734,7 +736,7 @@ if RUN_ALL
     end
 
     it 'should produce a correct oddb_product.xml' do
-      checkProductXml(NrProducts)
+      checkProductXml(NrPackages)
     end
 
     it 'should report correct output on stdout' do
@@ -870,7 +872,7 @@ if RUN_ALL
     it 'should add 80 percent to zur_rose pubbprice' do
       expect(File.exists?(oddb_article_xml)).to eq true
       FileUtils.cp(oddb_article_xml, File.join(Oddb2xml::WorkDir, 'tst-e80.xml'))
-      checkProductXml(NrProducts)
+      checkProductXml(NrPackages)
       checkArticleXml
       checkPrices(true)
     end
@@ -883,7 +885,7 @@ if RUN_ALL
     end
 
     it 'should generate a correct oddb_product.xml' do
-      checkProductXml(NrProducts)
+      checkProductXml(NrPackages)
     end
 
     it 'should generate an article with the COOL (fridge) attribute' do

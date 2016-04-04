@@ -32,6 +32,7 @@ module Oddb2xml
   'CREATION_DATETIME' => Time.new.strftime('%FT%T%z'),
   'PROD_DATE'         => Time.new.strftime('%FT%T%z'),
   'VALID_DATE'        => Time.new.strftime('%FT%T%z'),
+  'GENERATED_BY'      => "oddb2xml #{VERSION}"
   }
   class Builder
     attr_accessor :subject, :refdata, :items, :flags, :lppvs,
@@ -458,7 +459,7 @@ module Oddb2xml
       prepare_interactions
       prepare_codes
       add_missing_products_from_swissmedic
-      nbr_records = 0
+      nbr_products = 0
       Oddb2xml.log "build_product #{@products.size+@missing.size} products"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
@@ -466,15 +467,14 @@ module Oddb2xml
         emitted = []
         xml.PRODUCT(XML_OPTIONS) {
           list = []
-          length = 0
           @missing.each do |obj|
             next if /^Q/i.match(obj[:atc])
             if obj[:prodno]
               next if emitted.index(obj[:prodno])
               emitted << obj[:prodno]
             end
-            length += 1
             xml.PRD('DT' => obj[:last_change]) {
+            nbr_products += 1
             ean = obj[:ean].to_i
             xml.GTIN ean
             xml.PRODNO obj[:prodno]                                 if obj[:prodno]
@@ -498,8 +498,8 @@ module Oddb2xml
           @products.each do |ean13, obj|
             next if /^Q/i.match(obj[:atc])
             seq = obj[:seq]
-            length += 1
               xml.PRD('DT' => obj[:last_change]) do
+              nbr_products += 1
               ean = obj[:ean]
               xml.GTIN ean
               ppac = ((_ppac = @packs[ean.to_s[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
@@ -616,12 +616,11 @@ module Oddb2xml
               xml.EinheitSwissmedic   obj[:eht] unless obj[:eht].empty?
               xml.SubstanceSwissmedic obj[:sub] unless obj[:sub].empty?
               xml.CompositionSwissmedic obj[:comp] unless obj[:comp].empty?
-              nbr_records += 1
             end
           end
           xml.RESULT {
             xml.OK_ERROR   'OK'
-            xml.NBR_RECORD nbr_records
+            xml.NBR_RECORD nbr_products
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
           }
@@ -956,10 +955,8 @@ module Oddb2xml
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
         xml.KOMPENDIUM(XML_OPTIONS) {
-          length = 0
           %w[de fr].each do |lang|
             infos = @infos[lang].uniq {|i| i[:monid] }
-            length += infos.length
             infos.each do |info|
               xml.KMP(
                 'MONTYPE' => 'fi', # only
@@ -996,7 +993,6 @@ module Oddb2xml
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
         xml.KOMPENDIUM_PRODUCT(XML_OPTIONS) {
-          length = 0
           info_index = {}
           %w[de fr].each do |lang|
             @infos[lang].each_with_index do |info, i|
@@ -1112,8 +1108,8 @@ module Oddb2xml
         bag_entry_via_ean = @items.values.select do |i|
           next unless i[:packages]
           i[:packages].values.select {|_pac| _pac[:ean].to_s == de_idx[:ean].to_s }.length != 0
-        end.length
-        if bag_entry_via_ean > 0
+        end
+        if bag_entry_via_ean.length > 0
           10
         else
           nil

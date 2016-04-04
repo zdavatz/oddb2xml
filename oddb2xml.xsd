@@ -102,6 +102,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="required"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="ART">
@@ -451,6 +452,7 @@
       </xs:sequence>
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Betrieb">
@@ -507,6 +509,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="CD">
@@ -530,6 +533,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="CDMD">
@@ -554,6 +558,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="IX">
@@ -614,6 +619,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="IXMD">
@@ -674,6 +680,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="LIM">
@@ -731,6 +738,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="LIMMD">
@@ -802,6 +810,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="PRD">
@@ -876,6 +885,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="PRDMD">
@@ -938,6 +948,7 @@
       </xs:sequence>
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="Person">
@@ -986,6 +997,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="SB">
@@ -1008,6 +1020,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="SBMD">
@@ -1160,6 +1173,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
 
@@ -1186,6 +1200,7 @@
       <xs:attribute name="CREATION_DATETIME" use="required"/>
       <xs:attribute name="PROD_DATE" use="required"/>
       <xs:attribute name="VALID_DATE" use="required"/>
+      <xs:attribute name="GENERATED_BY" use="optional"/>
     </xs:complexType>
   </xs:element>
 </xs:schema>
