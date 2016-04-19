@@ -310,7 +310,7 @@ def check_validation_via_xsd
         if error.message
           puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@oddb2xml_xsd}"
         end
-        expect(error.message).to be_nil
+        expect(error.message).to be_nil, "expected #{error.message} to be nil\nfor #{file} content \n#{File.read(file)}"
     end
   }
 end

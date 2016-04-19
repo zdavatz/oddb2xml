@@ -454,6 +454,19 @@ module Oddb2xml
     end
 
     def build_product
+      def check_name(obj, lang = :de)
+        ean = obj[:ean].to_i
+        refdata = @refdata[ean]
+        if lang == :de
+          name = (refdata && refdata[:desc_de]) ? refdata[:desc_de] : obj[:sequence_name]
+        elsif lang == :fr
+          name = (refdata && refdata[:desc_fr]) ? refdata[:desc_fr] : obj[:sequence_name]
+        else
+          return false
+        end
+        return false if !name || name.empty? || name.length < 3
+        name
+      end
       prepare_substances
       prepare_products
       prepare_interactions
@@ -468,6 +481,9 @@ module Oddb2xml
         xml.PRODUCT(XML_OPTIONS) {
           list = []
           @missing.each do |obj|
+            ean = obj[:ean].to_i
+            next unless check_name(obj, :de)
+            next unless check_name(obj, :fr)
             next if /^Q/i.match(obj[:atc])
             if obj[:prodno]
               next if emitted.index(obj[:prodno])
@@ -475,16 +491,10 @@ module Oddb2xml
             end
             xml.PRD('DT' => obj[:last_change]) {
             nbr_products += 1
-            ean = obj[:ean].to_i
             xml.GTIN ean
             xml.PRODNO obj[:prodno]                                 if obj[:prodno]
-            if refdata = @refdata[ean]
-              xml.DSCRD  refdata[:desc_de]
-              xml.DSCRF  refdata[:desc_fr]
-            else
-              xml.DSCRD  obj[:sequence_name]                        if obj[:sequence_name]
-              xml.DSCRF  obj[:sequence_name]                        if obj[:sequence_name]
-            end
+            xml.DSCRD  check_name(obj, :de)
+            xml.DSCRF  check_name(obj, :fr)
             xml.ATC obj[:atc_code]                                  if obj[:atc_code] and !obj[:atc_code].empty?
             xml.IT  obj[:ith_swissmedic]                            if obj[:ith_swissmedic]
             xml.CPT
@@ -498,22 +508,19 @@ module Oddb2xml
           @products.each do |ean13, obj|
             next if /^Q/i.match(obj[:atc])
             seq = obj[:seq]
+              ean = obj[:ean]
+              next unless check_name(obj, :de)
+              next unless check_name(obj, :fr)
               xml.PRD('DT' => obj[:last_change]) do
               nbr_products += 1
-              ean = obj[:ean]
               xml.GTIN ean
               ppac = ((_ppac = @packs[ean.to_s[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
               unless ppac
                 ppac = @packs.find{|pac| pac.ean == ean }.first
               end
               xml.PRODNO ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
-              if refdata = @refdata[ean]
-                xml.DSCRD  refdata[:desc_de]
-                xml.DSCRF  refdata[:desc_fr]
-              else
-                xml.DSCRD  obj[:sequence_name]                        if obj[:sequence_name]
-                xml.DSCRF  obj[:sequence_name]                        if obj[:sequence_name]
-              end
+              xml.DSCRD  check_name(obj, :de)
+              xml.DSCRF  check_name(obj, :fr)
               #xml.BNAMD
               #xml.BNAMF
               #xml.ADNAMD

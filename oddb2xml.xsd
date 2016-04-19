@@ -105,6 +105,25 @@
       <xs:attribute name="GENERATED_BY" use="required"/>
     </xs:complexType>
   </xs:element>
+
+  <xs:element name="DSCRD">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:minLength value="3" />
+        <xs:maxLength value="120" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
+  <xs:element name="DSCRF">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:minLength value="3" />
+        <xs:maxLength value="120" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
   <xs:element name="ART">
     <xs:complexType>
       <xs:sequence>
@@ -696,8 +715,8 @@
         <xs:element ref="ns1:LIMVAL"/>
         <xs:element ref="ns1:LIMNAMEBAG"/>
         <xs:element ref="ns1:LIMNIV"/>
-        <xs:element ref="ns1:DSCRD"/>
-        <xs:element ref="ns1:DSCRF"/>
+        <xs:element name="DSCRD" type="xs:string"/>
+        <xs:element name="DSCRF" type="xs:string"/>
         <xs:element ref="ns1:VDAT"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
@@ -754,8 +773,8 @@
         <xs:element ref="ns1:LIMVALMD"/>
         <xs:element ref="ns1:LIMNAMEBAGMD"/>
         <xs:element ref="ns1:LIMNIVMD"/>
-        <xs:element ref="ns1:DSCRDMD"/>
-        <xs:element ref="ns1:DSCRFMD"/>
+        <xs:element name="DSCRDMD" type="xs:string"/>
+        <xs:element name="DSCRFMD" type="xs:string"/>
         <xs:element ref="ns1:VDATMD"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
@@ -1040,8 +1059,6 @@
       </xs:restriction>
     </xs:simpleType>
   </xs:element>
-  <xs:element name="DSCRD" type="xs:string"/>
-  <xs:element name="DSCRF" type="xs:string"/>
   <xs:element name="IT" type="xs:string"/>
   <xs:element name="SUBNO" type="xs:integer"/>
   <xs:element name="QTY" type="xs:string"/>
