@@ -43,6 +43,8 @@ Consumers of the data file may use it to check whether they have to replace the 
 
 ## usage
 
+HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `https://download.hin.ch/download/oddb2xml`, e.g. using  `wget https://download.hin.ch/download/oddb2xml/oddb_article.xml`
+
 see `--help`.
 
 ```

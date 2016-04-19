@@ -1,3 +1,7 @@
+=== 2.3.8 /19.04.2016
+
+* DSCRD/DSCRD for article/product must be between 3 and 120 chars long
+
 === 2.3.7 /4.04.2016
 
 * Emit version of oddb2xml which generated the XML-file
