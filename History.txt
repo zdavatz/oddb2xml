@@ -1,3 +1,7 @@
+=== 2.3.9 /23.08.2016
+
+* Get ZurRose data from http://pillbox.oddb.org/TRANSFER.ZIP
+
 === 2.3.8 /19.04.2016
 
 * DSCRD/DSCRD for article/product must be between 3 and 120 chars long
