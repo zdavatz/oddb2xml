@@ -152,7 +152,7 @@ module ServerMockHelper
       File.join(Oddb2xml::SpecCompressor, 'epha_interactions.txt*'),
       File.join(Oddb2xml::SpecCompressor, 'medregbm_company.txt*'),
       File.join(Oddb2xml::SpecCompressor, 'medregbm_person.txt*'),
-      File.join(Oddb2xml::SpecCompressor, 'zurrose_transfer.dat.*'),
+      File.join(Oddb2xml::SpecCompressor, 'transfer.dat.*'),
       File.join(Oddb2xml::SpecCompressor, 'oddb2xml_files_nonpharma.xls.*'),
       ].each { |file| FileUtils.rm_f(Dir.glob(file), :verbose => false) if Dir.glob(file).size > 0 }
   end

@@ -608,7 +608,7 @@ if RUN_ALL
       # Oddb2xml::Cli.new(options.opts).run # to debug
     end
 
-    it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
+    it 'should contain the correct values fo CMUT from transfer.dat' do
       expect(@res).to match(/products/)
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
       expect(File.exists?(dat_filename)).to eq true
@@ -911,7 +911,7 @@ if RUN_ALL
       expect(@res).to match(/products/)
     end
 
-    it 'should contain the correct values fo CMUT from zurrose_transfer.dat' do
+    it 'should contain the correct values fo CMUT from transfer.dat' do
       dat_filename = File.join(Oddb2xml::WorkDir, 'oddb.dat')
       expect(File.exists?(dat_filename)).to eq true
       oddb_dat = IO.read(dat_filename)

@@ -331,7 +331,7 @@ describe Oddb2xml::ZurroseExtractor do
   end
   context 'when parsing examples' do
     subject do
-      filename = File.expand_path(File.join(__FILE__, '..', 'data', 'zurrose_transfer.dat'))
+      filename = File.expand_path(File.join(__FILE__, '..', 'data', 'transfer.dat'))
       Oddb2xml::ZurroseExtractor.new(filename, true)
     end
 

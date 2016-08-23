@@ -145,15 +145,29 @@ module Oddb2xml
   class ZurroseDownloader < Downloader
     include DownloadMethod
     def download
-      @url ||= 'http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat'
+      @url ||= 'http://pillbox.oddb.org/TRANSFER.ZIP'
       unless @url =~ /^http/
         io = File.open(@url, 'r:iso-8859-1:utf-8')
         content = io.read
         Oddb2xml.log("ZurroseDownloader #{__LINE__} download #{@url} @url returns #{content.bytes}")
-        content   
+        content
       else
-        Oddb2xml.log("ZurroseDownloader #{__LINE__} download #{@url} @url")
-        download_as('zurrose_transfer.dat', 'r:iso-8859-1:utf-8')
+        file = File.join(WorkDir, 'transfer.zip')
+        unless Oddb2xml.skip_download(file)
+          Oddb2xml.log "ZurroseDownloader #{__LINE__}: #{file}"
+          begin
+            response = @agent.get(@url)
+            response.save_as(file)
+            response = nil # win
+          rescue Timeout::Error, Errno::ETIMEDOUT
+            retrievable? ? retry : raise
+          ensure
+            Oddb2xml.download_finished(file)
+          end
+        end
+        read_xml_from_zip(/transfer.dat/, File.join(Downloads, File.basename(file)))
+        dest = File.join(Downloads, 'transfer.dat')
+        File.open(dest, 'r:iso-8859-1:utf-8').read
       end
     end
   end

@@ -183,7 +183,7 @@ describe Oddb2xml::Cli do
       expect(@cli_output).to match(/\sPharma\s/)
       expected = [
         'duplicate_ean13_from_zur_rose.txt',
-        'zurrose_transfer.dat',
+        'transfer.zip',
         'oddb.dat',
       ].each{ |file|
         expect(File.exists?(File.join(Oddb2xml::WorkDir, file))).to eq true

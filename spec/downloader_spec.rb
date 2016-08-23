@@ -461,6 +461,7 @@ describe Oddb2xml::ZurroseDownloader do
     end
     it 'should clean up current directory' do
       expect { dat }.not_to raise_error
+      expect(File.exist?('transfer.dat')).to eq(false)
       expect(File.exist?('oddb2xml_zurrose_transfer.dat')).to eq(false)
     end
   end
