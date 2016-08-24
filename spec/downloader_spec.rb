@@ -436,12 +436,10 @@ describe Oddb2xml::ZurroseDownloader do
   before(:each) do
     VCR.configure do |c|
       c.before_record(:zurrose) do |i|
-        if /zurrose/i.match(i.request.uri)
+        if /pillbox/i.match(i.request.uri)
           puts "#{Time.now}: #{__LINE__}: URI was #{i.request.uri}"
-          lines = i.response.body.clone.split("\n")
-          to_add = lines[0..5]
-          Oddb2xml::GTINS_DRUGS.each{ |ean| to_add << lines.find{ |line| line.index(ean.to_s) || /EPIMINERAL/i.match(line) } }
-          i.response.body = to_add.compact.join("\n")
+          tmp_zip = File.join(Oddb2xml::SpecData, 'vcr', 'transfer.zip')
+          i.response.body = IO.binread(tmp_zip)
           i.response.headers['Content-Length'] = i.response.body.size
         end
       end
@@ -475,26 +473,32 @@ describe Oddb2xml::MedregbmDownloader do
       c.before_record(:medreg) do |i|
         if /medregbm.admin.ch/i.match(i.request.uri)
           puts "#{Time.now}: #{__LINE__}: URI was #{i.request.uri} containing #{i.response.body.size/(1024*1024)} MB "
-          medreg_dir = File.join(Oddb2xml::WorkDir, 'medreg')
-          FileUtils.makedirs(medreg_dir)
-          xlsx_name = File.join(medreg_dir, /ListBetrieb/.match(i.request.uri) ? 'Betriebe.xlsx' : 'Personen.xlsx')
-          File.open(xlsx_name, 'wb+') { |f| f.write(i.response.body) }
-          puts "#{Time.now}: Openening saved #{xlsx_name} (#{File.size(xlsx_name)} bytes) will take some time. URI was #{i.request.uri}"
-          workbook = RubyXL::Parser.parse(xlsx_name)
-          worksheet = workbook[0]
-          idx = 1; to_delete = []
-          while (worksheet.sheet_data[idx])
-            idx += 1
-            next unless worksheet.sheet_data[idx-1][0]
-            to_delete << (idx-1) unless Oddb2xml::GTINS_MEDREG.index(worksheet.sheet_data[idx-1][0].value.to_i)
-          end
-          if to_delete.size > 0
-            puts "#{Time.now}: Deleting #{to_delete.size} of the #{idx} items will take some time"
-            to_delete.reverse.each{ |row_id|  worksheet.delete_row(row_id) }
-            workbook.write(xlsx_name)
-            i.response.body = IO.binread(xlsx_name)
+          begin
+            medreg_dir = File.join(Oddb2xml::WorkDir, 'medreg')
+            FileUtils.makedirs(medreg_dir)
+            xlsx_name = File.join(medreg_dir, /ListBetrieb/.match(i.request.uri) ? 'Betriebe.xlsx' : 'Personen.xlsx')
+            File.open(xlsx_name, 'wb+') { |f| f.write(i.response.body) }
+            puts "#{Time.now}: Openening saved #{xlsx_name} (#{File.size(xlsx_name)} bytes) will take some time. URI was #{i.request.uri}"
+            workbook = RubyXL::Parser.parse(xlsx_name)
+            worksheet = workbook[0]
+            idx = 1; to_delete = []
+            while (worksheet.sheet_data[idx])
+              idx += 1
+              next unless worksheet.sheet_data[idx-1][0]
+              to_delete << (idx-1) unless Oddb2xml::GTINS_MEDREG.index(worksheet.sheet_data[idx-1][0].value.to_i)
+            end
+            if to_delete.size > 0
+              puts "#{Time.now}: Deleting #{to_delete.size} of the #{idx} items will take some time"
+              to_delete.reverse.each{ |row_id|  worksheet.delete_row(row_id) }
+              workbook.write(xlsx_name)
+              i.response.body = IO.binread(xlsx_name)
+              i.response.headers['Content-Length'] = i.response.body.size
+              puts "#{Time.now}: response.body is now #{i.response.body.size/(1024*1024)} MB  long. #{xlsx_name} was #{File.size(xlsx_name)}"
+            end
+          rescue
+            puts "Creating empty content, as I am unable to parse the XLSX file"
+            i.response.body = ""
             i.response.headers['Content-Length'] = i.response.body.size
-            puts "#{Time.now}: response.body is now #{i.response.body.size/(1024*1024)} MB  long. #{xlsx_name} was #{File.size(xlsx_name)}"
           end
         end
       end

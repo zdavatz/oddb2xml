@@ -268,11 +268,11 @@ def check_article_IGM_format(line, price_kendural=825, add_80_percents=false)
   if /7680353660163\d$/.match(line) # KENDURAL Depottabl 30 Stk
     puts "found_SL for #{line}" if $VERBOSE
     found_SL = true
-    expect(line[60..65]).to eq '000495'
-    expect(price_exf).to eq 495
+    expect(line[60..65]).to eq '000496'
+    expect(price_exf).to eq 496
     expect(ckzl).to eq '1'
     expect(price_public).to eq price_kendural     # this is a SL-product. Therefore we may not have a price increase
-    expect(line[66..71]).to eq '000'+price_kendural.to_s  # the dat format requires leading zeroes and not point
+    expect(line[66..71]).to eq '000'+sprintf('%03d', price_kendural)  # the dat format requires leading zeroes and not point
   end
 
   if /7680403330459\d$/.match(line) # CARBADERM
@@ -392,7 +392,7 @@ def checkArticleXml(checkERYTHROCIN = true)
 
   erythrocin_gtin = '7680202580475' # picked up from zur rose
   erythrocin = checkAndGetArticleWithGTIN(doc, erythrocin_gtin)
-  expect(erythrocin.elements['DSCRD'].text).to eq("ERYTHROCIN i.v. Trockensub 1000 mg Amp [!]") if checkERYTHROCIN
+  expect(erythrocin.elements['DSCRD'].text).to eq("ERYTHROCIN i.v. Trockensub 1000 mg Amp") if checkERYTHROCIN
 
   lansoyl = checkAndGetArticleWithGTIN(doc, Oddb2xml::LANSOYL_GTIN)
   expect(lansoyl.elements['DSCRD'].text).to eq 'LANSOYL Gel 225 g'
@@ -616,7 +616,7 @@ if RUN_ALL
       expect(oddb_dat).to match(/^..2/), "should have a record with '2' in CMUT field"
       expect(oddb_dat).to match(/^..3/), "should have a record with '3' in CMUT field"
       expect(oddb_dat).to match(RegExpDesitin), "should have Desitin"
-      IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line) }
+      IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 0) }
       m = /.+DIAPHIN Trocke.*7680555610041.+/.match(oddb_dat)
       expect(m[0].size).to eq 97 # size of IGM 1 record
       expect(m[0][74]).to eq '3'
@@ -918,7 +918,7 @@ if RUN_ALL
       expect(oddb_dat).to match(/^..2/), "should have a record with '2' in CMUT field"
       expect(oddb_dat).to match(/^..3/), "should have a record with '3' in CMUT field"
       expect(oddb_dat).to match(RegExpDesitin), "should have Desitin"
-      IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line) }
+      IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 0) }
       # oddb_dat.should match(/^..1/), "should have a record with '1' in CMUT field" # we have no
     end
   end
@@ -940,7 +940,7 @@ if RUN_ALL
       expect(File.exists?(dat_filename)).to eq true
       oddb_dat = IO.read(dat_filename)
       oddb_dat_lines = IO.readlines(dat_filename)
-      IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 891, true) }
+      IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 892, true) }
     end
   end
 end
