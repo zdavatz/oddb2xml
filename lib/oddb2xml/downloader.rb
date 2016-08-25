@@ -132,7 +132,9 @@ module Oddb2xml
     include DownloadMethod
     def download
       @url ||= 'https://download.epha.ch/cleaned/matrix.csv'
-      download_as('epha_interactions.csv', 'r')
+      content = download_as('epha_interactions.csv', 'r')
+      FileUtils.rm_f('epha_interactions.csv', :verbose => true)
+      content
     end
   end
   class LppvDownloader < Downloader
@@ -152,7 +154,7 @@ module Oddb2xml
         Oddb2xml.log("ZurroseDownloader #{__LINE__} download #{@url} @url returns #{content.bytes}")
         content
       else
-        file = File.join(WorkDir, 'transfer.zip')
+        file = File.join(Downloads, 'transfer.zip')
         unless Oddb2xml.skip_download(file)
           Oddb2xml.log "ZurroseDownloader #{__LINE__}: #{file}"
           begin
@@ -165,7 +167,7 @@ module Oddb2xml
             Oddb2xml.download_finished(file)
           end
         end
-        read_xml_from_zip(/transfer.dat/, File.join(Downloads, File.basename(file)))
+        read_xml_from_zip(/transfer.dat/, file)
         dest = File.join(Downloads, 'transfer.dat')
         File.open(dest, 'r:iso-8859-1:utf-8').read
       end

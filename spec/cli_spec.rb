@@ -181,9 +181,10 @@ describe Oddb2xml::Cli do
     end
     it 'should create the needed files' do
       expect(@cli_output).to match(/\sPharma\s/)
+      expect(File.exists?(File.join(Oddb2xml::Downloads, 'transfer.zip'))).to eq true
+      expect(File.exists?(File.join(Oddb2xml::WorkDir, 'transfer.zip'))).to eq false
       expected = [
         'duplicate_ean13_from_zur_rose.txt',
-        'transfer.zip',
         'oddb.dat',
       ].each{ |file|
         expect(File.exists?(File.join(Oddb2xml::WorkDir, file))).to eq true

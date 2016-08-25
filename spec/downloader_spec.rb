@@ -262,6 +262,9 @@ end
           expect(File.exist?('oddb_orphan.xls')).to eq(false)
         end
       end
+      it 'should not save into the download directory' do
+        expect(File.exist?(File.join(Oddb2xml::Downloads, 'oddb_orphan.xls'))).to eq(false)
+      end
     end
   end
   context 'package' do
@@ -270,15 +273,16 @@ end
       VCR.insert_cassette('oddb2xml', :tag => :swissmedic, :exclusive => false)
       common_before
       @downloader = Oddb2xml::SwissmedicDownloader.new(:package)
+      @bin = @downloader.download
     end
     after(:each) do common_after end
     context 'download_by for package xls' do
-      let(:bin) {
-        @downloader.download
-      }
       it 'should return valid Binary-String' do
-        expect(bin).to be_a String
-        expect(bin.bytes).not_to be nil
+        expect(@bin).to be_a String
+        expect(@bin.bytes).not_to be nil
+      end
+      it 'should save into the download directory' do
+        expect(File.exist?(File.join(Oddb2xml::Downloads, 'swissmedic_package.xlsx'))).to eq(true)
       end
     end
   end
@@ -305,6 +309,7 @@ describe Oddb2xml::EphaDownloader do
     VCR.insert_cassette('oddb2xml', :tag => :epha)
     @downloader = Oddb2xml::EphaDownloader.new
     common_before
+    @downloader.download
   end
   after(:all) do
     common_after
@@ -321,8 +326,10 @@ describe Oddb2xml::EphaDownloader do
       expect(csv.bytes).not_to be nil
     end
     it 'should clean up current directory' do
-      expect { csv }.not_to raise_error
-      # File.exist?('epha_interactions.csv').should eq(false)
+      File.exist?('epha_interactions.csv').should eq(false)
+    end
+    it 'should save under download' do
+      expect(File.exist?(File.join(Oddb2xml::Downloads, 'epha_interactions.csv'))).to eq(true)
     end
   end
 end
@@ -413,6 +420,7 @@ describe Oddb2xml::MigelDownloader do
     @downloader = Oddb2xml::MigelDownloader.new
     VCR.insert_cassette('oddb2xml', :tag => :migel)
     common_before
+    @downloader.download
   end
   after(:each) do common_after end
 
@@ -447,6 +455,7 @@ describe Oddb2xml::ZurroseDownloader do
     VCR.insert_cassette('oddb2xml', :tag => :zurrose)
     @downloader = Oddb2xml::ZurroseDownloader.new
     common_before
+    @downloader.download
   end
   after(:each) do common_after end
   
@@ -461,6 +470,11 @@ describe Oddb2xml::ZurroseDownloader do
       expect { dat }.not_to raise_error
       expect(File.exist?('transfer.dat')).to eq(false)
       expect(File.exist?('oddb2xml_zurrose_transfer.dat')).to eq(false)
+      expect(File.exist?('transfer.zip')).to eq(false)
+    end
+    it 'should save into the download directory' do
+      expect(File.exist?(File.join(Oddb2xml::Downloads, 'transfer.zip'))).to eq(true)
+      expect(File.exist?(File.join(Oddb2xml::Downloads, 'transfer.dat'))).to eq(true)
     end
   end
 end
@@ -512,6 +526,7 @@ describe Oddb2xml::MedregbmDownloader do
       VCR.eject_cassette
       VCR.insert_cassette('oddb2xml', :tag => :medreg)
       @downloader = Oddb2xml::MedregbmDownloader.new(:company)
+      @downloader.download
     end
     after(:each) do common_after end
     it_behaves_like 'any downloader'
@@ -582,6 +597,7 @@ describe Oddb2xml::SwissmedicInfoDownloader do
     VCR.insert_cassette('oddb2xml', :tag => :swissmedicInfo)
     common_before
     @downloader = Oddb2xml::SwissmedicInfoDownloader.new
+    @downloader.download
   end
   after(:all) do common_after end
   it_behaves_like 'any downloader'
@@ -599,6 +615,9 @@ describe Oddb2xml::SwissmedicInfoDownloader do
     it 'should clean up current directory' do
       expect { xml }.not_to raise_error
       expect(File.exist?('swissmedic_info.zip')).to eq(false)
+    end
+    it 'should save into the download directory' do
+      expect(File.exist?(File.join(Oddb2xml::Downloads, 'swissmedic_info.zip'))).to eq(true)
     end
   end
 end
