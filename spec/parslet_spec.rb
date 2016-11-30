@@ -709,11 +709,24 @@ describe ParseComposition do
 
     context "should parse a complex composition" do
       string = 'globulina equina (immunisé avec coeur) 8 mg'
+      composition = ParseUtil.parse_compositions(string).first
+      specify { expect(composition.substances.size).to eq 1 }
+      globulina = composition.substances.find{ |x| /globulina/i.match(x.name) }
+      specify { expect(globulina.name).to eq 'Globulina Equina (immunisé Avec Coeur)' }
+      specify { expect(globulina.is_active_agent).to eq true }
+      specify { expect(globulina.qty).to eq 8 }
+      specify { expect(globulina.unit).to eq 'mg' }
+    end
+
+    context "should parse globulina equina (immunise" do
       string = 'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg'
-      composition = ParseComposition.from_string(string)
+      composition = ParseUtil.parse_compositions(string).first
       specify { expect(composition.substances.size).to eq 1 }
       globulina = composition.substances.find{ |x| /globulina/i.match(x.name) }
       specify { expect(globulina.name).to eq 'Globulina Equina (immunisé Avec Coeur, Tissu Pulmonaire, Reins De Porcins)' }
+      specify { expect(globulina.is_active_agent).to eq true }
+      specify { expect(globulina.qty).to eq 8 }
+      specify { expect(globulina.unit).to eq 'mg' }
     end
 
      context "should return correct composition for containing '(acarus siro)" do
