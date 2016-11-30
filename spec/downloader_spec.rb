@@ -558,12 +558,10 @@ describe Oddb2xml::MedregbmDownloader do
         @downloader.download
       }
       it 'should return valid String' do
-        pending 'Should handle SSL issues'
         expect(txt).to be_a String
         expect(txt.bytes).not_to be nil
       end
       it 'should clean up current directory' do
-        pending 'Should handle SSL issues'
         expect { txt }.not_to raise_error
         expect(File.exist?('oddb_person.xls')).to eq(false)
       end
