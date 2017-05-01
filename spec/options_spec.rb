@@ -176,14 +176,26 @@ describe Oddb2xml::Options do
     specify { expect(args).to eq ["nonpharma", "zurrose"] } # will lead to an exit 2 in bin/oddb2xml
   end
 
-  context 'when --calc is given' do
+  context 'when --artikelstamm_v4 is given' do
     options = Oddb2xml::Options.new
-    args = '--calc'.split(' ')
+    args = '--artikelstamm_v4'.split(' ')
     options.parser.parse!(args) # .should raise
     expected = Default_opts.clone
-    expected[:calc]  =  true
+    expected[:price]  =  :zurrose
+    expected[:extended]  =  true
+    expected[:artikelstamm_v4]  =  true
     specify { expect(options.opts).to eq expected }
     specify { expect(args).to eq [] }
   end
+
+  context 'when -c tar.gz option is given' do
+    options = Oddb2xml::Options.new
+    options.parser.parse!('-c tar.gz'.split(' '))
+    specify { expect(options.opts[:compress_ext]).to eq('tar.gz') }
+    expected = Default_opts.clone
+    expected[:compress_ext] = 'tar.gz'
+    specify { expect(options.opts).to eq expected }
+  end
+
 end
 
