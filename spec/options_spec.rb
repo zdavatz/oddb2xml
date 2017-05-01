@@ -9,6 +9,7 @@ describe Oddb2xml::Options do
     :fi           => false,
     :adr          => false,
     :address      => false,
+    :artikelstamm_v4 => false,
     :nonpharma    => false,
     :extended     => false,
     :compress_ext => nil,
