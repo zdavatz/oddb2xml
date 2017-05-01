@@ -14,7 +14,7 @@ module Oddb2xml
     def download_as(file, option='r')
       tempFile  = File.join(WorkDir,   File.basename(file))
       file2save = File.join(Downloads, File.basename(file))
-      Oddb2xml.log "download_as file #{file2save} via #{tempFile} from #{@url}"
+      report_download(@url, file2save)
       data = nil
       FileUtils.rm_f(tempFile, :verbose => false)
       if Oddb2xml.skip_download(file)
@@ -46,6 +46,12 @@ module Oddb2xml
       HTTPI.log = false # disable httpi warning
       Oddb2xml.log "Downloader from #{@url} for #{self.class}"
       init
+    end
+    def report_download(url, file)
+      Oddb2xml.log sprintf("%-20s: download_as %-24s from %s",
+                           self.class.to_s.split('::').last,
+                           File.basename(file),
+                           url)
     end
     def init
       @agent = Mechanize.new
@@ -132,8 +138,9 @@ module Oddb2xml
     include DownloadMethod
     def download
       @url ||= 'https://download.epha.ch/cleaned/matrix.csv'
-      content = download_as('epha_interactions.csv', 'r')
-      FileUtils.rm_f('epha_interactions.csv', :verbose => true)
+      file = 'epha_interactions.csv'
+      content = download_as(file, 'r')
+      FileUtils.rm_f(file, :verbose => true)
       content
     end
   end
@@ -151,12 +158,13 @@ module Oddb2xml
       unless @url =~ /^http/
         io = File.open(@url, 'r:iso-8859-1:utf-8')
         content = io.read
+        report_download(@url, File.basename(@url))
         Oddb2xml.log("ZurroseDownloader #{__LINE__} download #{@url} @url returns #{content.bytes}")
         content
       else
         file = File.join(Downloads, 'transfer.zip')
+        report_download(@url, file)
         unless Oddb2xml.skip_download(file)
-          Oddb2xml.log "ZurroseDownloader #{__LINE__}: #{file}"
           begin
             response = @agent.get(@url)
             response.save_as(file)
@@ -189,7 +197,9 @@ module Oddb2xml
       super({}, url)
     end
     def download
-      download_as("medregbm_#{@type.to_s}.txt", 'r:iso-8859-1:utf-8')
+      file = "medregbm_#{@type.to_s}.txt"
+      report_download(@url, file)
+      FileUtils.rm_f(file, :verbose => false) # we need it only in the download
     end
   end
   class BagXmlDownloader < Downloader
@@ -199,9 +209,8 @@ module Oddb2xml
     end
     def download
       file = File.join(WorkDir, 'XMLPublications.zip')
-      Oddb2xml.log "BagXmlDownloader #{__LINE__}: #{file}"
+      report_download(@url, file)
       unless Oddb2xml.skip_download(file)
-        Oddb2xml.log "BagXmlDownloader #{__LINE__}: #{file}"
         begin
           response = @agent.get(@url)
           response.save_as(file)
@@ -246,6 +255,7 @@ module Oddb2xml
   </SOAP-ENV:Envelope>
 </ns1:ATYPE></ns2:DownloadArticleInput></SOAP-ENV:Body>
 )
+        report_download(@url, file2save)
         return IO.read(file2save) if Oddb2xml.skip_download? and File.exists?(file2save)
         FileUtils.rm_f(file2save, :verbose => false)
         response = @client.call(:download, :xml => soap)
@@ -286,6 +296,7 @@ module Oddb2xml
     end
     def download
       @type == file = File.join(Oddb2xml::WorkDir, "swissmedic_#{@type}.xlsx")
+      report_download(@url, file)
       if  @options[:calc] and @options[:skip_download] and File.exists?(file) and (Time.now-File.ctime(file)).to_i < 24*60*60
         Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{file} #{File.size(file)} bytes"
         return File.expand_path(file)
@@ -316,6 +327,7 @@ module Oddb2xml
     end
     def download
       file = File.join(Downloads, "swissmedic_info.zip")
+      report_download(@url, file)
       FileUtils.rm_f(file, :verbose => false) unless Oddb2xml.skip_download?
       begin
         response = nil
