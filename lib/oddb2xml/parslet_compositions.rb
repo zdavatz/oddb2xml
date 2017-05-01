@@ -16,6 +16,9 @@ module ParseUtil
   # this class is responsible to patch errors in swissmedic entries after
   # oddb.org detected them, as it takes sometimes a few days (or more) till they get corrected
   # Reports the number of occurrences of each entry
+  @@saved_parsed ||= {}
+  @@nr_saved_parsed_used  ||= 0
+
   class HandleSwissmedicErrors
 
     attr_accessor :nrParsingErrors
@@ -51,7 +54,7 @@ module ParseUtil
         result = result.gsub(entry.pattern,  entry.replacement)
         unless result.eql?(intermediate)
             entry.nr_occurrences += 1
-            puts "#{File.basename(__FILE__)}:#{__LINE__}: fixed \nbefore: #{intermediate}\nafter:  #{result}" unless defined?(RSpec)
+            puts "#{File.basename(__FILE__)}:#{__LINE__}: fixed \nbefore: #{intermediate}\nafter:  #{result}" if $VERBOSE
         end
       }
       @nrLines += 1
@@ -64,8 +67,18 @@ module ParseUtil
     string.split(/\s+/u).collect { |word| word.capitalize }.join(' ').strip
   end
 
+  def ParseUtil.nr_saved_parsed_used
+    @@nr_saved_parsed_used
+  end
+
   def ParseUtil.parse_compositions(composition_text, active_agents_string = '')
     active_agents = active_agents_string ? active_agents_string.downcase.split(/,\s+/) : []
+    key = [ composition_text, active_agents ]
+    saved_value = @@saved_parsed[key]
+    if saved_value
+      @@nr_saved_parsed_used += 1
+      return saved_value
+    end
     comps = []
     lines = composition_text.gsub(/\r\n?/u, "\n").split(/\n/u)
     lines.select do
@@ -84,7 +97,10 @@ module ParseUtil
       end
     end
     comps << ParseComposition.new(composition_text.split(/,|:|\(/)[0]) if comps.size == 0
+    @@saved_parsed[key] = comps
     comps
+  rescue => error
+      binding.pry
   end
 
 end
