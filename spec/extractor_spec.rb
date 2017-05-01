@@ -71,6 +71,7 @@ describe Oddb2xml::RefdataExtractor do
         :ean=> Oddb2xml::LEVETIRACETAM_GTIN.to_i,
         :pharmacode=> pharma_code_LEVETIRACETAM,
         :last_change => @@last_change,
+        :data_origin => "refdata",
         :desc_de=>"LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
         :desc_fr=>"LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce",
         :atc_code=>"N03AX14",
@@ -97,6 +98,7 @@ describe Oddb2xml::RefdataExtractor do
       :ean=>7611600441020,
       :pharmacode=>pharma_code_TUBEGAZE,
       :last_change => @@last_change,
+      :data_origin => "refdata",
       :desc_de=>"TUBEGAZE Verband weiss Nr 12 20m Finger gross",
       :desc_fr=>"TUBEGAZE pans tubul blanc Nr 12 20m doigts grands",
       :atc_code=>"",
@@ -217,14 +219,14 @@ describe Oddb2xml::SwissmedicExtractor do
   end
 
   context 'can parse swissmedic_orphans.xls' do
-    it {
+    it do
         @filename = File.join(Oddb2xml::SpecData, 'swissmedic_orphan.xlsx')
         expect(File.exists?(@filename)).to eq(true), "File #{@filename} must exists"
         @packs = Oddb2xml::SwissmedicExtractor.new(@filename, :orphan).to_arry
         expect(@packs.size).to eq 95
         expect(@packs.first).to eq("62132")
         expect(@packs[7]).to eq("00687")
-      }
+    end
   end
 end
 
@@ -236,7 +238,7 @@ describe Oddb2xml::EphaExtractor do
         filename = File.join(Oddb2xml::SpecData, 'epha_interactions.csv')
         string = IO.read(filename)
         @actions = Oddb2xml::EphaExtractor.new(string).to_arry
-        expect(@actions.size).to eq(2) 
+        expect(@actions.size).to eq(2)
        }
   end
 end

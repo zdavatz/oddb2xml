@@ -213,7 +213,7 @@ module Oddb2xml
         i = 1
         col_zulassung = 5
         raise "Could not find Zulassungsnummer in column #{col_zulassung} of #{@filename}" unless /Zulassungs.*nummer/.match(@sheet[3][col_zulassung].value)
-        @sheet[0..20].each do |row|
+        @sheet.each do |row|
           next unless row[col_zulassung]
           number = row[col_zulassung].value.to_i
           if number != 0
