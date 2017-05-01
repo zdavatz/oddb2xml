@@ -64,7 +64,7 @@ module Oddb2xml
       end
     end
     def to_xml(subject=nil)
-      Oddb2xml.log "to_xml subject #{subject} #{@subject} for #{self.class}"
+      Oddb2xml.log "to_xml subject #{subject || @subject}"
       if subject
         self.send('build_' + subject.to_s)
       elsif @subject
@@ -117,47 +117,45 @@ module Oddb2xml
         if @options[:extended]
           Oddb2xml.log("prepare_articles extended prepare_local_index having already #{@articles.size} articles")
           nrItems = 0
-          @infos_zur_rose.each{
-            |ean13, info|
-          nrItems += 1
-          pharmacode = info[:pharmacode]
-          if @pharmacode[pharmacode]
-            @pharmacode[pharmacode][:price]     = info[:price]
-            @pharmacode[pharmacode][:pub_price] = info[:pub_price]
-            next
-          end
-          obj = {}
-          found = false
-          # existing = @refdata.values.find{ |x| x[:ean].eql? ean13 }
-          existing = @refdata[ean13]
-          if existing
-            found = true
-            existing[:price]     = info[:price]
-            existing[:pub_price] = info[:pub_price]
-          else
-            entry = {
-                      :desc            => info[:description],
-                      :desc_de         => info[:description],
-                      :status          => info[:status] == '3' ? 'I' : 'A', # from ZurRose, we got 1,2 or 3 means aktive, aka available in trade
-                      :atc_code        => '',
-                      :ean             => ean13,
-                      :pharmacode      => pharmacode,
-                      :price           => info[:price],
-                      :pub_price       => info[:pub_price],
-                      :type            => info[:type],
-                      }
-            if pharmacode
-              @refdata[pharmacode] = entry
-            else
-              @refdata[ean13] = entry
+          @infos_zur_rose.each do |ean13, info|
+            nrItems += 1
+            pharmacode = info[:pharmacode]
+            if @pharmacode[pharmacode]
+              @pharmacode[pharmacode][:price]     = info[:price]
+              @pharmacode[pharmacode][:pub_price] = info[:pub_price]
+              next
             end
-            obj = entry
+            obj = {}
+            found = false
+            existing = @refdata[ean13]
+            if existing
+              found = true
+              existing[:price]     = info[:price]
+              existing[:pub_price] = info[:pub_price]
+            else
+              entry = {
+                        :desc            => info[:description],
+                        :desc_de         => info[:description],
+                        :status          => info[:status] == '3' ? 'I' : 'A', # from ZurRose, we got 1,2 or 3 means aktive, aka available in trade
+                        :atc_code        => '',
+                        :ean             => ean13,
+                        :pharmacode      => pharmacode,
+                        :price           => info[:price],
+                        :pub_price       => info[:pub_price],
+                        :type            => info[:type],
+                        }
+              if pharmacode
+                @refdata[pharmacode] = entry
+              else
+                @refdata[ean13] = entry
+              end
+              obj = entry
+            end
+            if not found and obj.size > 0
+              @articles << obj
+              nrAdded += 1
+            end
           end
-          if not found and obj.size > 0
-            @articles << obj
-            nrAdded += 1
-          end
-          }
         end
       end
       Oddb2xml.log("prepare_articles done. Added #{nrAdded} prices. Total #{@articles.size}")
@@ -175,7 +173,7 @@ module Oddb2xml
         @substances.uniq!
         @substances.sort!
         Oddb2xml.log("prepare_substances done. Total #{@substances.size} from #{@items.size} items")
-        exit 2 if @options[:extended] and @substances.size == 0
+        exit 2 if @options[:extended] && @substances.size == 0
       end
     end
     def prepare_limitations
@@ -271,7 +269,7 @@ module Oddb2xml
           XML_OPTIONS
         ) {
           Oddb2xml.log "build_substance #{@substances.size} substances"
-        exit 2 if @options[:extended] and @substances.size == 0
+        exit 2 if @options[:extended] && @substances.size == 0
         nbr_records = 0
         @substances.each_with_index do |sub_name, i|
             xml.SB('DT' => '') do
@@ -636,6 +634,57 @@ module Oddb2xml
       Oddb2xml.add_hash(_builder.to_xml)
     end
 
+    def prepare_calc_items(suppress_composition_parsing: false)
+      @calc_items = {}
+      packungen_xlsx = File.join(Oddb2xml::WorkDir, "swissmedic_package.xlsx")
+      idx = 0
+      return unless File.exists?(packungen_xlsx)
+      workbook = RubyXL::Parser.parse(packungen_xlsx)
+      row_nr = 0
+      workbook.worksheets[0].each do |row|
+        row_nr += 1
+        next unless row and row.cells[0] and row.cells[0].value and row.cells[0].value.to_i > 0
+        iksnr               = "%05i" % row.cells[0].value.to_i
+        seqnr               = "%02d" % row.cells[1].value.to_i
+        if row_nr % 250 == 0
+            puts "#{Time.now}: At row #{row_nr} iksnr #{iksnr}";
+            $stdout.flush
+        end
+        ith       = COLUMNS_JULY_2015.keys.index(:index_therapeuticus)
+        seq_name  = COLUMNS_JULY_2015.keys.index(:name_base)
+        i_3       = COLUMNS_JULY_2015.keys.index(:ikscd)
+        p_1_2     = COLUMNS_JULY_2015.keys.index(:seqnr)
+        cat       = COLUMNS_JULY_2015.keys.index(:ikscat)
+        siz       = COLUMNS_JULY_2015.keys.index(:size)
+        atc       = COLUMNS_JULY_2015.keys.index(:atc_class)
+        list_code = COLUMNS_JULY_2015.keys.index(:production_science)
+        unit      = COLUMNS_JULY_2015.keys.index(:unit)
+        sub       = COLUMNS_JULY_2015.keys.index(:substances)
+        comp      = COLUMNS_JULY_2015.keys.index(:composition)
+
+        no8                 = iksnr + sprintf('%03d',row.cells[i_3].value.to_i)
+        name                = row.cells[seq_name]  ? row.cells[seq_name].value  : nil
+        atc_code            = row.cells[atc]  ? row.cells[atc].value  : nil
+        list_code           = row.cells[list_code]  ? row.cells[list_code].value  : nil
+        package_size        = row.cells[siz] ? row.cells[siz].value : nil
+        unit                = row.cells[unit] ? row.cells[unit].value : nil
+        active_substance    = row.cells[sub] ? row.cells[sub].value : nil
+        composition         = row.cells[comp] ? row.cells[comp].value : nil
+
+        # skip veterinary product
+        next if atc_code  and /^Q/i.match(atc_code)
+        next if list_code and /Tierarzneimittel/.match(list_code)
+        info = nil
+        begin
+          info = Calc.new(name, package_size, unit, active_substance, composition)
+        rescue
+          puts "#{Time.now}: #{row_nr} iksnr #{iksnr} rescue from Calc.new"
+        end unless suppress_composition_parsing
+        ean12 = '7680' + no8
+        ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
+        @calc_items[ean13] = info
+      end
+    end
     def build_calc
       def emit_substance(xml, substance, emit_active=false)
           xml.MORE_INFO substance.more_info if substance.more_info
@@ -655,69 +704,22 @@ module Oddb2xml
             }
           end
           if substance.salts and substance.salts.size > 0
-            xml.SALTS {
-              substance.salts.each { |salt|
-                xml.SALT {
+            xml.SALTS do
+              substance.salts.each do |salt|
+                xml.SALT do
                   emit_substance(xml, salt)
-                         }
-                                   }
-              }
-
+                end
+              end
+            end
           end
       end
-      packungen_xlsx = File.join(Oddb2xml::WorkDir, "swissmedic_package.xlsx")
-      idx = 0
-      return unless File.exists?(packungen_xlsx)
-      workbook = RubyXL::Parser.parse(packungen_xlsx)
-      items = {}
-      row_nr = 0
+      prepare_calc_items
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
-        xml.ARTICLES(XML_OPTIONS) {
-          workbook.worksheets[0].each do |row|
-            row_nr += 1
-            next unless row and row.cells[0] and row.cells[0].value and row.cells[0].value.to_i > 0
-            iksnr               = "%05i" % row.cells[0].value.to_i
-            seqnr               = "%02d" % row.cells[1].value.to_i
-            if row_nr % 250 == 0
-                puts "#{Time.now}: At row #{row_nr} iksnr #{iksnr}";
-                $stdout.flush
-            end
-            ith       = COLUMNS_JULY_2015.keys.index(:index_therapeuticus)
-            seq_name  = COLUMNS_JULY_2015.keys.index(:name_base)
-            i_3       = COLUMNS_JULY_2015.keys.index(:ikscd)
-            p_1_2     = COLUMNS_JULY_2015.keys.index(:seqnr)
-            cat       = COLUMNS_JULY_2015.keys.index(:ikscat)
-            siz       = COLUMNS_JULY_2015.keys.index(:size)
-            atc       = COLUMNS_JULY_2015.keys.index(:atc_class)
-            list_code = COLUMNS_JULY_2015.keys.index(:production_science)
-            unit      = COLUMNS_JULY_2015.keys.index(:unit)
-            sub       = COLUMNS_JULY_2015.keys.index(:substances)
-            comp      = COLUMNS_JULY_2015.keys.index(:composition)
-
-            no8                 = iksnr + sprintf('%03d',row.cells[i_3].value.to_i)
-            name                = row.cells[seq_name]  ? row.cells[seq_name].value  : nil
-            atc_code            = row.cells[atc]  ? row.cells[atc].value  : nil
-            list_code           = row.cells[list_code]  ? row.cells[list_code].value  : nil
-            package_size        = row.cells[siz] ? row.cells[siz].value : nil
-            unit                = row.cells[unit] ? row.cells[unit].value : nil
-            active_substance    = row.cells[sub] ? row.cells[sub].value : nil
-            composition         = row.cells[comp] ? row.cells[comp].value : nil
-
-            # skip veterinary product
-            next if atc_code  and /^Q/i.match(atc_code)
-            next if list_code and /Tierarzneimittel/.match(list_code)
-            begin
-              info = Calc.new(name, package_size, unit, active_substance, composition)
-            rescue
-              puts "#{Time.now}: #{row_nr} iksnr #{iksnr} rescue from Calc.new"
-              info = nil
-            end
-            ean12 = '7680' + no8
-            ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
-            items[ean13] = info
-            xml.ARTICLE {
+        xml.ARTICLES(XML_OPTIONS) do
+          @calc_items.each do |ean13, info|
+            xml.ARTICLE do
               xml.GTIN              ean13
               xml.NAME              info.column_c
               xml.PKG_SIZE          info.pkg_size
@@ -731,29 +733,30 @@ module Oddb2xml
                 xml.GALENIC_FORM  info.galenic_form.description
                 xml.GALENIC_GROUP info.galenic_group ? info.galenic_group.description : "Unknown"
               end
-              xml.COMPOSITIONS {
-                info.compositions.each { |composition|
-                  xml.COMPOSITION {
+              xml.COMPOSITIONS do
+                info.compositions.each do |composition|
+                  xml.COMPOSITION do
                     xml.EXCIPIENS { emit_substance(xml, composition.excipiens) } if composition.excipiens
                     xml.LABEL composition.label if composition.label
                     xml.LABEL_DESCRIPTION composition.label_description if composition.label_description
                     xml.CORRESP composition.corresp if composition.corresp
                     if composition.substances and composition.substances.size > 0
-                      xml.SUBSTANCES {
-                          composition.substances.each { |substance| xml.SUBSTANCE { emit_substance(xml, substance, true) }}
-                      }
+                      xml.SUBSTANCES do
+                        composition.substances.each { |substance| xml.SUBSTANCE { emit_substance(xml, substance, true) }}
+                      end
                     end
-                  }
-                }
-              }
-            } if info and info.compositions
+                  end
+                end
+              end
+            end if info and info.compositions
           end
-        }
+        end
       end
+
       csv_name = File.join(WorkDir, 'oddb_calc.csv')
       CSV.open(csv_name, "w+", :col_sep => ';') do |csv|
-        csv << ['gtin'] + items.values.first.headers
-        items.each do |key, value|
+        csv << ['gtin'] + @calc_items.values.first.headers
+        @calc_items.each do |key, value|
           if value and value.to_array
             csv <<  [key] + value.to_array
           else
@@ -763,6 +766,7 @@ module Oddb2xml
       end
       Oddb2xml.add_hash(_builder.to_xml)
     end
+
     def build_article
       prepare_limitations
       prepare_articles
@@ -1298,5 +1302,6 @@ module Oddb2xml
         end
       rows.join("\n")
     end
+
   end
 end
