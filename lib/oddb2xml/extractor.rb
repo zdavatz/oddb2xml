@@ -37,6 +37,7 @@ module Oddb2xml
       result = PreparationsEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
       result.Preparations.Preparation.each do |seq|
         item = {}
+        item[:data_origin]  = 'bag_xml'
         item[:refdata]      = true
         item[:product_key]  = seq.ProductCommercial
         item[:desc_de]      = (desc = seq.DescriptionDe) ? desc : ''
@@ -69,7 +70,7 @@ module Oddb2xml
         item[:packages]    = {} # pharmacode => package
         seq.Packs.Pack.each do |pac|
           unless pac.GTIN
-            puts "BagXmlExtractor: Skipping as missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId}. Skipping"
+            puts "BagXmlExtractor: Skipping as missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId}. Skipping" if $VERBOSE
             next
           end
           ean = pac.GTIN.to_i
@@ -174,6 +175,7 @@ module Oddb2xml
       items = result.ARTICLE.ITEM
       items.each do |pac|
         item = {}
+        item[:data_origin]     = 'refdata'
         item[:refdata]         = true
         item[:_type]           = (typ  = pac.ATYPE.downcase.to_sym)  ? typ: ''
         item[:ean]             = (gtin = pac.GTIN.to_i)   ? gtin: 0
@@ -211,7 +213,7 @@ module Oddb2xml
         i = 1
         col_zulassung = 5
         raise "Could not find Zulassungsnummer in column #{col_zulassung} of #{@filename}" unless /Zulassungs.*nummer/.match(@sheet[3][col_zulassung].value)
-        @sheet.each do |row|
+        @sheet[0..20].each do |row|
           next unless row[col_zulassung]
           number = row[col_zulassung].value.to_i
           if number != 0
@@ -286,6 +288,7 @@ module Oddb2xml
               :gen_production       => row[COLUMNS_JULY_2015.keys.index(:gen_production)].value.to_s,
               :insulin_category     => row[COLUMNS_JULY_2015.keys.index(:insulin_category)].value.to_s,
               :drug_index           => row[COLUMNS_JULY_2015.keys.index(:drug_index)].value.to_s,
+              :data_origin          => 'swissmedic_package',
             }
           end
         end
@@ -297,14 +300,13 @@ module Oddb2xml
     def cleanup_file
       begin
         File.unlink(@filename) if File.exists?(@filename)
-        rescue Errno::EACCES # Permission Denied on Windows      
+        rescue Errno::EACCES # Permission Denied on Windows
       end unless defined?(RSpec)
     end
 
   end
   class MigelExtractor < Extractor
     def initialize(bin)
-      io = StringIO.new(bin)
       book = Spreadsheet.open(io, 'rb')
       @sheet = book.worksheet(0)
     end
@@ -325,6 +327,7 @@ module Oddb2xml
           :quantity        => row[5], # quantity
           :company_name    => row[6],
           :company_ean     => row[7].to_i,
+          :data_origin     => 'migel'
         }
       end
       data
@@ -340,7 +343,8 @@ module Oddb2xml
         lang = pac.lang.to_s
         next unless lang =~ /de|fr/
         item = {}
-        item[:refdata] = true,
+        item[:refdata] = true
+        item[:data_origin] = 'swissmedic_info'
         item[:name]  = (name = pac.title) ? name : ''
         item[:owner] = (ownr = pac.authHolder) ? ownr : ''
         item[:style] =  Nokogiri::HTML.fragment(pac.style).to_html(:encoding => 'UTF-8')
@@ -374,6 +378,7 @@ module Oddb2xml
           row = CSV.parse_line(line.gsub('""','"'))
           action = {}
           next unless row.size > 8
+          action[:data_origin] = 'epha'
           action[:ixno]      = ixno
           action[:title]     = row[4]
           action[:atc1]      = row[0]
@@ -403,6 +408,7 @@ module Oddb2xml
           row = line.chomp.split("\t")
           next if row[0] =~ /^GLN/
           data << {
+            :data_origin   => 'medreg',
             :gln           => row[0].to_s.gsub(/[^0-9]/, ''), #=> GLN Betrieb
             :name_1        => row[1].to_s,                    #=> Betriebsname 1
             :name_2        => row[2].to_s,                    #=> Betriebsname 2
@@ -421,6 +427,7 @@ module Oddb2xml
           row = line.chomp.split("\t")
           next if row[0] =~ /^GLN/
           data << {
+            :data_origin   => 'medreg',
             :gln           => row[0].to_s.gsub(/[^0-9]/, ''), #=> GLN Person
             :last_name     => row[1].to_s,                    #=> Name
             :first_name    => row[2].to_s,                    #=> Vorname
@@ -482,6 +489,7 @@ module Oddb2xml
         end
 
         data[ean13] = {
+          :data_origin   => 'zur_rose',
           :line   => line.chomp,
           :ean   => ean13,
           :clag  => line[73],
