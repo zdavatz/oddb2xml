@@ -9,6 +9,7 @@ require 'optparse'
 require 'mechanize'
 require 'oddb2xml'
 require 'oddb2xml/options'
+$stdout.sync = true
 
 options = Oddb2xml::Options.new
 

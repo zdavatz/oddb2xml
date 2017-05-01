@@ -35,6 +35,10 @@ module Oddb2xml
   'GENERATED_BY'      => "oddb2xml #{VERSION}"
   }
   class Builder
+    Data_dir = File.expand_path(File.join(File.dirname(__FILE__),'..','..', 'data'))
+    @@article_overrides  = YAML.load_file(File.join(Data_dir, 'article_overrides.yaml'))
+    @@product_overrides  = YAML.load_file(File.join(Data_dir, 'product_overrides.yaml'))
+    @@gtin2ignore        = YAML.load_file(File.join(Data_dir, 'gtin2ignore.yaml'))
     attr_accessor :subject, :refdata, :items, :flags, :lppvs,
                   :actions, :migel, :orphan,
                   :infos, :packs, :infos_zur_rose,
@@ -114,7 +118,7 @@ module Oddb2xml
           @articles << entry
         end unless SkipMigelDownloader
         nrAdded = 0
-        if @options[:extended]
+        if @options[:extended] || @options[:artikelstamm_v4]
           Oddb2xml.log("prepare_articles extended prepare_local_index having already #{@articles.size} articles")
           nrItems = 0
           @infos_zur_rose.each do |ean13, info|
@@ -152,7 +156,7 @@ module Oddb2xml
               obj = entry
             end
             if not found and obj.size > 0
-              @articles << obj
+              @articles << obj unless @options[:artikelstamm_v4]
               nrAdded += 1
             end
           end
@@ -173,7 +177,7 @@ module Oddb2xml
         @substances.uniq!
         @substances.sort!
         Oddb2xml.log("prepare_substances done. Total #{@substances.size} from #{@items.size} items")
-        exit 2 if @options[:extended] && @substances.size == 0
+        exit 2 if (@options[:extended] || @options[:artikelstamm_v4]) and @substances.size == 0
       end
     end
     def prepare_limitations
@@ -269,7 +273,7 @@ module Oddb2xml
           XML_OPTIONS
         ) {
           Oddb2xml.log "build_substance #{@substances.size} substances"
-        exit 2 if @options[:extended] && @substances.size == 0
+        exit 2 if (@options[:extended] || @options[:artikelstamm_v4]) and @substances.size == 0
         nbr_records = 0
         @substances.each_with_index do |sub_name, i|
             xml.SB('DT' => '') do
@@ -1303,5 +1307,222 @@ module Oddb2xml
       rows.join("\n")
     end
 
+    def build_artikelstamm_v4
+      def check_name(obj, lang = :de)
+        ean = obj[:ean].to_i
+        refdata = @refdata[ean]
+        if lang == :de
+          name = (refdata && refdata[:desc_de]) ? refdata[:desc_de] : obj[:sequence_name]
+        elsif lang == :fr
+          name = (refdata && refdata[:desc_fr]) ? refdata[:desc_fr] : obj[:sequence_name]
+        else
+          return '--missing--'
+        end
+        return '--missing--' if !name || name.empty? || name.length < 3
+        name
+      end
+      def override(xml, id, field, default_value)
+        has_overrides =  /\d{13}/.match(id.to_s) ? @@article_overrides[id.to_i] : @@product_overrides[id.to_i]
+        unless (has_overrides && has_overrides[field.to_s])
+          cmd = "xml.#{field} \"#{default_value.gsub('"','')}\""
+        else
+          new_value = has_overrides[field.to_s]
+          if new_value.to_s.eql?(default_value.to_s)
+            xml.comment('obsolete override')
+            cmd = "xml.#{field} \"#{new_value}\""
+          else
+            xml.comment("override #{default_value} with")
+            cmd ="xml.#{field} \"#{new_value}\""
+          end
+        end
+        eval cmd
+      end
+      prepare_limitations
+      prepare_articles
+      prepare_products
+      # set suppress_composition_parsing to  debug errors which occur only when working on the full data set
+      prepare_calc_items # (suppress_composition_parsing: true)
+      nr_products = 0
+      nr_articles = 0
+      used_limitations = []
+      old_rose_size = @infos_zur_rose.size
+      @infos_zur_rose.each do |ean13, value|
+        if /^7680/.match(ean13.to_s) && @options[:artikelstamm_v4]
+          @infos_zur_rose.delete(ean13)
+        end
+      end
+      new_rose_size = @infos_zur_rose.size
+      Oddb2xml.log "build_artikelstamm_v4: Deleted #{old_rose_size - new_rose_size} entries from ZurRose where GTIN start with 7680 (Swissmedic)"
+      Oddb2xml.log "build_artikelstamm_v4 #{nr_products} of #{@products.size} articles and ignore #{@@gtin2ignore.size} GTINS"
+      _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
+        xml.doc.tag_suffix = @tag_suffix
+        datetime = Time.new.strftime('%FT%T%z')
+        elexis_strftime_format = "%FT%T\.%L%:z"
+        options_v4 =  {
+          'xmlns'  => 'http://elexis.ch/Elexis_Artikelstamm_v4',
+          'CREATION_DATETIME' => Time.new.strftime(elexis_strftime_format),
+          'BUILD_DATETIME'    => Time.new.strftime(elexis_strftime_format),
+          'VERSION_ID' => '0',
+          'LANG' => 'DE',
+          'MONTH' => Date.today.month,
+          'YEAR' => Date.today.year,
+          'SET_TYPE' => 'F',
+          }
+        options_v4['VERSION_ID'] = 0
+        xml.ARTIKELSTAMM(options_v4) do
+          xml.PRODUCTS do
+            products = @products.sort_by { |ean13, obj| ean13 }
+            products.each do |product|
+              ean13 = product[0]
+              obj = product[1]
+              next if /^Q/i.match(obj[:atc])
+              sequence = obj[:seq]
+              ean = obj[:ean]
+              next unless check_name(obj, :de)
+              ppac = ((_ppac = @packs[ean.to_s[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
+              unless ppac
+                ppac = @packs.find{|pac| pac.ean == ean }.first
+              end
+              prodno = ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
+              next unless prodno
+              next unless sequence && sequence[:name_de]
+              nr_products += 1
+              xml.PRODUCT do
+                xml.PRODNO prodno
+                if sequence
+                  override(xml, prodno, :DSCR,  (sequence[:name_de] + ' ' + sequence[:desc_de]).strip)
+                  override(xml, prodno, :DSCRF, (sequence[:name_fr] + ' ' + sequence[:desc_fr]).strip)
+                end
+                xml.ATC obj[:atc] if obj[:atc] and !obj[:atc].empty?
+                if (first_package = sequence[:packages].values.first) &&
+                   (first_limitation = first_package[:limitations].first)
+                  lim_code = first_limitation[:code]
+                  used_limitations << lim_code unless used_limitations.index(lim_code)
+                  xml.LIMNAMEBAG lim_code
+                end
+                if sequence && sequence[:substances]
+                  value = nil
+                  if sequence[:substances].size > 1
+                    value = 'Verschiedene Kombinationen'
+                  elsif sequence[:substances].first
+                    value = sequence[:substances].first[:name]
+                  else
+                    value = obj[:sub]
+                  end
+                  override(xml, prodno, :SUBSTANCE, value) if value
+                end
+              end
+            end
+          end
+          xml.LIMITATIONS do
+            @limitations.sort! { |left, right| left[:code] <=> right[:code] }
+            @limitations.each do |lim|
+              next unless used_limitations.index(lim[:code])
+              xml.LIMITATION do
+                xml.LIMNAMEBAG lim[:code] # original LIMCD
+                xml.DSCR       lim[:desc_de]
+                xml.DSCRF      lim[:desc_fr]
+              end
+            end
+          end
+
+          xml.ITEMS do
+            gtins_to_article = {}
+            @articles.each {|article| gtins_to_article[article[:ean]] = article }
+            gtins_to_article
+            gtins = gtins_to_article.keys + @infos_zur_rose.keys
+            gtins = (gtins-@@gtin2ignore)
+            gtins.sort!.uniq!
+            @nr_articles = gtins.size
+            gtins.each do |ean13|
+              obj = gtins_to_article[ean13] || @infos_zur_rose[ean13]
+              nr_articles += 1
+              ean13 = 0 if sprintf('%013d', ean13).match(/^000000/)
+              next if ean13 == 0
+              Oddb2xml.log "build_article #{nr_articles} of #{gtins.size} articles" if nr_articles % 5000 == 0
+              item = @items[ean13]
+              pac,no8 = nil,ean13.to_s[4..11] # BAG-XML(SL/LS)
+              pack_info = nil
+              pack_info = @packs[no8.intern] if no8 # info from Packungen.xlsx from swissmedic_info
+              next if pack_info && /Tierarzneimittel/.match(pack_info[:list_code])
+              next if obj[:desc_de] && /ad us vet/i.match(obj[:desc_de])
+              pharma_code = obj[:pharmacode]
+              if sequence = obj[:seq]
+                pac = sequence[:packages][obj[:pharmacode]]
+                pac = sequence[:packages][ean13] unless pac
+              else
+                pac = @items[ean13][:packages][ean13] if @items and ean13 and @items[ean13] and @items[ean13][:packages]
+              end
+              if no8
+                ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
+              end
+              if sequence
+                sequence[:packages].each do |ean13, package|
+                  xml.ITEM( 'PHARMATYPE' => 'P') do
+                    xml.GTIN package[:ean]
+                    xml.PHAR pharma_code if pharma_code
+                    xml.DSCR obj[:desc_de]
+                    xml.DSCRF obj[:desc_fr]
+                    xml.COMP  do
+                      xml.GLN obj[:company_ean]
+                    end
+                    xml.PEXF package[:prices][:exf_price][:price] if package[:prices][:exf_price][:price] &&
+                        !package[:prices][:exf_price][:price].empty?
+                    xml.PPUB package[:prices][:pub_price][:price]
+                    info = @calc_items[ean13.to_s]
+                    if info && info.pkg_size && !info.pkg_size.empty?
+                      # skip some invalid PKG_SIZE like 2 x 30 g, 2,5, 2.5, 80/8
+                      xml.PKG_SIZE  info.pkg_size unless /[ x,\.+\/]/i.match(info.pkg_size)
+                    end
+                    if info
+                      if info.pkg_size && info.measure
+                        xml.PKG_SIZE_STRING   info.pkg_size + ' ' + info.measure
+                      elsif info.pkg_size
+                        xml.PKG_SIZE_STRING   info.pkg_size
+                      elsif info.measure
+                        xml.PKG_SIZE_STRING   info.measure
+                      end
+                    end
+                    xml.SL_ENTRY          'true' if  @items[ean13]
+                    xml.IKSCAT            package[:swissmedic_category]
+                    xml.GENERIC_TYPE      sequence[:org_gen_code] if sequence[:org_gen_code] && !sequence[:org_gen_code].empty?
+                    xml.DEDUCTIBLE        sequence[:deductible] == 'N' ? 10 : 20
+                    xml.PRODNO            ppac[:prodno] if ppac && ppac[:prodno] # ean13.to_s[4..11]
+                    override(xml, ean13, :MEASURE, info.measure) if info
+                  end
+                end
+              else # non pharma
+                xml.ITEM( 'PHARMATYPE' => 'N') do
+                  xml.GTIN ean13
+                  xml.PHAR pharma_code      if pharma_code
+                  xml.DSCR obj[:desc_de] || obj[:description] # for description for zur_rose
+                  xml.DSCRF obj[:desc_fr] || '--missing--'
+                  xml.COMP  do
+                    xml.GLN obj[:company_ean]
+                  end if obj[:company_ean]
+                  xml.PEXF obj[:price]      if obj[:price] && !obj[:price].empty?
+                  xml.PPUB obj[:pub_price]  if obj[:pub_price]
+                end
+              end
+            end
+          end
+        end
+      end
+      Oddb2xml.log "build_artikelstamm_v4. Done #{nr_products} of #{@products.size} products, #{@limitations.size} limitations and #{nr_articles} articles"
+      # we don't add a SHA256 hash for each element in the article
+      # Oddb2xml.add_hash(_builder.to_xml)
+      # doc = REXML::Document.new( source, { :raw => :all })
+      # doc.write( $stdout, 0 )
+      lines = []
+      lines << "  - #{sprintf('%5d', @products.size)} products"
+      lines << "  - #{sprintf('%5d', @limitations.size)} limitations"
+      lines << "  - #{sprintf('%5d', @nr_articles)} articles"
+      lines << "  - #{sprintf('%5d', @@gtin2ignore.size)} ignored GTINS"
+      @@articlestamm_v4_info_lines = lines
+      _builder.to_xml({:indent => 4, :encoding => 'UTF-8'})
+    end
+    def self.articlestamm_v4_info_lines
+      @@articlestamm_v4_info_lines
+    end
   end
 end

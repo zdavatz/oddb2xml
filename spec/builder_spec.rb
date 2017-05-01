@@ -450,6 +450,12 @@ def checkProductXml(nbr_record = -1)
   expect(hirudoid.elements['ATC'].text).to eq('C05BA01') # modified by atc.csv!
 end
 
+def check_artikelstamm_v4_xml(key, expected_value)
+  expect(@artikelstamm_v4_name).not_to be nil
+  expect(@inhalt).not_to be nil
+  expect(@inhalt.index(expected_value)).not_to be nil
+end
+
 describe Oddb2xml::Builder do
   NrExtendedArticles = 34
   NrSubstances = 14
@@ -949,6 +955,158 @@ if RUN_ALL
       out = Oddb2xml.convert_to_8859_1(lines.first)
       expect(out.encoding.to_s).to eq 'ISO-8859-1'
       expect(out.chomp).to eq '<NAME_DE>SENSURA Mio 1t Uro 10-33 midi con lig so op 10 Stk</NAME_DE>'
+
+  context 'when artikelstamm_v4 option is given' do
+    before(:all) do
+      common_run_init
+      options = Oddb2xml::Options.new
+      options.parser.parse!(['--artikelstamm_v4']) # , '--log'])
+      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      Oddb2xml::Cli.new(options.opts).run # to debug
+      @artikelstamm_v4_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v4.xml")
+      @doc = Nokogiri::XML(File.open(@artikelstamm_v4_name))
+      # @rexml = REXML::Document.new File.read(@artikelstamm_v4_name)
+      @inhalt = IO.read(@artikelstamm_v4_name)
+    end
+
+    context 'should return produce a artikelstamm_v4.xml' do
+      @artikelstamm_v4_name = File.join(Oddb2xml::WorkDir, 'artikelstamm_v4.xml')
+
+      it 'should exist' do
+        expect(File.exists?(@artikelstamm_v4_name)).to eq true
+      end
+
+      it 'should not contain a GTIN=0' do
+        expect(IO.read(@artikelstamm_v4_name).index('GTIN>0')).to be nil
+      end
+
+      tests = {
+        'item 4042809018288 TENSOPLAST' =>
+      %(<ITEM PHARMATYPE="N">
+            <GTIN>4042809018288</GTIN>
+            <PHAR>55805</PHAR>
+            <DSCR>TENSOPLAST Kompressionsbinde 5cmx4.5m</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>0.00</PEXF>
+            <PPUB>15.00</PPUB>
+        </ITEM>),
+        'product 5366201 3TC' =>
+      %(<PRODUCT>
+            <PRODNO>5366201</PRODNO>
+            <DSCR>3TC Filmtabl 150 mg</DSCR>
+            <DSCRF>3TC cpr pell 150 mg</DSCRF>
+            <ATC>J05AF05</ATC>),
+                'product 3536601 kendural' => %(<PRODUCT>
+            <PRODNO>3536601</PRODNO>
+            <!--override Kendural Depottabl with-->
+            <DSCR>KENDURAL Depottabl</DSCR>
+            <!--override Kendural cpr dépôt with-->
+            <DSCRF>--missing--</DSCRF>
+            <ATC>B03AE10</ATC>
+            <SUBSTANCE>Verschiedene Kombinationen</SUBSTANCE>
+        </PRODUCT>),
+        'item 7680353660163 KENDURAL' =>
+                %(<ITEM PHARMATYPE="P">
+            <GTIN>7680353660163</GTIN>
+            <PHAR>20273</PHAR>
+            <DSCR>KENDURAL Depottabl 30 Stk</DSCR>
+            <DSCRF>KENDURAL cpr dépot 30 pce</DSCRF>
+            <COMP>
+                <GLN>7601001374539</GLN>
+            </COMP>
+            <PEXF>4.4606</PEXF>
+            <PPUB>8.25</PPUB>
+            <PKG_SIZE>30</PKG_SIZE>
+            <PKG_SIZE_STRING>30 Tablette(n)</PKG_SIZE_STRING>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>C</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>3536601</PRODNO>
+            <!--obsolete override-->
+            <MEASURE>Tablette(n)</MEASURE>
+        </ITEM>),
+        'item 7680161050583 HIRUDOID' =>
+         %(<ITEM PHARMATYPE="P">
+            <GTIN>7680161050583</GTIN>
+            <PHAR>2731179</PHAR>
+            <DSCR>HIRUDOID Creme 3 mg/g 40 g</DSCR>
+            <DSCRF>HIRUDOID crème 3 mg/g 40 g</DSCRF>
+            <COMP>
+                <GLN>7601001002258</GLN>
+            </COMP>
+            <PEXF>4.768575</PEXF>
+            <PPUB>8.8</PPUB>
+            <PKG_SIZE>40</PKG_SIZE>
+            <PKG_SIZE_STRING>40 g</PKG_SIZE_STRING>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>D</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>1610501</PRODNO>
+            <MEASURE>g</MEASURE>
+        </ITEM>),
+        'item 7680284860144 ANCOPIR' =>
+        %(<ITEM PHARMATYPE="P">
+            <GTIN>7680284860144</GTIN>
+            <PHAR>177804</PHAR>
+            <DSCR>ANCOPIR Inj Lös 5 Amp 2 ml</DSCR>
+            <DSCRF>ANCOPIR sol inj 5 amp 2 ml</DSCRF>
+            <COMP>
+                <GLN>7601001029880</GLN>
+            </COMP>
+            <PEXF>3.83</PEXF>
+            <PPUB>8.5</PPUB>
+            <PKG_SIZE_STRING>5 x 2 ml Ampulle(n)</PKG_SIZE_STRING>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>B</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>2848601</PRODNO>
+            <MEASURE>Ampulle(n)</MEASURE>
+        </ITEM>)
+              }
+
+      tests.each do |key, expected|
+        it "should a valid entry for #{key}" do
+          check_artikelstamm_v4_xml(key, expected)
+        end
+      end
+
+      it 'should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
+        skip("Where does the DSCR for 4042809018288 come from. It should be TENSOPLAST bande compression 5cmx4.5m")
+      end
+
+      it 'should ignore GTIN 7680172330414' do
+        # Took to much time to construct an example. Should change VCR
+        skip("No time to check that data/gtin2ignore.yaml has an effect")
+        @inhalt = IO.read(@artikelstamm_v4_name)
+        expect(@inhalt.index('7680172330414')).to be nil
+      end
+
+      it 'should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
+        skip("Where does the COMP GLN for 4042809018288 come from. It should be 7601003468441")
+      end
+
+      it 'shoud contain Lamivudinum as 3TC substance' do
+        @inhalt = IO.read(@artikelstamm_v4_name)
+        expect(@inhalt.index('<SUBSTANCE>Lamivudinum</SUBSTANCE>')).not_to be nil
+      end
+
+      it 'should validate against artikelstamm_v4.xsd' do
+        VCR.eject_cassette; VCR.insert_cassette('artikelstamm')
+        require 'open-uri'
+        xsd =open('https://raw.githubusercontent.com/elexis/elexis-3-base/master/at.medevit.ch.artikelstamm/lib/Elexis_Artikelstamm_v4.xsd').read
+        # on the command line you might run
+        # xmllint --noout --schema Elexis_Artikelstamm_v4.xsd spec/run/artikelstamm_v4.xml
+        xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
+        file = @artikelstamm_v4_name
+        doc = Nokogiri::XML(File.read(file))
+        xsd_rtikelstamm_xml.validate(doc).each do
+          |error|
+            if error.message
+              puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@artikelstamm_v4_xsd}"
+            end
+            expect(error.message).to be_nil, "expected #{error.message} to be nil\nfor #{file} content \n#{File.read(file)}"
+        end
+      end
     end
   end
 end

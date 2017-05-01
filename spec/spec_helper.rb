@@ -162,7 +162,7 @@ module ServerMockHelper
     dirs.each{ |dir| FileUtils.makedirs(dir, :verbose => false) }
     cleanup_compressor
   end
-  
+
   def setup_server_mocks
     puts "Skip setup_server_mocks as we want to use vcr"
   end

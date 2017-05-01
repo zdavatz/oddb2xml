@@ -2,7 +2,7 @@
 require 'optparse'
 
 module Oddb2xml
-  
+
   class Options
     attr_reader :parser, :opts
     def Options.default_opts
@@ -10,6 +10,7 @@ module Oddb2xml
         :fi           => false,
         :adr          => false,
         :address      => false,
+        :artikelstamm_v4 => false,
         :nonpharma    => false,
         :extended     => false,
         :compress_ext => nil,
@@ -30,6 +31,7 @@ Usage:
   oddb2xml [option]
     produced files are found under data
     -a,   --append       Additional target nonpharma
+          --artikelstamm_v4 Create Artikelstamm Version 4 for Elexis
     -c F, --compress=F   Compress format F. {tar.gz|zip}
     -e    --extended     pharma, non-pharma plus prices and non-pharma from zurrose.
                          Products without EAN-Code will also be listed.
@@ -60,6 +62,10 @@ EOS
     def initialize
       @parser = OptionParser.new
       @opts   = Options.default_opts
+      @parser.on('--artikelstamm_v4')                      {|v| @opts[:artikelstamm_v4] = true
+                                                                @opts[:price] = :zurrose
+                                                                @opts[:extended] = true
+                                                           }
       @parser.on('-a',   '--append')                       {|v| @opts[:nonpharma] = true }
       @parser.on('-c v', '--compress v',   /^tar\.gz|zip$/){|v| @opts[:compress_ext] = v }
       @parser.on('-e', '--extended')                       {|v| @opts[:extended] = true

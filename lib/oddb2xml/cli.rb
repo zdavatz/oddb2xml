@@ -11,7 +11,7 @@ require 'rubyXL'
 require 'date' # for today
 
 module Oddb2xml
-  
+
   class Cli
     attr_reader :options
     SUBJECTS  = %w[product article]
@@ -19,6 +19,7 @@ module Oddb2xml
     OPTIONALS = %w[fi fi_product]
     def initialize(args)
       @options = args
+      STDOUT.puts "\nStarting cli with from #{caller[1]}" if defined?(RSpec)
       Oddb2xml.save_options(@options)
       @mutex = Mutex.new
       # product
@@ -84,12 +85,11 @@ module Oddb2xml
     end
     private
     def build
-      Oddb2xml.log("Start build")
       begin
-        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not @options[:extended]
+        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not (@options[:extended] || @options[:artikelstamm_v4])
         files.each_pair do |sbj, file|
           builder = Builder.new(@options) do |builder|
-            if @options[:calc] and not @options[:extended]
+            if @options[:calc] and not  (@options[:extended] || @options[:artikelstamm_v4])
               builder.packs = @packs
               builder.subject = sbj
             elsif @options[:address]
@@ -302,7 +302,9 @@ module Oddb2xml
       unless @_files
         @_files = {}
         @_files[:calc] = "oddb_calc.xml" if @options[:calc]
-        if @options[:address]
+        if @options[:artikelstamm_v4]
+          @_files[:artikelstamm_v4] = "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v4.xml"
+        elsif @options[:address]
           @_files[:company] = "#{prefix}_betrieb.xml"
           @_files[:person]  = "#{prefix}_medizinalperson.xml"
         elsif @options[:format] == :dat
@@ -336,34 +338,40 @@ module Oddb2xml
         lines << Calc.report_conversion
         lines << ParseComposition.report
       end
-      unless @options[:address]
-        types.each do |type|
-          if @refdata_types[type]
-            indices = @refdata_types[type].values.flatten.length
-            if type == :nonpharma
-              nonpharmas = @refdata_types[type].keys
-              if SkipMigelDownloader
-                indices + nonpharmas.length
+      if  @options[:artikelstamm_v4]
+        lines << "Generated artikelstamm_v4.xml for Elexis"
+        lines += Builder.articlestamm_v4_info_lines
+      else
+        unless @options[:address]
+          types.each do |type|
+            if @refdata_types[type]
+              indices = @refdata_types[type].values.flatten.length
+
+              if type == :nonpharma
+                nonpharmas = @refdata_types[type].keys
+                if SkipMigelDownloader
+                  indices + nonpharmas.length
+                else
+                  migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode]}.map{|m| m[:pharmacode] }
+                  indices += (migel_xls - nonpharmas).length # ignore duplicates, null
+                end
+                lines << sprintf("\tNonPharma products: %i", indices)
               else
-                migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode]}.map{|m| m[:pharmacode] }
-                indices += (migel_xls - nonpharmas).length # ignore duplicates, null
+                lines << sprintf("\tPharma products: %i", indices)
               end
-              lines << sprintf("\tNonPharma products: %i", indices)
-            else
-              lines << sprintf("\tPharma products: %i", indices)
             end
           end
-        end
-        if @options[:extended]
-          lines << sprintf("\tInformation items zur Rose: %i", @infos_zur_rose.length)
-        end
-      else
-        {
-          'Betrieb' => :@companies,
-          'Person'  => :@people
-        }.each do |type, var|
-          lines << sprintf(
-            "#{type} addresses: %i", self.instance_variable_get(var).length)
+          if  (@options[:extended] || @options[:artikelstamm_v4])
+            lines << sprintf("\tInformation items zur Rose: %i", @infos_zur_rose.length)
+          end
+        else
+          {
+            'Betrieb' => :@companies,
+            'Person'  => :@people
+          }.each do |type, var|
+            lines << sprintf(
+              "#{type} addresses: %i", self.instance_variable_get(var).length)
+          end
         end
       end
       puts lines.join("\n")

@@ -3,7 +3,7 @@
 require 'pry'
 
 ALT = 'artikelstamm_150417.xml'
-NEU = 'artikelstamm_v4.xml'
+NEU = "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v4.xml"
 def compare_count(pattern)
   lines = []
   lines << "comparing count for #{pattern}"
@@ -24,7 +24,7 @@ def compare_count(pattern)
 end
 
 def check_via_xsd
-  `xmllint --noout --schema Elexis_Artikelstamm_v4.xsd artikelstamm_v4.xml`
+  `xmllint --noout --schema Elexis_Artikelstamm_v4.xsd #{NEU}`
 end
 
 def compare_gtin
