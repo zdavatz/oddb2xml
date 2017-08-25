@@ -620,9 +620,8 @@ describe Oddb2xml::Calc do
     Dir.chdir(Oddb2xml::WorkDir)
     VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
     @run_time_options = '--calc --skip-download'
-    @options = Oddb2xml::Options.new
-    @options.parser.parse!(@run_time_options.split(' '))
-    @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(@options.opts).run }
+    @options = Oddb2xml::Options.parse(@run_time_options)
+    @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(@options).run }
     expect(File.exists?(Oddb_calc_xml)).to eq true
     @doc = REXML::Document.new File.read(Oddb_calc_xml)
     @nokogiri = Nokogiri::XML(File.read(Oddb_calc_xml))

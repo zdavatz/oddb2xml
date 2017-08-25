@@ -41,6 +41,11 @@ The following additional data is in the files:
 The top elements of all XML files have a SHA256 attribute over their content. The content corresponds to Nokogiris text method of the node which is essentially join by "\n" + some whitespaces of each element.
 Consumers of the data file may use it to check whether they have to replace the corresponding nodes.
 
+With the option --artikelstamm_v5 it can also generate directly an artikelstamm usabel for Elexis which is needed for Elexis >= 3.3.
+
+With the option --artikelstamm_v3 it should also generate directly an artikelstamm usabel for Elexis which is needed for 3.0.x or 3.1.x.
+
+
 ## usage
 
 HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `https://download.hin.ch/download/oddb2xml`, e.g. using  `wget https://download.hin.ch/download/oddb2xml/oddb_article.xml`
@@ -341,3 +346,4 @@ for your currently open Terminal to download and set the Certificate.
 * we use the gem VCR to record real HTTP responses.
 ** Removing the directory fixtures and running @bundle exec rspec spec/downloader_spec.rb@ gets the actual content from the different servers
 ** To minimize the downloaded size we use several @before_record@ hooks to select the desired content, eg. only the 5 items from EPha.
+

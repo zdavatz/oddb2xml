@@ -7,194 +7,189 @@ describe Oddb2xml::Options do
   include ServerMockHelper
   Default_opts =  {
     :fi           => false,
-    :adr          => false,
     :address      => false,
-    :artikelstamm_v4 => false,
+    :artikelstamm_v3 => false,
+    :artikelstamm_v5 => false,
     :nonpharma    => false,
     :extended     => false,
     :compress_ext => nil,
     :format       => :xml,
     :calc         => false,
     :tag_suffix   => nil,
-    :debug        => false,
     :ean14        => false,
     :skip_download=> false,
     :log          => false,
     :percent      => nil,
+    :use_ra11zip  => nil,
   }
-  context 'when default_opts' do
-    specify { expect(Oddb2xml::Options.default_opts).to eq  Default_opts }
-  end
-
   context 'when no options is passed' do
-    options = Oddb2xml::Options.new
-    specify { expect(options.opts).to eq Default_opts }
+    test_opts = Oddb2xml::Options.parse('-a')
+    opts = Default_opts.clone
+    opts[:nonpharma] = true
+    specify { expect(test_opts).to eq opts }
   end
 
   context 'when -c tar.gz option is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-c tar.gz'.split(' '))
-    specify { expect(options.opts[:compress_ext]).to eq('tar.gz') }
+    test_opts = Oddb2xml::Options.parse('-c tar.gz')
+    specify { expect(test_opts[:compress_ext]).to eq('tar.gz') }
     expected = Default_opts.clone
     expected[:compress_ext] = 'tar.gz'
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -c tar.gz option --skip-download is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-c tar.gz --skip-download'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-c tar.gz --skip-download')
     expected = Default_opts.clone
     expected[:compress_ext] = 'tar.gz'
     expected[:skip_download] = true
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -c tar.gz option --skip-download is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-c tar.gz --skip-download'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-c tar.gz --skip-download')
     expected = Default_opts.clone
     expected[:compress_ext] = 'tar.gz'
     expected[:skip_download] = true
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -a is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-a'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-a')
     expected = Default_opts.clone
     expected[:nonpharma] =  true
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when --append is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('--append '.split(' '))
+    test_opts = Oddb2xml::Options.parse('--append ')
     expected = Default_opts.clone
     expected[:nonpharma] =  true
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -e is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-e'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-e')
     expected = Default_opts.clone
     expected[:extended]  =  true
     expected[:nonpharma] =  true
     expected[:calc]      =  true
     expected[:price]      = :zurrose
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -e -I 80 is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-e -I 80'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-e -I 80')
     expected = Default_opts.clone
     expected[:extended]  =  true
     expected[:nonpharma] =  true
     expected[:calc]      =  true
     expected[:price]      = :zurrose
     expected[:percent]    = 80
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -f dat is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-f dat'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-f dat')
     expected = Default_opts.clone
     expected[:format]  =  :dat
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -f dat -I 80 is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-f dat -I 80'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-f dat -I 80')
     expected = Default_opts.clone
     expected[:format]  =  :dat
     expected[:percent] = 80
     expected[:price]   = :zurrose
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -I 80 is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-I 80'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-I 80')
     expected = Default_opts.clone
     expected[:percent]   = 80
     expected[:price]   = :zurrose
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -o is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-o'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-o')
     expected = Default_opts.clone
     expected[:fi]  =  true
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -i ean14 is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-i ean14'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-i ean14')
     expected = Default_opts.clone
     expected[:ean14]  =  true
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -x addr is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-x addr'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-x addr')
     expected = Default_opts.clone
     expected[:address]  =  true
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -p zurrose is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-p zurrose'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-p zurrose')
     expected = Default_opts.clone
     expected[:price]  =  :zurrose
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -o fi --log is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-o fi --log'.split(' '))
+    test_opts = Oddb2xml::Options.parse('-o fi --log')
     expected = Default_opts.clone
     expected[:fi]  =  true
     expected[:log]  =  true
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -a nonpharma -p zurrose is given' do
-    options = Oddb2xml::Options.new
-    args = '-a nonpharma -p zurrose'.split(' ')
-    options.parser.parse!(args) # .should raise
+    args = '-a nonpharma -p zurrose'
+    test_opts = Oddb2xml::Options.parse(args) # .should raise
     expected = Default_opts.clone
     expected[:price]  =  :zurrose
     expected[:nonpharma]  =  true
-    specify { expect(options.opts).to eq expected }
-    specify { expect(args).to eq ["nonpharma", "zurrose"] } # will lead to an exit 2 in bin/oddb2xml
+    specify { expect(test_opts).to eq expected }
   end
 
-  context 'when --artikelstamm_v4 is given' do
-    options = Oddb2xml::Options.new
-    args = '--artikelstamm_v4'.split(' ')
-    options.parser.parse!(args) # .should raise
+  context 'when --artikelstamm_v5 is given' do
+    args = '--artikelstamm-v5'
+    test_opts = Oddb2xml::Options.parse(args) # .should raise
     expected = Default_opts.clone
     expected[:price]  =  :zurrose
     expected[:extended]  =  true
-    expected[:artikelstamm_v4]  =  true
-    specify { expect(options.opts).to eq expected }
-    specify { expect(args).to eq [] }
+    expected[:artikelstamm_v5]  =  true
+    specify { expect(test_opts).to eq expected }
   end
 
   context 'when -c tar.gz option is given' do
-    options = Oddb2xml::Options.new
-    options.parser.parse!('-c tar.gz'.split(' '))
-    specify { expect(options.opts[:compress_ext]).to eq('tar.gz') }
+    test_opts = Oddb2xml::Options.parse('-c tar.gz')
+    specify { expect(test_opts[:compress_ext]).to eq('tar.gz') }
     expected = Default_opts.clone
     expected[:compress_ext] = 'tar.gz'
-    specify { expect(options.opts).to eq expected }
+    specify { expect(test_opts).to eq expected }
+  end
+
+  context 'when  --use-ra11zip is given' do
+    test_opts = Oddb2xml::Options.parse(' --use-ra11zip some_other_zip')
+    expected = Default_opts.clone
+    expected[:use_ra11zip] = 'some_other_zip'
+    # expected[:price]  =  :zurrose
+    # expected[:extended]  =  true
+    # expected[:artikelstamm_v5]  =  true
+    specify { expect(test_opts).to eq expected }
+  end
+
+  context 'when -t swiss is given' do
+    test_opts = Oddb2xml::Options.parse('-t swiss')
+    expected = Default_opts.clone
+    expected[:tag_suffix]  =  'swiss'
+    specify { expect(test_opts).to eq expected }
   end
 
 end

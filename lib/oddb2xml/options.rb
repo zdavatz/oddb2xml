@@ -1,91 +1,83 @@
 # encoding: utf-8
-require 'optparse'
+require 'trollop'
 
 module Oddb2xml
+  module Options
+    def self.parse(args =ARGV)
+      if args.is_a?(String)
+        args = args.split(' ') 
+      end
 
-  class Options
-    attr_reader :parser, :opts
-    def Options.default_opts
-      {
-        :fi           => false,
-        :adr          => false,
-        :address      => false,
-        :artikelstamm_v4 => false,
-        :nonpharma    => false,
-        :extended     => false,
-        :compress_ext => nil,
-        :format       => :xml,
-        :calc         => false,
-        :tag_suffix   => nil,
-        :debug        => false,
-        :ean14        => false,
-        :skip_download=> false,
-        :log          => false,
-        :percent      => nil,
-      }
-    end
-    def Options.help
-  <<EOS
-#$0 ver.#{Oddb2xml::VERSION}
-Usage:
-  oddb2xml [option]
-    produced files are found under data
-    -a,   --append       Additional target nonpharma
-          --artikelstamm_v4 Create Artikelstamm Version 4 for Elexis
-    -c F, --compress=F   Compress format F. {tar.gz|zip}
-    -e    --extended     pharma, non-pharma plus prices and non-pharma from zurrose.
-                         Products without EAN-Code will also be listed.
-                         File oddb_calc.xml will also be generated
-    -f F, --format=F     File format F, default is xml. {xml|dat}
-                         If F is given, -o option is ignored.
-    -I x, --increment=x  Increment price by x percent. Forces -f dat -p zurrose.
-    -I x, --increment=x  create additional field price_resellerpub as
-                         price_extfactory incremented by x percent (rounded to the next 0.05 francs)
-                         in oddb_article.xml. In generated zurrose_transfer.dat PRPU is set to this price
-                         Forces -f dat -p zurrose.
-    -i,   --include      Include target option for ean14  for 'dat' format.
-                         'xml' format includes always ean14 records.
-    -o,   --option       Optional fachinfo output.
-    -p,   --price        Price source (transfer.dat) from ZurRose
-    -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9]
-                         If S is given, it is also used as prefix of filename.
-    -x N, --context=N    context N {product|address}. product is default.
-    --calc               create only oddb_calc.xml with GTIN, name and galenic information
-
-                         For debugging purposes
-    --skip-download      skips downloading files it the file is already under downloads.
-                         Downloaded files are saved under downloads
-    --log                log important actions
-    -h,   --help         Show this help message.
+      @opts = Trollop::options(args) do
+        version "#$0 ver.#{Oddb2xml::VERSION}"
+        banner <<-EOS
+        Usage:
+        oddb2xml [option]
+          produced files are found under data
 EOS
-    end
-    def initialize
-      @parser = OptionParser.new
-      @opts   = Options.default_opts
-      @parser.on('--artikelstamm_v4')                      {|v| @opts[:artikelstamm_v4] = true
-                                                                @opts[:price] = :zurrose
-                                                                @opts[:extended] = true
-                                                           }
-      @parser.on('-a',   '--append')                       {|v| @opts[:nonpharma] = true }
-      @parser.on('-c v', '--compress v',   /^tar\.gz|zip$/){|v| @opts[:compress_ext] = v }
-      @parser.on('-e', '--extended')                       {|v| @opts[:extended] = true
-                                                              @opts[:nonpharma] = true
-                                                              @opts[:price] = :zurrose
-                                                              @opts[:calc] = true
-                                                            }
-      @parser.on('-f v', '--format v',     /^xml|dat$/)    {|v| @opts[:format] = v.intern }
-      @parser.on('--calc')                                 {|v| @opts[:calc] = true }
-      @parser.on('-o',   '--option')                       {|v| @opts[:fi] = true }
-      @parser.on('-I v', '--increment v',  /^[0-9]+$/)     {|v| @opts[:percent] = v ? v.to_i : 0
-                                                                @opts[:price] = :zurrose
-                                                           }
-      @parser.on('-i',   '--include')                      {|v| @opts[:ean14] = true }
-      @parser.on('-t v', '--tag-suffix v', /^[A-z0-9]*$/i) {|v| @opts[:tag_suffix] = v.upcase }
-      @parser.on('-x v', '--context v',    /^addr(ess)*$/i){|v| @opts[:address] = true }
-      @parser.on('-p', '--price')                          {|v| @opts[:price] = :zurrose }
-      @parser.on('--skip-download')                        {|v| @opts[:skip_download] = true }
-      @parser.on('--log')                                  {|v| @opts[:log] = true }
-      @parser.on_tail('-h', '--help') { puts Options.help; exit }
+        opt :append,       "Additional target nonpharma", :default => false
+        opt :artikelstamm_v3, "Create Artikelstamm Version 3 for Elexis 3.1"
+        opt :artikelstamm_v5, "Create Artikelstamm Version 5 for Elexis >= 3.3"
+        opt :compress_ext,     "format F. {tar.gz|zip}", :type => :string, :default => nil, :short => 'c'
+        opt :extended,     "pharma, non-pharma plus prices and non-pharma from zurrose.
+                            Products without EAN-Code will also be listed.
+                            File oddb_calc.xml will also be generated"
+        opt :format,        "File format F, default is xml. {xml|dat}
+                            If F is given, -o option is ignored.", :type => :string, :default => 'xml'
+        opt :include,       "Include target option for ean14  for 'dat' format.
+                            'xml' format includes always ean14 records.", :short => 'i'
+        opt :increment,     "Increment price by x percent. Forces -f dat -p zurrose.
+                            create additional field price_resellerpub as
+                            price_extfactory incremented by x percent (rounded to the next 0.05 francs)
+                            in oddb_article.xml. In generated zurrose_transfer.dat PRPU is set to this price
+                            Forces -f dat -p zurrose.", :type => :int, :default => nil, :short => 'I'
+        opt :fi,            "Optional fachinfo output.", :short => 'o'
+        opt :price,         "Price source (transfer.dat) from ZurRose", :default => nil
+        opt :tag_suffix,   "XML tag suffix S. Default is none. [A-z0-9]
+                            If S is given, it is also used as prefix of filename.", :type => :string, :short => 't'
+        opt :context,       "{product|address}. product is default.", :default => 'product', :type => :string, :short => 'x'
+        opt :calc,          "create only oddb_calc.xml with GTIN, name and galenic information"
+
+        opt :skip_download, "skips downloading files it the file is already under downloads.
+                            Downloaded files are saved under downloads"
+        opt :log,           "log important actions", :short => :none
+        opt :use_ra11zip,   "Use the ra11.zip (a zipped transfer.dat from Galexis)",
+                            :default => File.exist?('ra11.zip') ? 'ra11.zip' : nil, :type => :string
+      end
+          
+      @opts[:percent] = @opts[:increment]
+      if @opts[:increment] 
+        @opts[:nonpharma] = true
+        @opts[:price] = :zurrose
+      end
+      @opts[:ean14]  = @opts[:increment]
+      @opts.delete(:increment)
+      @opts[:nonpharma] = @opts[:append]
+      @opts.delete(:append)
+      if @opts[:extended] 
+        @opts[:nonpharma] = true
+        @opts[:price] = :zurrose
+        @opts[:calc] = true
+      end
+      if @opts[:artikelstamm_v5]
+        @opts[:extended] = true
+        @opts[:price] = :zurrose
+      end      
+      @opts[:price] = :zurrose if @opts[:price].is_a?(TrueClass)
+      @opts[:price]  = @opts[:price].to_sym if @opts[:price]
+      @opts[:ean14] = @opts[:include]
+      @opts[:format] = @opts[:format].to_sym if @opts[:format]
+      @opts.delete(:include)
+      @opts.delete(:help)
+      @opts.delete(:version)
+
+      @opts[:address]  = false
+      @opts[:address]  = true  if /^addr(ess)*$/i.match(@opts[:context])
+      @opts.delete(:context)
+
+      @opts.delete(:price) unless @opts[:price]
+
+      @opts.each{|k,v| @opts.delete(k) if /_given$/.match(k.to_s)}
     end
   end
 end

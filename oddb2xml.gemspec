@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   # hoping that these version fix only security/severe bugs
   # Consulted the Gemfile.lock to get
   spec.add_dependency 'rubyzip'#, '~> 1.1.3'
-  spec.add_dependency 'archive-tar-minitar'#, '~> 0.5.2'
+  spec.add_dependency 'minitar'#, '~> 0.5.2'
   spec.add_dependency 'mechanize'#, '~> 2.5.1'
   spec.add_dependency 'nokogiri', '~> 1.6.0'
   spec.add_dependency 'savon'#, '~> 2.11.0'
@@ -33,6 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'multi_json'#, '>= 0.3.2'
   spec.add_dependency 'rack', '< 2.0'
   spec.add_dependency 'httpi' #, '>= 2.4.1'
+  spec.add_dependency 'trollop' #, '>= 2.4.1'
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"

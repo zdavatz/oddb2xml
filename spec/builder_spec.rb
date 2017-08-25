@@ -450,8 +450,8 @@ def checkProductXml(nbr_record = -1)
   expect(hirudoid.elements['ATC'].text).to eq('C05BA01') # modified by atc.csv!
 end
 
-def check_artikelstamm_v4_xml(key, expected_value)
-  expect(@artikelstamm_v4_name).not_to be nil
+def check_artikelstamm_v5_xml(key, expected_value)
+  expect(@artikelstamm_v5_name).not_to be nil
   expect(@inhalt).not_to be nil
   expect(@inhalt.index(expected_value)).not_to be nil
 end
@@ -481,9 +481,7 @@ describe Oddb2xml::Builder do
   context 'when default options are given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.new
-      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
-      Oddb2xml::Cli.new(options.opts).run # to debug
+      Oddb2xml::Cli.new({}).run # to debug
       @doc = Nokogiri::XML(File.open(oddb_article_xml))
       @rexml = REXML::Document.new File.read(oddb_article_xml)
     end
@@ -563,10 +561,9 @@ describe Oddb2xml::Builder do
       common_run_init
       @oddb_fi_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_fi.xml'))
       @oddb_fi_product_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_fi_product.xml'))
-      options = Oddb2xml::Options.new
-      options.parser.parse!(['-o'])
-      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
-      Oddb2xml::Cli.new(options.opts).run
+      options = Oddb2xml::Options.parse(['-o'])
+      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
+      Oddb2xml::Cli.new(options).run
     end
 
     it 'should have a correct NBR_RECORD in oddb_fi_product.xml' do
@@ -608,10 +605,9 @@ if RUN_ALL
   context 'when -f dat is given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-f dat --log'.split(' '))
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
-      # Oddb2xml::Cli.new(options.opts).run # to debug
+      options = Oddb2xml::Options.parse('-f dat --log')
+      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
+      # Oddb2xml::Cli.new(options).run # to debug
     end
 
     it 'should contain the correct values fo CMUT from transfer.dat' do
@@ -632,10 +628,8 @@ if RUN_ALL
   context 'when --append -f dat is given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.new
-      options.parser.parse!('--append -f dat'.split(' '))
-      # Oddb2xml::Cli.new(options.opts).run
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      options = Oddb2xml::Options.parse('--append -f dat')
+      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
     end
 
     it 'should generate a valid oddb_with_migel.dat' do
@@ -657,10 +651,9 @@ if RUN_ALL
   context 'when --append -I 80 -e is given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.new
-      options.parser.parse!('--append -I 80 -e'.split(' '))
-      Oddb2xml::Cli.new(options.opts).run
-      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      options = Oddb2xml::Options.parse('--append -I 80 -e')
+      Oddb2xml::Cli.new(options).run
+      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
     end
 
     it "oddb_article with stuf from ZurRose", :skip => "ZurRose contains ERYTHROCIN i.v. Troc*esteekensub 1000 mg Amp [!]" do
@@ -692,13 +685,13 @@ if RUN_ALL
   context 'when option -e is given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-e'.split(' '))
-      Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-e')
+      puts options
+      Oddb2xml::Cli.new(options)
       if RUN_ALL
-        @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+        @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
       else
-        Oddb2xml::Cli.new(options.opts).run
+        Oddb2xml::Cli.new(options).run
       end
     end
 
@@ -870,9 +863,8 @@ if RUN_ALL
   context 'testing -e -I 80 option' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-e -I 80'.split(' '))
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      options = Oddb2xml::Options.parse('-e -I 80')
+      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
     end
 
     it 'should add 80 percent to zur_rose pubbprice' do
@@ -908,9 +900,8 @@ if RUN_ALL
   context 'when -f dat -p is given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-f dat -p'.split(' '))
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      options = Oddb2xml::Options.parse('-f dat -p')
+      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
     end
 
     it 'should report correct number of items' do
@@ -932,9 +923,8 @@ if RUN_ALL
   context 'when -f dat -I 80 is given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-f dat -I 80'.split(' '))
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
+      options = Oddb2xml::Options.parse('-f dat -I 80')
+      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
     end
 
     it 'should report correct number of items' do
@@ -956,28 +946,27 @@ if RUN_ALL
       expect(out.encoding.to_s).to eq 'ISO-8859-1'
       expect(out.chomp).to eq '<NAME_DE>SENSURA Mio 1t Uro 10-33 midi con lig so op 10 Stk</NAME_DE>'
 
-  context 'when artikelstamm_v4 option is given' do
+  context 'when artikelstamm_v5 option is given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.new
-      options.parser.parse!(['--artikelstamm_v4']) # , '--log'])
-      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options.opts).run }
-      Oddb2xml::Cli.new(options.opts).run # to debug
-      @artikelstamm_v4_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v4.xml")
-      @doc = Nokogiri::XML(File.open(@artikelstamm_v4_name))
-      # @rexml = REXML::Document.new File.read(@artikelstamm_v4_name)
-      @inhalt = IO.read(@artikelstamm_v4_name)
+      options = Oddb2xml::Options.parse(['--artikelstamm-v4']) # , '--log'])
+      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
+      Oddb2xml::Cli.new(options).run # to debug
+      @artikelstamm_v5_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml")
+      @doc = Nokogiri::XML(File.open(@artikelstamm_v5_name))
+      # @rexml = REXML::Document.new File.read(@artikelstamm_v5_name)
+      @inhalt = IO.read(@artikelstamm_v5_name)
     end
 
-    context 'should return produce a artikelstamm_v4.xml' do
-      @artikelstamm_v4_name = File.join(Oddb2xml::WorkDir, 'artikelstamm_v4.xml')
+    context 'should return produce a artikelstamm_v5.xml' do
+      @artikelstamm_v5_name = File.join(Oddb2xml::WorkDir, 'artikelstamm_v5.xml')
 
       it 'should exist' do
-        expect(File.exists?(@artikelstamm_v4_name)).to eq true
+        expect(File.exists?(@artikelstamm_v5_name)).to eq true
       end
 
       it 'should not contain a GTIN=0' do
-        expect(IO.read(@artikelstamm_v4_name).index('GTIN>0')).to be nil
+        expect(IO.read(@artikelstamm_v5_name).index('GTIN>0')).to be nil
       end
 
       tests = {
@@ -1066,7 +1055,7 @@ if RUN_ALL
 
       tests.each do |key, expected|
         it "should a valid entry for #{key}" do
-          check_artikelstamm_v4_xml(key, expected)
+          check_artikelstamm_v5_xml(key, expected)
         end
       end
 
@@ -1077,7 +1066,7 @@ if RUN_ALL
       it 'should ignore GTIN 7680172330414' do
         # Took to much time to construct an example. Should change VCR
         skip("No time to check that data/gtin2ignore.yaml has an effect")
-        @inhalt = IO.read(@artikelstamm_v4_name)
+        @inhalt = IO.read(@artikelstamm_v5_name)
         expect(@inhalt.index('7680172330414')).to be nil
       end
 
@@ -1086,23 +1075,23 @@ if RUN_ALL
       end
 
       it 'shoud contain Lamivudinum as 3TC substance' do
-        @inhalt = IO.read(@artikelstamm_v4_name)
+        @inhalt = IO.read(@artikelstamm_v5_name)
         expect(@inhalt.index('<SUBSTANCE>Lamivudinum</SUBSTANCE>')).not_to be nil
       end
 
-      it 'should validate against artikelstamm_v4.xsd' do
+      it 'should validate against artikelstamm_v5.xsd' do
         VCR.eject_cassette; VCR.insert_cassette('artikelstamm')
         require 'open-uri'
-        xsd =open('https://raw.githubusercontent.com/elexis/elexis-3-base/master/at.medevit.ch.artikelstamm/lib/Elexis_Artikelstamm_v4.xsd').read
+        xsd =open('https://raw.githubusercontent.com/elexis/elexis-3-base/master/at.medevit.ch.artikelstamm/lib/Elexis_Artikelstamm_v5.xsd').read
         # on the command line you might run
-        # xmllint --noout --schema Elexis_Artikelstamm_v4.xsd spec/run/artikelstamm_v4.xml
+        # xmllint --noout --schema Elexis_Artikelstamm_v5.xsd spec/run/artikelstamm_v5.xml
         xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
-        file = @artikelstamm_v4_name
+        file = @artikelstamm_v5_name
         doc = Nokogiri::XML(File.read(file))
         xsd_rtikelstamm_xml.validate(doc).each do
           |error|
             if error.message
-              puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@artikelstamm_v4_xsd}"
+              puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@artikelstamm_v5_xsd}"
             end
             expect(error.message).to be_nil, "expected #{error.message} to be nil\nfor #{file} content \n#{File.read(file)}"
         end

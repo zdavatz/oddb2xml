@@ -5,30 +5,18 @@ require 'pathname'
 root = Pathname.new(__FILE__).realpath.parent.parent
 $:.unshift root.join('lib') if $0 == __FILE__
 
-require 'optparse'
 require 'mechanize'
 require 'oddb2xml'
 require 'oddb2xml/options'
 $stdout.sync = true
 
-options = Oddb2xml::Options.new
+opts = Oddb2xml::Options.parse(ARGV)
 
-args = ARGV.dup
-begin
-  options.parser.parse!(args)
-rescue OptionParser::MissingArgument,
-       OptionParser::InvalidArgument,
-       OptionParser::InvalidOption
-  puts Oddb2xml::Options.help
-  exit
-end
-
-opts = options.opts
+args = ARGV
 if args.size > 0
   puts "Please remove unused parameters #{args}"
   exit 2
 end
-
 # TEMP
 if path = args.first
   opts[:transfer_dat] = path

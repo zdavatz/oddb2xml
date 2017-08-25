@@ -118,7 +118,7 @@ module Oddb2xml
           @articles << entry
         end unless SkipMigelDownloader
         nrAdded = 0
-        if @options[:extended] || @options[:artikelstamm_v4]
+        if @options[:extended] || @options[:artikelstamm_v5]
           Oddb2xml.log("prepare_articles extended prepare_local_index having already #{@articles.size} articles")
           nrItems = 0
           @infos_zur_rose.each do |ean13, info|
@@ -156,7 +156,7 @@ module Oddb2xml
               obj = entry
             end
             if not found and obj.size > 0
-              @articles << obj unless @options[:artikelstamm_v4]
+              @articles << obj unless @options[:artikelstamm_v5]
               nrAdded += 1
             end
           end
@@ -177,7 +177,7 @@ module Oddb2xml
         @substances.uniq!
         @substances.sort!
         Oddb2xml.log("prepare_substances done. Total #{@substances.size} from #{@items.size} items")
-        exit 2 if (@options[:extended] || @options[:artikelstamm_v4]) and @substances.size == 0
+        exit 2 if (@options[:extended] || @options[:artikelstamm_v5]) and @substances.size == 0
       end
     end
     def prepare_limitations
@@ -273,7 +273,7 @@ module Oddb2xml
           XML_OPTIONS
         ) {
           Oddb2xml.log "build_substance #{@substances.size} substances"
-        exit 2 if (@options[:extended] || @options[:artikelstamm_v4]) and @substances.size == 0
+        exit 2 if (@options[:extended] || @options[:artikelstamm_v5]) and @substances.size == 0
         nbr_records = 0
         @substances.each_with_index do |sub_name, i|
             xml.SB('DT' => '') do
@@ -1307,7 +1307,7 @@ module Oddb2xml
       rows.join("\n")
     end
 
-    def build_artikelstamm_v4
+    def build_artikelstamm_v5
       def check_name(obj, lang = :de)
         ean = obj[:ean].to_i
         refdata = @refdata[ean]
@@ -1347,19 +1347,19 @@ module Oddb2xml
       used_limitations = []
       old_rose_size = @infos_zur_rose.size
       @infos_zur_rose.each do |ean13, value|
-        if /^7680/.match(ean13.to_s) && @options[:artikelstamm_v4]
+        if /^7680/.match(ean13.to_s) && @options[:artikelstamm_v5]
           @infos_zur_rose.delete(ean13)
         end
       end
       new_rose_size = @infos_zur_rose.size
-      Oddb2xml.log "build_artikelstamm_v4: Deleted #{old_rose_size - new_rose_size} entries from ZurRose where GTIN start with 7680 (Swissmedic)"
-      Oddb2xml.log "build_artikelstamm_v4 #{nr_products} of #{@products.size} articles and ignore #{@@gtin2ignore.size} GTINS"
+      Oddb2xml.log "build_artikelstamm_v5: Deleted #{old_rose_size - new_rose_size} entries from ZurRose where GTIN start with 7680 (Swissmedic)"
+      Oddb2xml.log "build_artikelstamm_v5 #{nr_products} of #{@products.size} articles and ignore #{@@gtin2ignore.size} GTINS"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
         elexis_strftime_format = "%FT%T\.%L%:z"
-        options_v4 =  {
-          'xmlns'  => 'http://elexis.ch/Elexis_Artikelstamm_v4',
+        options_v5 =  {
+          'xmlns'  => 'http://elexis.ch/Elexis_Artikelstamm_v5',
           'CREATION_DATETIME' => Time.new.strftime(elexis_strftime_format),
           'BUILD_DATETIME'    => Time.new.strftime(elexis_strftime_format),
           'VERSION_ID' => '0',
@@ -1368,8 +1368,8 @@ module Oddb2xml
           'YEAR' => Date.today.year,
           'SET_TYPE' => 'F',
           }
-        options_v4['VERSION_ID'] = 0
-        xml.ARTIKELSTAMM(options_v4) do
+        options_v5['VERSION_ID'] = 0
+        xml.ARTIKELSTAMM(options_v5) do
           xml.PRODUCTS do
             products = @products.sort_by { |ean13, obj| ean13 }
             products.each do |product|
@@ -1508,7 +1508,7 @@ module Oddb2xml
           end
         end
       end
-      Oddb2xml.log "build_artikelstamm_v4. Done #{nr_products} of #{@products.size} products, #{@limitations.size} limitations and #{nr_articles} articles"
+      Oddb2xml.log "build_artikelstamm_v5. Done #{nr_products} of #{@products.size} products, #{@limitations.size} limitations and #{nr_articles} articles"
       # we don't add a SHA256 hash for each element in the article
       # Oddb2xml.add_hash(_builder.to_xml)
       # doc = REXML::Document.new( source, { :raw => :all })
@@ -1518,11 +1518,11 @@ module Oddb2xml
       lines << "  - #{sprintf('%5d', @limitations.size)} limitations"
       lines << "  - #{sprintf('%5d', @nr_articles)} articles"
       lines << "  - #{sprintf('%5d', @@gtin2ignore.size)} ignored GTINS"
-      @@articlestamm_v4_info_lines = lines
+      @@articlestamm_v5_info_lines = lines
       _builder.to_xml({:indent => 4, :encoding => 'UTF-8'})
     end
-    def self.articlestamm_v4_info_lines
-      @@articlestamm_v4_info_lines
+    def self.articlestamm_v5_info_lines
+      @@articlestamm_v5_info_lines
     end
   end
 end

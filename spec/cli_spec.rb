@@ -48,18 +48,16 @@ describe Oddb2xml::Cli do
   context 'when -x address option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-e --log'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-e --log')
+      @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
   end
   context 'when -o fi option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-o fi'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-o fi')
+      @cli = Oddb2xml::Cli.new(options)
  #     @cli_output = buildr_capture(:stdout) { @cli.run }
       @cli.run
     end
@@ -72,9 +70,8 @@ describe Oddb2xml::Cli do
   context 'when -t md option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-t md'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-t md')
+      @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
     it_behaves_like 'any interface for product'
@@ -113,9 +110,8 @@ describe Oddb2xml::Cli do
   context 'when -c tar.gz option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-c tar.gz'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-c tar.gz')
+      @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
       # @cli_output = @cli.run # to debug
     end
@@ -144,9 +140,8 @@ describe Oddb2xml::Cli do
   context 'when -c zip option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-c zip'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-c zip')
+      @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
     it_behaves_like 'any interface for product'
@@ -170,9 +165,8 @@ describe Oddb2xml::Cli do
   context 'when -f dat option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-f dat'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-f dat')
+      @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
     it_behaves_like 'any interface for product'
@@ -195,9 +189,8 @@ describe Oddb2xml::Cli do
   context 'when -a nonpharma option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-a nonpharma'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-a nonpharma')
+      @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
     it_behaves_like 'any interface for product'
@@ -227,9 +220,8 @@ describe Oddb2xml::Cli do
   context 'when -t _swiss option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-t _swiss'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-t _swiss')
+      @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
     it_behaves_like 'any interface for product'
@@ -259,9 +251,8 @@ describe Oddb2xml::Cli do
   context 'when -o fi option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-o fi'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-o fi')
+      @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
     it_behaves_like 'any interface for product'
@@ -293,9 +284,8 @@ describe Oddb2xml::Cli do
   context 'when -x address option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.new
-      options.parser.parse!('-x address'.split(' '))
-      @cli = Oddb2xml::Cli.new(options.opts)
+      options = Oddb2xml::Options.parse('-x address')
+      @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
     it_behaves_like 'any interface for address'

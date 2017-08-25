@@ -1,7 +1,7 @@
 # encoding: utf-8
 
 require 'zlib'
-require 'archive/tar/minitar'
+require 'minitar'
 require 'zip'
 
 module Oddb2xml

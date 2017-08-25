@@ -86,10 +86,10 @@ module Oddb2xml
     private
     def build
       begin
-        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not (@options[:extended] || @options[:artikelstamm_v4])
+        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not (@options[:extended] || @options[:artikelstamm_v5])
         files.each_pair do |sbj, file|
           builder = Builder.new(@options) do |builder|
-            if @options[:calc] and not  (@options[:extended] || @options[:artikelstamm_v4])
+            if @options[:calc] and not  (@options[:extended] || @options[:artikelstamm_v5])
               builder.packs = @packs
               builder.subject = sbj
             elsif @options[:address]
@@ -302,8 +302,8 @@ module Oddb2xml
       unless @_files
         @_files = {}
         @_files[:calc] = "oddb_calc.xml" if @options[:calc]
-        if @options[:artikelstamm_v4]
-          @_files[:artikelstamm_v4] = "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v4.xml"
+        if @options[:artikelstamm_v5]
+          @_files[:artikelstamm_v5] = "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml"
         elsif @options[:address]
           @_files[:company] = "#{prefix}_betrieb.xml"
           @_files[:person]  = "#{prefix}_medizinalperson.xml"
@@ -338,9 +338,9 @@ module Oddb2xml
         lines << Calc.report_conversion
         lines << ParseComposition.report
       end
-      if  @options[:artikelstamm_v4]
-        lines << "Generated artikelstamm_v4.xml for Elexis"
-        lines += Builder.articlestamm_v4_info_lines
+      if  @options[:artikelstamm_v5]
+        lines << "Generated artikelstamm_v5.xml for Elexis"
+        lines += Builder.articlestamm_v5_info_lines
       else
         unless @options[:address]
           types.each do |type|
@@ -361,7 +361,7 @@ module Oddb2xml
               end
             end
           end
-          if  (@options[:extended] || @options[:artikelstamm_v4])
+          if  (@options[:extended] || @options[:artikelstamm_v5])
             lines << sprintf("\tInformation items zur Rose: %i", @infos_zur_rose.length)
           end
         else
