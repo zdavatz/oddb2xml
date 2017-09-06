@@ -135,7 +135,17 @@ module Oddb2xml
           else
             output = builder.to_xml
           end
-          File.open(File.join(WorkDir, file), 'w:utf-8'){ |fh| fh << output }
+          File.open(File.join(WorkDir, file), 'w:utf-8') do |fh|
+            output.split("\n").each do |line|
+              begin
+                # We want to ignore lines which are not really UTF-8 encoded
+                iso_8859_1 = line.encode('ISO-8859-1')
+                fh.puts(line)
+              rescue => error
+                puts "#{error}: #{file} Ignoring #{line}"
+              end
+            end
+          end
           if @options[:calc]
             FileUtils.cp(File.join(WorkDir, file), File.join(WorkDir, file.sub('.xml', '_'+Time.now.strftime("%d.%m.%Y_%H.%M")+'.xml')), :verbose => false)
           end
