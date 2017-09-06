@@ -1,3 +1,13 @@
+=== 2.4.2 / 6.09.2017
+
+* Ignore lines that cannot be converted from UTF-8 to ISO-8859-1
+  We found in refdata_NonPharma.xml some U+2013 (-) characters in SENSURA products
+
+=== 2.4.1 / 2.12.2016
+
+* Update oddb2xml.gemspec to add GPL-3.0 as correct license for Rubygems as stated in LICENSE file 
+* Added a hack for 24 globulina equina which commas between brackets
+
 === 2.4.0 /25.08.2016
 
 * Remove transfer.zip in current directory. Added spec tests for downloaded files
