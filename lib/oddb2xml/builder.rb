@@ -1337,6 +1337,15 @@ module Oddb2xml
         end
         eval cmd
       end
+      def emit_salecd(xml, ean13, obj)
+          info_zur_rose = nil
+          if !@infos_zur_rose.empty? && ean13 && @infos_zur_rose[ean13]
+            info_zur_rose = @infos_zur_rose[ean13] # zurrose
+          end
+              # <xs:element name="SALECD" type="SALECDType" minOccurs="1" maxOccurs="1">
+          nincd = detect_nincd(obj)
+          (nincd && nincd == 13) ? xml.SALECD('A') : xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
+      end
       prepare_limitations
       prepare_articles
       prepare_products
@@ -1362,18 +1371,13 @@ module Oddb2xml
           'xmlns'  => 'http://elexis.ch/Elexis_Artikelstamm_v5',
           'CREATION_DATETIME' => Time.new.strftime(elexis_strftime_format),
           'BUILD_DATETIME'    => Time.new.strftime(elexis_strftime_format),
-          'VERSION_ID' => '0',
-          'LANG' => 'DE',
-          'MONTH' => Date.today.month,
-          'YEAR' => Date.today.year,
-          'SET_TYPE' => 'F',
-          }
-        options_v5['VERSION_ID'] = 0
+        }
         xml.ARTIKELSTAMM(options_v5) do
           xml.PRODUCTS do
             products = @products.sort_by { |ean13, obj| ean13 }
             products.each do |product|
               ean13 = product[0]
+              binding.pry if ean13.to_i == 7611600441013
               obj = product[1]
               next if /^Q/i.match(obj[:atc])
               sequence = obj[:seq]
@@ -1390,6 +1394,7 @@ module Oddb2xml
               xml.PRODUCT do
                 xml.PRODNO prodno
                 if sequence
+                  emit_salecd(xml, ean13, obj)
                   override(xml, prodno, :DSCR,  (sequence[:name_de] + ' ' + sequence[:desc_de]).strip)
                   override(xml, prodno, :DSCRF, (sequence[:name_fr] + ' ' + sequence[:desc_fr]).strip)
                 end
@@ -1461,40 +1466,49 @@ module Oddb2xml
                   xml.ITEM( 'PHARMATYPE' => 'P') do
                     xml.GTIN package[:ean]
                     xml.PHAR pharma_code if pharma_code
+                    emit_salecd(xml, ean13, obj) 
                     xml.DSCR obj[:desc_de]
                     xml.DSCRF obj[:desc_fr]
-                    xml.COMP  do
-                      xml.GLN obj[:company_ean]
+                    xml.COMP  do # Manufacturer
+                      xml.NAME  obj[:company_name]
+                      xml.GLN   obj[:company_ean]
                     end
                     xml.PEXF package[:prices][:exf_price][:price] if package[:prices][:exf_price][:price] &&
                         !package[:prices][:exf_price][:price].empty?
                     xml.PPUB package[:prices][:pub_price][:price]
                     info = @calc_items[ean13.to_s]
-                    if info && info.pkg_size && !info.pkg_size.empty?
-                      # skip some invalid PKG_SIZE like 2 x 30 g, 2,5, 2.5, 80/8
-                      xml.PKG_SIZE  info.pkg_size unless /[ x,\.+\/]/i.match(info.pkg_size)
-                    end
                     if info
-                      if info.pkg_size && info.measure
-                        xml.PKG_SIZE_STRING   info.pkg_size + ' ' + info.measure
+                      # MEASSURE Measurement Unit,e.g. Pills or milliliters
+                      #             <DSCR>HIRUDOID Creme 3 mg/g 40 g</DSCR>
+                      if info.pkg_size && info.unit
+                        xml.MEASURE   info.pkg_size + ' ' + info.unit
                       elsif info.pkg_size
-                        xml.PKG_SIZE_STRING   info.pkg_size
+                        xml.MEASURE   info.pkg_size
                       elsif info.measure
-                        xml.PKG_SIZE_STRING   info.measure
+                        xml.MEASURE   info.measure
                       end
+                      xml.MEASUREF    info.measure
+                      # Die Darreichungsform dieses Items. zB Tablette(n) oder Spritze(n)
+                      xml.DOSAGE_FORMF info.galenic_form.descriptions['de']
                     end
                     xml.SL_ENTRY          'true' if  @items[ean13]
                     xml.IKSCAT            package[:swissmedic_category]
                     xml.GENERIC_TYPE      sequence[:org_gen_code] if sequence[:org_gen_code] && !sequence[:org_gen_code].empty?
                     xml.DEDUCTIBLE        sequence[:deductible] == 'N' ? 10 : 20
                     xml.PRODNO            ppac[:prodno] if ppac && ppac[:prodno] # ean13.to_s[4..11]
-                    override(xml, ean13, :MEASURE, info.measure) if info
                   end
                 end
               else # non pharma
                 xml.ITEM( 'PHARMATYPE' => 'N') do
                   xml.GTIN ean13
                   xml.PHAR pharma_code      if pharma_code
+                    info_zur_rose = nil
+                    if !@infos_zur_rose.empty? && ean13 && @infos_zur_rose[ean13]
+                      info_zur_rose = @infos_zur_rose[ean13] # zurrose
+                    end
+                        # <xs:element name="SALECD" type="SALECDType" minOccurs="1" maxOccurs="1">
+                    nincd = detect_nincd(obj)
+                    (nincd && nincd == 13) ? xml.SALECD('A') : xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
                   xml.DSCR obj[:desc_de] || obj[:description] # for description for zur_rose
                   xml.DSCRF obj[:desc_fr] || '--missing--'
                   xml.COMP  do

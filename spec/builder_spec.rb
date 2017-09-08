@@ -453,6 +453,7 @@ end
 def check_artikelstamm_v5_xml(key, expected_value)
   expect(@artikelstamm_v5_name).not_to be nil
   expect(@inhalt).not_to be nil
+  binding.pry unless @inhalt.index(expected_value)
   expect(@inhalt.index(expected_value)).not_to be nil
 end
 
@@ -949,7 +950,7 @@ if RUN_ALL
   context 'when artikelstamm_v5 option is given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.parse(['--artikelstamm-v4']) # , '--log'])
+      options = Oddb2xml::Options.parse(['--artikelstamm-v5']) # , '--log'])
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
       Oddb2xml::Cli.new(options).run # to debug
       @artikelstamm_v5_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml")
@@ -974,83 +975,75 @@ if RUN_ALL
       %(<ITEM PHARMATYPE="N">
             <GTIN>4042809018288</GTIN>
             <PHAR>55805</PHAR>
+            <SALECD>A</SALECD>
             <DSCR>TENSOPLAST Kompressionsbinde 5cmx4.5m</DSCR>
             <DSCRF>--missing--</DSCRF>
             <PEXF>0.00</PEXF>
             <PPUB>15.00</PPUB>
         </ITEM>),
         'product 5366201 3TC' =>
-      %(<PRODUCT>
-            <PRODNO>5366201</PRODNO>
-            <DSCR>3TC Filmtabl 150 mg</DSCR>
-            <DSCRF>3TC cpr pell 150 mg</DSCRF>
-            <ATC>J05AF05</ATC>),
-                'product 3536601 kendural' => %(<PRODUCT>
-            <PRODNO>3536601</PRODNO>
-            <!--override Kendural Depottabl with-->
-            <DSCR>KENDURAL Depottabl</DSCR>
-            <!--override Kendural cpr dépôt with-->
-            <DSCRF>--missing--</DSCRF>
-            <ATC>B03AE10</ATC>
-            <SUBSTANCE>Verschiedene Kombinationen</SUBSTANCE>
-        </PRODUCT>),
-        'item 7680353660163 KENDURAL' =>
-                %(<ITEM PHARMATYPE="P">
+      "<ITEM PHARMATYPE=\"P\">
             <GTIN>7680353660163</GTIN>
             <PHAR>20273</PHAR>
+            <SALECD>I</SALECD>
             <DSCR>KENDURAL Depottabl 30 Stk</DSCR>
             <DSCRF>KENDURAL cpr dépot 30 pce</DSCRF>
             <COMP>
+                <NAME>Farmaceutica Teofarma Suisse SA (c/o Bernasconi Peter Gaggin</NAME>
                 <GLN>7601001374539</GLN>
             </COMP>
             <PEXF>4.4606</PEXF>
             <PPUB>8.25</PPUB>
-            <PKG_SIZE>30</PKG_SIZE>
-            <PKG_SIZE_STRING>30 Tablette(n)</PKG_SIZE_STRING>
+            <MEASURE>30 Tablette(n)</MEASURE>
+            <MEASUREF>Tablette(n)</MEASUREF>
+            <DOSAGE_FORMF>Tupfer</DOSAGE_FORMF>
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>C</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>3536601</PRODNO>
-            <!--obsolete override-->
-            <MEASURE>Tablette(n)</MEASURE>
-        </ITEM>),
+        </ITEM>",
         'item 7680161050583 HIRUDOID' =>
          %(<ITEM PHARMATYPE="P">
             <GTIN>7680161050583</GTIN>
             <PHAR>2731179</PHAR>
+            <SALECD>I</SALECD>
             <DSCR>HIRUDOID Creme 3 mg/g 40 g</DSCR>
             <DSCRF>HIRUDOID crème 3 mg/g 40 g</DSCRF>
             <COMP>
+                <NAME>Medinova AG</NAME>
                 <GLN>7601001002258</GLN>
             </COMP>
             <PEXF>4.768575</PEXF>
             <PPUB>8.8</PPUB>
-            <PKG_SIZE>40</PKG_SIZE>
-            <PKG_SIZE_STRING>40 g</PKG_SIZE_STRING>
+            <MEASURE>40 g</MEASURE>
+            <MEASUREF>g</MEASUREF>
+            <DOSAGE_FORMF>Creme</DOSAGE_FORMF>
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>D</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>1610501</PRODNO>
-            <MEASURE>g</MEASURE>
         </ITEM>),
         'item 7680284860144 ANCOPIR' =>
-        %(<ITEM PHARMATYPE="P">
+        "<ITEM PHARMATYPE=\"P\">
             <GTIN>7680284860144</GTIN>
             <PHAR>177804</PHAR>
+            <SALECD>I</SALECD>
             <DSCR>ANCOPIR Inj Lös 5 Amp 2 ml</DSCR>
             <DSCRF>ANCOPIR sol inj 5 amp 2 ml</DSCRF>
             <COMP>
+                <NAME>Dr. Grossmann AG Pharmaca</NAME>
                 <GLN>7601001029880</GLN>
             </COMP>
             <PEXF>3.83</PEXF>
             <PPUB>8.5</PPUB>
-            <PKG_SIZE_STRING>5 x 2 ml Ampulle(n)</PKG_SIZE_STRING>
+            <MEASURE>5 x 2 ml Ampulle(n)</MEASURE>
+            <MEASUREF>Ampulle(n)</MEASUREF>
+            <DOSAGE_FORMF>Injektionslösung</DOSAGE_FORMF>
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>B</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>2848601</PRODNO>
-            <MEASURE>Ampulle(n)</MEASURE>
-        </ITEM>)
+        </ITEM>"
               }
 
       tests.each do |key, expected|
@@ -1080,9 +1073,8 @@ if RUN_ALL
       end
 
       it 'should validate against artikelstamm_v5.xsd' do
-        VCR.eject_cassette; VCR.insert_cassette('artikelstamm')
-        require 'open-uri'
-        xsd =open('https://raw.githubusercontent.com/elexis/elexis-3-base/master/at.medevit.ch.artikelstamm/lib/Elexis_Artikelstamm_v5.xsd').read
+        @v5_xsd = File.expand_path(File.join(File.dirname(__FILE__), 'data', 'Elexis_Artikelstamm_v5.xsd'))
+        xsd =open(@v5_xsd).read
         # on the command line you might run
         # xmllint --noout --schema Elexis_Artikelstamm_v5.xsd spec/run/artikelstamm_v5.xml
         xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)

@@ -109,7 +109,7 @@ VCR.configure do |config|
   config.hook_into :webmock
   config.debug_logger = File.open(File.join(File.dirname(File.dirname(__FILE__)), 'vcr.log'), 'w+')
   config.debug_logger.sync = true
-  config.default_cassette_options = { :record => ARGV.join(' ').index('downloader_spec') ? :new_episodes : :once ,
+  config.default_cassette_options = { :record =>:once, # ARGV.join(' ').index('downloader_spec') ? :new_episodes : :once ,
                                       :preserve_exact_body_bytes => true,
                                       :allow_playback_repeats => true,
                                       :serialize_with => :json,

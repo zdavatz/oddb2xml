@@ -1,3 +1,7 @@
+=== Upcoming
+
+* Artikelstamm_V5 seems to work
+
 === 2.4.3 / 11.09.2017
 
 * Never drop lines with UTF-8 problems while creating XML files
