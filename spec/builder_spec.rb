@@ -880,7 +880,7 @@ if RUN_ALL
       expect(File.exists?(oddb_article_xml)).to eq true
       doc = REXML::Document.new IO.read(oddb_article_xml)
       article = XPath.match( doc, "//ART[PHAR=5822801]").first
-      article.elements['DSCRD'].text.should match /EPIMINERAL/i
+      expect(article.elements['DSCRD'].text).to match /EPIMINERAL/i
     end
 
     it 'should generate a correct oddb_product.xml' do
@@ -890,7 +890,7 @@ if RUN_ALL
     it 'should generate an article with the COOL (fridge) attribute' do
       doc = REXML::Document.new File.new(oddb_article_xml)
       fridge_product = checkAndGetArticleWithGTIN(doc, Oddb2xml::FRIDGE_GTIN)
-      fridge_product.elements['COOL'].text.should == '1'
+      expect(fridge_product.elements['COOL'].text).to eq('1')
     end
 
     it 'should generate a correct oddb_article.xml' do
