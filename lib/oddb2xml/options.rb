@@ -16,7 +16,6 @@ module Oddb2xml
           produced files are found under data
 EOS
         opt :append,       "Additional target nonpharma", :default => false
-        opt :artikelstamm_v3, "Create Artikelstamm Version 3 for Elexis 3.1"
         opt :artikelstamm_v5, "Create Artikelstamm Version 5 for Elexis >= 3.3"
         opt :compress_ext,     "format F. {tar.gz|zip}", :type => :string, :default => nil, :short => 'c'
         opt :extended,     "pharma, non-pharma plus prices and non-pharma from zurrose.
