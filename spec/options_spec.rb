@@ -8,7 +8,6 @@ describe Oddb2xml::Options do
   Default_opts =  {
     :fi           => false,
     :address      => false,
-    :artikelstamm_v3 => false,
     :artikelstamm_v5 => false,
     :nonpharma    => false,
     :extended     => false,

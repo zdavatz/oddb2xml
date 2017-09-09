@@ -76,7 +76,7 @@ describe Oddb2xml::Cli do
     end
     it_behaves_like 'any interface for product'
     it 'should have tag_suffix option' do
-      expect(@cli).to have_option(:tag_suffix=> 'MD')
+      expect(@cli).to have_option(:tag_suffix=> 'md')
     end
     it 'should not create a compressed file' do
       expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.tar.gz')).first).to be_nil
@@ -226,7 +226,7 @@ describe Oddb2xml::Cli do
     end
     it_behaves_like 'any interface for product'
     it 'should have tag_suffix option' do
-      expect(@cli).to have_option(:tag_suffix=> '_SWISS')
+      expect(@cli).to have_option(:tag_suffix=> '_swiss')
     end
     it 'should not create any compressed file' do
       expect(@cli_output).to match(/Pharma/)
