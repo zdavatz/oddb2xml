@@ -985,7 +985,7 @@ if RUN_ALL
       "<ITEM PHARMATYPE=\"P\">
             <GTIN>7680353660163</GTIN>
             <PHAR>20273</PHAR>
-            <SALECD>I</SALECD>
+            <SALECD>A</SALECD>
             <DSCR>KENDURAL Depottabl 30 Stk</DSCR>
             <DSCRF>KENDURAL cpr dépot 30 pce</DSCRF>
             <COMP>
@@ -1006,7 +1006,7 @@ if RUN_ALL
          %(<ITEM PHARMATYPE="P">
             <GTIN>7680161050583</GTIN>
             <PHAR>2731179</PHAR>
-            <SALECD>I</SALECD>
+            <SALECD>A</SALECD>
             <DSCR>HIRUDOID Creme 3 mg/g 40 g</DSCR>
             <DSCRF>HIRUDOID crème 3 mg/g 40 g</DSCRF>
             <COMP>
@@ -1027,7 +1027,7 @@ if RUN_ALL
         "<ITEM PHARMATYPE=\"P\">
             <GTIN>7680284860144</GTIN>
             <PHAR>177804</PHAR>
-            <SALECD>I</SALECD>
+            <SALECD>A</SALECD>
             <DSCR>ANCOPIR Inj Lös 5 Amp 2 ml</DSCR>
             <DSCRF>ANCOPIR sol inj 5 amp 2 ml</DSCRF>
             <COMP>

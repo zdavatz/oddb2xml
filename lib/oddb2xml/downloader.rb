@@ -175,8 +175,12 @@ module Oddb2xml
             Oddb2xml.download_finished(file)
           end
         end
-        read_xml_from_zip(/transfer.dat/, file)
+        read_xml_from_zip(/transfer.dat/, file);
         dest = File.join(Downloads, 'transfer.dat')
+        # res = `/usr/bin/file #{dest}`
+        # system("/usr/bin/iconv -f ISO-8859-1 -t utf-8 --output=#{dest} #{dest}") if /ISO-8859/i.match(res)
+        # require 'pry'; binding.pry
+        # content = IO.read('transfer.dat')
         File.open(dest, 'r:iso-8859-1:utf-8').read
       end
     end

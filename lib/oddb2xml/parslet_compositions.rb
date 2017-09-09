@@ -100,7 +100,8 @@ module ParseUtil
     @@saved_parsed[key] = comps
     comps
   rescue => error
-      binding.pry
+    puts "error #{error}"
+      # binding.pry
   end
 
 end

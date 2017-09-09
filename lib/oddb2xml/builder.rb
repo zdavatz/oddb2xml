@@ -55,7 +55,7 @@ module Oddb2xml
       @infos      = {}
       @packs      = {}
       @migel      = {}
-      @infos_zur_rose     = {} # zurrose
+      @infos_zur_rose  ||= {}
       @actions    = []
       @orphan    = []
       @ean14      = false
@@ -804,9 +804,9 @@ module Oddb2xml
             if no8
               ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
             end
-            info_zur_rose = nil
+            zur_rose = nil
             if !@infos_zur_rose.empty? && ean && @infos_zur_rose[ean]
-              info_zur_rose = @infos_zur_rose[ean] # zurrose
+              zur_rose = @infos_zur_rose[ean] # zurrose
             end
             xml.ART('DT' => obj[:last_change] ? obj[:last_change] : '') do
               nbr_records += 1
@@ -832,12 +832,10 @@ module Oddb2xml
               #xml.HOSPCD
               #xml.CLINCD
               #xml.ARTTYP
-              if info_zur_rose
-                xml.VAT info_zur_rose[:vat]
+              if zur_rose
+                xml.VAT zur_rose[:vat]
               end
-
-              nincd = detect_nincd(obj)
-              (nincd and nincd == 13) ? xml.SALECD('A') : xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
+              emit_salecd(xml, ean13, obj)
               if pac and pac[:limitation_points]
                 #xml.INSLIM
                 xml.LIMPTS pac[:limitation_points] unless pac[:limitation_points].empty?
@@ -1215,9 +1213,9 @@ module Oddb2xml
             pac = ppac if ppac
           end
           row << "%#{DAT_LEN[:RECA]}s"  % '11'
-          info_zur_rose = @infos_zur_rose[ean] # zurrose
-          if info_zur_rose && info_zur_rose[:cmut]
-            row << info_zur_rose[:cmut]
+          zur_rose = @infos_zur_rose[ean] # zurrose
+          if zur_rose && zur_rose[:cmut]
+            row << zur_rose[:cmut]
           else
             row << '1'
           end
@@ -1306,6 +1304,15 @@ module Oddb2xml
         end
       rows.join("\n")
     end
+    def emit_salecd(xml, ean13, obj)
+      zur_rose = nil
+      if !@infos_zur_rose.empty? && ean13 && @infos_zur_rose[ean13]
+        zur_rose = @infos_zur_rose[ean13] # zurrose
+      end
+          # <xs:element name="SALECD" type="SALECDType" minOccurs="1" maxOccurs="1">
+      nincd = detect_nincd(obj)
+      (nincd && nincd == 13) ? xml.SALECD('A') : xml.SALECD( (zur_rose && zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
+    end
 
     def build_artikelstamm_v5
       def check_name(obj, lang = :de)
@@ -1336,15 +1343,6 @@ module Oddb2xml
           end
         end
         eval cmd
-      end
-      def emit_salecd(xml, ean13, obj)
-          info_zur_rose = nil
-          if !@infos_zur_rose.empty? && ean13 && @infos_zur_rose[ean13]
-            info_zur_rose = @infos_zur_rose[ean13] # zurrose
-          end
-              # <xs:element name="SALECD" type="SALECDType" minOccurs="1" maxOccurs="1">
-          nincd = detect_nincd(obj)
-          (nincd && nincd == 13) ? xml.SALECD('A') : xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
       end
       prepare_limitations
       prepare_articles
@@ -1377,7 +1375,6 @@ module Oddb2xml
             products = @products.sort_by { |ean13, obj| ean13 }
             products.each do |product|
               ean13 = product[0]
-              binding.pry if ean13.to_i == 7611600441013
               obj = product[1]
               next if /^Q/i.match(obj[:atc])
               sequence = obj[:seq]
@@ -1394,7 +1391,7 @@ module Oddb2xml
               xml.PRODUCT do
                 xml.PRODNO prodno
                 if sequence
-                  emit_salecd(xml, ean13, obj)
+                  xml.SALECD('A') # these products are always active!
                   override(xml, prodno, :DSCR,  (sequence[:name_de] + ' ' + sequence[:desc_de]).strip)
                   override(xml, prodno, :DSCRF, (sequence[:name_fr] + ' ' + sequence[:desc_fr]).strip)
                 end
@@ -1466,7 +1463,7 @@ module Oddb2xml
                   xml.ITEM( 'PHARMATYPE' => 'P') do
                     xml.GTIN package[:ean]
                     xml.PHAR pharma_code if pharma_code
-                    emit_salecd(xml, ean13, obj) 
+                    xml.SALECD('A') # these products are always active!
                     xml.DSCR obj[:desc_de]
                     xml.DSCRF obj[:desc_fr]
                     xml.COMP  do # Manufacturer
@@ -1502,13 +1499,7 @@ module Oddb2xml
                 xml.ITEM( 'PHARMATYPE' => 'N') do
                   xml.GTIN ean13
                   xml.PHAR pharma_code      if pharma_code
-                    info_zur_rose = nil
-                    if !@infos_zur_rose.empty? && ean13 && @infos_zur_rose[ean13]
-                      info_zur_rose = @infos_zur_rose[ean13] # zurrose
-                    end
-                        # <xs:element name="SALECD" type="SALECDType" minOccurs="1" maxOccurs="1">
-                    nincd = detect_nincd(obj)
-                    (nincd && nincd == 13) ? xml.SALECD('A') : xml.SALECD( (info_zur_rose && info_zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
+                  emit_salecd(xml, ean13, obj)
                   xml.DSCR obj[:desc_de] || obj[:description] # for description for zur_rose
                   xml.DSCRF obj[:desc_fr] || '--missing--'
                   xml.COMP  do
