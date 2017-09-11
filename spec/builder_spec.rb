@@ -943,6 +943,14 @@ if RUN_ALL
       IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 892, true) }
     end
   end
+  context 'when utf-8 to iso-8859 fails' do
+    it 'should return a correct 8859 line' do
+      lines = IO.readlines(File.join(Oddb2xml::SpecData, 'problems.txt'))
+      out = Oddb2xml.convert_to_8859_1(lines.first)
+      expect(out.encoding.to_s).to eq 'ISO-8859-1'
+      expect(out.chomp).to eq '<NAME_DE>SENSURA Mio 1t Uro 10-33 midi con lig so op 10 Stk</NAME_DE>'
+    end
+  end
 end
 end
 end

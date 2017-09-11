@@ -137,12 +137,10 @@ module Oddb2xml
           end
           File.open(File.join(WorkDir, file), 'w:utf-8') do |fh|
             output.split("\n").each do |line|
-              begin
-                # We want to ignore lines which are not really UTF-8 encoded
-                iso_8859_1 = line.encode('ISO-8859-1')
+              if /.xml$/i.match(file)
                 fh.puts(line)
-              rescue => error
-                puts "#{error}: #{file} Ignoring #{line}"
+              else
+                fh.puts(Oddb2xml.convert_to_8859_1(line))
               end
             end
           end

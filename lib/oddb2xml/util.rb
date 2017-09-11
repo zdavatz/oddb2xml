@@ -20,6 +20,27 @@ module Oddb2xml
   @atc_csv_origin = 'https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv'
   @atc_csv_content = {}
 
+  def Oddb2xml.convert_to_8859_1(line)
+    begin
+      # We want to ignore lines which are not really UTF-8 encoded
+      return line.encode('ISO-8859-1')
+    rescue => error
+      ausgabe = ''
+      0.upto(line.size-1).each do |idx|
+        begin
+          if line[idx].ord == 8211
+            ausgabe += '-'
+          else
+            ausgabe += line[idx].encode('ISO-8859-1')
+          end
+        rescue => error
+          puts "#{error}: in #{line} at #{idx}"
+        end
+      end
+    end
+    ausgabe.encode('ISO-8859-1')
+  end
+
   def Oddb2xml.add_epha_changes_for_ATC(iksnr, atc_code)
     if @atc_csv_content.size == 0
       open(@atc_csv_origin).readlines.each{
