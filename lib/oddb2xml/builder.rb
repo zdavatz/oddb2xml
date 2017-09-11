@@ -299,10 +299,14 @@ module Oddb2xml
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
-        xml.LIMITATION(XML_OPTIONS) {
+        xml.LIMITATION(XML_OPTIONS) do
         nbr_records = 0
         @limitations.each do |lim|
-            xml.LIM('DT' => '') {
+          if lim[:id].empty?
+            puts "Skipping empty id of #{lim}"
+            next
+          end
+            xml.LIM('DT' => '') do
               case lim[:key]
               when :swissmedic_number8
                 xml.SwissmedicNo8 lim[:id]
@@ -319,20 +323,16 @@ module Oddb2xml
               xml.DSCRD      lim[:desc_de]
               xml.DSCRF      lim[:desc_fr]
               xml.VDAT       lim[:vdate]
-              if lim[:del]
-                xml.DEL 3
-              end
               nbr_records += 1
-
-            }
+            end
           end
-          xml.RESULT {
+          xml.RESULT do
             xml.OK_ERROR   'OK'
             xml.NBR_RECORD nbr_records
             xml.ERROR_CODE ''
             xml.MESSAGE    ''
-          }
-        }
+          end
+        end
       end
       Oddb2xml.add_hash(_builder.to_xml)
     end
@@ -642,7 +642,7 @@ module Oddb2xml
           xml.SUBSTANCE_NAME substance.name
           xml.IS_ACTIVE_AGENT substance.is_active_agent if emit_active
           if substance.dose
-            if substance.qty.is_a?(Float) or substance.qty.is_a?(Fixnum)
+            if substance.qty.is_a?(Float) or substance.qty.is_a?(Integer)
               xml.QTY  substance.qty
               xml.UNIT substance.unit
             else

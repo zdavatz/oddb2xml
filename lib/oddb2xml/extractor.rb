@@ -124,6 +124,10 @@ module Oddb2xml
               key = :swissmedic_number8
               id  = item[:packages][ean][key].to_s
             end
+            if id.empty? && item[:packages][ean][ :swissmedic_number8]
+              key = :swissmedic_number8
+              id  = item[:packages][ean][key].to_s
+            end
             lims.each do |lim|
               limitation = {
                 :it      => item[:it_code],

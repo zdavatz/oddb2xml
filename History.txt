@@ -3,6 +3,7 @@
 * Never drop lines with UTF-8 problems while creating XML files
 * Fix some rspec errors
 * Travis runs only for ruby 2.2.7 and newer
+* Do not emit a DEL field for limitations, as it is not specifid in the oddb2xml.xsd
 
 === 2.4.2 / 6.09.2017
 

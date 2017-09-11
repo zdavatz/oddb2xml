@@ -289,7 +289,7 @@ public
     end
 
     def pkg_size_to_int(pkg_size, skip_last_part = false)
-      return pkg_size if pkg_size.is_a?(Fixnum)
+      return pkg_size if pkg_size.is_a?(Integer)
       return 1 unless pkg_size
       parts = pkg_size.split(/\s*x\s*/i)
       parts = parts[0..-2] if skip_last_part and parts.size > 1
