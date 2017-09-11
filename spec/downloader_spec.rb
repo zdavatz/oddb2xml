@@ -326,7 +326,7 @@ describe Oddb2xml::EphaDownloader do
       expect(csv.bytes).not_to be nil
     end
     it 'should clean up current directory' do
-      File.exist?('epha_interactions.csv').should eq(false)
+      expect(File.exist?('epha_interactions.csv')).to eq(false)
     end
     it 'should save under download' do
       expect(File.exist?(File.join(Oddb2xml::Downloads, 'epha_interactions.csv'))).to eq(true)
@@ -533,12 +533,10 @@ describe Oddb2xml::MedregbmDownloader do
     context 'download betrieb txt' do
       let(:txt) { @downloader.download }
       it 'should return valid String' do
-        pending 'Should handle SSL issues'
         expect(txt).to be_a String
         expect(txt.bytes).not_to be nil
       end
       it 'should clean up current directory' do
-        pending 'Should handle SSL issues'
         expect { txt }.not_to raise_error
         expect(File.exist?('oddb_company.xls')).to eq(false)
       end
