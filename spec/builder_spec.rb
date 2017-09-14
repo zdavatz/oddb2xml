@@ -1074,7 +1074,15 @@ describe Oddb2xml::Builder do
             <IKSCAT>B</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>2848601</PRODNO>
-        </ITEM>"
+        </ITEM>",
+      'product 3TC Filmtabl' => %(<PRODUCT>
+            <PRODNO>5366201</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>3TC Filmtabl 150 mg</DSCR>
+            <DSCRF>3TC cpr pell 150 mg</DSCRF>
+            <ATC>J05AF05</ATC>
+            <SUBSTANCE>Lamivudinum</SUBSTANCE>
+        </PRODUCT>),
               }
 
       tests.each do |key, expected|

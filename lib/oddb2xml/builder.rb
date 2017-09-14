@@ -497,7 +497,6 @@ module Oddb2xml
             xml.PRODNO obj[:prodno]                                 if obj[:prodno]
             xml.DSCRD  check_name(obj, :de)
             xml.DSCRF  check_name(obj, :fr)
-            xml.ATC obj[:atc_code]                                  if obj[:atc_code] and !obj[:atc_code].empty?
             xml.IT  obj[:ith_swissmedic]                            if obj[:ith_swissmedic]
             xml.CPT
             xml.PackGrSwissmedic      obj[:package_size]            if obj[:package_size]
@@ -1396,7 +1395,7 @@ module Oddb2xml
                   override(xml, prodno, :DSCR,  (sequence[:name_de] + ' ' + sequence[:desc_de]).strip)
                   override(xml, prodno, :DSCRF, (sequence[:name_fr] + ' ' + sequence[:desc_fr]).strip)
                 end
-                xml.ATC obj[:atc] if obj[:atc] and !obj[:atc].empty?
+                xml.ATC sequence[:atc_code] if sequence[:atc_code] && !sequence[:atc_code].empty?
                 if (first_package = sequence[:packages].values.first) &&
                    (first_limitation = first_package[:limitations].first)
                   lim_code = first_limitation[:code]
