@@ -590,7 +590,6 @@ describe Oddb2xml::Builder do
       inhalt = IO.read(@oddb_fi_product_xml)
     end
 
-if RUN_ALL
     it 'should produce valid xml files' do
       skip "Niklaus does not know how to create a valid oddb_fi_product.xml"
       # check_validation_via_xsd
@@ -680,9 +679,7 @@ if RUN_ALL
       checkPrices(true)
     end
   end
-end
 
-if RUN_ALL
   context 'when option -e is given' do
     before(:all) do
       common_run_init
@@ -860,7 +857,6 @@ if RUN_ALL
       checkItemForSALECD(doc, Oddb2xml::SOFRADEX_GTIN, 'I') # SOFRADEX
     end
   end
-if RUN_ALL
   context 'testing -e -I 80 option' do
     before(:all) do
       common_run_init
@@ -946,6 +942,8 @@ if RUN_ALL
       out = Oddb2xml.convert_to_8859_1(lines.first)
       expect(out.encoding.to_s).to eq 'ISO-8859-1'
       expect(out.chomp).to eq '<NAME_DE>SENSURA Mio 1t Uro 10-33 midi con lig so op 10 Stk</NAME_DE>'
+    end
+  end
 
   context 'when artikelstamm_v5 option is given' do
     before(:all) do
@@ -959,17 +957,50 @@ if RUN_ALL
       @inhalt = IO.read(@artikelstamm_v5_name)
     end
 
-    context 'should return produce a artikelstamm_v5.xml' do
-      @artikelstamm_v5_name = File.join(Oddb2xml::WorkDir, 'artikelstamm_v5.xml')
+    it 'should exist' do
+      expect(File.exists?(@artikelstamm_v5_name)).to eq true
+    end
 
-      it 'should exist' do
-        expect(File.exists?(@artikelstamm_v5_name)).to eq true
+    it 'should not contain a GTIN=0' do
+      expect(IO.read(@artikelstamm_v5_name).index('GTIN>0')).to be nil
+    end
+
+    it 'should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
+      skip("Where does the DSCR for 4042809018288 come from. It should be TENSOPLAST bande compression 5cmx4.5m")
+    end
+
+    it 'should ignore GTIN 7680172330414' do
+      # Took to much time to construct an example. Should change VCR
+      skip("No time to check that data/gtin2ignore.yaml has an effect")
+      @inhalt = IO.read(@artikelstamm_v5_name)
+      expect(@inhalt.index('7680172330414')).to be nil
+    end
+
+    it 'should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
+      skip("Where does the COMP GLN for 4042809018288 come from. It should be 7601003468441")
+    end
+
+    it 'shoud contain Lamivudinum as 3TC substance' do
+      @inhalt = IO.read(@artikelstamm_v5_name)
+      expect(@inhalt.index('<SUBSTANCE>Lamivudinum</SUBSTANCE>')).not_to be nil
+    end
+
+    it 'should validate against artikelstamm_v5.xsd' do
+      @v5_xsd = File.expand_path(File.join(File.dirname(__FILE__), 'data', 'Elexis_Artikelstamm_v5.xsd'))
+      xsd =open(@v5_xsd).read
+      # on the command line you might run
+      # xmllint --noout --schema Elexis_Artikelstamm_v5.xsd spec/run/artikelstamm_v5.xml
+      xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
+      file = @artikelstamm_v5_name
+      doc = Nokogiri::XML(File.read(file))
+      xsd_rtikelstamm_xml.validate(doc).each do
+        |error|
+          if error.message
+            puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@artikelstamm_v5_xsd}"
+          end
+          expect(error.message).to be_nil, "expected #{error.message} to be nil\nfor #{file} content \n#{File.read(file)}"
       end
-
-      it 'should not contain a GTIN=0' do
-        expect(IO.read(@artikelstamm_v5_name).index('GTIN>0')).to be nil
-      end
-
+    end
       tests = {
         'item 4042809018288 TENSOPLAST' =>
       %(<ITEM PHARMATYPE="N">
@@ -1051,45 +1082,5 @@ if RUN_ALL
           check_artikelstamm_v5_xml(key, expected)
         end
       end
-
-      it 'should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
-        skip("Where does the DSCR for 4042809018288 come from. It should be TENSOPLAST bande compression 5cmx4.5m")
-      end
-
-      it 'should ignore GTIN 7680172330414' do
-        # Took to much time to construct an example. Should change VCR
-        skip("No time to check that data/gtin2ignore.yaml has an effect")
-        @inhalt = IO.read(@artikelstamm_v5_name)
-        expect(@inhalt.index('7680172330414')).to be nil
-      end
-
-      it 'should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
-        skip("Where does the COMP GLN for 4042809018288 come from. It should be 7601003468441")
-      end
-
-      it 'shoud contain Lamivudinum as 3TC substance' do
-        @inhalt = IO.read(@artikelstamm_v5_name)
-        expect(@inhalt.index('<SUBSTANCE>Lamivudinum</SUBSTANCE>')).not_to be nil
-      end
-
-      it 'should validate against artikelstamm_v5.xsd' do
-        @v5_xsd = File.expand_path(File.join(File.dirname(__FILE__), 'data', 'Elexis_Artikelstamm_v5.xsd'))
-        xsd =open(@v5_xsd).read
-        # on the command line you might run
-        # xmllint --noout --schema Elexis_Artikelstamm_v5.xsd spec/run/artikelstamm_v5.xml
-        xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
-        file = @artikelstamm_v5_name
-        doc = Nokogiri::XML(File.read(file))
-        xsd_rtikelstamm_xml.validate(doc).each do
-          |error|
-            if error.message
-              puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@artikelstamm_v5_xsd}"
-            end
-            expect(error.message).to be_nil, "expected #{error.message} to be nil\nfor #{file} content \n#{File.read(file)}"
-        end
-      end
-    end
   end
-end
-end
 end

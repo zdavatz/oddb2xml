@@ -835,7 +835,7 @@ module Oddb2xml
               if zur_rose
                 xml.VAT zur_rose[:vat]
               end
-              emit_salecd(xml, ean13, obj)
+              emit_salecd(xml, ean, obj)
               if pac and pac[:limitation_points]
                 #xml.INSLIM
                 xml.LIMPTS pac[:limitation_points] unless pac[:limitation_points].empty?
@@ -929,21 +929,22 @@ module Oddb2xml
                   }
                 end
               end
-              if info_zur_rose
-                price = info_zur_rose[:price]
+              if zur_rose
+                price = zur_rose[:price]
                 xml.ARTPRI {
                   xml.PTYP  "ZURROSE"
                   xml.PRICE price
                 }
                 xml.ARTPRI {
                   xml.PTYP  "ZURROSEPUB"
-                  xml.PRICE info_zur_rose[:pub_price]
+                  xml.PRICE zur_rose[:pub_price]
                 }
                 xml.ARTPRI {
                   xml.PTYP  "RESELLERPUB"
                   xml.PRICE (price.to_f*(1 + (@options[:percent].to_f/100))).round_by(0.05).round(2)
                 } if @options[:percent] != nil
               end
+              nincd = detect_nincd(obj)
               if nincd
                 xml.ARTINS {
                   xml.NINCD nincd
@@ -1309,9 +1310,9 @@ module Oddb2xml
       if !@infos_zur_rose.empty? && ean13 && @infos_zur_rose[ean13]
         zur_rose = @infos_zur_rose[ean13] # zurrose
       end
-          # <xs:element name="SALECD" type="SALECDType" minOccurs="1" maxOccurs="1">
       nincd = detect_nincd(obj)
-      (nincd && nincd == 13) ? xml.SALECD('A') : xml.SALECD( (zur_rose && zur_rose[:cmut] != '3') ? 'A' : 'I') # XML_OPTIONS
+      status = (nincd && nincd == 13) ?  'A' : (zur_rose && zur_rose[:cmut] != '3') ? 'A' : 'I'
+      xml.SALECD(status) { xml.comment( "expiry_date #{obj[:expiry_date]}") if obj[:expiry_date] }
     end
 
     def build_artikelstamm_v5

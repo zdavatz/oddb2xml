@@ -1,6 +1,11 @@
 === Upcoming
 
-* Artikelstamm_V5 seems to work
+* Artikelstamm_V5 seems to work with the following additions
+** Better reporting of downloads
+** Allow overriding a specific field of an item
+** trace data_origin
+** Better spec tests for options
+** Trollop instead of optparse
 
 === 2.4.3 / 11.09.2017
 

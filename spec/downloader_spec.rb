@@ -481,20 +481,10 @@ end
 
 describe Oddb2xml::MedregbmDownloader do
   include ServerMockHelper
-  before(:all) do
-    VCR.eject_cassette
-  end
+  before(:all) do VCR.eject_cassette end
   before(:each) do
-    VCR.eject_cassette
     VCR.configure do |c|
-        c.default_cassette_options = { :record => ARGV.join(' ').index('downloader_spec') ? :new_episodes : :once ,
-                                      :preserve_exact_body_bytes => true,
-                                      :allow_playback_repeats => true,
-                                      :serialize_with => :json,
-                                      :decode_compressed_response => true,
-                                      :match_requests_on => [:method, :uri, :body],
-                                       }
-        c.before_record(:medreg) do |i|
+      c.before_record(:medreg) do |i|
         if /medregbm.admin.ch/i.match(i.request.uri)
           puts "#{Time.now}: #{__LINE__}: URI was #{i.request.uri} containing #{i.response.body.size/(1024*1024)} MB "
           begin
@@ -527,12 +517,14 @@ describe Oddb2xml::MedregbmDownloader do
         end
       end
     end
-    VCR.insert_cassette('medreg', :tag => :medreg)
+    common_before
   end
   after(:each) do common_after end
 
   context 'betrieb' do
     before(:each) do
+      VCR.eject_cassette
+      VCR.insert_cassette('oddb2xml', :tag => :medreg)
       @downloader = Oddb2xml::MedregbmDownloader.new(:company)
       @downloader.download
     end
@@ -542,18 +534,19 @@ describe Oddb2xml::MedregbmDownloader do
       let(:txt) { @downloader.download }
       it 'should return valid String' do
         expect(txt).to be_a String
-        expect(txt.bytes).to be (nil || txt.bytes.size > 10)
+        expect(txt.bytes).not_to be nil
       end
       it 'should clean up current directory' do
         expect { txt }.not_to raise_error
         expect(File.exist?('oddb_company.xls')).to eq(false)
-        expect(File.exist?('medregbm_company.txt')).to eq(false)
       end
     end
   end
 
   context 'person' do
     before(:each) do
+      VCR.eject_cassette
+      VCR.insert_cassette('oddb2xml', :tag => :medreg)
       @downloader = Oddb2xml::MedregbmDownloader.new(:person)
     end
     after(:each) do common_after end
@@ -563,7 +556,6 @@ describe Oddb2xml::MedregbmDownloader do
         @downloader.download
       }
       it 'should return valid String' do
-        skip 'Medreg person does not work at the moment'
         expect(txt).to be_a String
         expect(txt.bytes).not_to be nil
       end

@@ -202,8 +202,10 @@ module Oddb2xml
     end
     def download
       file = "medregbm_#{@type.to_s}.txt"
+      download_as(file, 'r:iso-8859-1:utf-8')
       report_download(@url, file)
       FileUtils.rm_f(file, :verbose => false) # we need it only in the download
+      file
     end
   end
   class BagXmlDownloader < Downloader

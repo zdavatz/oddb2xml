@@ -289,6 +289,7 @@ module Oddb2xml
               :insulin_category     => row[COLUMNS_JULY_2015.keys.index(:insulin_category)].value.to_s,
               :drug_index           => row[COLUMNS_JULY_2015.keys.index(:drug_index)].value.to_s,
               :data_origin          => 'swissmedic_package',
+              :expiry_date          => row[COLUMNS_JULY_2015.keys.index(:expiry_date)].value.to_s,
             }
           end
         end
