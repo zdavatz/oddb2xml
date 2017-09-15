@@ -1369,7 +1369,9 @@ module Oddb2xml
           'xmlns'  => 'http://elexis.ch/Elexis_Artikelstamm_v5',
           'CREATION_DATETIME' => Time.new.strftime(elexis_strftime_format),
           'BUILD_DATETIME'    => Time.new.strftime(elexis_strftime_format),
+          'DATA_SOURCE'       => 'oddb2xml',
         }
+        emitted_prodno = []
         xml.ARTIKELSTAMM(options_v5) do
           xml.PRODUCTS do
             products = @products.sort_by { |ean13, obj| ean13 }
@@ -1387,6 +1389,8 @@ module Oddb2xml
               prodno = ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
               next unless prodno
               next unless sequence && sequence[:name_de]
+              next if emitted_prodno.index(prodno)
+              emitted_prodno << prodno
               nr_products += 1
               xml.PRODUCT do
                 xml.PRODNO prodno
@@ -1416,10 +1420,13 @@ module Oddb2xml
               end
             end
           end
+          emitted_lim_code = []
           xml.LIMITATIONS do
             @limitations.sort! { |left, right| left[:code] <=> right[:code] }
             @limitations.each do |lim|
               next unless used_limitations.index(lim[:code])
+              next if emitted_lim_code.index(lim[:code])
+              emitted_lim_code << lim[:code]
               xml.LIMITATION do
                 xml.LIMNAMEBAG lim[:code] # original LIMCD
                 xml.DSCR       lim[:desc_de]
