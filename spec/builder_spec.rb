@@ -1095,7 +1095,6 @@ describe Oddb2xml::Builder do
             <GTIN>7680002770014</GTIN>
             <SALECD>A</SALECD>
             <DSCR>Coeur-Vaisseaux Sérocytol, suppositoire</DSCR>
-            <DSCRF/>
             <COMP>
                 <NAME>Sérolab, société anonyme</NAME>
                 <GLN/>

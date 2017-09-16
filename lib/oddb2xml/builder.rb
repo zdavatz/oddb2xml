@@ -1442,31 +1442,30 @@ module Oddb2xml
             gtins.sort!.uniq!
             @nr_articles = gtins.size
             gtins.each do |ean13|
-              obj = gtins_to_article[ean13] || @infos_zur_rose[ean13] || @packs[ean13]
-              nr_articles += 1
               ean13 = 0 if sprintf('%013d', ean13).match(/^000000/)
+              pac,no8 = nil,ean13.to_s[4..11] # BAG-XML(SL/LS)
               next if ean13 == 0
+              obj = gtins_to_article[ean13] || @infos_zur_rose[ean13]
+              if obj
+                obj = @packs[no8].merge(obj) if @packs[no8]
+              else
+                obj = @packs[no8] # obj not yet in refdata. Use data from swissmedic_package.xlsx
+              end
+              nr_articles += 1
               Oddb2xml.log "build_article #{nr_articles} of #{gtins.size} articles" if nr_articles % 5000 == 0
               item = @items[ean13]
-              pac,no8 = nil,ean13.to_s[4..11] # BAG-XML(SL/LS)
               pack_info = nil
               pack_info = @packs[no8] if no8 # info from Packungen.xlsx from swissmedic_info
-              unless obj # obj not yet in refdata. Use data from swissmedic_package.xlsx
-                obj =  @packs[no8]
-                obj[:desc_de] = obj[:sequence_name]
-                sequence = {:packages =>{ean13 => @packs[no8]}}
-                obj[:seq] = sequence
-              end
               next if pack_info && /Tierarzneimittel/.match(pack_info[:list_code])
               next if obj[:desc_de] && /ad us vet/i.match(obj[:desc_de])
               pharma_code = obj[:pharmacode]
-              sequence  ||= obj[:seq]
-              if sequence
-                pac = sequence[:packages][obj[:pharmacode]]
-                pac = sequence[:packages][ean13] unless pac
-              else
-                pac = @items[ean13][:packages][ean13] if @items and ean13 and @items[ean13] and @items[ean13][:packages]
-              end if false
+              sequence    = obj[:seq]
+              unless sequence
+                if  @packs[no8]
+                  sequence = {:packages =>{ean13 => @packs[no8]}}
+                  obj[:seq] = sequence
+                end
+              end
               if no8
                 ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
               end
@@ -1476,8 +1475,8 @@ module Oddb2xml
                     xml.GTIN package[:ean]
                     xml.PHAR pharma_code if pharma_code
                     xml.SALECD('A') # these products are always active!
-                    xml.DSCR obj[:desc_de]
-                    xml.DSCRF obj[:desc_fr]
+                    xml.DSCR  obj[:desc_de] || obj[:sequence_name]
+                    xml.DSCRF obj[:desc_fr] if obj[:desc_fr]
                     xml.COMP  do # Manufacturer
                       xml.NAME  obj[:company_name]
                       xml.GLN   obj[:company_ean]
