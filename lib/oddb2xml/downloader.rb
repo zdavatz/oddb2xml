@@ -228,6 +228,11 @@ module Oddb2xml
         end
       end
       content = read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
+      if @options[:artikelstamm_v5]
+        cmd = "xmllint --format --output Preparations.xml Preparations.xml"
+        Oddb2xml.log(cmd)
+        system(cmd)
+      end
       FileUtils.rm_f(file, :verbose => false) unless defined?(RSpec)
       content
     end
@@ -270,6 +275,11 @@ module Oddb2xml
             response = nil # win
             FileUtils.makedirs(Downloads)
             File.open(file2save, 'w+') { |file| file.write xml }
+            if @options[:artikelstamm_v5]
+              cmd = "xmllint --format --output #{file2save} #{file2save}"
+              Oddb2xml.log(cmd)
+              system(cmd)
+            end
           else
             # received broken data or internal error
             raise StandardError
@@ -315,6 +325,11 @@ module Oddb2xml
           response = link.click
           response.save_as(file)
           response = nil # win
+        end
+        if @options[:artikelstamm_v5]
+          cmd = "ssconvert #{file} #{File.join(Downloads, File.basename(file).sub(/\.xls.*/, '.csv'))} 2> /dev/null"
+          Oddb2xml.log(cmd)
+          system(cmd)
         end
         return File.expand_path(file)
       rescue Timeout::Error, Errno::ETIMEDOUT

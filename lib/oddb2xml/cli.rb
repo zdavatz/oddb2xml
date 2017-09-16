@@ -187,7 +187,7 @@ module Oddb2xml
       when :orphan
         var = what.to_s
         begin # instead of Thread.new do
-          downloader = SwissmedicDownloader.new(what)
+          downloader = SwissmedicDownloader.new(what, @options)
           bin = downloader.download
           Oddb2xml.log("SwissmedicDownloader #{var} #{bin} #{File.size(bin)} bytes")
           self.instance_variable_set(

@@ -237,7 +237,7 @@ module Oddb2xml
           if obj[:ean] # via EAN-Code
             obj[:no8] = obj[:ean].to_s[4..11]
           end
-          if obj[:no8] and ppac = @packs[obj[:no8].intern] and # Packungen.xls
+          if obj[:no8] && (ppac = @packs[obj[:no8]]) && # Packungen.xls
               !ppac[:is_tier]
             # If RefData does not have EAN
             if obj[:ean].nil?
@@ -515,7 +515,7 @@ module Oddb2xml
               xml.PRD('DT' => obj[:last_change]) do
               nbr_products += 1
               xml.GTIN ean
-              ppac = ((_ppac = @packs[ean.to_s[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
+              ppac = ((_ppac = @packs[ean.to_s[4..11]] and !_ppac[:is_tier]) ? _ppac : {})
               unless ppac
                 ppac = @packs.find{|pac| pac.ean == ean }.first
               end
@@ -685,7 +685,7 @@ module Oddb2xml
         end unless suppress_composition_parsing
         ean12 = '7680' + no8
         ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
-        @calc_items[ean13] = info
+        @calc_items[ean13.to_i] = info
       end
     end
     def build_calc
@@ -787,7 +787,7 @@ module Oddb2xml
             item = @items[obj[:ean]]
             pac,no8 = nil,obj[:ean].to_s[4..11] # BAG-XML(SL/LS)
             pack_info = nil
-            pack_info = @packs[no8.intern] if no8 # info from Packungen.xlsx from swissmedic_info
+            pack_info = @packs[no8] if no8 # info from Packungen.xlsx from swissmedic_info
             ppac = nil                        # Packungen
             ean = obj[:ean]
             next if pack_info and /Tierarzneimittel/.match(pack_info[:list_code])
@@ -1206,7 +1206,7 @@ module Oddb2xml
           end
             # :swissmedic_numbers
           if pac
-            no8 = pac[:swissmedic_number8].intern
+            no8 = pac[:swissmedic_number8]
           end
           if pac and pac[:prices] == nil and no8
             ppac = ((ppac = pack_info and ppac[:is_tier]) ? ppac : nil)
@@ -1382,7 +1382,7 @@ module Oddb2xml
               sequence = obj[:seq]
               ean = obj[:ean]
               next unless check_name(obj, :de)
-              ppac = ((_ppac = @packs[ean.to_s[4..11].intern] and !_ppac[:is_tier]) ? _ppac : {})
+              ppac = ((_ppac = @packs[ean.to_s[4..11]] and !_ppac[:is_tier]) ? _ppac : {})
               unless ppac
                 ppac = @packs.find{|pac| pac.ean == ean }.first
               end
@@ -1434,17 +1434,15 @@ module Oddb2xml
               end
             end
           end
-
           xml.ITEMS do
             gtins_to_article = {}
-            @articles.each {|article| gtins_to_article[article[:ean]] = article }
-            gtins_to_article
-            gtins = gtins_to_article.keys + @infos_zur_rose.keys
+            @articles.each {|article| gtins_to_article[article[:ean].to_i] = article }
+            gtins = gtins_to_article.keys + @infos_zur_rose.keys + @packs.values.collect{|x| x[:ean].to_i}
             gtins = (gtins-@@gtin2ignore)
             gtins.sort!.uniq!
             @nr_articles = gtins.size
             gtins.each do |ean13|
-              obj = gtins_to_article[ean13] || @infos_zur_rose[ean13]
+              obj = gtins_to_article[ean13] || @infos_zur_rose[ean13] || @packs[ean13]
               nr_articles += 1
               ean13 = 0 if sprintf('%013d', ean13).match(/^000000/)
               next if ean13 == 0
@@ -1452,16 +1450,23 @@ module Oddb2xml
               item = @items[ean13]
               pac,no8 = nil,ean13.to_s[4..11] # BAG-XML(SL/LS)
               pack_info = nil
-              pack_info = @packs[no8.intern] if no8 # info from Packungen.xlsx from swissmedic_info
+              pack_info = @packs[no8] if no8 # info from Packungen.xlsx from swissmedic_info
+              unless obj # obj not yet in refdata. Use data from swissmedic_package.xlsx
+                obj =  @packs[no8]
+                obj[:desc_de] = obj[:sequence_name]
+                sequence = {:packages =>{ean13 => @packs[no8]}}
+                obj[:seq] = sequence
+              end
               next if pack_info && /Tierarzneimittel/.match(pack_info[:list_code])
               next if obj[:desc_de] && /ad us vet/i.match(obj[:desc_de])
               pharma_code = obj[:pharmacode]
-              if sequence = obj[:seq]
+              sequence  ||= obj[:seq]
+              if sequence
                 pac = sequence[:packages][obj[:pharmacode]]
                 pac = sequence[:packages][ean13] unless pac
               else
                 pac = @items[ean13][:packages][ean13] if @items and ean13 and @items[ean13] and @items[ean13][:packages]
-              end
+              end if false
               if no8
                 ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
               end
@@ -1477,23 +1482,27 @@ module Oddb2xml
                       xml.NAME  obj[:company_name]
                       xml.GLN   obj[:company_ean]
                     end
-                    xml.PEXF package[:prices][:exf_price][:price] if package[:prices][:exf_price][:price] &&
-                        !package[:prices][:exf_price][:price].empty?
-                    xml.PPUB package[:prices][:pub_price][:price]
-                    info = @calc_items[ean13.to_s]
+                    if package[:prices]
+                      xml.PEXF package[:prices][:exf_price][:price] if package[:prices][:exf_price][:price] &&
+                          !package[:prices][:exf_price][:price].empty?
+                      xml.PPUB package[:prices][:pub_price][:price]
+                    end
+                    info = @calc_items[ean13]
                     if info
                       # MEASSURE Measurement Unit,e.g. Pills or milliliters
                       #             <DSCR>HIRUDOID Creme 3 mg/g 40 g</DSCR>
-                      if info.pkg_size && info.unit
+                      xml.PKG_SIZE info.pkg_size.to_i if info.pkg_size
+                      if info.measure
+                        xml.MEASURE   info.measure
+                      elsif info.pkg_size && info.unit
                         xml.MEASURE   info.pkg_size + ' ' + info.unit
                       elsif info.pkg_size
                         xml.MEASURE   info.pkg_size
-                      elsif info.measure
-                        xml.MEASURE   info.measure
                       end
                       xml.MEASUREF    info.measure
                       # Die Darreichungsform dieses Items. zB Tablette(n) oder Spritze(n)
-                      xml.DOSAGE_FORMF info.galenic_form.descriptions['de']
+                      xml.DOSAGE_FORM  info.galenic_form.descriptions['de'] if info.galenic_form.descriptions['de']
+                      xml.DOSAGE_FORMF info.galenic_form.descriptions['fr'] if info.galenic_form.descriptions['fr']
                     end
                     xml.SL_ENTRY          'true' if  @items[ean13]
                     xml.IKSCAT            package[:swissmedic_category]

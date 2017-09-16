@@ -272,7 +272,7 @@ module Oddb2xml
           unless no8.empty?
             next if no8.to_i == 0
             ean_base12 = "7680#{no8}"
-            data[no8.intern] = {
+            data[no8] = {
               :ean                  => (ean_base12.ljust(12, '0') + Oddb2xml.calc_checksum(ean_base12)),
               :prodno               => prodno ? prodno : '',
               :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
@@ -290,8 +290,12 @@ module Oddb2xml
               :drug_index           => row[COLUMNS_JULY_2015.keys.index(:drug_index)].value.to_s,
               :data_origin          => 'swissmedic_package',
               :expiry_date          => row[COLUMNS_JULY_2015.keys.index(:expiry_date)].value.to_s,
+              :company_name         => row[COLUMNS_JULY_2015.keys.index(:company)].value.to_s,
+              :size                 => row[COLUMNS_JULY_2015.keys.index(:size)].value.to_s,
+              :unit                 => row[COLUMNS_JULY_2015.keys.index(:unit)].value.to_s,
             }
           end
+          require 'pry'; binding.pry if  data[no8][:ean] == 7680667190028  # 7680 66719 002 8
         end
       end
       cleanup_file

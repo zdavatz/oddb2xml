@@ -351,7 +351,7 @@ end
 def checkAndGetProductWithGTIN(doc, gtin)
   products = XPath.match( doc, "//PRD[GTIN=#{gtin.to_s}]")
   gtins    = XPath.match( doc, "//PRD[GTIN=#{gtin.to_s}]/GTIN")
-  binding.pry unless gtins.size == 1
+  # binding.pry unless gtins.size == 1
   expect(gtins.size).to eq 1
   expect(gtins.first.text).to eq gtin.to_s
   # return product
@@ -453,7 +453,10 @@ end
 def check_artikelstamm_v5_xml(key, expected_value)
   expect(@artikelstamm_v5_name).not_to be nil
   expect(@inhalt).not_to be nil
-  binding.pry unless @inhalt.index(expected_value)
+  unless @inhalt.index(expected_value)
+    puts expected_value
+    # binding.pry
+  end
   expect(@inhalt.index(expected_value)).not_to be nil
 end
 
@@ -1025,9 +1028,11 @@ describe Oddb2xml::Builder do
             </COMP>
             <PEXF>4.4606</PEXF>
             <PPUB>8.25</PPUB>
-            <MEASURE>30 Tablette(n)</MEASURE>
+            <PKG_SIZE>30</PKG_SIZE>
+            <MEASURE>Tablette(n)</MEASURE>
             <MEASUREF>Tablette(n)</MEASUREF>
-            <DOSAGE_FORMF>Tupfer</DOSAGE_FORMF>
+            <DOSAGE_FORM>Tupfer</DOSAGE_FORM>
+            <DOSAGE_FORMF>Compresse</DOSAGE_FORMF>
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>C</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
@@ -1046,9 +1051,10 @@ describe Oddb2xml::Builder do
             </COMP>
             <PEXF>4.768575</PEXF>
             <PPUB>8.8</PPUB>
-            <MEASURE>40 g</MEASURE>
+            <PKG_SIZE>40</PKG_SIZE>
+            <MEASURE>g</MEASURE>
             <MEASUREF>g</MEASUREF>
-            <DOSAGE_FORMF>Creme</DOSAGE_FORMF>
+            <DOSAGE_FORM>Creme</DOSAGE_FORM>
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>D</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
@@ -1067,9 +1073,11 @@ describe Oddb2xml::Builder do
             </COMP>
             <PEXF>3.83</PEXF>
             <PPUB>8.5</PPUB>
-            <MEASURE>5 x 2 ml Ampulle(n)</MEASURE>
+            <PKG_SIZE>5</PKG_SIZE>
+            <MEASURE>Ampulle(n)</MEASURE>
             <MEASUREF>Ampulle(n)</MEASUREF>
-            <DOSAGE_FORMF>Injektionslösung</DOSAGE_FORMF>
+            <DOSAGE_FORM>Injektionslösung</DOSAGE_FORM>
+            <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>B</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
@@ -1083,6 +1091,45 @@ describe Oddb2xml::Builder do
             <ATC>J05AF05</ATC>
             <SUBSTANCE>Lamivudinum</SUBSTANCE>
         </PRODUCT>),
+        'nur aus Packungen Coeur-Vaisseaux Sérocytol,' => %(<ITEM PHARMATYPE="P">
+            <GTIN>7680002770014</GTIN>
+            <SALECD>A</SALECD>
+            <DSCR>Coeur-Vaisseaux Sérocytol, suppositoire</DSCR>
+            <DSCRF/>
+            <COMP>
+                <NAME>Sérolab, société anonyme</NAME>
+                <GLN/>
+            </COMP>
+            <PKG_SIZE>3</PKG_SIZE>
+            <MEASURE>Suppositorien</MEASURE>
+            <MEASUREF>Suppositorien</MEASUREF>
+            <DOSAGE_FORM>suppositoire</DOSAGE_FORM>
+            <IKSCAT>B</IKSCAT>
+            <DEDUCTIBLE>20</DEDUCTIBLE>
+            <PRODNO>0027701</PRODNO>
+        </ITEM>),
+        'HUMALOG (Richter)' => %(<ITEM PHARMATYPE="P">
+            <GTIN>7680532900196</GTIN>
+            <PHAR>1699999</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>HUMALOG Inj Lös 100 IE/ml Durchstf 10 ml</DSCR>
+            <DSCRF>HUMALOG sol inj 100 UI/ml flac 10 ml</DSCRF>
+            <COMP>
+                <NAME>Eli Lilly (Suisse) SA</NAME>
+                <GLN>7601001261853</GLN>
+            </COMP>
+            <PEXF>30.4</PEXF>
+            <PPUB>51.3</PPUB>
+            <PKG_SIZE>1</PKG_SIZE>
+            <MEASURE>Flasche(n)</MEASURE>
+            <MEASUREF>Flasche(n)</MEASUREF>
+            <DOSAGE_FORM>Injektionslösung</DOSAGE_FORM>
+            <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>B</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>5329001</PRODNO>
+        </ITEM>)
               }
 
       tests.each do |key, expected|
