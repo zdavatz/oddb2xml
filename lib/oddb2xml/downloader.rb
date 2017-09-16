@@ -327,7 +327,7 @@ module Oddb2xml
           response = nil # win
         end
         if @options[:artikelstamm_v5]
-          cmd = "ssconvert #{file} #{File.join(Downloads, File.basename(file).sub(/\.xls.*/, '.csv'))} 2> /dev/null"
+          cmd = "ssconvert '#{file}' '#{File.join(Downloads, File.basename(file).sub(/\.xls.*/, '.csv'))}' 2> /dev/null"
           Oddb2xml.log(cmd)
           system(cmd)
         end
