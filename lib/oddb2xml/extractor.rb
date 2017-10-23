@@ -69,9 +69,18 @@ module Oddb2xml
         item[:pharmacodes] = []
         item[:packages]    = {} # pharmacode => package
         seq.Packs.Pack.each do |pac|
+          if pac.SwissmedicNo8 && pac.SwissmedicNo8.length < 8
+            puts "BagXmlExtractor: Adding leading zeros for SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}"
+            pac.SwissmedicNo8  = pac.SwissmedicNo8.rjust(8, '0')
+          end
           unless pac.GTIN
-            puts "BagXmlExtractor: Skipping as missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId}. Skipping" if $VERBOSE
-            next
+            unless pac.SwissmedicNo8
+              puts "BagXmlExtractor: Skipping as missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}. Skipping"
+            else
+              ean12 = '7680' + pac.SwissmedicNo8
+              pac.GTIN  = (ean12 + Oddb2xml.calc_checksum(ean12))
+              puts "BagXmlExtractor: Setting missing GTIN  #{pac.GTIN} in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}."
+            end
           end
           ean = pac.GTIN.to_i
           # packages
@@ -90,7 +99,7 @@ module Oddb2xml
           item[:packages][ean] = {
             :ean                 => ean,
             :swissmedic_category => (cat = pac.SwissmedicCategory) ? cat : '',
-            :swissmedic_number8  => (num = pac.SwissmedicNo8)      ? num.rjust(8, '0') : '',
+            :swissmedic_number8  => (num = pac.SwissmedicNo8)      ? num : '',
             :prices              => { :exf_price => exf, :pub_price => pub },
           }
           # related all limitations
