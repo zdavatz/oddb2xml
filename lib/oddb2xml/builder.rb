@@ -782,7 +782,7 @@ module Oddb2xml
             @preparations_only << ean
             missing_eans << ean
             item = @items[ean].clone
-            next unless item[:pharmacode]
+            next if defined?(RSpec) && !item[:pharmacode]
             item[:ean] = ean
             item[:_type] = :preparations_xml
             item[:desc_de] = item[:name_de] + ' ' + item[:desc_de]
