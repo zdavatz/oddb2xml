@@ -779,6 +779,23 @@ module Oddb2xml
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
+        eans_from_refdata = @articles.collect{|refdata|  refdata[:ean] }
+        eans_from_preparations = @items.keys
+        missing_eans = []
+        eans_from_preparations.each do |ean|
+          next if ean.to_i == 0
+          unless eans_from_refdata.index(ean)
+            @preparations_only << ean
+            missing_eans << ean
+            item = @items[ean].clone
+            next if defined?(RSpec) && !item[:pharmacode]
+            item[:ean] = ean
+            item[:_type] = :preparations_xml
+            item[:desc_de] = item[:name_de] + ' ' + item[:desc_de]
+            item[:desc_fr] = item[:name_fr] + ' ' + item[:desc_fr]
+            @articles << item
+          end
+        end
         xml.ARTICLE(XML_OPTIONS) {
         @articles.sort! { |a,b| a[:ean] <=> b[:ean] }
         @articles.each do |obj|
