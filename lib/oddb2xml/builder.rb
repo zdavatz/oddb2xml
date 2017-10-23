@@ -768,10 +768,28 @@ module Oddb2xml
       prepare_articles
       idx = 0
       nbr_records = 0
+      @preparations_only = []
       Oddb2xml.log "build_article #{idx} of #{@articles.size} articles"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
+        eans_from_refdata = @articles.collect{|refdata|  refdata[:ean] }
+        eans_from_preparations = @items.keys
+        missing_eans = []
+        eans_from_preparations.each do |ean|
+          next if ean.to_i == 0
+          unless eans_from_refdata.index(ean)
+            @preparations_only << ean
+            missing_eans << ean
+            item = @items[ean].clone
+            next unless item[:pharmacode]
+            item[:ean] = ean
+            item[:_type] = :preparations_xml
+            item[:desc_de] = item[:name_de] + ' ' + item[:desc_de]
+            item[:desc_fr] = item[:name_fr] + ' ' + item[:desc_fr]
+            @articles << item
+          end
+        end
         xml.ARTICLE(XML_OPTIONS) {
         @articles.sort! { |a,b| a[:ean] <=> b[:ean] }
         @articles.each do |obj|
@@ -844,9 +862,6 @@ module Oddb2xml
                 xml.BG(flag ? 'Y' : 'N')
               end
               #xml.EXP
-              if item and item[:substances] and substance = item[:substances].first
-                xml.QTY   "#{substance[:quantity]}#{substance[:unit] ? ' ' + substance[:unit] : ''}"
-              end if false # TODO: get qty/unit from refdata name
               xml.DSCRD obj[:desc_de]            if obj[:desc_de] and not obj[:desc_de].empty?
               xml.DSCRF obj[:desc_fr]            if obj[:desc_fr] and not obj[:desc_fr].empty?
               xml.DSCRF obj[:desc_de]            if !obj[:desc_fr] or obj[:desc_fr].empty?
@@ -953,7 +968,7 @@ module Oddb2xml
           }
         }
       end
-      Oddb2xml.log "build_article. Done #{idx} of #{@articles.size} articles"
+      Oddb2xml.log "build_article. Done #{idx} of #{@articles.size} articles " + ( @preparations_only.size > 0 ? ('. Only in preparations.xml '+ @preparations_only.join(' ')) : '')
       Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_fi
@@ -1108,6 +1123,7 @@ module Oddb2xml
       elsif @items[de_idx[:pharmacode]] # BAG-XML (SL/LS)
         10
       elsif (de_idx[:migel] or # MiGel (xls)
+             de_idx[:_type] == :preparations_xml or
              de_idx[:_type] == :nonpharma) # MiGel (swissindex)
         13
       else
