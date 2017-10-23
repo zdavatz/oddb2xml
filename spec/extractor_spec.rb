@@ -125,7 +125,7 @@ describe Oddb2xml::BagXmlExtractor do
       expect(with_pharma[:packages].size).to eq(1)
       expect(with_pharma[:packages].first[0]).to eq(Oddb2xml::THREE_TC_GTIN)
       expect(with_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('205.3')
-      expect(@items.size).to eq(4)
+      expect(@items.size).to eq(5)
     end
     it "should handle pub_price for 7680620690084 correctly" do
       @items = subject.to_hash
