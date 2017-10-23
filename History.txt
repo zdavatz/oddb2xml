@@ -1,3 +1,8 @@
+=== 2.4.4 / 23.10.2017
+
+* Add articles which are only found in the Preparation.xml (e.g. Mutagrid)
+* Correct SwissmedicNo8 when less than 8 chars long
+
 === 2.4.3 / 11.09.2017
 
 * Never drop lines with UTF-8 problems while creating XML files
