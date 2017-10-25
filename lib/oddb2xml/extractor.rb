@@ -485,14 +485,14 @@ module Oddb2xml
           ean13 = $1.to_i
         end
         if data[ean13]
-          @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"
+          @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line}\norg: #{data[ean13][:line]}"
           @@items_without_ean13s -= 1
           @@duplicated_ean13s += 1
           next
         end
 
         data[ean13] = {
-          :line   => line.chomp,
+          :line   => line,
           :ean   => ean13,
           :clag  => line[73],
           :vat   => line[96],

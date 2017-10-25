@@ -220,6 +220,7 @@ module Oddb2xml
         @refdata.each_pair do |ean13, item|
           next if item and item.is_a?(Hash) and item[:atc_code] and /^Q/i.match(item[:atc_code])
           next if item[:prodno] and @products[item[:prodno]]
+          next unless ean13.to_s.length == 13
           obj = {
             :seq => @items[ean13] ? @items[ean13] : @items[item[:ean]],
             :pac => nil,
@@ -808,7 +809,7 @@ module Oddb2xml
             if obj[:seq]
               pac = obj[:seq][:packages][obj[:pharmacode]]
               pac = obj[:seq][:packages][ean] unless pac
-            else
+            elsif ean > 0
               pac = @items[ean][:packages][ean] if @items and ean and @items[ean] and @items[ean][:packages]
             end
             if no8
@@ -922,7 +923,7 @@ module Oddb2xml
                 xml.BC     /^9999|^0000|^0$/.match(ean.to_s) ? 0 : sprintf('%013d', ean)
                 xml.BCSTAT 'A' # P is alternative
                 #xml.PHAR2
-              } if ean
+              } if ean && ean > 0
               #xml.ARTCH {
                 #xml.PHAR2
                 #xml.CHTYPE
