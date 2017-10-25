@@ -608,6 +608,17 @@ Die HILFSSTOFFE sind Aqua ad iniectabilia und Natrii chloridum.
       specify { expect(argenti.chemical_substance).to eq  nil }
     end
   end
+  context 'shire Subcuvia' do
+#   def initialize(column_c = nil, size = nil, unit = nil, active_substance = nil, composition= nil)
+    substance = 'immunoglobulinum humanum normale'
+    composition = 'proteina 160 mg cum immunoglobulinum humanum normale min. 95 %, glycinum, natrii chloridum, aqua ad iniectabilia, q.s. ad solutionem pro 1 ml.'
+    info = Calc.new('Subcuvia, Injektionslösung', '5', 'ml', substance, composition)
+    specify { expect(info.compositions.first.substances.first.name).to eq 'Proteina' }
+    specify { expect(info.compositions.first.substances[1].name).to eq 'Cum Immunoglobulinum Humanum Normale' }
+    specify { expect(info.compositions.first.substances[1].is_active_agent).to eq true }
+    specify { expect(info.pkg_size).to eq '5' }
+  end
+
 end
 
 describe Oddb2xml::Calc do

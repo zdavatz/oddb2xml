@@ -35,6 +35,32 @@ describe ParseComposition do
     specify { expect( composition.substances.first.name).to eq "E 216" }
   end
 
+  context 'Shire Subcuvia' do
+#   def initialize(column_c = nil, size = nil, unit = nil, active_substance = nil, composition= nil)
+    active_substance = 'immunoglobulinum humanum normale'
+    composition_text = 'proteina 160 mg cum immunoglobulinum humanum normale min. 95 %, glycinum, natrii chloridum, aqua ad iniectabilia, q.s. ad solutionem pro 1 ml.'
+    composition = ParseUtil.parse_compositions(composition_text, active_substance).first
+    specify { expect(composition.substances.size).to eq 4 }
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.label_description).to eq nil }
+    specify { expect(composition.substances[0].name).to eq 'Proteina' }
+    specify { expect(composition.substances[1].name).to eq 'Cum Immunoglobulinum Humanum Normale' }
+    specify { expect(composition.substances[0].is_active_agent).to eq false }
+    specify { expect(composition.substances[1].is_active_agent).to eq true }
+  end
+
+  context 'Shire Fosrenol' do
+#   def initialize(column_c = nil, size = nil, unit = nil, active_substance = nil, composition= nil)
+    active_substance = 'lanthanum'
+    composition_text = 'lanthanum 500 mg ut lanthani (III) carbonas hydricum, excipiens pro compresso.'
+    composition = ParseUtil.parse_compositions(composition_text, active_substance).first
+    specify { expect(composition.substances.size).to eq 1 }
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.label_description).to eq nil }
+    specify { expect(composition.substances[0].is_active_agent).to eq true }
+    specify { expect(composition.substances[0].name).to eq 'Lanthanum 500 Mg Ut Lanthani (iii) Carbonas Hydricum' }
+  end
+
   context "should return label with description" do
     string = "I) Glucoselösung: glucosum anhydricum 240 g ut glucosum monohydricum, calcii chloridum dihydricum 600 mg, acidum citricum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 500 ml."
     composition = ParseComposition.from_string(string)
@@ -708,8 +734,9 @@ describe ParseComposition do
     end
 
     context "should parse a complex composition" do
-      string = 'globulina equina (immunisé avec coeur) 8 mg'
-      composition = ParseUtil.parse_compositions(string).first
+      composition = ParseUtil.parse_compositions(
+        'globulina equina (immunisé avec coeur) 8 mg',
+        'globulina equina (immunisé avec coeur)').first
       specify { expect(composition.substances.size).to eq 1 }
       globulina = composition.substances.find{ |x| /globulina/i.match(x.name) }
       specify { expect(globulina.name).to eq 'Globulina Equina (immunisé Avec Coeur)' }
@@ -719,8 +746,9 @@ describe ParseComposition do
     end
 
     context "should parse globulina equina (immunise" do
-      string = 'globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg'
-      composition = ParseUtil.parse_compositions(string).first
+      composition = ParseUtil.parse_compositions(
+        'globulina equina (immunisé avec coeur, Tissu Pulmonaire, Reins De Porcins) 8 mg',
+        'globulina equina (immunisé avec coeur, Tissu Pulmonaire, Reins De Porcins)').first
       specify { expect(composition.substances.size).to eq 1 }
       globulina = composition.substances.find{ |x| /globulina/i.match(x.name) }
       specify { expect(globulina.name).to eq 'Globulina Equina (immunisé Avec Coeur, Tissu Pulmonaire, Reins De Porcins)' }
