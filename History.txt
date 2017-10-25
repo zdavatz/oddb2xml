@@ -1,3 +1,8 @@
+=== 2.4.6 / 25.10.2017
+
+* PHAR is optional in oddb2xml.xsd
+* Minimal length of DSCRD is 3. Emit BC/EAN 0 as required by XSD
+
 === 2.4.5 / 25.10.2017
 
 * Fix parsing shire products
