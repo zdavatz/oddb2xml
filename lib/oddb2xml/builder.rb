@@ -798,12 +798,14 @@ module Oddb2xml
           Oddb2xml.log "build_article #{idx} of #{@articles.size} articles" if idx % 500 == 0
             item = @items[obj[:ean]]
             pac,no8 = nil,obj[:ean].to_s[4..11] # BAG-XML(SL/LS)
-            pack_info = nil
+              pack_info = nil
             pack_info = @packs[no8.intern] if no8 # info from Packungen.xlsx from swissmedic_info
             ppac = nil                        # Packungen
             ean = obj[:ean]
             next if pack_info and /Tierarzneimittel/.match(pack_info[:list_code])
             next if obj[:desc_de] and /ad us vet/i.match(obj[:desc_de])
+            next if obj[:desc_de] and obj[:desc_de].length < 3
+            next if obj[:desc_fr] and obj[:desc_fr].length < 3
             pharma_code = obj[:pharmacode]
             ean = 0 if sprintf('%013d', ean).match(/^000000/)
             if obj[:seq]
@@ -822,7 +824,15 @@ module Oddb2xml
             xml.ART('DT' => obj[:last_change] ? obj[:last_change] : '') do
               nbr_records += 1
               xml.REF_DATA (obj[:refdata] || @migel[pharma_code]) ? '1' : '0'
-              xml.PHAR  sprintf('%07d', obj[:pharmacode]) if obj[:pharmacode]
+              if obj[:pharmacode]
+                xml.PHAR  sprintf('%07d', obj[:pharmacode])
+              elsif ean > 0
+                xml.PHAR  ean
+              else
+                @@counter_pseudo_ean ||= 0
+                @@counter_pseudo_ean += 1
+                xml.PHAR  sprintf('9999%07d', @@counter_pseudo_ean) # here we must add a pharmacode or validating will fail
+              end
               #xml.GRPCD
               #xml.CDS01
               #xml.CDS02
@@ -923,7 +933,7 @@ module Oddb2xml
                 xml.BC     /^9999|^0000|^0$/.match(ean.to_s) ? 0 : sprintf('%013d', ean)
                 xml.BCSTAT 'A' # P is alternative
                 #xml.PHAR2
-              } if ean && ean > 0
+              } if ean
               #xml.ARTCH {
                 #xml.PHAR2
                 #xml.CHTYPE

@@ -167,6 +167,7 @@ module Oddb2xml
           pts = pac.PointLimitations.PointLimitation.first # only first points
           item[:packages][ean][:limitation_points] = pts ? pts.Points : ''
           data[ean] = item
+          puts item if /NaCl Bichsel/.match(item[:name_de]) && ean == 7680298002271
         end
       end
       data
