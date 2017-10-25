@@ -1,3 +1,10 @@
+=== 2.4.5 / 25.10.2017
+
+* Fix parsing shire products
+* Don't emit barcode if 0.
+* Do not get price for barcode 0
+* Fix some failing spec tests
+
 === 2.4.4 / 23.10.2017
 
 * Add articles which are only found in the Preparation.xml (e.g. Mutagrid)
