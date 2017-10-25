@@ -309,6 +309,7 @@ def check_validation_via_xsd
       |error|
         if error.message
           puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@oddb2xml_xsd}"
+          puts "cmd would be: xsdvalidate #{@oddb2xml_xsd} #{file}"
         end
         expect(error.message).to be_nil, "expected #{error.message} to be nil\nfor #{file} content \n#{File.read(file)}"
     end
@@ -377,7 +378,6 @@ def checkArticleXml(checkERYTHROCIN = true)
 
   desitin = checkAndGetArticleWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
   expect(desitin).not_to eq nil
-  # TODO: why is this now nil? desitin.elements['ATC'].text.should == 'N03AX14'
   expect(desitin.elements['DSCRD'].text).to eq("LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk")
   expect(desitin.elements['DSCRF'].text).to eq('LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce')
   expect(desitin.elements['REF_DATA'].text).to eq('1')
@@ -405,7 +405,6 @@ def checkArticleXml(checkERYTHROCIN = true)
   expect(zyvoxid.elements['DSCRD'].text).to eq 'ZYVOXID Filmtabl 600 mg 10 Stk'
 
   expect(XPath.match( doc, "//LIMPTS" ).size).to be >= 1
-  # TODO: desitin.elements['QTY'].text.should eq '250 mg'
 end
 
 def checkProductXml(nbr_record = -1)
@@ -581,7 +580,7 @@ describe Oddb2xml::Builder do
       m = /<paragraph><!\[CDATA\[(.+)\n(.*)/.match(inhalt.to_s)
       expect(m[1]).to eq '<?xml version="1.0" encoding="utf-8"?><div xmlns="http://www.w3.org/1999/xhtml">'
       expected = '<p class="s2"> </p>'
-      skip { m[2].should eq '<p class="s4" id="section1"><span class="s2"><span>Zyvoxid</span></span><sup class="s3"><span>®</span></sup></p>'  }
+      skip { expect(m[2]).to eq '<p class="s4" id="section1"><span class="s2"><span>Zyvoxid</span></span><sup class="s3"><span>®</span></sup></p>'  }
       expect(File.exists?(@oddb_fi_product_xml)).to eq true
       inhalt = IO.read(@oddb_fi_product_xml)
     end
@@ -881,7 +880,7 @@ if RUN_ALL
       expect(File.exists?(oddb_article_xml)).to eq true
       doc = REXML::Document.new IO.read(oddb_article_xml)
       article = XPath.match( doc, "//ART[PHAR=5822801]").first
-      article.elements['DSCRD'].text.should match /EPIMINERAL/i
+      expect(article.elements['DSCRD'].text).to match(/EPIMINERAL/)
     end
 
     it 'should generate a correct oddb_product.xml' do
@@ -891,7 +890,7 @@ if RUN_ALL
     it 'should generate an article with the COOL (fridge) attribute' do
       doc = REXML::Document.new File.new(oddb_article_xml)
       fridge_product = checkAndGetArticleWithGTIN(doc, Oddb2xml::FRIDGE_GTIN)
-      fridge_product.elements['COOL'].text.should == '1'
+      expect(fridge_product.elements['COOL'].text).to eq '1'
     end
 
     it 'should generate a correct oddb_article.xml' do
@@ -919,7 +918,6 @@ if RUN_ALL
       expect(oddb_dat).to match(/^..3/), "should have a record with '3' in CMUT field"
       expect(oddb_dat).to match(RegExpDesitin), "should have Desitin"
       IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 0) }
-      # oddb_dat.should match(/^..1/), "should have a record with '1' in CMUT field" # we have no
     end
   end
 
