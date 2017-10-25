@@ -135,7 +135,7 @@
             </xs:restriction>
           </xs:simpleType>
         </xs:element>
-        <xs:element ref="ns1:PHAR"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="ns1:PHAR"/>
         <xs:element minOccurs="0" ref="ns1:SMCAT"/>
         <xs:element minOccurs="0" name="GEN_PRODUCTION" type="xs:string" />
         <xs:element minOccurs="0" name="INSULIN_CATEGORY" type="xs:string" />
