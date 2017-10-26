@@ -824,15 +824,7 @@ module Oddb2xml
             xml.ART('DT' => obj[:last_change] ? obj[:last_change] : '') do
               nbr_records += 1
               xml.REF_DATA (obj[:refdata] || @migel[pharma_code]) ? '1' : '0'
-              if obj[:pharmacode]
-                xml.PHAR  sprintf('%07d', obj[:pharmacode])
-              elsif ean > 0
-                xml.PHAR  ean
-              else
-                @@counter_pseudo_ean ||= 0
-                @@counter_pseudo_ean += 1
-                xml.PHAR  sprintf('9999%07d', @@counter_pseudo_ean) # here we must add a pharmacode or validating will fail
-              end
+              xml.PHAR  sprintf('%07d', obj[:pharmacode]) if obj[:pharmacode]
               #xml.GRPCD
               #xml.CDS01
               #xml.CDS02

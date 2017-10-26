@@ -1,3 +1,7 @@
+=== 2.4.7 / 26.10.2017
+
+* Only emit PHAR if present
+
 === 2.4.6 / 25.10.2017
 
 * PHAR is optional in oddb2xml.xsd
