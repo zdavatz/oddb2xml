@@ -292,26 +292,29 @@ def check_article_IGM_format(line, price_kendural=825, add_80_percents=false)
   return [found_SL, found_non_SL]
 end
 
+def validate_via_xsd(xsd_file, xml_file)
+  xsd =open(xsd_file).read
+  xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
+  doc = Nokogiri::XML(File.read(xml_file))
+  xsd_rtikelstamm_xml.validate(doc).each do
+    |error|
+      if error.message
+        puts "Failed validating #{xml_file} with #{File.size(xml_file)} bytes using XSD from #{xsd_file}"
+        puts "CMD: xmllint --noout --schema #{xsd_file} #{xml_file}"
+      end
+      msg = "expected #{error.message} to be nil\nfor #{xml_file}"
+      puts msg
+      expect(error.message).to be_nil, msg
+  end
+end
+
 def check_validation_via_xsd
-  @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
-  @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
-  expect(File.exists?(@oddb2xml_xsd)).to eq true
-  expect(File.exists?(@oddb_calc_xsd)).to eq true
   files = Dir.glob('*.xml')
-  xsd_oddb2xml = Nokogiri::XML::Schema(File.read(@oddb2xml_xsd))
-  xsd_oddb_calc = Nokogiri::XML::Schema(File.read(@oddb_calc_xsd))
   files.each{
     |file|
     next if /#{Time.now.year}/.match(file)
-    doc = Nokogiri::XML(File.read(file))
-    xsd2use = /oddb_calc/.match(file) ? xsd_oddb_calc : xsd_oddb2xml
-    xsd2use.validate(doc).each do
-      |error|
-        if error.message
-          puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@oddb2xml_xsd}"
-        end
-        expect(error.message).to be_nil, "expected #{error.message} to be nil\nfor #{file} content \n#{File.read(file)}"
-    end
+    xsd2use = /oddb_calc/.match(file) ? @oddb_calc_xsd : @oddb2xml_xsd
+    validate_via_xsd(xsd2use, file)
   }
 end
 
@@ -473,6 +476,14 @@ describe Oddb2xml::Builder do
   include ServerMockHelper
   def common_run_init
     @savedDir = Dir.pwd
+    @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
+    @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
+    @elexis_v3_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v003.xsd'))
+    @elexis_v5_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v5.xsd'))
+    expect(File.exist?(@oddb2xml_xsd)).to eq true
+    expect(File.exist?(@oddb_calc_xsd)).to eq true
+    expect(File.exist?(@elexis_v3_xsd)).to eq true
+    expect(File.exist?(@elexis_v5_xsd)).to eq true
     cleanup_directories_before_run
     FileUtils.makedirs(Oddb2xml::WorkDir)
     Dir.chdir(Oddb2xml::WorkDir)
@@ -964,6 +975,26 @@ describe Oddb2xml::Builder do
       expect(File.exists?(@artikelstamm_v5_name)).to eq true
     end
 
+    it 'should generate a valid v3 nonpharma xml' do
+      v3_name = @artikelstamm_v5_name.sub('_v5', '_v3').sub('artikelstamm_', 'artikelstamm_N_')
+      expect(File.exist?(v3_name)).to eq true
+      validate_via_xsd(@elexis_v3_xsd, v3_name)
+      expect(IO.read(v3_name)).not_to match(/<LIMITATION/)
+      expect(IO.read(v3_name)).not_to match(/GTIN>7680161050583/)
+      expect(IO.read(v3_name)).to match(/GTIN>4042809018288/)
+      expect(IO.read(v3_name)).not_to match(/<LPPV>true</)
+    end
+
+    it 'should generate a valid v3 pharma xml' do
+      v3_name = @artikelstamm_v5_name.sub('_v5', '_v3').sub('artikelstamm_', 'artikelstamm_P_')
+      expect(File.exist?(v3_name)).to eq true
+      validate_via_xsd(@elexis_v3_xsd, v3_name)
+      expect(IO.read(v3_name)).to match(/<LIMITATION/)
+      expect(IO.read(v3_name)).to match(/GTIN>7680161050583/)
+      expect(IO.read(v3_name)).not_to match(/GTIN>4042809018288/)
+      expect(IO.read(v3_name)).to match(/<LPPV>true</)
+    end
+
     it 'should not contain a GTIN=0' do
       expect(IO.read(@artikelstamm_v5_name).index('GTIN>0')).to be nil
     end
@@ -989,20 +1020,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should validate against artikelstamm_v5.xsd' do
-      @v5_xsd = File.expand_path(File.join(File.dirname(__FILE__), 'data', 'Elexis_Artikelstamm_v5.xsd'))
-      xsd =open(@v5_xsd).read
-      # on the command line you might run
-      # xmllint --noout --schema Elexis_Artikelstamm_v5.xsd spec/run/artikelstamm_v5.xml
-      xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
-      file = @artikelstamm_v5_name
-      doc = Nokogiri::XML(File.read(file))
-      xsd_rtikelstamm_xml.validate(doc).each do
-        |error|
-          if error.message
-            puts "Failed validating #{file} with #{File.size(file)} bytes using XSD from #{@artikelstamm_v5_xsd}"
-          end
-          expect(error.message).to be_nil, "expected #{error.message} to be nil\nfor #{file} content \n#{File.read(file)}"
-      end
+      validate_via_xsd(@elexis_v5_xsd, @artikelstamm_v5_name)
     end
       tests = {
         'item 4042809018288 TENSOPLAST' =>
@@ -1015,6 +1033,25 @@ describe Oddb2xml::Builder do
             <PEXF>0.00</PEXF>
             <PPUB>15.00</PPUB>
         </ITEM>),
+         'product 3247501 LANSOYL' => '<ITEM PHARMATYPE="P">
+            <GTIN>7680324750190</GTIN>
+            <PHAR>23722</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>LANSOYL Gel 225 g</DSCR>
+            <DSCRF>LANSOYL gel 225 g</DSCRF>
+            <COMP>
+                <NAME>Actipharm SA</NAME>
+                <GLN>7601001002012</GLN>
+            </COMP>
+            <PKG_SIZE>225</PKG_SIZE>
+            <MEASURE>g</MEASURE>
+            <MEASUREF>g</MEASUREF>
+            <DOSAGE_FORM>Gelée</DOSAGE_FORM>
+            <IKSCAT>D</IKSCAT>
+            <LPPV>true</LPPV>
+            <DEDUCTIBLE>20</DEDUCTIBLE>
+            <PRODNO>3247501</PRODNO>
+        </ITEM>',
         'product 5366201 3TC' =>
       "<ITEM PHARMATYPE=\"P\">
             <GTIN>7680353660163</GTIN>
@@ -1095,6 +1132,7 @@ describe Oddb2xml::Builder do
             <GTIN>7680002770014</GTIN>
             <SALECD>A</SALECD>
             <DSCR>Coeur-Vaisseaux Sérocytol, suppositoire</DSCR>
+            <DSCRF>--missing--</DSCRF>
             <COMP>
                 <NAME>Sérolab, société anonyme</NAME>
                 <GLN/>
