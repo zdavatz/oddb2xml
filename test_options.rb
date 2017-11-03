@@ -59,6 +59,7 @@ unless 'localhost.localdomain'.eql?(Socket.gethostbyname(Socket.gethostname).fir
   test_one_call('oddb2xml -f dat --append')
   test_one_call('oddb2xml --append')
 end
+test_one_call('oddb2xml --artikelstamm')
 test_one_call('oddb2xml --calc')
 test_one_call('oddb2xml -t md -c tar.gz')
 test_one_call('oddb2xml -o')

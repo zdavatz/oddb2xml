@@ -304,7 +304,6 @@ module Oddb2xml
               :unit                 => row[COLUMNS_JULY_2015.keys.index(:unit)].value.to_s,
             }
           end
-          require 'pry'; binding.pry if  data[no8][:ean] == 7680667190028  # 7680 66719 002 8
         end
       end
       cleanup_file

@@ -87,38 +87,36 @@ module Oddb2xml
     def build
       begin
         @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not (@options[:extended] || @options[:artikelstamm_v5])
-        files.each_pair do |sbj, file|
-          builder = Builder.new(@options) do |builder|
-            if @options[:calc] and not  (@options[:extended] || @options[:artikelstamm_v5])
-              builder.packs = @packs
-              builder.subject = sbj
-            elsif @options[:address]
-              builder.subject   = sbj
-              builder.companies = @companies
-              builder.people    = @people
-            else # product
-              if @options[:format] != :dat
-                refdata = {}
-                types.each do |type|
-                  refdata.merge!(@refdata_types[type]) if @refdata_types[type]
-                end
-                builder.refdata = refdata
-                builder.subject = sbj
+        builder = Builder.new(@options) do |builder|
+          if @options[:calc] and not  (@options[:extended] || @options[:artikelstamm_v5])
+            builder.packs = @packs
+          elsif @options[:address]
+            builder.companies = @companies
+            builder.people    = @people
+          else # product
+            if @options[:format] != :dat
+              refdata = {}
+              types.each do |type|
+                refdata.merge!(@refdata_types[type]) if @refdata_types[type]
               end
-              # common sources
-              builder.items = @items
-              builder.flags = @flags
-              builder.lppvs = @lppvs
-              # optional sources
-              builder.infos = @infos
-              builder.packs = @packs
-              # additional sources
-              %w[actions orphan migel infos_zur_rose].each do |addition|
-                builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
-              end
+              builder.refdata = refdata
             end
-            builder.tag_suffix = @options[:tag_suffix]
+            # common sources
+            builder.items = @items
+            builder.flags = @flags
+            builder.lppvs = @lppvs
+            # optional sources
+            builder.infos = @infos
+            builder.packs = @packs
+            # additional sources
+            %w[actions orphan migel infos_zur_rose].each do |addition|
+              builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
+            end
           end
+          builder.tag_suffix = @options[:tag_suffix]
+        end
+        files.each_pair do |sbj, file|
+          builder.subject = sbj
           output = ''
           if !@options[:address] and (@options[:format] == :dat)
             types.each do |type|
