@@ -5,6 +5,7 @@ require 'rubyntlm'
 require 'mechanize'
 require 'zip'
 require 'savon'
+require 'open-uri'
 
 SkipMigelDownloader = true  # https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls
 
@@ -275,14 +276,10 @@ module Oddb2xml
       @options = options
       case @type
       when :orphan
-        action = "arzneimittel/00156/00221/00222/00223/00224/00227/00228/index.html?lang=de"
-        @xpath = "//div[@id='sprungmarke10_3']//a[@title='Humanarzneimittel']"
+        @direct_url_link = "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/humanarzneimittel.orphan.xlsx.download.xlsx/humanarzneimittel.xlsx"
       when :package
-        action = "arzneimittel/00156/00221/00222/00230/index.html?lang=de"
-        @xpath = "//div[@id='sprungmarke10_7']//a[@title='Excel-Version Zugelassene Verpackungen*']"
+        @direct_url_link = "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx"
       end
-      url = "https://www.swissmedic.ch/#{action}"
-      super(@options, url)
     end
     def download
       @type == file = File.join(Oddb2xml::WorkDir, "swissmedic_#{@type}.xlsx")
@@ -292,12 +289,8 @@ module Oddb2xml
       end
       begin
         FileUtils.rm(File.expand_path(file), :verbose => !defined?(RSpec)) if File.exists?(File.expand_path(file))
-        page = @agent.get(@url)
-        if !page.class.is_a?(String) and link_node = page.search(@xpath).first
-          link = Mechanize::Page::Link.new(link_node, @agent, page)
-          response = link.click
-          response.save_as(file)
-          response = nil # win
+        File.open(file, 'w+') do |output|
+          output.write open(@direct_url_link).read
         end
         return File.expand_path(file)
       rescue Timeout::Error, Errno::ETIMEDOUT

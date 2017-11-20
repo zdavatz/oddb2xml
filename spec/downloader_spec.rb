@@ -188,49 +188,59 @@ describe Oddb2xml::RefdataDownloader do
   end
 end
 
-	describe Oddb2xml::SwissmedicDownloader do
+def cleanPackungenXlsx(info)
+  m = /dokumente\/liste/i.match(info.request.uri)
+  puts "#{Time.now}:  #{__LINE__} SwissmedicDownloader #{info.request.uri} #{m[1]} (#{info.response.body.size/(1024*1024)} MB )."
+  return unless m
+  name = nil
+  name = 'packungen' if /zugelasseneverpackungen/.match(info.request.uri)
+  name = 'orphan' if /zugelasseneverpackungen/.match(info.request.uri)
+  swissmedic_dir = File.join(Oddb2xml::WorkDir, 'swissmedic')
+  FileUtils.makedirs(swissmedic_dir)
+  xlsx_name = File.join(swissmedic_dir, name + '.xlsx')
+  if /Packungen/i.match(xlsx_name)
+      FileUtils.rm(xlsx_name, :verbose => true) if File.exists?(xlsx_name)
+    File.open(xlsx_name, 'wb+') { |f| f.write(info.response.body) }
+    FileUtils.cp(xlsx_name, File.join(Oddb2xml::SpecData, 'swissmedic_package_downloaded.xlsx'), :verbose => true, :preserve => true)
+    puts "#{Time.now}:  #{__LINE__}: Openening saved #{xlsx_name} (#{File.size(xlsx_name)} bytes) will take some time. URI was #{info.request.uri}"
+    workbook = RubyXL::Parser.parse(xlsx_name)
+    worksheet = workbook[0]
+    drugs = []
+    Oddb2xml::GTINS_DRUGS.each{ |x| next unless x.to_s.size == 13; drugs << [x.to_s[4..8].to_i, x.to_s[9..11].to_i] };
+    idx = 6; to_delete = []
+    puts "#{Time.now}: Finding items to delete will take some time"
+    while (worksheet.sheet_data[idx])
+    idx += 1
+    next unless worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_JULY_2015.keys.index(:iksnr)]
+    to_delete << (idx-1) unless drugs.find{ |x| x[0]== worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_JULY_2015.keys.index(:iksnr)].value.to_i and
+                                                x[1]== worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_JULY_2015.keys.index(:ikscd)].value.to_i
+                                            }
+    end
+    if to_delete.size > 0
+      puts "#{Time.now}: Deleting #{to_delete.size} of the #{idx} items will take some time"
+      to_delete.reverse.each{ |row_id|  worksheet.delete_row(row_id) }
+      workbook.write(xlsx_name)
+      FileUtils.cp(xlsx_name, File.join(Oddb2xml::SpecData, 'swissmedic_package_shortened.xlsx'), :verbose => true, :preserve => true)
+      info.response.body = IO.binread(xlsx_name)
+      info.response.headers['Content-Length'] = info.response.body.size
+      puts "#{Time.now}: response.body is now #{info.response.body.size/(1024*1024)} MB  long. #{xlsx_name} was #{File.size(xlsx_name)}"
+    end
+  end
+end
+
+describe Oddb2xml::SwissmedicDownloader do
   include ServerMockHelper
   before(:each) do
     VCR.configure do |c|
       c.before_record(:swissmedic) do |i|
+          config = c
+          info = i
+      begin
         if i.response.headers['Content-Disposition'] and /www.swissmedic.ch/.match(i.request.uri) and i.response.body.size > 1024*1024
-          puts "#{Time.now}: #{__LINE__} URI was #{i.request.uri}"
-          m = /filename=.([^\d]+)/.match(i.response.headers['Content-Disposition'][0])
-          puts "#{Time.now}:  #{__LINE__} SwissmedicDownloader #{m[1]} (#{i.response.body.size/(1024*1024)} MB )."
-          if m and true
-            name = m[1].chomp('_')
-            swissmedic_dir = File.join(Oddb2xml::WorkDir, 'swissmedic')
-            FileUtils.makedirs(swissmedic_dir)
-            xlsx_name = File.join(swissmedic_dir, name + '.xlsx')
-            if /Packungen/i.match(xlsx_name)
-              FileUtils.rm(xlsx_name, :verbose => true) if File.exists?(xlsx_name)
-              File.open(xlsx_name, 'wb+') { |f| f.write(i.response.body) }
-              FileUtils.cp(xlsx_name, File.join(Oddb2xml::SpecData, 'swissmedic_package_downloaded.xlsx'), :verbose => true, :preserve => true)
-              puts "#{Time.now}:  #{__LINE__}: Openening saved #{xlsx_name} (#{File.size(xlsx_name)} bytes) will take some time. URI was #{i.request.uri}"
-              workbook = RubyXL::Parser.parse(xlsx_name)
-              worksheet = workbook[0]
-              drugs = []
-              Oddb2xml::GTINS_DRUGS.each{ |x| next unless x.to_s.size == 13; drugs << [x.to_s[4..8].to_i, x.to_s[9..11].to_i] };
-              idx = 6; to_delete = []
-              puts "#{Time.now}: Finding items to delete will take some time"
-              while (worksheet.sheet_data[idx])
-                idx += 1
-                next unless worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_JULY_2015.keys.index(:iksnr)]
-                to_delete << (idx-1) unless drugs.find{ |x| x[0]== worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_JULY_2015.keys.index(:iksnr)].value.to_i and
-                                                            x[1]== worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_JULY_2015.keys.index(:ikscd)].value.to_i
-                                                      }
-              end
-              if to_delete.size > 0
-                puts "#{Time.now}: Deleting #{to_delete.size} of the #{idx} items will take some time"
-                to_delete.reverse.each{ |row_id|  worksheet.delete_row(row_id) }
-                workbook.write(xlsx_name)
-                FileUtils.cp(xlsx_name, File.join(Oddb2xml::SpecData, 'swissmedic_package_shortened.xlsx'), :verbose => true, :preserve => true)
-                i.response.body = IO.binread(xlsx_name)
-                i.response.headers['Content-Length'] = i.response.body.size
-                puts "#{Time.now}: response.body is now #{i.response.body.size/(1024*1024)} MB  long. #{xlsx_name} was #{File.size(xlsx_name)}"
-              end
-            end
-          end
+          cleanPackungenXlsx(i)
+        end
+        rescue => error
+            require 'pry'; binding.pry
         end
       end
     end
@@ -239,6 +249,19 @@ end
 
   context 'orphan' do
     before(:each) do
+      VCR.configure do |c|
+        c.before_record(:swissmedic) do |i|
+            config = c
+            info = i
+        begin
+          if i.response.headers['Content-Disposition'] and /www.swissmedic.ch/.match(i.request.uri) and i.response.body.size > 1024*1024
+            cleanPackungenXlsx(i)
+          end
+          rescue => error
+              require 'pry'; binding.pry
+          end
+        end
+      end
       VCR.eject_cassette
       VCR.insert_cassette('oddb2xml', :tag => :swissmedic, :exclusive => false)
       common_before
