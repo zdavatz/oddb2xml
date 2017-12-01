@@ -34,6 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rack', '< 2.0'
   spec.add_dependency 'httpi' #, '>= 2.4.1'
   spec.add_dependency 'trollop' #, '>= 2.4.1'
+  spec.add_dependency 'xml-simple'
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
@@ -42,5 +43,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rdoc"
   spec.add_development_dependency "vcr"
   spec.add_development_dependency "timecop"
+  spec.add_development_dependency "flexmock"
 end
 

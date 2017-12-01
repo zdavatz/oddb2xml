@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ARTIKELSTAMM xmlns="http://elexis.ch/Elexis_Artikelstamm_v5" CREATION_DATETIME="2017-12-01T03:34:58.000+01:00" BUILD_DATETIME="2017-12-01T08:39:09.605+01:00" DATA_SOURCE="oddb2xml">
+    <PRODUCTS>
+        <PRODUCT>
+            <PRODNO>3903201</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>RESYL Plus Sirup</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <ATC>R05FA02</ATC>
+            <SUBSTANCE>Opium-Derivate und Expektoranzien</SUBSTANCE>
+        </PRODUCT>
+        <PRODUCT>
+            <PRODNO>0027701</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>COEUR-VAISSEAUX Sérocytol Suppositoire</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <ATC>J06AA99</ATC>
+        </PRODUCT>
+        <PRODUCT>
+            <PRODNO>0027801</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>SEROCYTOL Kolon Supp</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <ATC>J06AA99</ATC>
+        </PRODUCT>
+        <PRODUCT>
+            <PRODNO>0027901</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>SEROCYTOL Bindegewebe Supp</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <ATC>J06AA99</ATC>
+        </PRODUCT>
+    </PRODUCTS>
+    <LIMITATIONS>
+        <LIMITATION>
+            <LIMNAMEBAG>070240</LIMNAMEBAG>
+            <DSCR>Gesamthaft zugelassen: &lt;b&gt;40&lt;/b&gt; Punkte</DSCR>
+            <DSCRF>Prescription limitée au maximum à: &lt;b&gt;40&lt;/b&gt; points</DSCRF>
+            <LIMITATION_PTS>40</LIMITATION_PTS>
+        </LIMITATION>
+        <LIMITATION>
+            <LIMNAMEBAG>071330</LIMNAMEBAG>
+            <DSCR>Kostenübernahme nur nach vorgängiger allergologischer Abklärung.</DSCR>
+            <DSCRF>Prise en charge seulement après exploration allergologique.</DSCRF>
+        </LIMITATION>
+        <LIMITATION>
+            <LIMNAMEBAG>070810</LIMNAMEBAG>
+            <DSCR>Nicht zur Adipositasbehandlung&lt;br&gt;
+Kostenübernahme nur nach vorgängiger endokrinologischer Untersuchung, auf besondere Gutsprache der Kasse und mit ausdrücklicher Bewilligung des Vertrauensarztes. Die maximale Behandlungsdauer beträgt ein Jahr.</DSCR>
+            <DSCRF>Non admis pour le traitement de l'adiposité.&lt;br&gt;
+Prise en charge seulement après examen endocrinologique préalable si la caisse a donné une garantie spéciale et avec l'autorisation expresse du médecin-conseil. La durée maximale du traitement se limite à une année.</DSCRF>
+        </LIMITATION>
+    </LIMITATIONS>
+    <ITEMS>
+        <ITEM PHARMATYPE="N">
+            <GTIN>9810510033990</GTIN>
+            <SALECD>A</SALECD>
+            <DSCR>ULTRATIP Krückenkapseln 17-19mm rot</DSCR>
+            <DSCRF>ULTRATIP Krückenkapseln 17-19mm rot</DSCRF>
+            <PEXF>0.0</PEXF>
+            <PPUB>15.4</PPUB>
+        </ITEM>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680002770021</GTIN>
+            <SALECD>A</SALECD>
+            <DSCR>Coeur-Vaisseaux Sérocytol, suppositoire</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PKG_SIZE>9</PKG_SIZE>
+            <MEASURE>Suppositorien</MEASURE>
+            <DOSAGE_FORM>supp</DOSAGE_FORM>
+            <PRODNO>0027701</PRODNO>
+        </ITEM>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680259263666</GTIN>
+            <PHAR>1143629</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>VITAMIN C Streuli Inj Lös 20 % 10 Amp 5 ml</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>8.72</PEXF>
+            <PPUB>17.05</PPUB>
+            <PKG_SIZE>10</PKG_SIZE>
+            <MEASURE>Ampulle(n)</MEASURE>
+            <DOSAGE_FORM>inj lös</DOSAGE_FORM>
+            <IKSCAT>B</IKSCAT>
+            <PRODNO>2592607</PRODNO>
+        </ITEM>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680259263239</GTIN>
+            <PHAR>456438</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>VITAMIN C Streuli Inj Lös 10 % 10 Amp 5 ml</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>7.95</PEXF>
+            <PPUB>16.25</PPUB>
+            <PKG_SIZE>10</PKG_SIZE>
+            <MEASURE>Ampulle(n)</MEASURE>
+            <DOSAGE_FORM>inj lös</DOSAGE_FORM>
+            <IKSCAT>B</IKSCAT>
+            <PRODNO>2592606</PRODNO>
+        </ITEM>
+    </ITEMS>
+</ARTIKELSTAMM>

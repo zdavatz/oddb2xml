@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ARTIKELSTAMM xmlns="http://elexis.ch/Elexis_Artikelstamm_v5" CREATION_DATETIME="2017-12-01T11:14:53.453+01:00" BUILD_DATETIME="2017-12-01T11:14:53.453+01:00" DATA_SOURCE="oddb2xml">
+    <PRODUCTS>
+        <PRODUCT>
+            <PRODNO>3903201</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>Resyl Plus Sirup</DSCR>
+            <DSCRF>Resyl Plus sirop</DSCRF>
+            <ATC>R05FA02</ATC>
+            <SUBSTANCE>Verschiedene Kombinationen</SUBSTANCE>
+        </PRODUCT>
+        <PRODUCT>
+            <PRODNO>3420101</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>Rhinocure Lös</DSCR>
+            <DSCRF>Rhinocure sol</DSCRF>
+            <ATC>R01AX10</ATC>
+            <SUBSTANCE>Verschiedene Kombinationen</SUBSTANCE>
+        </PRODUCT>
+        <PRODUCT>
+            <PRODNO>4045401</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>Indocid Retard Ret Kaps 75 mg</DSCR>
+            <DSCRF>Indocid Retard caps ret 75 mg</DSCRF>
+            <ATC>M01AB01</ATC>
+            <SUBSTANCE>Indometacinum</SUBSTANCE>
+        </PRODUCT>
+    </PRODUCTS>
+    <LIMITATIONS>
+        <LIMITATION>
+            <LIMNAMEBAG>070240</LIMNAMEBAG>
+            <DSCR>Gesamthaft zugelassen: &lt;b&gt;40&lt;/b&gt; Punkte</DSCR>
+            <DSCRF>Prescription limitée au maximum à: &lt;b&gt;40&lt;/b&gt; points</DSCRF>
+        </LIMITATION>
+        <LIMITATION>
+            <LIMNAMEBAG>070810</LIMNAMEBAG>
+            <DSCR>Nicht zur Adipositasbehandlung&lt;br&gt;
+Kostenübernahme nur nach vorgängiger endokrinologischer Untersuchung, auf besondere Gutsprache der Kasse und mit ausdrücklicher Bewilligung des Vertrauensarztes. Die maximale Behandlungsdauer beträgt ein Jahr.</DSCR>
+            <DSCRF>Non admis pour le traitement de l'adiposité.&lt;br&gt;
+Prise en charge seulement après examen endocrinologique préalable si la caisse a donné une garantie spéciale et avec l'autorisation expresse du médecin-conseil. La durée maximale du traitement se limite à une année.</DSCRF>
+        </LIMITATION>
+        <LIMITATION>
+            <LIMNAMEBAG>071330</LIMNAMEBAG>
+            <DSCR>Kostenübernahme nur nach vorgängiger allergologischer Abklärung.</DSCR>
+            <DSCRF>Prise en charge seulement après exploration allergologique.</DSCRF>
+        </LIMITATION>
+        <LIMITATION>
+            <LIMNAMEBAG>0808</LIMNAMEBAG>
+            <DSCR>Die Kostenübernahme der Impfstoffe für präventive Massnahmen in der obligatorischen Krankenpflegeversicherung wird in Art. 12a KLV geregelt. Die Voraussetzungen, damit die Impfungen bezahlt werden, sind in Bst. a bis m dieses Artikels abschliessend umschrieben.&lt;br&gt;
+Die Preise der Impfstoffe sind Höchstpreise (Art. 52 Abs. 3 KVG) und kommen bei Reihenimpfungen (z.B. im schulärztlichen Dienst) nicht zur Anwendung. In diesen Fällen gelten die von den Krankenversicherern mit den zuständigen Behörden ausgehandelten bzw. die allenfalls von den Behörden festgesetzten Tarife.&lt;br&gt;
+Für Hepatitis-B-Reihenimpfungen von Kindern und Jugendlichen gilt der Preis von Fr. 19.80 für eine Dose unter der Voraussetzung einer minimalen Bestellung von 100 Dosen an eine Lieferadresse.&lt;br&gt;
+Wenn der Impfstoff zum obgenannten Serienpreis bezogen wird, darf der Arzt, die Ärztin nicht zum Einzelpreis (= Publikumspreis) der SL weiterverrechnen. Dies würde eine klare Umgehung von Art. 56 Absätze 3 und 4 des KVG bedeuten und wäre als Rechtsmissbrauch zu ahnden.</DSCR>
+            <DSCRF>L'article 12a de l'OPAS règle la prise en charge par l'assurance obligatoire des soins des vaccins pour les mesures médicales de prévention. Les conditions de remboursement de ces vaccins sont énoncées de manière exhaustive aux lettres a à m de cet article.&lt;br&gt;
+Les prix des vaccins sont des prix maximum (art. 52, 3èeme al, LAMal). Ils ne s'appliquent pas aux vaccinations en série (p. ex. à celles effectuées par les services médicaux dans les écoles). Sont applicables pour ces cas, les tarifs fixés par convention entre les assureurs et les autorités compétentes ou, le cas échéant, ceux fixés par les autorités compétentes.&lt;br&gt;
+Pour les vaccinations en série contre l'hépatite B pour les enfants et les jeunes, le prix est de Fr. 19.80 pour une dose à condition d'une commande minimale de 100 doses à l'adresse d'un déstinataire.&lt;br&gt;
+Si le vaccin est obtenu au prix de série susmentionné, le médecin ne peut pas le facturer au prix par unité (= prix publique) de la LS. Cela équivaudrait à éluder manifestement l'article 56 alinéas 3 et 4 LAMal et serait considéré comme un abus de droit.</DSCRF>
+        </LIMITATION>
+    </LIMITATIONS>
+    <ITEMS>
+        <ITEM PHARMATYPE="N">
+            <GTIN>9810510033990</GTIN>
+            <PHAR>2798723</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>ULTRATIP Krückenkapseln 17-19mm rot</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>0.00</PEXF>
+            <PPUB>15.40</PPUB>
+        </ITEM>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680002770021</GTIN>
+            <SALECD>A</SALECD>
+            <DSCR>Coeur-Vaisseaux Sérocytol, suppositoire</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <COMP>
+                <NAME>Sérolab, société anonyme</NAME>
+                <GLN/>
+            </COMP>
+            <PKG_SIZE>9</PKG_SIZE>
+            <MEASURE>Suppositorien</MEASURE>
+            <MEASUREF>Suppositorien</MEASUREF>
+            <DOSAGE_FORM>suppositoire</DOSAGE_FORM>
+            <IKSCAT>B</IKSCAT>
+            <DEDUCTIBLE>20</DEDUCTIBLE>
+            <PRODNO>0027701</PRODNO>
+        </ITEM>
+        <ITEM PHARMATYPE="N">
+            <GTIN>30102415</GTIN>
+            <PHAR>5454964</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>ROCHE POSAY Tolériane Teint Blush rose doré</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>17.21</PEXF>
+            <PPUB>24.50</PPUB>
+        </ITEM>
+        <ITEM PHARMATYPE="N">
+            <GTIN>40133249</GTIN>
+            <PHAR>6824618</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>DOVE DermaSpa Bodycream Kaschmirgefühl Topf 300 ml</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>5.80</PEXF>
+            <PPUB>7.20</PPUB>
+        </ITEM>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680259263666</GTIN>
+            <PHAR>1143629</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>VITAMIN C Streuli Inj Lös 20 % 10 Amp 5 ml</DSCR>
+            <DSCRF>VITAMINE C Streuli sol inj 20 % 10 amp 5 ml</DSCRF>
+            <COMP>
+                <NAME>Streuli Pharma AG</NAME>
+                <GLN>7601001004214</GLN>
+            </COMP>
+            <PKG_SIZE>10</PKG_SIZE>
+            <MEASURE>Ampulle(n)</MEASURE>
+            <MEASUREF>Ampulle(n)</MEASUREF>
+            <DOSAGE_FORM>Injektionslösung</DOSAGE_FORM>
+            <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
+            <IKSCAT>B</IKSCAT>
+            <DEDUCTIBLE>20</DEDUCTIBLE>
+            <PRODNO>2592607</PRODNO>
+        </ITEM>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680259263239</GTIN>
+            <PHAR>456438</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>VITAMIN C Streuli Inj Lös 10 % 10 Amp 5 ml</DSCR>
+            <DSCRF>VITAMINE C Streuli sol inj 10 % 10 amp 5 ml</DSCRF>
+            <COMP>
+                <NAME>Streuli Pharma AG</NAME>
+                <GLN>7601001004214</GLN>
+            </COMP>
+            <PKG_SIZE>10</PKG_SIZE>
+            <MEASURE>Ampulle(n)</MEASURE>
+            <MEASUREF>Ampulle(n)</MEASUREF>
+            <DOSAGE_FORM>Injektionslösung</DOSAGE_FORM>
+            <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
+            <IKSCAT>B</IKSCAT>
+            <DEDUCTIBLE>20</DEDUCTIBLE>
+            <PRODNO>2592606</PRODNO>
+        </ITEM>
+        <ITEM PHARMATYPE="N">
+            <GTIN>9810510033990</GTIN>
+            <PHAR>2798723</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>ULTRATIP Krückenkapseln 17-19mm rot</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>0.00</PEXF>
+            <PPUB>15.40</PPUB>
+        </ITEM>
+    </ITEMS>
+</ARTIKELSTAMM>

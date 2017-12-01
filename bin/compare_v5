@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+require 'pathname'
+
+root = Pathname.new(__FILE__).realpath.parent.parent
+$:.unshift root.join('lib') if $0 == __FILE__
+
+require 'oddb2xml/version'
+require 'oddb2xml/compare'
+require 'trollop'
+
+@opts = Trollop::options(ARGV) do
+  version "#$0 ver.#{Oddb2xml::VERSION}"
+  banner <<-EOS
+  Usage:
+  compare_v5 [option] first_v5_xml second_v5_xml
+EOS
+end
+$stdout.sync = true
+
+args = ARGV
+if args.size != 2
+  puts "you must pass exactly two  existing files. Not #{args}"
+  exit 2
+end
+
+startTime = Time.now
+result = Oddb2xml::CompareV5.new(ARGV.first, ARGV.last).compare
+diff = (Time.now-startTime).to_i
+puts "#{Time.now}: #{__FILE__} done. Took #{diff} seconds"
