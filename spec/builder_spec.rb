@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require "rexml/document"
+require 'webmock/rspec'
 include REXML
 RUN_ALL = true
 
@@ -474,12 +475,13 @@ describe Oddb2xml::Builder do
   NrProducts = 19
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
-  def common_run_init
+  def common_run_init(options = {})
     @savedDir = Dir.pwd
     @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
     @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
     @elexis_v3_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v003.xsd'))
     @elexis_v5_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v5.xsd'))
+    @elexis_v5_csv = File.join(Oddb2xml::WorkDir, 'Elexis_Artikelstamm_v5.csv')
     expect(File.exist?(@oddb2xml_xsd)).to eq true
     expect(File.exist?(@oddb_calc_xsd)).to eq true
     expect(File.exist?(@elexis_v3_xsd)).to eq true
@@ -488,6 +490,20 @@ describe Oddb2xml::Builder do
     FileUtils.makedirs(Oddb2xml::WorkDir)
     Dir.chdir(Oddb2xml::WorkDir)
     VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
+    WebMock.enable!
+    { 'https://download.epha.ch/cleaned/matrix.csv' =>  'epha_interactions.csv',
+#      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/humanarzneimittel.orphan.xlsx.download.xlsx/humanarzneimittel.xlsx' =>  'swissmedic_orphan.xlsx',
+      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx' => 'swissmedic_package.xlsx',
+#      'http://pillbox.oddb.org/TRANSFER.ZIP' =>  'vcr/transfer.zip',
+      'https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv' => 'atc.csv',
+      'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt' => 'oddb2xml_files_lppv.txt',
+#      'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip' => 'XMLPublications.zip',
+#      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml',
+      }.each do |url, file|
+      inhalt = File.read(File.join(Oddb2xml::SpecData, file))
+      puts  "stub #{url} => #{file}"
+      stub_request(:get,url).to_return(body: inhalt)
+    end
   end
 
   after(:all) do
@@ -501,7 +517,7 @@ describe Oddb2xml::Builder do
       @rexml = REXML::Document.new File.read(oddb_article_xml)
     end
 
-    it 'should return produce a oddb_article.xml' do
+    it 'should produce a oddb_article.xml' do
       expect(File.exists?(oddb_article_xml)).to eq true
     end
 
@@ -975,6 +991,13 @@ describe Oddb2xml::Builder do
       expect(File.exists?(@artikelstamm_v5_name)).to eq true
     end
 
+    it 'should produce a Elexis_Artikelstamm_v5.csv' do
+      expect(File.exists?(@elexis_v5_csv)).to eq true
+      inhalt = File.open(@elexis_v5_csv, 'r+').read
+      expect(inhalt.size).to be > 0
+      expect(inhalt).to match /7680284860144/
+    end
+
     it 'should generate a valid v3 nonpharma xml' do
       v3_name = @artikelstamm_v5_name.sub('_v5', '_v3').sub('artikelstamm_', 'artikelstamm_N_')
       expect(File.exist?(v3_name)).to eq true
@@ -995,8 +1018,23 @@ describe Oddb2xml::Builder do
       expect(IO.read(v3_name)).to match(/<LPPV>true</)
     end
 
+    it 'should contain a LIMITATION_PTS' do
+      expect(@inhalt.index('<LIMITATION_PTS>40</LIMITATION_PTS>')).not_to be nil
+    end
+
+    it 'should contain a PRODUCT which was not in refdata' do
+      expected = %(<PRODUCT>
+            <PRODNO>6118601</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>Nutriflex Omega special, Infusionsemulsion 625 ml</DSCR>
+            <DSCRF/>
+            <ATC>B05BA10</ATC>
+        </PRODUCT>)
+      expect(@inhalt.index(expected)).not_to be nil
+    end
+
     it 'should not contain a GTIN=0' do
-      expect(IO.read(@artikelstamm_v5_name).index('GTIN>0')).to be nil
+      expect(@inhalt.index('GTIN>0')).to be nil
     end
 
     it 'should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
@@ -1015,8 +1053,11 @@ describe Oddb2xml::Builder do
     end
 
     it 'shoud contain Lamivudinum as 3TC substance' do
-      @inhalt = IO.read(@artikelstamm_v5_name)
       expect(@inhalt.index('<SUBSTANCE>Lamivudinum</SUBSTANCE>')).not_to be nil
+    end
+
+    it 'shoud contain GENERIC_TYPE' do
+      expect(@inhalt.index('<GENERIC_TYPE')).not_to be nil
     end
 
     it 'should validate against artikelstamm_v5.xsd' do

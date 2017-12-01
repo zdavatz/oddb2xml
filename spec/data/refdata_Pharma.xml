@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <ARTICLE xmlns="http://refdatabase.refdata.ch/Article_out" CREATION_DATETIME="2017-12-01T09:41:49.5856186+01:00">
+      <ITEM DT="2017-12-01T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680002770014</GTIN>
+        <PHAR>0361815</PHAR>
+        <SWMC_AUTHNR>00277001</SWMC_AUTHNR>
+        <NAME_DE>SEROCYTOL Herz-Gefässe Supp 3 Stk</NAME_DE>
+        <NAME_FR>SEROCYTOL Coeur-Vaisseaux supp 3 pce</NAME_FR>
+        <ATC>J06AA99</ATC>
+        <AUTH_HOLDER_NAME>Serolab SA (succursale de Remaufens)</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7640128710004</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-01T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680002780013</GTIN>
+        <PHAR>0361821</PHAR>
+        <SWMC_AUTHNR>00278001</SWMC_AUTHNR>
+        <NAME_DE>SEROCYTOL Kolon Supp 3 Stk</NAME_DE>
+        <NAME_FR>SEROCYTOL Côlon supp 3 pce</NAME_FR>
+        <ATC>J06AA99</ATC>
+        <AUTH_HOLDER_NAME>Serolab SA (succursale de Remaufens)</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7640128710004</AUTH_HOLDER_GLN>
+      </ITEM>
+      <RESULT>
+        <OK_ERROR>OK</OK_ERROR>
+        <NBR_RECORD>15169</NBR_RECORD>
+      </RESULT>
+    </ARTICLE>
+  </soap:Body>
+</soap:Envelope>

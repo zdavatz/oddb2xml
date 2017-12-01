@@ -23,13 +23,9 @@ module Oddb2xml
         data = io.read
       else
         begin
-          response = @agent.get(@url)
-          response.save_as(file)
-          response = nil # win
           io = File.open(file, option)
-          data = io.read
-        rescue Timeout::Error, Errno::ETIMEDOUT
-          retrievable? ? retry : raise
+          data = open(@url).read
+          io.write(data)
         ensure
           io.close if io and !io.closed? # win
           Oddb2xml.download_finished(tempFile)
@@ -140,7 +136,7 @@ module Oddb2xml
     def download
       @url ||= 'https://download.epha.ch/cleaned/matrix.csv'
       file = 'epha_interactions.csv'
-      content = download_as(file, 'r')
+      content = download_as(file, 'w+')
       FileUtils.rm_f(file, :verbose => true)
       content
     end
@@ -149,7 +145,7 @@ module Oddb2xml
     include DownloadMethod
     def download
       @url ||= 'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt'
-      download_as('oddb2xml_files_lppv.txt', 'r')
+      download_as('oddb2xml_files_lppv.txt', 'w+')
     end
   end
   class ZurroseDownloader < Downloader
@@ -297,6 +293,7 @@ module Oddb2xml
     end
   end
   class SwissmedicDownloader < Downloader
+    include DownloadMethod
     def initialize(type=:orphan, options = {})
       @type = type
       @options = options
@@ -316,9 +313,8 @@ module Oddb2xml
       end
       begin
         FileUtils.rm(File.expand_path(file), :verbose => !defined?(RSpec)) if File.exists?(File.expand_path(file))
-        File.open(file, 'w+') do |output|
-          output.write open(@direct_url_link).read
-        end
+        @url = @direct_url_link
+        download_as(file, 'w+')
         if @options[:artikelstamm_v5]
           cmd = "ssconvert '#{file}' '#{File.join(Downloads, File.basename(file).sub(/\.xls.*/, '.csv'))}' 2> /dev/null"
           Oddb2xml.log(cmd)
