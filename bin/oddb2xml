@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'pathname'
-
+require 'pry'
 root = Pathname.new(__FILE__).realpath.parent.parent
 $:.unshift root.join('lib') if $0 == __FILE__
 

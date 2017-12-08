@@ -13,7 +13,11 @@ describe Oddb2xml::CompareV5 do
       @result = Oddb2xml::CompareV5.new(@first, @second).compare
     end
     it 'should return true' do
-      expect(@result).to eq(true)
+      expectecd = {"PRODUCTS"=>{"NR_COMPARED"=>1, "PRODNO"=>0, "SALECD"=>0, "DSCR"=>1, "DSCRF"=>0, "ATC"=>0, "SUBSTANCE"=>1},
+                  "LIMITATIONS"=>{"NR_COMPARED"=>3, "LIMNAMEBAG"=>0, "DSCR"=>0, "DSCRF"=>0, "LIMITATION_PTS"=>1},
+                  "ITEMS"=>{"NR_COMPARED"=>4, "PHARMATYPE"=>0, "GTIN"=>0, "SALECD"=>0, "DSCR"=>0, "DSCRF"=>0, "PEXF"=>2, "PPUB"=>2, "PKG_SIZE"=>0,
+                            "MEASURE"=>0, "DOSAGE_FORM"=>3, "PRODNO"=>0, "PHAR"=>0, "IKSCAT"=>0}}
+      expect(@result).to eq(expectecd)
     end
   end
 end

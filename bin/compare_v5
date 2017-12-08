@@ -7,6 +7,13 @@ $:.unshift root.join('lib') if $0 == __FILE__
 require 'oddb2xml/version'
 require 'oddb2xml/compare'
 require 'trollop'
+    DEFAULTSx = {
+      :components => ["PRODUCTS", "LIMITATIONS", "ITEMS",],
+      :fields_to_ignore => ['COMP', 'DOSAGE_FORMF', 'MEASUREF'],
+      :fields_as_floats => [ 'PEXT', 'PEXF', 'PPUB' ],
+      :min_diff_for_floats => 0.01,
+      :case_insensitive => true,
+    }
 
 @opts = Trollop::options(ARGV) do
   version "#$0 ver.#{Oddb2xml::VERSION}"
@@ -14,6 +21,11 @@ require 'trollop'
   Usage:
   compare_v5 [option] first_v5_xml second_v5_xml
 EOS
+  opt :components,          "components to compare", :default => Oddb2xml::CompareV5::DEFAULTS[:components]
+  opt :fields_as_floats,    "Fields that should be compared as floats", :default => Oddb2xml::CompareV5::DEFAULTS[:fields_as_floats]
+  opt :fields_to_ignore,    "Ignore these fields", :default => Oddb2xml::CompareV5::DEFAULTS[:fields_to_ignore]
+  opt :min_diff_for_floats, "Minimal difference when comparing floats", :default => Oddb2xml::CompareV5::DEFAULTS[:min_diff_for_floats]
+  opt :case_insensitive,    "case_insensitive comparison", :default => Oddb2xml::CompareV5::DEFAULTS[:case_insensitive]
 end
 $stdout.sync = true
 
@@ -24,6 +36,6 @@ if args.size != 2
 end
 
 startTime = Time.now
-result = Oddb2xml::CompareV5.new(ARGV.first, ARGV.last).compare
+result = Oddb2xml::CompareV5.new(ARGV.first, ARGV.last).compare(@opts)
 diff = (Time.now-startTime).to_i
 puts "#{Time.now}: #{__FILE__} done. Took #{diff} seconds"
