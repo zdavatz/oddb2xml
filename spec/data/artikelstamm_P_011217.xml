@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ARTIKELSTAMM xmlns="http://elexis.ch/Elexis_Artikelstamm_v003" CREATION_DATETIME="2017-12-01T03:34:58.000+01:00" LANG="de" MONTH="12" YEAR="2017" CUMUL_VER="60" TYPE="P" DATA_QUALITY="3">
+    <ITEM>
+        <GTIN>7680002680023</GTIN>
+        <PHAR>709448</PHAR>
+        <DSCR>M M R II Trockensub c solv + Spritze 10 Durchstf</DSCR>
+        <PEXF>265.24</PEXF>
+        <PPUB>467.0</PPUB>
+    </ITEM>
+    <ITEM>
+        <GTIN>7680002770014</GTIN>
+        <PHAR>361815</PHAR>
+        <DSCR>SEROCYTOL Herz-Gefässe Supp 3 Stk</DSCR>
+        <ATC>J06AA99</ATC>
+        <COMP>
+            <GLN>7640128710004</GLN>
+        </COMP>
+        <PEXF>22.84</PEXF>
+        <PPUB>35.2</PPUB>
+        <PKG_SIZE>3</PKG_SIZE>
+        <IKSCAT>B</IKSCAT>
+        <PRODNO>0027701</PRODNO>
+    </ITEM>
+    <ITEM>
+        <GTIN>7680002820016</GTIN>
+        <PHAR>361896</PHAR>
+        <DSCR>SEROCYTOL Zwischenhirn Supp 3 Stk</DSCR>
+        <ATC>J06AA99</ATC>
+        <COMP>
+            <GLN>7640128710004</GLN>
+        </COMP>
+        <PEXF>22.84</PEXF>
+        <PPUB>39.6</PPUB>
+        <PKG_SIZE>3</PKG_SIZE>
+        <IKSCAT>B</IKSCAT>
+        <PRODNO>28201</PRODNO>
+    </ITEM>
+    <ITEM>
+        <GTIN>7680667090021</GTIN>
+        <PHAR>7265196</PHAR>
+        <DSCR>ENTECAVIR Mepha Lactab 1 mg 30 Stk</DSCR>
+        <ATC>J05AF10</ATC>
+        <COMP>
+            <GLN>7601001001121</GLN>
+        </COMP>
+        <PEXF>615.02</PEXF>
+        <PPUB>688.0</PPUB>
+    </ITEM>
+</ARTIKELSTAMM>

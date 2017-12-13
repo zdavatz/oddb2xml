@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ARTIKELSTAMM xmlns="http://elexis.ch/Elexis_Artikelstamm_v003" CREATION_DATETIME="2017-09-01T03:40:15.000+02:00" LANG="de" MONTH="9" YEAR="2017" CUMUL_VER="57" TYPE="P" DATA_QUALITY="3">
+    <ITEM>
+        <GTIN>7680002680023</GTIN>
+        <PHAR>709448</PHAR>
+        <DSCR>M M R II Trockensubstanz solv + Spritze 10 Durchstf</DSCR>
+        <PEXF>999.99</PEXF>
+        <PPUB>333.333</PPUB>
+    </ITEM>
+    <ITEM>
+        <GTIN>7680002790012</GTIN>
+        <PHAR>99999</PHAR>
+        <DSCR>SEROCYTOL Bindegewebe Supp 3 Stk</DSCR>
+        <ATC>J06AA99</ATC>
+        <COMP>
+            <GLN>7640128710004</GLN>
+        </COMP>
+        <PEXF>22.84</PEXF>
+        <PPUB>39.6</PPUB>
+        <PKG_SIZE>3</PKG_SIZE>
+        <IKSCAT>B</IKSCAT>
+        <PRODNO>27901</PRODNO>
+    </ITEM>
+    <ITEM>
+        <GTIN>7680002820016</GTIN>
+        <PHAR>361896</PHAR>
+        <DSCR>SEROCYTOL Zwischenhirn Supp 3 Stk</DSCR>
+        <ATC>J06AA99</ATC>
+        <COMP>
+            <GLN>7640128710004</GLN>
+        </COMP>
+        <PEXF>22.84</PEXF>
+        <PPUB>39.6</PPUB>
+        <PKG_SIZE>3</PKG_SIZE>
+        <IKSCAT>B</IKSCAT>
+        <PRODNO>28201</PRODNO>
+    </ITEM>
+    <ITEM>
+        <GTIN>7680665610023</GTIN>
+        <PHAR>7074102</PHAR>
+        <DSCR>AZICLAV Filmtabl 625 mg 20 Stk</DSCR>
+        <ATC>J01CR02</ATC>
+        <COMP>
+            <GLN>7601001394834</GLN>
+        </COMP>
+        <PEXF>19.88</PEXF>
+        <PPUB>39.2</PPUB>
+        <PKG_SIZE>20</PKG_SIZE>
+        <IKSCAT>A</IKSCAT>
+        <PRODNO>6656101</PRODNO>
+    </ITEM>
+</ARTIKELSTAMM>

@@ -4,7 +4,21 @@ require "rexml/document"
 require "oddb2xml/compare"
 
 describe Oddb2xml::CompareV5 do
-  context 'when download is called' do
+  
+  context 'when comparing v3' do
+    before(:all) do
+      @first = File.join(Oddb2xml::SpecData, 'artikelstamm_P_010917.xml')
+      @second = File.join(Oddb2xml::SpecData, 'artikelstamm_P_011217.xml')
+      expect(File.exist?(@second)).to eq true
+      expect(File.exist?(@first)).to eq true
+      @result = Oddb2xml::CompareV5.new(@first, @second).compare
+    end
+    it 'should return true' do
+      expectecd =  {"ITEMS"=>{"NR_COMPARED"=>2, "GTIN"=>0, "PHAR"=>0, "DSCR"=>1, "PEXF"=>1, "PPUB"=>1, "ATC"=>0, "COMP"=>0, "PKG_SIZE"=>0, "IKSCAT"=>0, "PRODNO"=>0}}
+      expect(@result).to eq(expectecd)
+    end
+  end
+  context 'when comparing v5' do
     before(:all) do
       @first = File.join(Oddb2xml::SpecData, 'v5_first.xml')
       @second = File.join(Oddb2xml::SpecData, 'v5_second.xml')
