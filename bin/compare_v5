@@ -27,7 +27,7 @@ EOS
   opt :min_diff_for_floats, "Minimal difference when comparing floats", :default => Oddb2xml::CompareV5::DEFAULTS[:min_diff_for_floats]
   opt :case_insensitive,    "case_insensitive comparison", :default => Oddb2xml::CompareV5::DEFAULTS[:case_insensitive]
 end
-$stdout.sync = true
+$stdout.sync = false
 
 args = ARGV
 if args.size != 2
@@ -36,6 +36,6 @@ if args.size != 2
 end
 
 startTime = Time.now
-result = Oddb2xml::CompareV5.new(ARGV.first, ARGV.last).compare(@opts)
+result = Oddb2xml::CompareV5.new(ARGV.first, ARGV.last, @opts).compare
 diff = (Time.now-startTime).to_i
-puts "#{Time.now}: #{__FILE__} done. Took #{diff} seconds"
+puts "#{Time.now.strftime("%H:%M:%S")}: #{__FILE__} done. Took #{diff} seconds"
