@@ -38,6 +38,28 @@ ARTICLE_ZURROSE_ELEMENTS =    [
   ['ARTICLE/ART/ARTINS/NINCD', '20'],
 ]
 
+ARTICLE_NAROPIN = %(<REF_DATA>1</REF_DATA>
+    <PHAR>1882189</PHAR>
+    <SMCAT>B</SMCAT>
+    <SMNO>54015011</SMNO>
+    <PRODNO>5401501</PRODNO>
+    <SALECD>I</SALECD>
+    <CDBG>N</CDBG>
+    <BG>N</BG>
+    <DSCRD>NAROPIN Inj Lös 0.2 % 10ml Duofit Amp 5 Stk</DSCRD>
+    <DSCRF>NAROPIN sol inj 0.2 % 10ml amp duofit 5 pce</DSCRF>
+    <SORTD>NAROPIN INJ LÖS 0.2 % 10ML DUOFIT AMP 5 STK</SORTD>
+    <SORTF>NAROPIN SOL INJ 0.2 % 10ML AMP DUOFIT 5 PCE</SORTF>
+    <ARTCOMP>
+      <COMPNO>7601001402539</COMPNO>
+    </ARTCOMP>
+    <ARTBAR>
+      <CDTYP>E13</CDTYP>
+      <BC>7680540150118</BC>
+      <BCSTAT>A</BCSTAT>
+    </ARTBAR>
+  </ART>)
+  
 ARTICLE_COMMON_ELEMENTS =    [
   ['ARTICLE/ART/REF_DATA', '1'],
   ['ARTICLE/ART/SMCAT', 'A'],
@@ -60,10 +82,6 @@ ARTICLE_COMMON_ELEMENTS =    [
   ['ARTICLE/ART/BG', 'N'],
   ['ARTICLE/ART/ARTBAR/BC', Oddb2xml::ORPHAN_GTIN.to_s],
   ['ARTICLE/ART/ARTBAR/BC', Oddb2xml::FRIDGE_GTIN.to_s],
-  ['ARTICLE/ART/DSCRD', 'NAROPIN Inj Lös 0.2 % 5 Polybag 100 ml'],
-  ['ARTICLE/ART/DSCRF', 'NAROPIN sol inj 0.2 % 5 polybag 100 ml'],
-  ['ARTICLE/ART/SORTD', 'NAROPIN INJ LÖS 0.2 % 5 POLYBAG 100 ML'],
-  ['ARTICLE/ART/SORTF', 'NAROPIN SOL INJ 0.2 % 5 POLYBAG 100 ML'],
   ['ARTICLE/ART/SYN1D', 'Hirudoid'],
   ['ARTICLE/ART/SYN1F', 'Hirudoid'],
   ['ARTICLE/ART/SLOPLUS', '2'],
@@ -227,12 +245,18 @@ MEDIZINALPERSON_ELEMENT_TESTS = [
   ['Personen/Person/BTM_Berechtigung', 'BTM_Berechtigung'],
 ]
 
-def check_result(rexml, nbr_record)
-  expect(XPath.match(rexml, '//RESULT/NBR_RECORD').size).to eq 1
-  expect(XPath.match(rexml, '//RESULT/NBR_RECORD').first.text.to_i).to eq nbr_record
-  expect(XPath.match(rexml, '//RESULT/OK_ERROR').first.text).to eq 'OK'
-  expect(XPath.match(rexml, '//RESULT/ERROR_CODE').first.text).to eq nil
-  expect(XPath.match(rexml, '//RESULT/MESSAGE').first.text).to eq nil
+def check_result(inhalt, nbr_record)
+  [ "<NBR_RECORD>",
+    "<OK_ERROR>",
+    '<OK_ERROR>OK</OK_ERROR>',
+    ].each do |what|
+    expect(inhalt.scan(what).size).to eq 1
+  end
+  expect(inhalt.index('<OK_ERROR>OK</OK_ERROR>')).to be > 0
+  expect(inhalt.index('<ERROR_CODE/>')).to be > 0
+  m = /<NBR_RECORD>(\d+)<\/NBR_RECORD>/.match(inhalt)
+  expect(m).not_to be nil
+  expect(m[1].to_i).to eq  nbr_record 
 end
 
 def checkItemForRefdata(doc, pharmacode, isRefdata)
@@ -419,7 +443,7 @@ def checkProductXml(nbr_record = -1)
   # check products
   content = IO.read(product_filename)
   doc = REXML::Document.new content
-  check_result(doc, nbr_record)
+  check_result(content, nbr_record)
   expect(nbr_record).to eq  content.scan(/<PRD/).size if nbr_record != -1
 
   desitin = checkAndGetProductWithGTIN(doc, Oddb2xml::LEVETIRACETAM_GTIN)
@@ -432,9 +456,8 @@ def checkProductXml(nbr_record = -1)
   expect(desitin.elements['EinheitSwissmedic'].text).to eq 'Tablette(n)'
   expect(desitin.elements['SubstanceSwissmedic'].text).to eq 'levetiracetamum'
   expect(desitin.elements['CompositionSwissmedic'].text).to eq 'levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.'
-
   expect(desitin.elements['CPT/CPTCMP/LINE'].text).to eq '0'
-  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '10'
+  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '13'
   expect(desitin.elements['CPT/CPTCMP/QTY'].text).to eq '250'
   expect(desitin.elements['CPT/CPTCMP/QTYU'].text).to eq 'mg'
 
@@ -454,56 +477,27 @@ def checkProductXml(nbr_record = -1)
   expect(hirudoid.elements['ATC'].text).to eq('C05BA01') # modified by atc.csv!
 end
 
-def check_artikelstamm_v5_xml(key, expected_value)
-  expect(@artikelstamm_v5_name).not_to be nil
-  expect(@inhalt).not_to be nil
-  unless @inhalt.index(expected_value)
-    puts expected_value
-    # binding.pry
-  end
-  expect(@inhalt.index(expected_value)).not_to be nil
-end
-
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 34
-  NrSubstances = 14
-  NrLimitations = 5
-  NrInteractions = 5
+  NrExtendedArticles = 47
+  NrSubstances = 21
+  NrLimitations = 7
+  NrInteractions = 2
   NrCodes = 5
-  NrProdno = 23
-  NrPackages = 24
-  NrProducts = 19
+  NrProdno = 27
+  NrPackages = 31
+  NrProducts = 13
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init(options = {})
     @savedDir = Dir.pwd
     @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
     @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
-    @elexis_v3_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v003.xsd'))
-    @elexis_v5_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v5.xsd'))
-    @elexis_v5_csv = File.join(Oddb2xml::WorkDir, 'Elexis_Artikelstamm_v5.csv')
     expect(File.exist?(@oddb2xml_xsd)).to eq true
     expect(File.exist?(@oddb_calc_xsd)).to eq true
-    expect(File.exist?(@elexis_v3_xsd)).to eq true
-    expect(File.exist?(@elexis_v5_xsd)).to eq true
     cleanup_directories_before_run
     FileUtils.makedirs(Oddb2xml::WorkDir)
     Dir.chdir(Oddb2xml::WorkDir)
-    VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
-    WebMock.enable!
-    { 'https://download.epha.ch/cleaned/matrix.csv' =>  'epha_interactions.csv',
-#      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/humanarzneimittel.orphan.xlsx.download.xlsx/humanarzneimittel.xlsx' =>  'swissmedic_orphan.xlsx',
-      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx' => 'swissmedic_package.xlsx',
-#      'http://pillbox.oddb.org/TRANSFER.ZIP' =>  'vcr/transfer.zip',
-      'https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv' => 'atc.csv',
-      'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt' => 'oddb2xml_files_lppv.txt',
-#      'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip' => 'XMLPublications.zip',
-#      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml',
-      }.each do |url, file|
-      inhalt = File.read(File.join(Oddb2xml::SpecData, file))
-      puts  "stub #{url} => #{file}"
-      stub_request(:get,url).to_return(body: inhalt)
-    end
+    mock_downloads
   end
 
   after(:all) do
@@ -514,6 +508,7 @@ describe Oddb2xml::Builder do
       common_run_init
       Oddb2xml::Cli.new({}).run # to debug
       @doc = Nokogiri::XML(File.open(oddb_article_xml))
+      @inhalt = File.read(oddb_article_xml)
       @rexml = REXML::Document.new File.read(oddb_article_xml)
     end
 
@@ -522,7 +517,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should have a correct NBR_RECORD in oddb_article.xml' do
-      check_result(@rexml, NrProducts)
+      check_result(@inhalt, NrProducts)
     end
 
     it 'oddb_article.xml should contain a SHA256' do
@@ -539,8 +534,10 @@ describe Oddb2xml::Builder do
       check_validation_via_xsd
     end
 
-    context 'XSD article' do
+    it 'should validate XSD article' do
       check_attributes(oddb_article_xml, ARTICLE_ATTRIBUTE_TESTS)
+      @inhalt = File.read(oddb_article_xml)
+      expect(oddb_article_xml.scan(ARTICLE_NAROPIN).size).to eq 1
       check_elements(oddb_article_xml, ARTICLE_COMMON_ELEMENTS)
     end
 
@@ -558,7 +555,7 @@ describe Oddb2xml::Builder do
 
     it 'should have a correct insulin (gentechnik) for 7680532900196' do
       expect(XPath.match( @rexml, "//ART/[BC='7680532900196']").size).to eq 1
-      expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").size).to eq 2
+      expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").size).to be >= 1
       expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").first.text).to eq 'X'
       expect(XPath.match( @rexml, "//ART//INSULIN_CATEGORY").size).to eq 1
       expect(XPath.match( @rexml, "//ART//INSULIN_CATEGORY").first.text).to eq 'Insulinanalog: schnell wirkend'
@@ -571,6 +568,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should have a correct drug information for 7680555610041' do
+      binding.pry
       expect(XPath.match( @rexml, "//ART/[BC='7680555610041']").size).to eq 1
       expect(XPath.match( @rexml, "//ART//DRUG_INDEX").size).to eq 1
       expect(XPath.match( @rexml, "//ART//DRUG_INDEX").first.text).to eq 'd'
@@ -592,19 +590,17 @@ describe Oddb2xml::Builder do
       common_run_init
       @oddb_fi_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_fi.xml'))
       @oddb_fi_product_xml  = File.expand_path(File.join(Oddb2xml::WorkDir, 'oddb_fi_product.xml'))
-      options = Oddb2xml::Options.parse(['-o'])
+      options = Oddb2xml::Options.parse(['-o', '--log'])
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
       Oddb2xml::Cli.new(options).run
     end
 
     it 'should have a correct NBR_RECORD in oddb_fi_product.xml' do
-      rexml = REXML::Document.new File.read('oddb_fi_product.xml')
-      check_result(rexml, 0)
+      check_result( File.read('oddb_fi_product.xml'), 0)
     end
 
     it 'should have a correct NBR_RECORD in oddb_fi.xml' do
-      rexml = REXML::Document.new File.read('oddb_fi.xml')
-      check_result(rexml, 2)
+      check_result( File.read('oddb_fi.xml'), 2)
     end
 
     it 'should return produce a correct oddb_fi.xml' do
@@ -649,7 +645,7 @@ describe Oddb2xml::Builder do
       expect(oddb_dat).to match(/^..3/), "should have a record with '3' in CMUT field"
       expect(oddb_dat).to match(RegExpDesitin), "should have Desitin"
       IO.readlines(dat_filename).each{ |line| check_article_IGM_format(line, 0) }
-      m = /.+DIAPHIN Trocke.*7680555610041.+/.match(oddb_dat)
+      m = /.+KENDURAL Depottabl 30 Stk.*7680353660163.+/.match(oddb_dat)
       expect(m[0].size).to eq 97 # size of IGM 1 record
       expect(m[0][74]).to eq '3'
     end
@@ -694,6 +690,9 @@ describe Oddb2xml::Builder do
       check_attributes(oddb_article_xml, ARTICLE_ATTRIBUTE_TESTS)
       check_elements(oddb_article_xml, ARTICLE_COMMON_ELEMENTS)
       check_elements(oddb_article_xml, ARTICLE_ZURROSE_ELEMENTS)
+      it 'should contain NAROPIN' do
+        expect(oddb_article_xml.scan(ARTICLE_NAROPIN).size).to eq 1
+      end
     end
 
     it 'should emit a correct oddb_article.xml' do
@@ -734,8 +733,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should have a correct NBR_RECORD in oddb_code.xml' do
-      rexml = REXML::Document.new File.read(oddb_code_xml)
-      check_result(rexml, NrCodes)
+      check_result(File.read(oddb_code_xml), NrCodes)
     end
 
     context 'XSD interaction' do
@@ -744,8 +742,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should have a correct NBR_RECORD in oddb_interaction.xml' do
-      rexml = REXML::Document.new File.read(oddb_interaction_xml)
-      check_result(rexml, NrInteractions)
+      check_result(File.read(oddb_interaction_xml), NrInteractions)
     end
 
     context 'XSD substance' do
@@ -754,8 +751,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should have a correct NBR_RECORD in oddb_substance.xml' do
-      rexml = REXML::Document.new File.read('oddb_substance.xml')
-      check_result(rexml, NrSubstances)
+      check_result(File.read('oddb_substance.xml'), NrSubstances)
     end
 
     it 'should emit a correct oddb_article.xml' do
@@ -819,7 +815,7 @@ describe Oddb2xml::Builder do
       expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('5366964') }.size).to eq(1)
       expect(dscrds.size).to eq(NrExtendedArticles)
       expect(XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size).to be >= 1
-      expect(XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('0027701') }.size).to eq(0)
+      expect(XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('0027701') }.size).to eq(1)
       expect(XPath.match( doc, "//PRODNO" ).find_all{|x| x.text.match('6206901') }.size).to eq(1)
     end
 
@@ -833,8 +829,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should have a correct NBR_RECORD in oddb_limitation.xml' do
-      rexml = REXML::Document.new File.read('oddb_limitation.xml')
-      check_result(rexml, NrLimitations)
+      check_result(File.read('oddb_limitation.xml'), NrLimitations)
     end
 
     it 'should emit a correct oddb_limitation.xml' do
@@ -890,8 +885,9 @@ describe Oddb2xml::Builder do
   context 'testing -e -I 80 option' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.parse('-e -I 80')
-      @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
+      options = Oddb2xml::Options.parse('-e -I 80 --log')
+      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
+      @res = Oddb2xml::Cli.new(options).run
     end
 
     it 'should add 80 percent to zur_rose pubbprice' do
@@ -975,245 +971,4 @@ describe Oddb2xml::Builder do
     end
   end
 
-  context 'when artikelstamm_v5 option is given' do
-    before(:all) do
-      common_run_init
-      options = Oddb2xml::Options.parse(['--artikelstamm-v5']) # , '--log'])
-      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
-      Oddb2xml::Cli.new(options).run # to debug
-      @artikelstamm_v5_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml")
-      @doc = Nokogiri::XML(File.open(@artikelstamm_v5_name))
-      # @rexml = REXML::Document.new File.read(@artikelstamm_v5_name)
-      @inhalt = IO.read(@artikelstamm_v5_name)
-    end
-
-    it 'should exist' do
-      expect(File.exists?(@artikelstamm_v5_name)).to eq true
-    end
-
-    it 'should produce a Elexis_Artikelstamm_v5.csv' do
-      expect(File.exists?(@elexis_v5_csv)).to eq true
-      inhalt = File.open(@elexis_v5_csv, 'r+').read
-      expect(inhalt.size).to be > 0
-      expect(inhalt).to match /7680284860144/
-    end
-
-    it 'should generate a valid v3 nonpharma xml' do
-      v3_name = @artikelstamm_v5_name.sub('_v5', '_v3').sub('artikelstamm_', 'artikelstamm_N_')
-      expect(File.exist?(v3_name)).to eq true
-      validate_via_xsd(@elexis_v3_xsd, v3_name)
-      expect(IO.read(v3_name)).not_to match(/<LIMITATION/)
-      expect(IO.read(v3_name)).not_to match(/GTIN>7680161050583/)
-      expect(IO.read(v3_name)).to match(/GTIN>4042809018288/)
-      expect(IO.read(v3_name)).not_to match(/<LPPV>true</)
-    end
-
-    it 'should generate a valid v3 pharma xml' do
-      v3_name = @artikelstamm_v5_name.sub('_v5', '_v3').sub('artikelstamm_', 'artikelstamm_P_')
-      expect(File.exist?(v3_name)).to eq true
-      validate_via_xsd(@elexis_v3_xsd, v3_name)
-      expect(IO.read(v3_name)).to match(/<LIMITATION/)
-      expect(IO.read(v3_name)).to match(/GTIN>7680161050583/)
-      expect(IO.read(v3_name)).not_to match(/GTIN>4042809018288/)
-      expect(IO.read(v3_name)).to match(/<LPPV>true</)
-    end
-
-    it 'should contain a LIMITATION_PTS' do
-      expect(@inhalt.index('<LIMITATION_PTS>40</LIMITATION_PTS>')).not_to be nil
-    end
-
-    it 'should contain a PRODUCT which was not in refdata' do
-      expected = %(<PRODUCT>
-            <PRODNO>6118601</PRODNO>
-            <SALECD>A</SALECD>
-            <DSCR>Nutriflex Omega special, Infusionsemulsion 625 ml</DSCR>
-            <DSCRF/>
-            <ATC>B05BA10</ATC>
-        </PRODUCT>)
-      expect(@inhalt.index(expected)).not_to be nil
-    end
-
-    it 'should not contain a GTIN=0' do
-      expect(@inhalt.index('GTIN>0')).to be nil
-    end
-
-    it 'should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
-      skip("Where does the DSCR for 4042809018288 come from. It should be TENSOPLAST bande compression 5cmx4.5m")
-    end
-
-    it 'should ignore GTIN 7680172330414' do
-      # Took to much time to construct an example. Should change VCR
-      skip("No time to check that data/gtin2ignore.yaml has an effect")
-      @inhalt = IO.read(@artikelstamm_v5_name)
-      expect(@inhalt.index('7680172330414')).to be nil
-    end
-
-    it 'should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
-      skip("Where does the COMP GLN for 4042809018288 come from. It should be 7601003468441")
-    end
-
-    it 'shoud contain Lamivudinum as 3TC substance' do
-      expect(@inhalt.index('<SUBSTANCE>Lamivudinum</SUBSTANCE>')).not_to be nil
-    end
-
-    it 'shoud contain GENERIC_TYPE' do
-      expect(@inhalt.index('<GENERIC_TYPE')).not_to be nil
-    end
-
-    it 'should validate against artikelstamm_v5.xsd' do
-      validate_via_xsd(@elexis_v5_xsd, @artikelstamm_v5_name)
-    end
-      tests = {
-        'item 4042809018288 TENSOPLAST' =>
-      %(<ITEM PHARMATYPE="N">
-            <GTIN>4042809018288</GTIN>
-            <PHAR>55805</PHAR>
-            <SALECD>A</SALECD>
-            <DSCR>TENSOPLAST Kompressionsbinde 5cmx4.5m</DSCR>
-            <DSCRF>--missing--</DSCRF>
-            <PEXF>0.00</PEXF>
-            <PPUB>15.00</PPUB>
-        </ITEM>),
-         'product 3247501 LANSOYL' => '<ITEM PHARMATYPE="P">
-            <GTIN>7680324750190</GTIN>
-            <PHAR>23722</PHAR>
-            <SALECD>A</SALECD>
-            <DSCR>LANSOYL Gel 225 g</DSCR>
-            <DSCRF>LANSOYL gel 225 g</DSCRF>
-            <COMP>
-                <NAME>Actipharm SA</NAME>
-                <GLN>7601001002012</GLN>
-            </COMP>
-            <PKG_SIZE>225</PKG_SIZE>
-            <MEASURE>g</MEASURE>
-            <MEASUREF>g</MEASUREF>
-            <DOSAGE_FORM>Gelée</DOSAGE_FORM>
-            <IKSCAT>D</IKSCAT>
-            <LPPV>true</LPPV>
-            <DEDUCTIBLE>20</DEDUCTIBLE>
-            <PRODNO>3247501</PRODNO>
-        </ITEM>',
-        'product 5366201 3TC' =>
-      "<ITEM PHARMATYPE=\"P\">
-            <GTIN>7680353660163</GTIN>
-            <PHAR>20273</PHAR>
-            <SALECD>A</SALECD>
-            <DSCR>KENDURAL Depottabl 30 Stk</DSCR>
-            <DSCRF>KENDURAL cpr dépot 30 pce</DSCRF>
-            <COMP>
-                <NAME>Farmaceutica Teofarma Suisse SA (c/o Bernasconi Peter Gaggin</NAME>
-                <GLN>7601001374539</GLN>
-            </COMP>
-            <PEXF>4.4606</PEXF>
-            <PPUB>8.25</PPUB>
-            <PKG_SIZE>30</PKG_SIZE>
-            <MEASURE>Tablette(n)</MEASURE>
-            <MEASUREF>Tablette(n)</MEASUREF>
-            <DOSAGE_FORM>Tupfer</DOSAGE_FORM>
-            <DOSAGE_FORMF>Compresse</DOSAGE_FORMF>
-            <SL_ENTRY>true</SL_ENTRY>
-            <IKSCAT>C</IKSCAT>
-            <DEDUCTIBLE>10</DEDUCTIBLE>
-            <PRODNO>3536601</PRODNO>
-        </ITEM>",
-        'item 7680161050583 HIRUDOID' =>
-         %(<ITEM PHARMATYPE="P">
-            <GTIN>7680161050583</GTIN>
-            <PHAR>2731179</PHAR>
-            <SALECD>A</SALECD>
-            <DSCR>HIRUDOID Creme 3 mg/g 40 g</DSCR>
-            <DSCRF>HIRUDOID crème 3 mg/g 40 g</DSCRF>
-            <COMP>
-                <NAME>Medinova AG</NAME>
-                <GLN>7601001002258</GLN>
-            </COMP>
-            <PEXF>4.768575</PEXF>
-            <PPUB>8.8</PPUB>
-            <PKG_SIZE>40</PKG_SIZE>
-            <MEASURE>g</MEASURE>
-            <MEASUREF>g</MEASUREF>
-            <DOSAGE_FORM>Creme</DOSAGE_FORM>
-            <SL_ENTRY>true</SL_ENTRY>
-            <IKSCAT>D</IKSCAT>
-            <DEDUCTIBLE>10</DEDUCTIBLE>
-            <PRODNO>1610501</PRODNO>
-        </ITEM>),
-        'item 7680284860144 ANCOPIR' =>
-        "<ITEM PHARMATYPE=\"P\">
-            <GTIN>7680284860144</GTIN>
-            <PHAR>177804</PHAR>
-            <SALECD>A</SALECD>
-            <DSCR>ANCOPIR Inj Lös 5 Amp 2 ml</DSCR>
-            <DSCRF>ANCOPIR sol inj 5 amp 2 ml</DSCRF>
-            <COMP>
-                <NAME>Dr. Grossmann AG Pharmaca</NAME>
-                <GLN>7601001029880</GLN>
-            </COMP>
-            <PEXF>3.83</PEXF>
-            <PPUB>8.5</PPUB>
-            <PKG_SIZE>5</PKG_SIZE>
-            <MEASURE>Ampulle(n)</MEASURE>
-            <MEASUREF>Ampulle(n)</MEASUREF>
-            <DOSAGE_FORM>Injektionslösung</DOSAGE_FORM>
-            <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
-            <SL_ENTRY>true</SL_ENTRY>
-            <IKSCAT>B</IKSCAT>
-            <DEDUCTIBLE>10</DEDUCTIBLE>
-            <PRODNO>2848601</PRODNO>
-        </ITEM>",
-      'product 3TC Filmtabl' => %(<PRODUCT>
-            <PRODNO>5366201</PRODNO>
-            <SALECD>A</SALECD>
-            <DSCR>3TC Filmtabl 150 mg</DSCR>
-            <DSCRF>3TC cpr pell 150 mg</DSCRF>
-            <ATC>J05AF05</ATC>
-            <SUBSTANCE>Lamivudinum</SUBSTANCE>
-        </PRODUCT>),
-        'nur aus Packungen Coeur-Vaisseaux Sérocytol,' => %(<ITEM PHARMATYPE="P">
-            <GTIN>7680002770014</GTIN>
-            <SALECD>A</SALECD>
-            <DSCR>Coeur-Vaisseaux Sérocytol, suppositoire</DSCR>
-            <DSCRF>--missing--</DSCRF>
-            <COMP>
-                <NAME>Sérolab, société anonyme</NAME>
-                <GLN/>
-            </COMP>
-            <PKG_SIZE>3</PKG_SIZE>
-            <MEASURE>Suppositorien</MEASURE>
-            <MEASUREF>Suppositorien</MEASUREF>
-            <DOSAGE_FORM>suppositoire</DOSAGE_FORM>
-            <IKSCAT>B</IKSCAT>
-            <DEDUCTIBLE>20</DEDUCTIBLE>
-            <PRODNO>0027701</PRODNO>
-        </ITEM>),
-        'HUMALOG (Richter)' => %(<ITEM PHARMATYPE="P">
-            <GTIN>7680532900196</GTIN>
-            <PHAR>1699999</PHAR>
-            <SALECD>A</SALECD>
-            <DSCR>HUMALOG Inj Lös 100 IE/ml Durchstf 10 ml</DSCR>
-            <DSCRF>HUMALOG sol inj 100 UI/ml flac 10 ml</DSCRF>
-            <COMP>
-                <NAME>Eli Lilly (Suisse) SA</NAME>
-                <GLN>7601001261853</GLN>
-            </COMP>
-            <PEXF>30.4</PEXF>
-            <PPUB>51.3</PPUB>
-            <PKG_SIZE>1</PKG_SIZE>
-            <MEASURE>Flasche(n)</MEASURE>
-            <MEASUREF>Flasche(n)</MEASUREF>
-            <DOSAGE_FORM>Injektionslösung</DOSAGE_FORM>
-            <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
-            <SL_ENTRY>true</SL_ENTRY>
-            <IKSCAT>B</IKSCAT>
-            <DEDUCTIBLE>10</DEDUCTIBLE>
-            <PRODNO>5329001</PRODNO>
-        </ITEM>)
-              }
-
-      tests.each do |key, expected|
-        it "should a valid entry for #{key}" do
-          check_artikelstamm_v5_xml(key, expected)
-        end
-      end
-  end
 end

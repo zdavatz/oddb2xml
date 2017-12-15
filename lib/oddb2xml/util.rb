@@ -56,7 +56,8 @@ module Oddb2xml
 
   def Oddb2xml.log(msg)
     return unless @options[:log]
-    $stdout.puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}: #{msg}"
+    # TODO:: require 'pry'; binding.pry if msg.size > 1000
+    $stdout.puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")}: #{msg[0..250]}"
     $stdout.flush
   end
 

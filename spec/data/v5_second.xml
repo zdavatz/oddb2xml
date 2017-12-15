@@ -2,6 +2,22 @@
 <ARTIKELSTAMM xmlns="http://elexis.ch/Elexis_Artikelstamm_v5" CREATION_DATETIME="2017-12-01T11:14:53.453+01:00" BUILD_DATETIME="2017-12-01T11:14:53.453+01:00" DATA_SOURCE="oddb2xml">
     <PRODUCTS>
         <PRODUCT>
+            <PRODNO>1394202</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>PELSANO Med Badeemulsion</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <ATC>D02AC</ATC>
+            <LIMNAMEBAG>1010</LIMNAMEBAG>
+        </PRODUCT>
+        <PRODUCT>
+            <PRODNO>2592607</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>VITAMIN C Streuli 20 % Inj Lös</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <ATC>A11GA01</ATC>
+            <SUBSTANCE>Ascorbinsäure (Vitamin C)</SUBSTANCE>
+        </PRODUCT>
+        <PRODUCT>
             <PRODNO>3903201</PRODNO>
             <SALECD>A</SALECD>
             <DSCR>Resyl Plus Sirup</DSCR>
@@ -148,5 +164,21 @@ Si le vaccin est obtenu au prix de série susmentionné, le médecin ne peut pas
             <PEXF>0.00</PEXF>
             <PPUB>15.40</PPUB>
         </ITEM>
-    </ITEMS>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680139420998</GTIN>
+            <PHAR>1946156</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>PELSANO med Badeemulsion 300 ml</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>6.81</PEXF>
+            <PPUB>11.1</PPUB>
+            <PKG_SIZE>300</PKG_SIZE>
+            <MEASURE>ml</MEASURE>
+            <DOSAGE_FORM>emuls</DOSAGE_FORM>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>D</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>1394202</PRODNO>
+        </ITEM>
+      </ITEMS>
 </ARTIKELSTAMM>

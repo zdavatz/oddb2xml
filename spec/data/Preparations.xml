@@ -639,4 +639,1940 @@
       <FlagApd>N</FlagApd>
     </Status>
   </Preparation>
+  <Preparation ProductCommercial="5988">
+    <NameDe>Pevisone</NameDe>
+    <NameFr>Pevisone</NameFr>
+    <NameIt>Pevisone</NameIt>
+    <DescriptionDe>Creme </DescriptionDe>
+    <DescriptionFr>crème </DescriptionFr>
+    <DescriptionIt>crema</DescriptionIt>
+    <AtcCode>D01AC20</AtcCode>
+    <SwissmedicNo5>40662</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="5988" PackId="8633">
+        <DescriptionDe>15 g</DescriptionDe>
+        <DescriptionFr>15 g</DescriptionFr>
+        <DescriptionIt>15 g</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>40662014</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>12892</BagDossierNo>
+        <GTIN>7680406620144</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>4.9342</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>9.75</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Janssen-Cilag AG</Description>
+            <Street>Gubelstrasse 34</Street>
+            <ZipCode>6300</ZipCode>
+            <Place>Zug</Place>
+            <Phone>+41582313434</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1978</IntegrationDate>
+          <ValidFromDate>15.03.1978</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+      <Pack ProductKey="5988" PackId="8634">
+        <DescriptionDe>30 g</DescriptionDe>
+        <DescriptionFr>30 g</DescriptionFr>
+        <DescriptionIt>30 g</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>40662022</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>12892</BagDossierNo>
+        <GTIN>7680406620229</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>8.6396</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>18.1</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Janssen-Cilag AG</Description>
+            <Street>Gubelstrasse 34</Street>
+            <ZipCode>6300</ZipCode>
+            <Place>Zug</Place>
+            <Phone>+41582313434</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1978</IntegrationDate>
+          <ValidFromDate>15.03.1978</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Econazoli nitras</DescriptionLa>
+        <Quantity>10</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+      <Substance>
+        <DescriptionLa>Triamcinoloni acetonidum</DescriptionLa>
+        <Quantity>1</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="10.">
+        <DescriptionDe>DERMATOLOGICA</DescriptionDe>
+        <DescriptionFr>DERMATOLOGICA</DescriptionFr>
+        <DescriptionIt>DERMATOLOGICI </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="10.09.">
+        <DescriptionDe>Antiinfektiöse Mittel</DescriptionDe>
+        <DescriptionFr>Préparations antiinfectieuses</DescriptionFr>
+        <DescriptionIt>Antiinfettivi </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="10.09.42.">
+        <DescriptionDe>Mit Corticosteroiden</DescriptionDe>
+        <DescriptionFr>Avec corticostéroïdes</DescriptionFr>
+        <DescriptionIt>Con corticosteroidi</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>15.03.1978</IntegrationDate>
+      <ValidFromDate>15.03.1978</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="3518">
+    <NameDe>Humalog</NameDe>
+    <NameFr>Humalog</NameFr>
+    <NameIt>Humalog</NameIt>
+    <DescriptionDe>Inj Lös </DescriptionDe>
+    <DescriptionFr>sol inj </DescriptionFr>
+    <DescriptionIt>sol iniez</DescriptionIt>
+    <AtcCode>A10AB04</AtcCode>
+    <SwissmedicNo5>53290</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="3518" PackId="5137">
+        <DescriptionDe>Durchstf 10 ml</DescriptionDe>
+        <DescriptionFr>flac 10 ml</DescriptionFr>
+        <DescriptionIt>fiala 10 ml</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>53290019</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>16473</BagDossierNo>
+        <GTIN>7680532900196</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <PublicPrice>
+            <Price>51.3</Price>
+            <ValidFromDate>01.01.2011</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>MWSTAENDERUNG</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>MwSt-Änderung</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>MwSt-Änderung</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>MwSt-Änderung</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+          <ExFactoryPrice>
+            <Price>30.4</Price>
+            <ValidFromDate>01.12.2010</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>PATENTABLAUF</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preisänderung nach Patentablauf</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preisänderung nach Patentablauf</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preisänderung nach Patentablauf</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Eli Lilly (Suisse) SA</Description>
+            <Street>chemin des Coquelicots 16</Street>
+            <ZipCode>1214</ZipCode>
+            <Place>Vernier</Place>
+            <Phone>+41223060401</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1996</IntegrationDate>
+          <ValidFromDate>15.03.1996</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Insulinum lisprum</DescriptionLa>
+        <Quantity>100</Quantity>
+        <QuantityUnit>UI</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="07.">
+        <DescriptionDe>STOFFWECHSEL</DescriptionDe>
+        <DescriptionFr>METABOLISME</DescriptionFr>
+        <DescriptionIt>METABOLISMO</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.06.">
+        <DescriptionDe>Pankreas</DescriptionDe>
+        <DescriptionFr>Pancréas</DescriptionFr>
+        <DescriptionIt>Pancreas</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.06.10.">
+        <DescriptionDe>Insuline</DescriptionDe>
+        <DescriptionFr>Insulines</DescriptionFr>
+        <DescriptionIt>Insuline</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>15.03.1996</IntegrationDate>
+      <ValidFromDate>15.03.1996</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="29724">
+    <NameDe>Dibase 10'000</NameDe>
+    <NameFr>Dibase 10'000</NameFr>
+    <NameIt>Dibase 10'000</NameIt>
+    <DescriptionDe>Tropfen 10000 IE/ml </DescriptionDe>
+    <DescriptionFr>gouttes 10000 UI/ml </DescriptionFr>
+    <DescriptionIt>gouttes 10000 UI/ml </DescriptionIt>
+    <AtcCode>A11CC05</AtcCode>
+    <SwissmedicNo5>65856</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="29724" PackId="38212">
+        <DescriptionDe>Fl 10 ml</DescriptionDe>
+        <DescriptionFr>fl 10 ml</DescriptionFr>
+        <DescriptionIt>fl 10 ml</DescriptionIt>
+        <SwissmedicCategory>D</SwissmedicCategory>
+        <SwissmedicNo8>65856001</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>20639</BagDossierNo>
+        <GTIN />
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>5</Price>
+            <ValidFromDate>01.09.2017</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>9.25</Price>
+            <ValidFromDate>01.09.2017</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Gebro Pharma AG</Description>
+            <Street>Grienmatt 2</Street>
+            <ZipCode>4410</ZipCode>
+            <Place>Liestal</Place>
+            <Phone>+41619268833</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.09.2017</IntegrationDate>
+          <ValidFromDate>01.09.2017</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>2</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Cholecalciferolum (Vitamin D3)</DescriptionLa>
+        <Quantity>10000</Quantity>
+        <QuantityUnit>UI</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="07.">
+        <DescriptionDe>STOFFWECHSEL</DescriptionDe>
+        <DescriptionFr>METABOLISME</DescriptionFr>
+        <DescriptionIt>METABOLISMO</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.02.">
+        <DescriptionDe>Mineralia et Vitamina</DescriptionDe>
+        <DescriptionFr>Mineralia et Vitamina</DescriptionFr>
+        <DescriptionIt>Minerali e vitamine</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.02.30.">
+        <DescriptionDe>Einfache Vitamine</DescriptionDe>
+        <DescriptionFr>Vitamines simples</DescriptionFr>
+        <DescriptionIt>Vitamine sole</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.09.2017</IntegrationDate>
+      <ValidFromDate>01.09.2017</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>2</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="5407">
+    <NameDe>Nootropil</NameDe>
+    <NameFr>Nootropil</NameFr>
+    <NameIt>Nootropil</NameIt>
+    <DescriptionDe>Tabl 800 mg </DescriptionDe>
+    <DescriptionFr>cpr 800 mg </DescriptionFr>
+    <DescriptionIt>cpr 800 mg </DescriptionIt>
+    <AtcCode>N06BX03</AtcCode>
+    <SwissmedicNo5>40502</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="5407" PackId="7814">
+        <DescriptionDe>30 Stk</DescriptionDe>
+        <DescriptionFr>30 pce</DescriptionFr>
+        <DescriptionIt>30 pez</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>40502017</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>N</FlagModal>
+        <BagDossierNo>12832</BagDossierNo>
+        <GTIN>7680405020174</GTIN>
+        <Limitations />
+        <PointLimitations>
+          <PointLimitation>
+            <Points>20</Points>
+            <ValidFromDate>01.01.1955</ValidFromDate>
+            <ValidThruDate>31.12.9999</ValidThruDate>
+          </PointLimitation>
+        </PointLimitations>
+        <Prices>
+          <ExFactoryPrice>
+            <Price>4.6814</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>9.45</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>UCB-Pharma SA</Description>
+            <Street>chemin de la Croix-Blanche 10</Street>
+            <ZipCode>1630</ZipCode>
+            <Place>Bulle</Place>
+            <Phone>+41269190180</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1978</IntegrationDate>
+          <ValidFromDate>15.03.1978</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+      <Pack ProductKey="5407" PackId="7816">
+        <DescriptionDe>90 Stk</DescriptionDe>
+        <DescriptionFr>90 pce</DescriptionFr>
+        <DescriptionIt>90 pez</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>40502033</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>12832</BagDossierNo>
+        <GTIN>7680405020334</GTIN>
+        <Limitations />
+        <PointLimitations>
+          <PointLimitation>
+            <Points>40</Points>
+            <Packs>0</Packs>
+            <ValidFromDate>01.01.1955</ValidFromDate>
+            <ValidThruDate>31.12.9999</ValidThruDate>
+          </PointLimitation>
+        </PointLimitations>
+        <Prices>
+          <ExFactoryPrice>
+            <Price>11.1873</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>25.15</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>UCB-Pharma SA</Description>
+            <Street>chemin de la Croix-Blanche 10</Street>
+            <ZipCode>1630</ZipCode>
+            <Place>Bulle</Place>
+            <Phone>+41269190180</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1978</IntegrationDate>
+          <ValidFromDate>15.03.1978</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Piracetamum</DescriptionLa>
+        <Quantity>800</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>240PUNKTE</LimitationCode>
+        <LimitationType>PKT</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <LimitationValue>240</LimitationValue>
+        <DescriptionDe>Gesamthaft zugelassen:
+&lt;b&gt;240&lt;/b&gt; Punkte</DescriptionDe>
+        <DescriptionFr>Prescription limitée au maximum à:
+&lt;b&gt;240&lt;/b&gt; points</DescriptionFr>
+        <DescriptionIt>Ammessi in totale:
+&lt;b&gt;240&lt;/b&gt; punti</DescriptionIt>
+        <ValidFromDate>01.01.2007</ValidFromDate>
+        <ValidThruDate>31.12.9999</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="01.">
+        <DescriptionDe>NERVENSYSTEM</DescriptionDe>
+        <DescriptionFr>SYSTEME NERVEUX</DescriptionFr>
+        <DescriptionIt>SISTEMA NERVOSO </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.99.">
+        <DescriptionDe>Varia</DescriptionDe>
+        <DescriptionFr>Varia</DescriptionFr>
+        <DescriptionIt>Varie</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>15.03.1978</IntegrationDate>
+      <ValidFromDate>15.03.1978</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>  
+  <Preparation ProductCommercial="25550">
+    <NameDe>Adcetris</NameDe>
+    <NameFr>Adcetris</NameFr>
+    <NameIt>Adcetris</NameIt>
+    <DescriptionDe>Trockensub 50 mg </DescriptionDe>
+    <DescriptionFr>subst sèche 50 mg </DescriptionFr>
+    <DescriptionIt>sost secca 50 mg </DescriptionIt>
+    <AtcCode>L01XC12</AtcCode>
+    <SwissmedicNo5>62132</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="25550" PackId="32079">
+        <DescriptionDe>Durchstf 1 Stk</DescriptionDe>
+        <DescriptionFr>flac 1 pce</DescriptionFr>
+        <DescriptionIt>fiala 1 pez</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>62132001</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>N</FlagModal>
+        <BagDossierNo>19989</BagDossierNo>
+        <GTIN>7680621320010</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>3613.12</Price>
+            <ValidFromDate>01.04.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>3949.45</Price>
+            <ValidFromDate>01.04.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Takeda Pharma AG</Description>
+            <Street>Huobstrasse 16</Street>
+            <ZipCode>8808</ZipCode>
+            <Place>Pfäffikon SZ</Place>
+            <Phone>+41554515200</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.04.2013</IntegrationDate>
+          <ValidFromDate>01.04.2013</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>2</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+      <Pack ProductKey="25550" PackId="34025">
+        <DescriptionDe>Durchstf 2 Stk</DescriptionDe>
+        <DescriptionFr>flac 2 pce</DescriptionFr>
+        <DescriptionIt>fiala 2 pez</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>62132003</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>19989</BagDossierNo>
+        <GTIN>7680621320034</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>7226.23</Price>
+            <ValidFromDate>01.04.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>7652.9</Price>
+            <ValidFromDate>01.04.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Takeda Pharma AG</Description>
+            <Street>Huobstrasse 16</Street>
+            <ZipCode>8808</ZipCode>
+            <Place>Pfäffikon SZ</Place>
+            <Phone>+41554515200</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.11.2014</IntegrationDate>
+          <ValidFromDate>01.11.2014</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>2</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+          <FlagApd>Y</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Brentuximabum vedotinum</DescriptionLa>
+        <Quantity>50</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>ADCETRIS2</LimitationCode>
+        <LimitationType>DIA</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <DescriptionDe>Für eine Therapiedauer von maximal 16 Zyklen nach Kostengutsprache durch den Krankenversicherer aufgrund der Beurteilung durch den Vertrauensarzt.&lt;br&gt;
+Zur Behandlung von rezidiviertem oder refraktärem CD30 positivem Hodgkin-Lymphom (HL) nach autologer Stammzell- Transplantation (SZT) oder nach zumindest zwei vorherigen Behandlungen, falls eine SZT keine Behandlungsmöglichkeit darstellt sowie zur Behandlung von rezidiviertem oder refraktärem (nach Chemotherapie oder SZT) systemischem anaplastischem grosszelligem Lymphom (sALCL).&lt;br&gt;
+Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorgegebenen Internettool des Registers, abrufbar auf http://www.lymphomaregistry.ch, zu erfassen. Eine schriftliche Einwilligung des Patienten muss vorliegen. Es sind folgende Daten zu erfassen:&lt;br&gt;
+1) Geburtsjahr, Geschlecht und das Gewicht der Patienten und Indikationsstellung (HL oder sALCL) sowie die Vortherapien für HL oder sALCL,&lt;br&gt;
+2) Applikationsdatum, Dosierung und Anzahl verwendete Ampullen von Adcetris pro Zyklus, Zusatztherapien, Datum Therapieende.
+
+
+</DescriptionDe>
+        <DescriptionFr>Pour une durée de traitement maximale de 16 cycles après obtention de la garantie de prise en charge des frais par l’assurance maladie, après évaluation par le médecin-conseil.&lt;br&gt;
+Pour le traitement du lymphome hodgkinien (LH) CD30 positif, récidivant ou réfractaire, après une greffe autologue de cellules souches (ASCT) ou après au moins deux traitements antérieurs quand l’ASCT n’est pas une option de traitement, et pour le traitement du lymphome anaplasique à grandes cellules systémique (LAGCs) récidivant ou réfractaire (après chimiothérapie ou ACST).&lt;br&gt;
+Le médecin traitant est responsable de tenir à jour et d’enregistrer les données demandées dans le registre indiqué, disponible sous http://www.lymphomaregistry.ch. Le patient doit signer une lettre de consentement. Les données suivantes doivent être enregistrées:&lt;br&gt;
+1) année de naissance, sexe et poids du patient, indication thérapeutique (LH ou LAGCs) et traitements antérieurs du LH ou du LAGCs,&lt;br&gt;
+2) date d’utilisation, dosage et nombre d’ampoules d’Adcetris utilisées par cycle, traitements complémentaires et date de fin du traitement.
+</DescriptionFr>
+        <DescriptionIt>Per una durata di terapia di massimo 16 cicli dopo garanzia di pagamento da parte dell'assicuratore malattia sulla base della valutazione del medico di fiducia.&lt;br&gt;
+Per il trattamento del linfoma di Hodgkin (HL) positivo CD30 recidivante o refrattario dopo un trapianto autologo di cellule staminali (TCS) o dopo almeno due trattamenti precedenti nel caso in cui il trapianto di cellule staminali non rappresenti un’opzione terapeutica, nonché per il trattamento del linfoma anaplastico sistemico a grandi cellule (sALCL) recidivante o refrattario (dopo chemioterapia o TCS).&lt;br&gt;
+Il medico curante si impegna a registrare costantemente i necessari dati nell'apposito strumento Internet del registro, consultabile su http://www.lymphomaregistry.ch. Deve essere disponibile il consenso scritto del paziente. Occorre registrare i seguenti dati:&lt;br&gt;
+1) Anno di nascita, sesso e peso dei pazienti e indicazione (HL o sALCL) nonché terapie precedenti per HL o sALCL,&lt;br&gt;
+2) Data di applicazione, dosaggio e numero di fiale di Adcetris utilizzate per ciclo, terapie supplementari, data di conclusione della terapia.
+</DescriptionIt>
+        <ValidFromDate>01.04.2016</ValidFromDate>
+        <ValidThruDate>31.12.9999</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="07.">
+        <DescriptionDe>STOFFWECHSEL</DescriptionDe>
+        <DescriptionFr>METABOLISME</DescriptionFr>
+        <DescriptionIt>METABOLISMO</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.16.">
+        <DescriptionDe>Oncologica</DescriptionDe>
+        <DescriptionFr>Oncologica</DescriptionFr>
+        <DescriptionIt>Oncologici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.16.10.">
+        <DescriptionDe>Cytostatica</DescriptionDe>
+        <DescriptionFr>Cytostatica</DescriptionFr>
+        <DescriptionIt>Citostatici </DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.04.2013</IntegrationDate>
+      <ValidFromDate>01.04.2013</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>2</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="25816">
+    <NameDe>Hirudoid</NameDe>
+    <NameFr>Hirudoid</NameFr>
+    <NameIt>Hirudoid</NameIt>
+    <DescriptionDe>Creme 3 mg/g </DescriptionDe>
+    <DescriptionFr>crème 3 mg/g </DescriptionFr>
+    <DescriptionIt>crema 3 mg/g </DescriptionIt>
+    <AtcCode>C05BA01</AtcCode>
+    <SwissmedicNo5>16105</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="25816" PackId="14437">
+        <DescriptionDe>40 g</DescriptionDe>
+        <DescriptionFr>40 g</DescriptionFr>
+        <DescriptionIt>40 g</DescriptionIt>
+        <SwissmedicCategory>D</SwissmedicCategory>
+        <SwissmedicNo8>16105058</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>5087</BagDossierNo>
+        <GTIN>7680161050583</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>4.768575</Price>
+            <ValidFromDate>01.11.2012</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>8.8</Price>
+            <ValidFromDate>01.11.2012</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Medinova AG</Description>
+            <Street>Eggbühlstrasse 14</Street>
+            <ZipCode>8050</ZipCode>
+            <Place>Zürich</Place>
+            <Phone>+41443061330</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.09.2004</IntegrationDate>
+          <ValidFromDate>01.09.2004</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+      <Pack ProductKey="25816" PackId="14438">
+        <DescriptionDe>100 g</DescriptionDe>
+        <DescriptionFr>100 g</DescriptionFr>
+        <DescriptionIt>100 g</DescriptionIt>
+        <SwissmedicCategory>D</SwissmedicCategory>
+        <SwissmedicNo8>16105074</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>5087</BagDossierNo>
+        <GTIN>7680161050743</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>9.555316</Price>
+            <ValidFromDate>01.11.2012</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>17.65</Price>
+            <ValidFromDate>01.11.2012</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Medinova AG</Description>
+            <Street>Eggbühlstrasse 14</Street>
+            <ZipCode>8050</ZipCode>
+            <Place>Zürich</Place>
+            <Phone>+41443061330</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.09.2004</IntegrationDate>
+          <ValidFromDate>01.09.2004</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Heparinoidum (chondroitini polysulfas)</DescriptionLa>
+        <Quantity>3</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="02.">
+        <DescriptionDe>HERZ UND KREISLAUF</DescriptionDe>
+        <DescriptionFr>COEUR ET CIRCULATION</DescriptionFr>
+        <DescriptionIt>SISTEMA CARDIOVASCOLARE </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="02.08.">
+        <DescriptionDe>Venenmittel</DescriptionDe>
+        <DescriptionFr>Médicaments pour les veines</DescriptionFr>
+        <DescriptionIt>Medicamenti per le vene </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="02.08.20.">
+        <DescriptionDe>Venenmittel zu externem Gebrauch</DescriptionDe>
+        <DescriptionFr>Médicaments pour les veines, à usage externe</DescriptionFr>
+        <DescriptionIt>Medicamenti per le vene per uso esterno </DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.09.2004</IntegrationDate>
+      <ValidFromDate>01.09.2004</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="4159">
+    <NameDe>Kendural</NameDe>
+    <NameFr>Kendural</NameFr>
+    <NameIt>Kendural</NameIt>
+    <DescriptionDe>Depottabl </DescriptionDe>
+    <DescriptionFr>cpr dépôt </DescriptionFr>
+    <DescriptionIt>cpr dep</DescriptionIt>
+    <AtcCode>B03AE10</AtcCode>
+    <SwissmedicNo5>35366</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="4159" PackId="6020">
+        <DescriptionDe>30 Stk</DescriptionDe>
+        <DescriptionFr>30 pce</DescriptionFr>
+        <DescriptionIt>30 pez</DescriptionIt>
+        <SwissmedicCategory>C</SwissmedicCategory>
+        <SwissmedicNo8>35366016</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>11282</BagDossierNo>
+        <GTIN>7680353660163</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>4.4606</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>8.25</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Farmaceutica Teofarma Suisse SA</Description>
+            <Street>via Serafino Balestra 2</Street>
+            <ZipCode>6900</ZipCode>
+            <Place>Lugano</Place>
+            <Phone />
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1972</IntegrationDate>
+          <ValidFromDate>15.03.1972</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+      <Pack ProductKey="4159" PackId="6021">
+        <DescriptionDe>90 Stk</DescriptionDe>
+        <DescriptionFr>90 pce</DescriptionFr>
+        <DescriptionIt>90 pez</DescriptionIt>
+        <SwissmedicCategory>C</SwissmedicCategory>
+        <SwissmedicNo8>35366024</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>11282</BagDossierNo>
+        <GTIN>7680353660248</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>12.1101</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>22.35</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Farmaceutica Teofarma Suisse SA</Description>
+            <Street>via Serafino Balestra 2</Street>
+            <ZipCode>6900</ZipCode>
+            <Place>Lugano</Place>
+            <Phone />
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1972</IntegrationDate>
+          <ValidFromDate>15.03.1972</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Ferrum(II) ionisatum</DescriptionLa>
+        <Quantity>105</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+      <Substance>
+        <DescriptionLa>Acidum ascorbicum (Vitamin C, E300)</DescriptionLa>
+        <Quantity>500</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="06.">
+        <DescriptionDe>BLUT</DescriptionDe>
+        <DescriptionFr>SANG</DescriptionFr>
+        <DescriptionIt>SANGUE</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="06.07.">
+        <DescriptionDe>Antianaemica</DescriptionDe>
+        <DescriptionFr>Antianaemica</DescriptionFr>
+        <DescriptionIt>Antianemici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="06.07.11.">
+        <DescriptionDe>per os</DescriptionDe>
+        <DescriptionFr>per os</DescriptionFr>
+        <DescriptionIt>per os</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>15.03.1972</IntegrationDate>
+      <ValidFromDate>15.03.1972</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="9264">
+    <NameDe>Zyvoxid</NameDe>
+    <NameFr>Zyvoxid</NameFr>
+    <NameIt>Zyvoxid</NameIt>
+    <DescriptionDe>Filmtabl 600 mg </DescriptionDe>
+    <DescriptionFr>cpr pell 600 mg </DescriptionFr>
+    <DescriptionIt>cpr riv 600 mg </DescriptionIt>
+    <AtcCode>J01XX08</AtcCode>
+    <SwissmedicNo5>55558</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode>O</OrgGenCode>
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="9264" PackId="13460">
+        <DescriptionDe>10 Stk</DescriptionDe>
+        <DescriptionFr>10 pce</DescriptionFr>
+        <DescriptionIt>10 pez</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>55558005</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>17767</BagDossierNo>
+        <GTIN>7680555580054</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>805.7154</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>941.35</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Pfizer PFE Switzerland GmbH</Description>
+            <Street>Schärenmoosstrasse 99</Street>
+            <ZipCode>8052</ZipCode>
+            <Place>Zürich</Place>
+            <Phone>+41434957111</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.07.2002</IntegrationDate>
+          <ValidFromDate>01.07.2002</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Linezolidum</DescriptionLa>
+        <Quantity>600</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>ZYVOXID</LimitationCode>
+        <LimitationType>DIA</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <DescriptionDe>Behandlung nosokomialer Pneumonien,&lt;br&gt;
+komplizierter Haut- und Weichteilinfektionen,&lt;br&gt;
+Vancomycin-resistenter Enterococcus faecium-Infektionen einschliesslich Bakteriämie.</DescriptionDe>
+        <DescriptionFr>Traitement de la pneumonie nosocomiale,&lt;br&gt;
+des infections compliquées de la peau et des parties molles,&lt;br&gt;
+des infections à l'Enterococcus faecium résistant à la vancomycine, y compris la bactériémie.</DescriptionFr>
+        <DescriptionIt>Trattamento delle infezioni polmonari nosocomiali,&lt;br&gt;
+delle infezioni complicate della cute e dei tessuti molli,&lt;br&gt;
+delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batteremie.</DescriptionIt>
+        <ValidFromDate>01.01.2007</ValidFromDate>
+        <ValidThruDate>31.12.9999</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="08.">
+        <DescriptionDe>INFEKTIONSKRANKHEITEN</DescriptionDe>
+        <DescriptionFr>MALADIES INFECTIEUSES</DescriptionFr>
+        <DescriptionIt>MALATTIE INFETTIVE </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="08.01.">
+        <DescriptionDe>Mittel gegen bakterielle Erreger </DescriptionDe>
+        <DescriptionFr>Préparations antibactériennes </DescriptionFr>
+        <DescriptionIt>Antibatterici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="08.01.92.">
+        <DescriptionDe>Lincomycine und Analoge</DescriptionDe>
+        <DescriptionFr>Lincomicines et analogues</DescriptionFr>
+        <DescriptionIt>Lincomicine e analoghi </DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.07.2002</IntegrationDate>
+      <ValidFromDate>01.07.2002</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="9265">
+    <NameDe>Zyvoxid</NameDe>
+    <NameFr>Zyvoxid</NameFr>
+    <NameIt>Zyvoxid</NameIt>
+    <DescriptionDe>Susp 20 mg/ml </DescriptionDe>
+    <DescriptionFr>susp 20 mg/ml </DescriptionFr>
+    <DescriptionIt>sosp 20 mg/ml </DescriptionIt>
+    <AtcCode>J01XX08</AtcCode>
+    <SwissmedicNo5>55559</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode>O</OrgGenCode>
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="9265" PackId="13461">
+        <DescriptionDe>Fl 150 ml</DescriptionDe>
+        <DescriptionFr>fl 150 ml</DescriptionFr>
+        <DescriptionIt>bot 150 ml</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>55559002</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>17768</BagDossierNo>
+        <GTIN>7680555590022</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>387.6066</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>461.35</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Pfizer PFE Switzerland GmbH</Description>
+            <Street>Schärenmoosstrasse 99</Street>
+            <ZipCode>8052</ZipCode>
+            <Place>Zürich</Place>
+            <Phone>+41434957111</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.07.2002</IntegrationDate>
+          <ValidFromDate>01.07.2002</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Linezolidum</DescriptionLa>
+        <Quantity>20</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>ZYVOXID</LimitationCode>
+        <LimitationType>DIA</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <DescriptionDe>Behandlung nosokomialer Pneumonien,&lt;br&gt;
+komplizierter Haut- und Weichteilinfektionen,&lt;br&gt;
+Vancomycin-resistenter Enterococcus faecium-Infektionen einschliesslich Bakteriämie.</DescriptionDe>
+        <DescriptionFr>Traitement de la pneumonie nosocomiale,&lt;br&gt;
+des infections compliquées de la peau et des parties molles,&lt;br&gt;
+des infections à l'Enterococcus faecium résistant à la vancomycine, y compris la bactériémie.</DescriptionFr>
+        <DescriptionIt>Trattamento delle infezioni polmonari nosocomiali,&lt;br&gt;
+delle infezioni complicate della cute e dei tessuti molli,&lt;br&gt;
+delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batteremie.</DescriptionIt>
+        <ValidFromDate>01.01.2007</ValidFromDate>
+        <ValidThruDate>31.12.9999</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="08.">
+        <DescriptionDe>INFEKTIONSKRANKHEITEN</DescriptionDe>
+        <DescriptionFr>MALADIES INFECTIEUSES</DescriptionFr>
+        <DescriptionIt>MALATTIE INFETTIVE </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="08.01.">
+        <DescriptionDe>Mittel gegen bakterielle Erreger </DescriptionDe>
+        <DescriptionFr>Préparations antibactériennes </DescriptionFr>
+        <DescriptionIt>Antibatterici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="08.01.92.">
+        <DescriptionDe>Lincomycine und Analoge</DescriptionDe>
+        <DescriptionFr>Lincomicines et analogues</DescriptionFr>
+        <DescriptionIt>Lincomicine e analoghi </DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.07.2002</IntegrationDate>
+      <ValidFromDate>01.07.2002</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="28113">
+    <NameDe>Advate</NameDe>
+    <NameFr>Advate</NameFr>
+    <NameIt>Advate</NameIt>
+    <DescriptionDe>Trockensub 250 IE c Solv 2 ml</DescriptionDe>
+    <DescriptionFr>subst sèche 250 UI c solv 2 ml </DescriptionFr>
+    <DescriptionIt>subst sèche 250 UI c solv 2 ml </DescriptionIt>
+    <AtcCode>B02BD02</AtcCode>
+    <SwissmedicNo5>56352</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="28113" PackId="35667">
+        <DescriptionDe>Durchstf 1 Stk</DescriptionDe>
+        <DescriptionFr>flac 1 pce</DescriptionFr>
+        <DescriptionIt>flac 1 pce</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>56352017</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>18009</BagDossierNo>
+        <GTIN>7680563520172</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>289.07</Price>
+            <ValidFromDate>01.05.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>EXTRAORDMUT</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Ausserordentliche Preismutation</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Ausserordentliche Preismutation</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Ausserordentliche Preismutation</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>337.3</Price>
+            <ValidFromDate>01.05.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>EXTRAORDMUT</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Ausserordentliche Preismutation</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Ausserordentliche Preismutation</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Ausserordentliche Preismutation</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Shire Switzerland GmbH</Description>
+            <Street>Zählerweg 4</Street>
+            <ZipCode>6300</ZipCode>
+            <Place>Zug</Place>
+            <Phone>+41800820890</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.04.2004</IntegrationDate>
+          <ValidFromDate>15.04.2004</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Octocogum alfa </DescriptionLa>
+        <Quantity>250</Quantity>
+        <QuantityUnit>UI</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="06.">
+        <DescriptionDe>BLUT</DescriptionDe>
+        <DescriptionFr>SANG</DescriptionFr>
+        <DescriptionIt>SANGUE</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="06.01.">
+        <DescriptionDe>BLUT</DescriptionDe>
+        <DescriptionFr>SANG</DescriptionFr>
+        <DescriptionIt>SANG</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="06.01.10.">
+        <DescriptionDe>Blutkonserven und Plasmafraktionen</DescriptionDe>
+        <DescriptionFr>Conserves de sang et fractions plasmatiques</DescriptionFr>
+        <DescriptionIt>Conserve di sangue e frazioni plasmatiche</DescriptionIt>
+        <Limitations>
+          <Limitation>
+            <LimitationCode>BLUTPRODUKTE</LimitationCode>
+            <LimitationType>KOM</LimitationType>
+            <LimitationNiveau>IP</LimitationNiveau>
+            <DescriptionDe>Preisberechnung für Blutpräparate aufgrund des Fabrikabgabepreises zuzüglich einer Fixmarge wegen der speziellen Verteilersituation (praktisch kein Zwischenhandel) von Fr. 40.-- zuzüglich MWST.  Diese Berechnung gilt nicht für die Humanalbumine.</DescriptionDe>
+            <DescriptionFr>Calculation des prix pour préparations sanguines sur la base des prix "ex factory" plus une marge fixe de fr. 40.-- à cause de la situation particulière de distribution (pratiquement pas de commerce de grossiste et détailliste) plus la TVA. Cette calculation n'est pas valable pour l'albumine humaine.</DescriptionFr>
+            <DescriptionIt>I prezzi sono calcolati per prodotti sanguini sulla base del prezzo di fabbrica per la consegna e di un margine fisso di 40.-- fr. a causa della situazione particolare della distribuzione (che avviene in pratica senza intermediari) più la IVA. Questa calcolazione non è valida per l'albumina umana.</DescriptionIt>
+            <ValidFromDate>01.05.2014</ValidFromDate>
+            <ValidThruDate>31.12.9999</ValidThruDate>
+          </Limitation>
+        </Limitations>
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>15.04.2004</IntegrationDate>
+      <ValidFromDate>15.04.2004</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="9194">
+    <NameDe>Diaphin</NameDe>
+    <NameFr>Diaphin</NameFr>
+    <NameIt>Diaphin</NameIt>
+    <DescriptionDe>Trockensub 10 g i.v.</DescriptionDe>
+    <DescriptionFr>subst sèche 10 g i.v. </DescriptionFr>
+    <DescriptionIt>sost secca 10 g i.v. </DescriptionIt>
+    <AtcCode>N07BC06</AtcCode>
+    <SwissmedicNo5>55561</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="9194" PackId="13360">
+        <DescriptionDe>Amp 1 Stk</DescriptionDe>
+        <DescriptionFr>amp 1 pce</DescriptionFr>
+        <DescriptionIt>fiala 1 pez</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>55561004</SwissmedicNo8>
+        <FlagNarcosis>Y</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>17747</BagDossierNo>
+        <GTIN />
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>205</Price>
+            <ValidFromDate>01.08.2017</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>PEG</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preiserhöhungsgesuch</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preiserhöhungsgesuch</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preiserhöhungsgesuch</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>0</Price>
+            <ValidFromDate>01.07.2002</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>NORMAL</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Normale Preismutation</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Mutation de prix normale</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Mutation de prix normale</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>DiaMo Narcotics GmbH</Description>
+            <Street>Grabenstrasse 6</Street>
+            <ZipCode>3600</ZipCode>
+            <Place>Thun</Place>
+            <Phone>+41332220717</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.07.2002</IntegrationDate>
+          <ValidFromDate>01.07.2002</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Diamorphini hydrochloridum hydricum</DescriptionLa>
+        <Quantity>10</Quantity>
+        <QuantityUnit>g</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>SUBUTEX</LimitationCode>
+        <LimitationType>DIA</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <DescriptionDe>Gemäss Anhang 1 zur KLV (SR 832.112.31), vgl. Ziffer 8, Psychiatrie, Substitutionsbehandlung bei Opiatabhängigkeit.</DescriptionDe>
+        <DescriptionFr>Conformément à l'annexe 1 de l'OPAS (RS 832.112.31), v. chiffre 8, psychiatrie, traitement de substitution en cas de dépendance aux opiacés.</DescriptionFr>
+        <DescriptionIt>Secondo l’allegato 1 dell’OPre (RS 832.112.31), cf. cifra 8, psichiatria, terapia sostitutiva in caso di dipendenza dagli oppiacei.</DescriptionIt>
+        <ValidFromDate>01.01.2007</ValidFromDate>
+        <ValidThruDate>31.12.9999</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="01.">
+        <DescriptionDe>NERVENSYSTEM</DescriptionDe>
+        <DescriptionFr>SYSTEME NERVEUX</DescriptionFr>
+        <DescriptionIt>SISTEMA NERVOSO </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.01.">
+        <DescriptionDe>Analgetica</DescriptionDe>
+        <DescriptionFr>Analgetica</DescriptionFr>
+        <DescriptionIt>Analgesici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.01.30.">
+        <DescriptionDe>Narkotische Analgetica</DescriptionDe>
+        <DescriptionFr>Analgésiques stupéfiants</DescriptionFr>
+        <DescriptionIt>Analgesici narcotici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.07.2002</IntegrationDate>
+      <ValidFromDate>01.07.2002</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="28891">
+    <NameDe>Tebokan 240</NameDe>
+    <NameFr>Tebokan 240</NameFr>
+    <NameIt>Tebokan 240</NameIt>
+    <DescriptionDe>Filmtabl 240 mg </DescriptionDe>
+    <DescriptionFr>cpr pell 240 mg </DescriptionFr>
+    <DescriptionIt>cpr pell 240 mg </DescriptionIt>
+    <AtcCode>N06DX02</AtcCode>
+    <SwissmedicNo5>54534</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="28891" PackId="36898">
+        <DescriptionDe>30 Stk</DescriptionDe>
+        <DescriptionFr>30 pce</DescriptionFr>
+        <DescriptionIt>30 pce</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>54534001</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>N</FlagModal>
+        <BagDossierNo>17658</BagDossierNo>
+        <GTIN>7680545340019</GTIN>
+        <Limitations />
+        <PointLimitations>
+          <PointLimitation>
+            <Points>80</Points>
+            <ValidFromDate>01.09.2016</ValidFromDate>
+            <ValidThruDate>31.12.9999</ValidThruDate>
+          </PointLimitation>
+        </PointLimitations>
+        <Prices>
+          <ExFactoryPrice>
+            <Price>32.94</Price>
+            <ValidFromDate>01.09.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>54.2</Price>
+            <ValidFromDate>01.09.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Schwabe Pharma AG</Description>
+            <Street>Erlistrasse 2</Street>
+            <ZipCode>6403</ZipCode>
+            <Place>Küssnacht am Rigi</Place>
+            <Phone>+41418541860</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.09.2016</IntegrationDate>
+          <ValidFromDate>01.09.2016</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>2</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+          <FlagApd>Y</FlagApd>
+        </Status>
+      </Pack>
+      <Pack ProductKey="28891" PackId="36899">
+        <DescriptionDe>60 Stk</DescriptionDe>
+        <DescriptionFr>60 pce</DescriptionFr>
+        <DescriptionIt>60 pce</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>54534002</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>N</FlagModal>
+        <BagDossierNo>17658</BagDossierNo>
+        <GTIN>7680545340026</GTIN>
+        <Limitations />
+        <PointLimitations>
+          <PointLimitation>
+            <Points>100</Points>
+            <ValidFromDate>01.09.2016</ValidFromDate>
+            <ValidThruDate>31.12.9999</ValidThruDate>
+          </PointLimitation>
+        </PointLimitations>
+        <Prices>
+          <ExFactoryPrice>
+            <Price>57.96</Price>
+            <ValidFromDate>01.09.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>82.95</Price>
+            <ValidFromDate>01.09.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Schwabe Pharma AG</Description>
+            <Street>Erlistrasse 2</Street>
+            <ZipCode>6403</ZipCode>
+            <Place>Küssnacht am Rigi</Place>
+            <Phone>+41418541860</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.09.2016</IntegrationDate>
+          <ValidFromDate>01.09.2016</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>2</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+          <FlagApd>Y</FlagApd>
+        </Status>
+      </Pack>
+      <Pack ProductKey="28891" PackId="36900">
+        <DescriptionDe>90 Stk</DescriptionDe>
+        <DescriptionFr>90 pce</DescriptionFr>
+        <DescriptionIt>90 pce</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>54534003</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>17658</BagDossierNo>
+        <GTIN>7680545340033</GTIN>
+        <Limitations />
+        <PointLimitations>
+          <PointLimitation>
+            <Points>120</Points>
+            <ValidFromDate>01.09.2016</ValidFromDate>
+            <ValidThruDate>31.12.9999</ValidThruDate>
+          </PointLimitation>
+        </PointLimitations>
+        <Prices>
+          <ExFactoryPrice>
+            <Price>84</Price>
+            <ValidFromDate>01.09.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>112.85</Price>
+            <ValidFromDate>01.09.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Schwabe Pharma AG</Description>
+            <Street>Erlistrasse 2</Street>
+            <ZipCode>6403</ZipCode>
+            <Place>Küssnacht am Rigi</Place>
+            <Phone>+41418541860</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.09.2016</IntegrationDate>
+          <ValidFromDate>01.09.2016</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>2</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+          <FlagApd>Y</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Ginkgonis extractum siccum raffinatum et quantificatum</DescriptionLa>
+        <Quantity>240</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>240PUNKTE</LimitationCode>
+        <LimitationType>PKT</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <LimitationValue>240</LimitationValue>
+        <DescriptionDe>Gesamthaft zugelassen:
+&lt;b&gt;240&lt;/b&gt; Punkte</DescriptionDe>
+        <DescriptionFr>Prescription limitée au maximum à:
+&lt;b&gt;240&lt;/b&gt; points</DescriptionFr>
+        <DescriptionIt>Ammessi in totale:
+&lt;b&gt;240&lt;/b&gt; punti</DescriptionIt>
+        <ValidFromDate>01.09.2016</ValidFromDate>
+        <ValidThruDate>31.12.9999</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="52.">
+        <DescriptionDe>HERZ UND KREISLAUF KOMPLEMENTÄRMEDIZIN</DescriptionDe>
+        <DescriptionFr>COEUR ET CIRCULATION MEDECINES COMPLEMENTAIRES</DescriptionFr>
+        <DescriptionIt>SISTEMA CARDIOVASCOLARE</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="52.97.">
+        <DescriptionDe>Beschwerden bei Arteriosklerose</DescriptionDe>
+        <DescriptionFr>Troubles lors d'artériosclérose</DescriptionFr>
+        <DescriptionIt>Troubles lors d'artériosclérose</DescriptionIt>
+        <Limitations>
+          <Limitation>
+            <LimitationCode>SYMFONA</LimitationCode>
+            <LimitationType>PKT</LimitationType>
+            <LimitationNiveau>I</LimitationNiveau>
+            <LimitationValue>240</LimitationValue>
+            <DescriptionDe>Gesamthaft zugelassen: 240 Punkte (innerhalb von drei Monaten)</DescriptionDe>
+            <DescriptionFr>Prescription limitée au maximum à: 240 points (pour la durée de trois mois)</DescriptionFr>
+            <DescriptionIt>Ammessi in totale: 240 punti (per la durata di tre mesi)</DescriptionIt>
+            <ValidFromDate>01.01.2000</ValidFromDate>
+            <ValidThruDate>31.12.9999</ValidThruDate>
+          </Limitation>
+        </Limitations>
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.09.2016</IntegrationDate>
+      <ValidFromDate>01.09.2016</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>2</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+      <FlagApd>Y</FlagApd>
+    </Status>
+  </Preparation>
 </Preparations>

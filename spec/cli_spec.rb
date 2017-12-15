@@ -48,8 +48,8 @@ describe Oddb2xml::Cli do
   context 'when -x address option is given' do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-e --log')
-      @cli = Oddb2xml::Cli.new(options)
+      options = Oddb2xml::Options.parse('-e')
+      # @cli = Oddb2xml::Cli.new(options);  @cli.run
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
   end
@@ -57,9 +57,8 @@ describe Oddb2xml::Cli do
     before(:all) do
       cleanup_directories_before_run
       options = Oddb2xml::Options.parse('-o fi')
-      @cli = Oddb2xml::Cli.new(options)
- #     @cli_output = buildr_capture(:stdout) { @cli.run }
-      @cli.run
+      @cli = Oddb2xml::Cli.new(options);
+      @cli_output = buildr_capture(:stdout) { @cli.run }
     end
 #    it_behaves_like 'any interface for product'
     it 'should have nonpharma option' do

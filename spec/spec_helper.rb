@@ -10,6 +10,7 @@ $:.unshift File.dirname(__FILE__)
 
 require 'rspec'
 require 'webmock/rspec'
+require 'flexmock/rspec'
 require 'pp'
 
 begin # load pry if is available
@@ -44,7 +45,7 @@ module Oddb2xml
                   '7680532900196', # Insulin, gentechnik
                   '7680555610041', # Diaphin 10 g i.v. drug
     ]
-  FRIDGE_GTIN = '7680586180018'   # fridge drug IKSNR 58618: ARTISS 2 ml, tiefgefrorene Lösung
+  FRIDGE_GTIN = '7680002770014'   # fridge drug 7680002770014 Coeur-Vaisseaux Sérocytol, suppositoire
   ORPHAN_GTIN = '7680621320010'   # orphan drug IKSNR 62132: Adcetris, Pulver zur Herstellung einer Infusionslösung
   GTINS_DRUGS = [ '733905577161', # 1-DAY ACUVUE Moist Tag -2.00dpt BC 8.5
                   FRIDGE_GTIN,
@@ -101,6 +102,10 @@ module Oddb2xml
 
 end
 
+RSpec.configure do |config|
+    config.mock_with :flexmock
+  end        
+
 VCR.configure do |config|
   config.cassette_library_dir = "spec/fixtures/vcr_cassettes"
   config.hook_into :webmock
@@ -130,6 +135,7 @@ require 'oddb2xml'
 
 module Kernel
   def buildr_capture(stream)
+    Pry.config.output = STDOUT
     begin
       stream = stream.to_s
       eval "$#{stream} = StringIO.new"
@@ -158,6 +164,7 @@ module ServerMockHelper
     dirs.each{ |dir| FileUtils.rm_rf(Dir.glob(File.join(dir, '*')), :verbose => false) }
     dirs.each{ |dir| FileUtils.makedirs(dir, :verbose => false) }
     cleanup_compressor
+    mock_downloads
   end
 
   def setup_server_mocks
@@ -214,4 +221,51 @@ RSpec.configure do |config|
 
   # Helper
   config.include(ServerMockHelper)
+end
+
+def validate_via_xsd(xsd_file, xml_file)
+  xsd =open(xsd_file).read
+  xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
+  doc = Nokogiri::XML(File.read(xml_file))
+  xsd_rtikelstamm_xml.validate(doc).each do
+    |error|
+      if error.message
+        puts "Failed validating #{xml_file} with #{File.size(xml_file)} bytes using XSD from #{xsd_file}"
+        puts "CMD: xmllint --noout --schema #{xsd_file} #{xml_file}"
+      end
+      msg = "expected #{error.message} to be nil\nfor #{xml_file}"
+      puts msg
+      expect(error.message).to be_nil, msg
+  end
+end
+
+def mock_downloads
+    WebMock.enable!
+    { 'transfer.zip' => ['transfer.dat'],
+      'XMLPublications.zip' => ['Preparations.xml', 'ItCodes.xml', 'GL_Diff_SB.xml']
+      }.each do |zip, entries|
+        zip_file = File.join(Oddb2xml::SpecData,zip)
+        files = entries.collect{|entry| File.join(Oddb2xml::SpecData, entry)}
+        FileUtils.rm(zip_file, :verbose => true) if File.exist?(zip_file)
+        cmd = "zip  --junk-paths #{zip_file} #{files.join(' ')}"
+        puts cmd
+        system(cmd)
+    end
+    { 'https://download.epha.ch/cleaned/matrix.csv' =>  'epha_interactions.csv',
+      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/humanarzneimittel.orphan.xlsx.download.xlsx/humanarzneimittel.xlsx' =>  'swissmedic_orphan.xlsx',
+      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx' => 'swissmedic_package.xlsx',
+      'http://pillbox.oddb.org/TRANSFER.ZIP' =>  'transfer.zip',
+      'https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv' => 'atc.csv',
+      'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt' => 'oddb2xml_files_lppv.txt',
+      'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip' => 'XMLPublications.zip',
+#      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml',
+      }.each do |url, file|
+      inhalt = File.read(File.join(Oddb2xml::SpecData, file))
+      m = flexmock('open-uri')
+      m.should_receive(:open).with(url).and_return(inhalt)
+      stub_request(:any,url).to_return(body: inhalt)
+      stub_request(:get,url).to_return(body: inhalt)
+      stub_request(:open,url).to_return(body: inhalt)
+    end
+    VCR.eject_cassette; VCR.insert_cassette('oddb2xml')
 end

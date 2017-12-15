@@ -2,6 +2,12 @@
 require 'xmlsimple'
 
 module Oddb2xml
+  def self.log_timestamp(msg)
+    full_msg = "#{Time.now.strftime("%H:%M:%S")}: #{msg}"
+    puts full_msg
+    STDOUT.flush
+    full_msg
+  end
   class StammXML
     V3_NAME_REG = /_([N,P])_/
     attr_accessor :components
@@ -33,7 +39,7 @@ module Oddb2xml
           raise "Unexpected version #{version_from_xml} in #{fname}" unless version_from_xml == 3
         end
         @hash['ITEMS'] = @p_items + @n_items
-        puts "#{Time.now.strftime("%H:%M:%S")}: V3 #{filename} has #{@p_items.size} Pharma and #{@n_items.size} NonPharma items"
+        Oddb2xml.log_timestamp "V3 #{filename} has #{@p_items.size} Pharma and #{@n_items.size} NonPharma items"
       end
     end
     def self.get_component_key_name(component_name)
@@ -61,7 +67,7 @@ module Oddb2xml
       get_items(component_name).find{|item| item[keyname].first.to_i == id}
     end
     def load_file(name)
-      puts "#{Time.now.strftime("%H:%M:%S")}: Reading #{name} #{(File.size(name)/1024/1024).to_i} MB. This may take some time"
+      Oddb2xml.log_timestamp "Reading #{name} #{(File.size(name)/1024/1024).to_i} MB. This may take some time"
       XmlSimple.xml_in(IO.read(name))
     end
   end
@@ -116,7 +122,7 @@ module Oddb2xml
           binding.pry  if defined?(RSpec)
         end
       end
-      show_header("#{Time.now.strftime("%H:%M:%S")}: Summary comparing #{@left.filename} with #{@right.filename}")
+      show_header("Summary comparing #{@left.filename} with #{@right.filename}")
       puts "Ignored differences in #{@options[:fields_to_ignore]}. Signaled when differences in #{@options[:fields_as_floats]} were bigger than #{@options[:min_diff_for_floats]}"
       puts @report.join("\n")
       @diff_stat.each do |component, stats|
@@ -137,11 +143,12 @@ module Oddb2xml
     NR_COMPARED = 'NR_COMPARED'
     COUNT       = '_count'
     def show_header(header)
+      text = Oddb2xml.log_timestamp(header)
       pad = 5
       puts
-      puts '-'*(header.length+2*pad)
-      puts ''.ljust(pad) + header
-      puts '-'*(header.length+2*pad)
+      puts '-'*(text.length+2*pad)
+      puts ''.ljust(pad) + text
+      puts '-'*(text.length+2*pad)
       puts
     end
     def compare_details(component_name, compare_names, id)
@@ -198,16 +205,24 @@ module Oddb2xml
       puts details.gsub(/[\[\]]/,'') if found
     end
 
+    def show_keys(keys, batch_size = 20)
+      0.upto(keys.size) do |idx|
+        next unless idx % batch_size == 0
+        puts '  ' + keys[idx..(idx + batch_size-1)].join(' ')
+      end
+    end
     def key_results_details(component_name, compare_names, l_keys, r_keys)
       component_name += 'S' unless /S$/.match(component_name)
       @report <<  "#{component_name}: Found #{l_keys.size} items only in #{@left.basename} #{r_keys.size} items only in #{@right.basename}, compared #{@diff_stat[component_name][NR_COMPARED]} items"
       keys = r_keys - l_keys
       head = "#{component_name}: #{(keys).size} keys only in #{@right.basename}"
-      puts "#{head}: Keys were #{keys.size > 10 ? "\n" : ''} #{keys}"
+      puts "#{head}: Keys were #{keys.size}"
+      show_keys(keys)
       @report << head
       keys = l_keys - r_keys
       head = "#{component_name}: #{(keys).size} keys only in #{@left.basename}"
-      puts "#{head}: Keys were #{keys.size > 10 ? "\n" : ''} #{keys}"
+      puts "#{head}: Keys were #{keys.size}"
+      show_keys(keys)
       @report << head
     end
   end

@@ -36,6 +36,20 @@
         <PRODNO>28201</PRODNO>
     </ITEM>
     <ITEM>
+        <GTIN>7680259263666</GTIN>
+        <PHAR>1143629</PHAR>
+        <DSCR>VITAMIN C.Streuli Inj Lös 20 % 10 Amp 5 ml</DSCR>
+        <ATC>A11GA01</ATC>
+        <COMP>
+            <GLN>7601001004214</GLN>
+        </COMP>
+        <PEXF>99.99</PEXF>
+        <PPUB>33.33</PPUB>
+        <PKG_SIZE>10</PKG_SIZE>
+        <IKSCAT>B</IKSCAT>
+        <PRODNO>2592607</PRODNO>
+    </ITEM>
+    <ITEM>
         <GTIN>7680665610023</GTIN>
         <PHAR>7074102</PHAR>
         <DSCR>AZICLAV Filmtabl 625 mg 20 Stk</DSCR>
@@ -48,5 +62,25 @@
         <PKG_SIZE>20</PKG_SIZE>
         <IKSCAT>A</IKSCAT>
         <PRODNO>6656101</PRODNO>
+    </ITEM>
+    <ITEM>
+        <GTIN>7680139420998</GTIN>
+        <PHAR>1946156</PHAR>
+        <DSCR>PELSANO med Badeemulsion 300 ml</DSCR>
+        <ATC>D02AC</ATC>
+        <COMP>
+            <GLN>7601001002173</GLN>
+        </COMP>
+        <PEXF>6.02</PEXF>
+        <PPUB>11.1</PPUB>
+        <PKG_SIZE>300</PKG_SIZE>
+        <SL_ENTRY>true</SL_ENTRY>
+        <IKSCAT>D</IKSCAT>
+        <LIMITATION>true</LIMITATION>
+        <LIMITATION_PTS>70</LIMITATION_PTS>
+        <LIMITATION_TEXT>Gesamthaft zugelassen: weniger als 60 Punkte.</LIMITATION_TEXT>
+        <DEDUCTIBLE>10</DEDUCTIBLE>
+        <PRODNO>1394202</PRODNO>
+        <LIMNAMEBAG>1010</LIMNAMEBAG>
     </ITEM>
 </ARTIKELSTAMM>

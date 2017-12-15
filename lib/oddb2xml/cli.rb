@@ -19,7 +19,7 @@ module Oddb2xml
     OPTIONALS = %w[fi fi_product]
     def initialize(args)
       @options = args
-      STDOUT.puts "\nStarting cli with from #{caller[1]}" if defined?(RSpec)
+      STDOUT.puts "\nStarting cli with from #{caller[1]} using #{@options}" if defined?(RSpec)
       Oddb2xml.save_options(@options)
       @mutex = Mutex.new
       # product
@@ -39,6 +39,7 @@ module Oddb2xml
     end
     def run
       threads = []
+      startTime = Time.now
       files2rm = Dir.glob(File.join(Downloads, '*'))
       FileUtils.rm_f(files2rm, :verbose => @options[:log]) if files2rm.size > 0 and not Oddb2xml.skip_download?
       if @options[:calc] and not @options[:extended]
@@ -81,7 +82,10 @@ module Oddb2xml
       end
       build
       compress if @options[:compress_ext]
-      report
+      res = report
+      nrSecs =  (Time.now - startTime).to_i
+      if defined?(RSpec) && (nrSecs).to_i > 10 then require 'pry'; binding.pry ; end
+      res
     end
     private
     def build
@@ -192,7 +196,7 @@ module Oddb2xml
             "@#{var}",
             items = SwissmedicExtractor.new(bin, what).to_arry
           )
-          Oddb2xml.log("SwissmedicExtractor added #{items.size} #{var}. File #{bin} was #{File.size(bin)} bytes")
+          Oddb2xml.log("SwissmedicExtractor added #{items.size}")
           items
         end
       when :interaction

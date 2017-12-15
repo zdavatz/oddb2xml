@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ARTIKELSTAMM xmlns="http://elexis.ch/Elexis_Artikelstamm_v003" CREATION_DATETIME="2017-09-01T03:40:15.000+02:00" LANG="de" MONTH="9" YEAR="2017" CUMUL_VER="57" TYPE="N" DATA_QUALITY="3">
+    <ITEM>
+        <GTIN>30065949</GTIN>
+        <PHAR>3064029</PHAR>
+        <DSCR>VICHY IS Stick empfindl Hautpartien SPF50+ 9 g</DSCR>
+        <PEXF>10.28</PEXF>
+        <PPUB>13.6</PPUB>
+    </ITEM>
+    <ITEM>
+        <GTIN>30070349</GTIN>
+        <PHAR>3607234</PHAR>
+        <DSCR>ROCHE POSAY Nutritic Lèvres 4.7 ml</DSCR>
+        <PEXF>6.17</PEXF>
+        <PPUB>8.15</PPUB>
+    </ITEM>
+    <ITEM>
+        <GTIN>30080270</GTIN>
+        <PHAR>4310335</PHAR>
+        <DSCR>VICHY AQUALIA Thermal Lippen Stick 4.7 ml</DSCR>
+        <PEXF>6.85</PEXF>
+        <PPUB>9.0</PPUB>
+    </ITEM>
+    <ITEM>
+        <GTIN>30089372</GTIN>
+        <PHAR>5030520</PHAR>
+        <DSCR>ROCHE POSAY Anthélios Lippenstift XL 50+</DSCR>
+        <PEXF>11.37</PEXF>
+        <PPUB>15.0</PPUB>
+    </ITEM>
+    <ITEM>
+        <GTIN>68711428074880</GTIN>
+        <PHAR>1638816</PHAR>
+        <DSCR>3M COBAN Elast Binde 2.6cmx4.57m blau 30 Stk</DSCR>
+        <COMP>
+            <GLN>7610182000007</GLN>
+        </COMP>
+    </ITEM>
+</ARTIKELSTAMM>

@@ -75,6 +75,12 @@ def common_before
   cleanup_directories_before_run
   FileUtils.makedirs(Oddb2xml::WorkDir)
   Dir.chdir(Oddb2xml::WorkDir)
+  WebMock.enable!
+  { 'https://download.epha.ch/cleaned/matrix.csv' =>  'epha_interactions.csv',
+    }.each do |url, file|
+    inhalt = File.read(File.join(Oddb2xml::SpecData, file))
+    stub_request(:get,url).to_return(body: inhalt)
+  end
 end
 
 def common_after

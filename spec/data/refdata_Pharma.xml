@@ -1,7 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <soap:Body>
-    <ARTICLE xmlns="http://refdatabase.refdata.ch/Article_out" CREATION_DATETIME="2017-12-01T09:41:49.5856186+01:00">
+      <ARTICLE xmlns="http://refdatabase.refdata.ch/Article_out" CREATION_DATETIME="2017-12-01T09:41:49.5856186+01:00">
+      <ITEM DT="2017-12-14T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680545340019</GTIN>
+        <PHAR>6749124</PHAR>
+        <SWMC_AUTHNR>54534001</SWMC_AUTHNR>
+        <NAME_DE>TEBOKAN Filmtabl 240 mg 30 Stk</NAME_DE>
+        <NAME_FR>TEBOKAN cpr pell 240 mg 30 pce</NAME_FR>
+        <ATC>N06DX02</ATC>
+        <AUTH_HOLDER_NAME>Schwabe Pharma AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001001541</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-14T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680540150118</GTIN>
+        <PHAR>1882189</PHAR>
+        <SWMC_AUTHNR>54015011</SWMC_AUTHNR>
+        <NAME_DE>NAROPIN Inj Lös 0.2 % 10ml Duofit Amp 5 Stk</NAME_DE>
+        <NAME_FR>NAROPIN sol inj 0.2 % 10ml amp duofit 5 pce</NAME_FR>
+        <ATC>N01BB09</ATC>
+        <AUTH_HOLDER_NAME>Aspen Pharma Schweiz GmbH</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001402539</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-08T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680563520172</GTIN>
+        <PHAR>6477223</PHAR>
+        <SWMC_AUTHNR>56352017</SWMC_AUTHNR>
+        <NAME_DE>ADVATE Trockensub 250 IE c Solv 2 ml Durchstf</NAME_DE>
+        <NAME_FR>ADVATE subst sèche 250 UI c solv 2 ml flac</NAME_FR>
+        <ATC>B02BD02</ATC>
+        <AUTH_HOLDER_NAME>Shire Switzerland GmbH</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001395756</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-08T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680555580054</GTIN>
+        <PHAR>2465312</PHAR>
+        <SWMC_AUTHNR>55558005</SWMC_AUTHNR>
+        <NAME_DE>ZYVOXID Filmtabl 600 mg 10 Stk</NAME_DE>
+        <NAME_FR>ZYVOXID cpr pell 600 mg 10 pce</NAME_FR>
+        <ATC>J01XX08</ATC>
+        <AUTH_HOLDER_NAME>Pfizer PFE Switzerland GmbH</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001402218</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-08T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680620690084</GTIN>
+        <PHAR>5819012</PHAR>
+        <SWMC_AUTHNR>62069008</SWMC_AUTHNR>
+        <NAME_DE>LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk</NAME_DE>
+        <NAME_FR>LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce</NAME_FR>
+        <ATC>N03AX14</ATC>
+        <AUTH_HOLDER_NAME>Desitin Pharma GmbH</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001320451</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-08T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680353660163</GTIN>
+        <PHAR>0020273</PHAR>
+        <SWMC_AUTHNR>35366016</SWMC_AUTHNR>
+        <NAME_DE>KENDURAL Depottabl 30 Stk</NAME_DE>
+        <NAME_FR>KENDURAL cpr dépôt 30 pce</NAME_FR>
+        <ATC>B03AE10</ATC>
+        <AUTH_HOLDER_NAME>Farmaceutica Teofarma Suisse SA</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001374539</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-08T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680536620137</GTIN>
+        <PHAR>1699947</PHAR>
+        <SWMC_AUTHNR>53662013</SWMC_AUTHNR>
+        <NAME_DE>3TC Filmtabl 150 mg 60 Stk</NAME_DE>
+        <NAME_FR>3TC cpr pell 150 mg 60 pce</NAME_FR>
+        <ATC>J05AF05</ATC>
+        <AUTH_HOLDER_NAME>ViiV Healthcare GmbH</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001392175</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-08T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680161050583</GTIN>
+        <PHAR>2731179</PHAR>
+        <SWMC_AUTHNR>16105058</SWMC_AUTHNR>
+        <NAME_DE>HIRUDOID Creme 3 mg/g 40 g</NAME_DE>
+        <NAME_FR>HIRUDOID crème 3 mg/g 40 g</NAME_FR>
+        <ATC>C05BA01</ATC>
+        <AUTH_HOLDER_NAME>Medinova AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001002258</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-08T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680324750190</GTIN>
+        <PHAR>0023722</PHAR>
+        <SWMC_AUTHNR>32475019</SWMC_AUTHNR>
+        <NAME_DE>LANSOYL Gel 225 g</NAME_DE>
+        <NAME_FR>LANSOYL gel 225 g</NAME_FR>
+        <ATC>A06AA01</ATC>
+        <AUTH_HOLDER_NAME>Actipharm SA</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001002012</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-08T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680573230016</GTIN>
+        <PHAR>6824802</PHAR>
+        <SWMC_AUTHNR>57323001</SWMC_AUTHNR>
+        <NAME_DE>LANSOPRAZOL Mepha Kaps 15 mg Fl 60 Stk</NAME_DE>
+        <NAME_FR>LANSOPRAZOL Mepha caps 15 mg fl 60 pce</NAME_FR>
+        <ATC>A02BC03</ATC>
+        <AUTH_HOLDER_NAME>Mepha Pharma AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001001121</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-08T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680532900196</GTIN>
+        <PHAR>1699999</PHAR>
+        <SWMC_AUTHNR>53290019</SWMC_AUTHNR>
+        <NAME_DE>HUMALOG Inj Lös 100 IE/ml Durchstf 10 ml</NAME_DE>
+        <NAME_FR>HUMALOG sol inj 100 UI/ml flac 10 ml</NAME_FR>
+        <ATC>A10AB04</ATC>
+        <AUTH_HOLDER_NAME>Eli Lilly (Suisse) SA</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001261853</AUTH_HOLDER_GLN>
+      </ITEM>
       <ITEM DT="2017-12-01T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680002770014</GTIN>
@@ -23,6 +144,28 @@
         <ATC>J06AA99</ATC>
         <AUTH_HOLDER_NAME>Serolab SA (succursale de Remaufens)</AUTH_HOLDER_NAME>
         <AUTH_HOLDER_GLN>7640128710004</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-01T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680406620144</GTIN>
+        <PHAR>0769841</PHAR>
+        <SWMC_AUTHNR>40662014</SWMC_AUTHNR>
+        <NAME_DE>PEVISONE Creme 15 g</NAME_DE>
+        <NAME_FR>PEVISONE crème 15 g</NAME_FR>
+        <ATC>D01AC20</ATC>
+        <AUTH_HOLDER_NAME>Janssen-Cilag AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001000902</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2017-12-01T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680406620229</GTIN>
+        <PHAR>0863244</PHAR>
+        <SWMC_AUTHNR>40662022</SWMC_AUTHNR>
+        <NAME_DE>PEVISONE Creme 30 g</NAME_DE>
+        <NAME_FR>PEVISONE crème 30 g</NAME_FR>
+        <ATC>D01AC20</ATC>
+        <AUTH_HOLDER_NAME>Janssen-Cilag AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001000902</AUTH_HOLDER_GLN>
       </ITEM>
       <RESULT>
         <OK_ERROR>OK</OK_ERROR>

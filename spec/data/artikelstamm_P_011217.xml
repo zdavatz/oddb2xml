@@ -46,4 +46,18 @@
         <PEXF>615.02</PEXF>
         <PPUB>688.0</PPUB>
     </ITEM>
+    <ITEM>
+        <GTIN>7680259263666</GTIN>
+        <PHAR>1143629</PHAR>
+        <DSCR>VITAMIN C Streuli Inj Lös 20 % 10 Amp 5 ml</DSCR>
+        <ATC>A11GA01</ATC>
+        <COMP>
+            <GLN>7601001004214</GLN>
+        </COMP>
+        <PEXF>8.72</PEXF>
+        <PPUB>17.05</PPUB>
+        <PKG_SIZE>10</PKG_SIZE>
+        <IKSCAT>B</IKSCAT>
+        <PRODNO>2592607</PRODNO>
+    </ITEM>
 </ARTIKELSTAMM>

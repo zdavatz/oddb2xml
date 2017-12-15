@@ -12,12 +12,11 @@ SkipMigelDownloader = true  # https://github.com/zdavatz/oddb2xml_files/raw/mast
 module Oddb2xml
   module DownloadMethod
     private
-    def download_as(file, option='r')
+    def download_as(file, option='w+')
       tempFile  = File.join(WorkDir,   File.basename(file))
-      file2save = File.join(Downloads, File.basename(file))
-      report_download(@url, file2save)
+      @file2save = File.join(Downloads, File.basename(file))
+      report_download(@url, @file2save)
       data = nil
-      FileUtils.rm_f(tempFile, :verbose => false)
       if Oddb2xml.skip_download(file)
         io = File.open(file, option)
         data = io.read
@@ -26,6 +25,9 @@ module Oddb2xml
           io = File.open(file, option)
           data = open(@url).read
           io.write(data)
+        rescue => error
+          puts "error #{error} while fetching #{@url}"
+          require 'pry'; binding.pry if defined?(RSpec)
         ensure
           io.close if io and !io.closed? # win
           Oddb2xml.download_finished(tempFile)
@@ -35,7 +37,7 @@ module Oddb2xml
     end
   end
   class Downloader
-    attr_reader :type, :agent
+    attr_reader :type, :agent, :url; :file2save
     def initialize(options={}, url=nil)
       @options     = options
       @url         = url
@@ -81,6 +83,7 @@ module Oddb2xml
         Dir.glob(File.join(Downloads, '*')).each { |name| if target.match(name) then entry = name; break end }
         if entry
           dest = "#{Downloads}/#{File.basename(entry)}"
+          @file2save = dest
           if File.exists?(dest)
             Oddb2xml.log "read_xml_from_zip return content of #{dest} #{File.size(dest)} bytes "
             return IO.read(dest)
@@ -152,34 +155,14 @@ module Oddb2xml
     include DownloadMethod
     def download
       @url ||= 'http://pillbox.oddb.org/TRANSFER.ZIP'
-      unless @url =~ /^http/
-        io = File.open(@url, 'r:iso-8859-1:utf-8')
-        content = io.read
-        report_download(@url, File.basename(@url))
-        Oddb2xml.log("ZurroseDownloader #{__LINE__} download #{@url} @url returns #{content.bytes}")
-        content
-      else
-        file = File.join(Downloads, 'transfer.zip')
-        report_download(@url, file)
-        unless Oddb2xml.skip_download(file)
-          begin
-            response = @agent.get(@url)
-            response.save_as(file)
-            response = nil # win
-          rescue Timeout::Error, Errno::ETIMEDOUT
-            retrievable? ? retry : raise
-          ensure
-            Oddb2xml.download_finished(file)
-          end
-        end
-        read_xml_from_zip(/transfer.dat/, file);
-        dest = File.join(Downloads, 'transfer.dat')
-        # res = `/usr/bin/file #{dest}`
-        # system("/usr/bin/iconv -f ISO-8859-1 -t utf-8 --output=#{dest} #{dest}") if /ISO-8859/i.match(res)
-        # require 'pry'; binding.pry
-        # content = IO.read('transfer.dat')
-        File.open(dest, 'r:iso-8859-1:utf-8').read
-      end
+      zipfile = File.join(WorkDir, 'transfer.zip')
+      download_as(zipfile)
+      dest = File.join(Downloads, 'transfer.dat')
+      cmd = "unzip -o #{zipfile} -d #{Downloads}"
+      system(cmd)
+      FileUtils.rm(zipfile)
+      # read file and convert it to utf-8
+      File.open(dest, 'r:iso-8859-1:utf-8').read
     end
   end
   class MedregbmDownloader < Downloader
@@ -199,32 +182,29 @@ module Oddb2xml
     end
     def download
       file = "medregbm_#{@type.to_s}.txt"
-      download_as(file, 'r:iso-8859-1:utf-8')
+      download_as(file, 'w+:iso-8859-1:utf-8')
       report_download(@url, file)
       FileUtils.rm_f(file, :verbose => false) # we need it only in the download
       file
     end
   end
   class BagXmlDownloader < Downloader
+    include DownloadMethod
     def init
       super
       @url ||= 'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip'
     end
     def download
       file = File.join(WorkDir, 'XMLPublications.zip')
+      download_as(file)
       report_download(@url, file)
-      unless Oddb2xml.skip_download(file)
-        begin
-          response = @agent.get(@url)
-          response.save_as(file)
-          response = nil # win
-        rescue Timeout::Error, Errno::ETIMEDOUT
-          retrievable? ? retry : raise
-        ensure
-          Oddb2xml.download_finished(file)
-        end
+      if defined?(RSpec)
+        src = File.join(Oddb2xml::SpecData, 'Preparations.xml')
+        content =  File.read(src)
+        FileUtils.cp(src, File.join(Downloads, File.basename(file)))
+      else
+        content = read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
       end
-      content = read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
       if @options[:artikelstamm_v5]
         cmd = "xmllint --format --output Preparations.xml Preparations.xml"
         Oddb2xml.log(cmd)
@@ -252,7 +232,7 @@ module Oddb2xml
     def download
       begin
         filename =  "refdata_#{@type}.xml"
-        file2save = File.join(Downloads, "refdata_#{@type}.xml")
+        @file2save = File.join(Downloads, "refdata_#{@type}.xml")
 				soap = %(<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://refdatabase.refdata.ch/Article_in" xmlns:ns2="http://refdatabase.refdata.ch/">
   <SOAP-ENV:Body>
@@ -263,17 +243,18 @@ module Oddb2xml
   </SOAP-ENV:Envelope>
 </ns1:ATYPE></ns2:DownloadArticleInput></SOAP-ENV:Body>
 )
-        report_download(@url, file2save)
-        return IO.read(file2save) if Oddb2xml.skip_download? and File.exists?(file2save)
-        FileUtils.rm_f(file2save, :verbose => false)
+        report_download(@url, @file2save)
+        return IO.read(@file2save) if Oddb2xml.skip_download? and File.exists?(@file2save)
+        FileUtils.rm_f(@file2save, :verbose => false)
         response = @client.call(:download, :xml => soap)
         if response.success?
           if xml = response.to_xml
+            xml =  File.read(File.join(Oddb2xml::SpecData, File.basename(@file2save))) if defined?(RSpec)
             response = nil # win
             FileUtils.makedirs(Downloads)
-            File.open(file2save, 'w+') { |file| file.write xml }
+            File.open(@file2save, 'w+') { |file| file.write xml }
             if @options[:artikelstamm_v5]
-              cmd = "xmllint --format --output #{file2save} #{file2save}"
+              cmd = "xmllint --format --output #{@file2save} #{@file2save}"
               Oddb2xml.log(cmd)
               system(cmd)
             end
@@ -305,28 +286,28 @@ module Oddb2xml
       end
     end
     def download
-      @type == file = File.join(Oddb2xml::WorkDir, "swissmedic_#{@type}.xlsx")
-      report_download(@url, file)
-      if  @options[:calc] and @options[:skip_download] and File.exists?(file) and (Time.now-File.ctime(file)).to_i < 24*60*60
-        Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{file} #{File.size(file)} bytes"
-        return File.expand_path(file)
+      @file2save = File.join(Oddb2xml::WorkDir, "swissmedic_#{@type}.xlsx")
+      report_download(@url, @file2save)
+      if  @options[:calc] and @options[:skip_download] and File.exists?(@file2save) and (Time.now-File.ctime(@file2save)).to_i < 24*60*60
+        Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{@file2save} #{File.size(@file2save)} bytes"
+          return File.expand_path(@file2save)
       end
       begin
-        FileUtils.rm(File.expand_path(file), :verbose => !defined?(RSpec)) if File.exists?(File.expand_path(file))
+        FileUtils.rm(File.expand_path(@file2save), :verbose => !defined?(RSpec)) if File.exists?(File.expand_path(@file2save))
         @url = @direct_url_link
-        download_as(file, 'w+')
+        download_as(@file2save, 'w+')
         if @options[:artikelstamm_v5]
-          cmd = "ssconvert '#{file}' '#{File.join(Downloads, File.basename(file).sub(/\.xls.*/, '.csv'))}' 2> /dev/null"
+          cmd = "ssconvert '#{@file2save}' '#{File.join(Downloads, File.basename(@file2save).sub(/\.xls.*/, '.csv'))}' 2> /dev/null"
           Oddb2xml.log(cmd)
           system(cmd)
         end
-        return File.expand_path(file)
+        return File.expand_path(@file2save)
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       ensure
-        Oddb2xml.download_finished(file, false)
+        Oddb2xml.download_finished(@file2save, false)
       end
-      return File.expand_path(file)
+      return File.expand_path(@file2save)
     end
   end
   class SwissmedicInfoDownloader < Downloader

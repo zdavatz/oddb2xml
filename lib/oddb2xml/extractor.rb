@@ -9,6 +9,7 @@ require 'oddb2xml/xml_definitions'
 module Oddb2xml
   module TxtExtractorMethods
     def initialize(str)
+      Oddb2xml.log("TxtExtractorMethods #{str} #{str.to_s.size} bytes")
       @io = StringIO.new(str)
     end
     def to_hash
@@ -24,6 +25,7 @@ module Oddb2xml
   class Extractor
     attr_accessor :xml
     def initialize(xml)
+      Oddb2xml.log("Extractor #{xml } xml #{xml.size} bytes")
       @xml = xml
     end
   end
@@ -193,8 +195,8 @@ module Oddb2xml
         item[:desc_de]         = (dscr = pac.NAME_DE)   ? dscr: ''
         item[:desc_fr]         = (dscr = pac.NAME_FR)   ? dscr: ''
         item[:atc_code]        = (code = pac.ATC)    ? code.to_s : ''
-				item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam: ''
-				item[:company_ean]  = (gln = pac.AUTH_HOLDER_GLN)  ? gln: ''
+        item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam: ''
+        item[:company_ean]  = (gln = pac.AUTH_HOLDER_GLN)  ? gln: ''
         unless item[:pharmacode]
           item[:pharmacode] = phar
           unless data[item[:pharmacode]] # pharmacode => GTINs
@@ -211,6 +213,7 @@ module Oddb2xml
       @filename = File.join(Downloads, File.basename(filename))
       @filename = File.join(SpecData, File.basename(filename)) if defined?(RSpec) and not File.exists?(@filename)
       @type  = type
+      Oddb2xml.log("SwissmedicExtractor #{@filename} #{File.size(@filename)} bytes")
       return unless File.exists?(@filename)
       @sheet = RubyXL::Parser.parse(File.expand_path(@filename)).worksheets[0]
     end
@@ -320,6 +323,7 @@ module Oddb2xml
   end
   class MigelExtractor < Extractor
     def initialize(bin)
+      Oddb2xml.log("MigelExtractor #{io} #{File.size(io)} bytes")
       book = Spreadsheet.open(io, 'rb')
       @sheet = book.worksheet(0)
     end
@@ -377,6 +381,7 @@ module Oddb2xml
 
   class EphaExtractor < Extractor
     def initialize(str)
+      Oddb2xml.log("EphaExtractor #{str.size} bytes")
       @io = StringIO.new(str)
     end
     def to_arry
