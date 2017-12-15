@@ -158,11 +158,12 @@ module Oddb2xml
       zipfile = File.join(WorkDir, 'transfer.zip')
       download_as(zipfile)
       dest = File.join(Downloads, 'transfer.dat')
-      cmd = "unzip -o #{zipfile} -d #{Downloads}"
+      cmd = "unzip -o '#{zipfile}' -d '#{Downloads}'"
       system(cmd)
-      FileUtils.rm(zipfile)
       # read file and convert it to utf-8
       File.open(dest, 'r:iso-8859-1:utf-8').read
+    ensure
+      FileUtils.rm(zipfile) if File.exist?(dest) && File.exist?(zipfile)
     end
   end
   class MedregbmDownloader < Downloader
