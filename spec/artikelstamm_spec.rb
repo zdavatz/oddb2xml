@@ -23,6 +23,7 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
+    binding.pry unless @inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
   def common_run_init(options = {})
@@ -159,7 +160,7 @@ DIBASE 25'000 - 7210539
       validate_via_xsd(@elexis_v5_xsd, @artikelstamm_v5_name)
     end
       tests = { 'item 7680403330459 CARBADERM only in Preparations(SL)' =>
-        %(<ITEM PHARMATYPE="N">
+        %(<ITEM PHARMATYPE="P">
             <GTIN>7680403330459</GTIN>
             <PHAR>3603779</PHAR>
             <SALECD>I</SALECD>
@@ -194,7 +195,6 @@ DIBASE 25'000 - 7210539
             <DOSAGE_FORM>Gelée</DOSAGE_FORM>
             <IKSCAT>D</IKSCAT>
             <LPPV>true</LPPV>
-            <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>3247501</PRODNO>
         </ITEM>',
         'product 5366201 3TC' =>
@@ -259,7 +259,7 @@ DIBASE 25'000 - 7210539
             <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>B</IKSCAT>
-            <DEDUCTIBLE>20</DEDUCTIBLE>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>2848601</PRODNO>
         </ITEM>',
       'product 3TC Filmtabl' => %(<PRODUCT>
@@ -285,7 +285,6 @@ DIBASE 25'000 - 7210539
             <MEASUREF>Suppositorien</MEASUREF>
             <DOSAGE_FORM>suppositoire</DOSAGE_FORM>
             <IKSCAT>B</IKSCAT>
-            <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>0027701</PRODNO>
         </ITEM>),
         'HUMALOG (Richter)' => %(<ITEM PHARMATYPE="P">
@@ -307,7 +306,7 @@ DIBASE 25'000 - 7210539
             <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>B</IKSCAT>
-            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>5329001</PRODNO>
         </ITEM>)
               }

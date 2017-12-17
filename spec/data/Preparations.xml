@@ -828,7 +828,7 @@
     <SwissmedicNo5>53290</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB20>Y</FlagSB20> <!-- Manually patched on 2017.12.17 by Niklaus, to hava one Y in examples -->
     <CommentDe />
     <CommentFr />
     <CommentIt />

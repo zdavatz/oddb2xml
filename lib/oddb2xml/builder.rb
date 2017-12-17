@@ -1526,11 +1526,11 @@ module Oddb2xml
                   end
                 end unless @emit_v5
                 xml.LPPV              'true' if @lppvs[pkg_gtin.to_s] # detect_nincd
-                case sequence[:deductible]
-                when 'Y'; xml.SLOPLUS 1; # 20%
-                when 'N'; xml.SLOPLUS 2; # 10%
-                else      xml.SLOPLUS '' # k.A.
-                end
+                case item[:deductible]
+                when 'Y'; xml.DEDUCTIBLE 20; # 20%
+                when 'N'; xml.DEDUCTIBLE 10; # 10%
+                else #     xml.DEDUCTIBLE '' # k.A.
+                end if item && item[:deductible]
                 xml.PRODNO            ppac[:prodno] if ppac && ppac[:prodno] # pkg_gtin.to_s[4..11]
                 csv = []
                 if @emit_v5
@@ -1560,7 +1560,7 @@ module Oddb2xml
             end
             # Set the pharmatype to 'Y' for outdated products, which are no longer found
             # in refdata/packungen
-            patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) ? 'Y': 'N' )
+            patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) ? 'P': 'N' )
             options = @emit_v5 ? {'PHARMATYPE' => patched_pharma_type } : {}
             xml.ITEM(options) do
               xml.GTIN ean13.to_s.rjust(13, '0')
