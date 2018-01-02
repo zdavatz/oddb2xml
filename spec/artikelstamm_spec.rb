@@ -71,7 +71,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should generate a valid v3 nonpharma xml' do
-      v3_name = @artikelstamm_v5_name.sub('_v5', '_v3').sub('artikelstamm_', 'artikelstamm_N_')
+      v3_name = @artikelstamm_v5_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_N_')
       expect(File.exist?(v3_name)).to eq true
       validate_via_xsd(@elexis_v3_xsd, v3_name)
       expect(IO.read(v3_name)).not_to match(/<LIMITATION/)
@@ -81,7 +81,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should generate a valid v3 pharma xml' do
-      v3_name = @artikelstamm_v5_name.sub('_v5', '_v3').sub('artikelstamm_', 'artikelstamm_P_')
+      v3_name = @artikelstamm_v5_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_P_')
       expect(File.exist?(v3_name)).to eq true
       validate_via_xsd(@elexis_v3_xsd, v3_name)
       expect(IO.read(v3_name)).to match(/<LIMITATION/)
