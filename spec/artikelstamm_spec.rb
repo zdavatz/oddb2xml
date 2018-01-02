@@ -7,6 +7,7 @@ include REXML
 RUN_ALL = true
 
 describe Oddb2xml::Builder do
+  raise "Cannot rspec in directroy containing a spac" if / /.match(Oddb2xml::SpecData)
   NrExtendedArticles = 34
   NrSubstances = 14
   NrLimitations = 5
