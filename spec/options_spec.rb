@@ -8,7 +8,7 @@ describe Oddb2xml::Options do
   Default_opts =  {
     :fi           => false,
     :address      => false,
-    :artikelstamm_v5 => false,
+    :artikelstamm => false,
     :nonpharma    => false,
     :extended     => false,
     :compress_ext => nil,
@@ -156,13 +156,13 @@ describe Oddb2xml::Options do
     specify { expect(test_opts).to eq expected }
   end
 
-  context 'when --artikelstamm_v5 is given' do
-    args = '--artikelstamm-v5'
+  context 'when --artikelstamm is given' do
+    args = '--artikelstamm'
     test_opts = Oddb2xml::Options.parse(args) # .should raise
     expected = Default_opts.clone
     expected[:price]  =  :zurrose
     expected[:extended]  =  true
-    expected[:artikelstamm_v5]  =  true
+    expected[:artikelstamm]  =  true
     specify { expect(test_opts).to eq expected }
   end
 
@@ -180,7 +180,7 @@ describe Oddb2xml::Options do
     expected[:use_ra11zip] = 'some_other_zip'
     # expected[:price]  =  :zurrose
     # expected[:extended]  =  true
-    # expected[:artikelstamm_v5]  =  true
+    # expected[:artikelstamm]  =  true
     specify { expect(test_opts).to eq expected }
   end
 

@@ -790,7 +790,7 @@ describe Oddb2xml::Calc do
 
     it 'should create correct entries for Caverject' do
       expect(XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/NAME").first.text).to eq "Caverject DC 20, Injektionspräparat"
-      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size).to eq 6
+      expect(XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/SUBSTANCES/SUBSTANCE").size).to eq 5
       expect(XPath.match( @doc, "//ARTICLE[GTIN='7680556740075']/COMPOSITIONS/COMPOSITION/EXCIPIENS/SUBSTANCE_NAME").first.text).to eq "pro Vitro"
     end
   end

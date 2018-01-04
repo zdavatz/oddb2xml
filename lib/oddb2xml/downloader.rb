@@ -27,7 +27,6 @@ module Oddb2xml
           io.write(data)
         rescue => error
           puts "error #{error} while fetching #{@url}"
-          require 'pry'; binding.pry if defined?(RSpec)
         ensure
           io.close if io and !io.closed? # win
           Oddb2xml.download_finished(tempFile)
@@ -140,7 +139,7 @@ module Oddb2xml
       @url ||= 'https://download.epha.ch/cleaned/matrix.csv'
       file = 'epha_interactions.csv'
       content = download_as(file, 'w+')
-      FileUtils.rm_f(file, :verbose => true)
+      FileUtils.rm_f(file, :verbose => false)
       content
     end
   end
@@ -206,7 +205,7 @@ module Oddb2xml
       else
         content = read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
       end
-      if @options[:artikelstamm_v5]
+      if @options[:artikelstamm]
         cmd = "xmllint --format --output Preparations.xml Preparations.xml"
         Oddb2xml.log(cmd)
         system(cmd)
@@ -254,7 +253,7 @@ module Oddb2xml
             response = nil # win
             FileUtils.makedirs(Downloads)
             File.open(@file2save, 'w+') { |file| file.write xml }
-            if @options[:artikelstamm_v5]
+            if @options[:artikelstamm]
               cmd = "xmllint --format --output #{@file2save} #{@file2save}"
               Oddb2xml.log(cmd)
               system(cmd)
@@ -297,7 +296,7 @@ module Oddb2xml
         FileUtils.rm(File.expand_path(@file2save), :verbose => !defined?(RSpec)) if File.exists?(File.expand_path(@file2save))
         @url = @direct_url_link
         download_as(@file2save, 'w+')
-        if @options[:artikelstamm_v5]
+        if @options[:artikelstamm]
           cmd = "ssconvert '#{@file2save}' '#{File.join(Downloads, File.basename(@file2save).sub(/\.xls.*/, '.csv'))}' 2> /dev/null"
           Oddb2xml.log(cmd)
           system(cmd)

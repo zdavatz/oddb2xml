@@ -4,17 +4,15 @@ require 'spec_helper'
 
 shared_examples_for 'any compressor' do
   it 'should create compress file' do
-    allow(File).to receive(:unlink).and_return(false)
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_article.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_product.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_substance.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_limitation.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_fi.xml')
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, 'oddb_fi_product.xml')
-    expect(@compressor.finalize!).to eq(true)
+    expect(@compressor.finalize!).not_to be nil
     compress_file = @compressor.instance_variable_get(:@compress_file)
     expect(File.exists?(compress_file)).to eq(true)
-    allow(File).to receive(:unlink).and_call_original
     @compressor = nil
   end
 end

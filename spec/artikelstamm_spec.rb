@@ -18,8 +18,8 @@ describe Oddb2xml::Builder do
   NrProducts = 19
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
-  def check_artikelstamm_v5_xml(key, expected_value)
-    expect(@artikelstamm_v5_name).not_to be nil
+  def check_artikelstamm_xml(key, expected_value)
+    expect(@artikelstamm_name).not_to be nil
     expect(@inhalt).not_to be nil
     unless @inhalt.index(expected_value)
       puts expected_value
@@ -47,20 +47,24 @@ describe Oddb2xml::Builder do
   after(:all) do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
-  context 'when artikelstamm_v5 option is given' do
+  context 'when artikelstamm option is given' do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.parse(['--artikelstamm-v5']) # , '--log'])
+      options = Oddb2xml::Options.parse(['--artikelstamm']) # , '--log'])
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
       Oddb2xml::Cli.new(options).run # to debug
-      @artikelstamm_v5_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml")
-      @doc = Nokogiri::XML(File.open(@artikelstamm_v5_name))
-      # @rexml = REXML::Document.new File.read(@artikelstamm_v5_name)
-      @inhalt = IO.read(@artikelstamm_v5_name)
+      @artikelstamm_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml")
+      @doc = Nokogiri::XML(File.open(@artikelstamm_name))
+      # @rexml = REXML::Document.new File.read(@artikelstamm_name)
+      @inhalt = IO.read(@artikelstamm_name)
     end
 
     it 'should exist' do
-      expect(File.exists?(@artikelstamm_v5_name)).to eq true
+      expect(File.exists?(@artikelstamm_name)).to eq true
+    end
+
+    it 'should have a comment' do
+      expect(@inhalt).to match /<!--Produced by/
     end
 
     it 'should produce a Elexis_Artikelstamm_v5.csv' do
@@ -71,7 +75,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should generate a valid v3 nonpharma xml' do
-      v3_name = @artikelstamm_v5_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_N_')
+      v3_name = @artikelstamm_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_N_')
       expect(File.exist?(v3_name)).to eq true
       validate_via_xsd(@elexis_v3_xsd, v3_name)
       expect(IO.read(v3_name)).not_to match(/<LIMITATION/)
@@ -81,7 +85,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should generate a valid v3 pharma xml' do
-      v3_name = @artikelstamm_v5_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_P_')
+      v3_name = @artikelstamm_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_P_')
       expect(File.exist?(v3_name)).to eq true
       validate_via_xsd(@elexis_v3_xsd, v3_name)
       expect(IO.read(v3_name)).to match(/<LIMITATION/)
@@ -120,7 +124,7 @@ describe Oddb2xml::Builder do
     it 'should ignore GTIN 7680172330414' do
       # Took to much time to construct an example. Should change VCR
       skip("No time to check that data/gtin2ignore.yaml has an effect")
-      @inhalt = IO.read(@artikelstamm_v5_name)
+      @inhalt = IO.read(@artikelstamm_name)
       expect(@inhalt.index('7680172330414')).to be nil
     end
 
@@ -157,8 +161,8 @@ DIBASE 25'000 - 7210539
       expect(@inhalt.index('PEVISONE Creme 30 g')).not_to be nil # 7680406620229
       # Should also check for price!
     end
-    it 'should validate against artikelstamm_v5.xsd' do
-      validate_via_xsd(@elexis_v5_xsd, @artikelstamm_v5_name)
+    it 'should validate against artikelstamm.xsd' do
+      validate_via_xsd(@elexis_v5_xsd, @artikelstamm_name)
     end
       tests = { 'item 7680403330459 CARBADERM only in Preparations(SL)' =>
         %(<ITEM PHARMATYPE="P">
@@ -314,7 +318,7 @@ DIBASE 25'000 - 7210539
 
       tests.each do |key, expected|
         it "should a valid entry for #{key}" do
-          check_artikelstamm_v5_xml(key, expected)
+          check_artikelstamm_xml(key, expected)
         end
       end
   end

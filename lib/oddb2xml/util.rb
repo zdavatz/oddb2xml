@@ -41,7 +41,8 @@ module Oddb2xml
     ausgabe.encode('ISO-8859-1')
   end
 
-  def Oddb2xml.add_epha_changes_for_ATC(iksnr, atc_code)
+  def Oddb2xml.add_epha_changes_for_ATC(iksnr, atc_code, force_run: false)
+    @atc_csv_content  =  {} if force_run
     if @atc_csv_content.size == 0
       open(@atc_csv_origin).readlines.each{
         |line|

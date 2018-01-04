@@ -2179,131 +2179,6 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
       <FlagApd>N</FlagApd>
     </Status>
   </Preparation>
-  <Preparation ProductCommercial="9194">
-    <NameDe>Diaphin</NameDe>
-    <NameFr>Diaphin</NameFr>
-    <NameIt>Diaphin</NameIt>
-    <DescriptionDe>Trockensub 10 g i.v.</DescriptionDe>
-    <DescriptionFr>subst sèche 10 g i.v. </DescriptionFr>
-    <DescriptionIt>sost secca 10 g i.v. </DescriptionIt>
-    <AtcCode>N07BC06</AtcCode>
-    <SwissmedicNo5>55561</SwissmedicNo5>
-    <FlagItLimitation>Y</FlagItLimitation>
-    <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
-    <CommentDe />
-    <CommentFr />
-    <CommentIt />
-    <VatInEXF>N</VatInEXF>
-    <Packs>
-      <Pack ProductKey="9194" PackId="13360">
-        <DescriptionDe>Amp 1 Stk</DescriptionDe>
-        <DescriptionFr>amp 1 pce</DescriptionFr>
-        <DescriptionIt>fiala 1 pez</DescriptionIt>
-        <SwissmedicCategory>A</SwissmedicCategory>
-        <SwissmedicNo8>55561004</SwissmedicNo8>
-        <FlagNarcosis>Y</FlagNarcosis>
-        <FlagModal />
-        <BagDossierNo>17747</BagDossierNo>
-        <GTIN />
-        <Limitations />
-        <PointLimitations />
-        <Prices>
-          <ExFactoryPrice>
-            <Price>205</Price>
-            <ValidFromDate>01.08.2017</ValidFromDate>
-            <DivisionDescription />
-            <PriceTypeCode>PEXF</PriceTypeCode>
-            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
-            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
-            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
-            <PriceChangeTypeCode>PEG</PriceChangeTypeCode>
-            <PriceChangeTypeDescriptionDe>Preiserhöhungsgesuch</PriceChangeTypeDescriptionDe>
-            <PriceChangeTypeDescriptionFr>Preiserhöhungsgesuch</PriceChangeTypeDescriptionFr>
-            <PriceChangeTypeDescriptionIt>Preiserhöhungsgesuch</PriceChangeTypeDescriptionIt>
-          </ExFactoryPrice>
-          <PublicPrice>
-            <Price>0</Price>
-            <ValidFromDate>01.07.2002</ValidFromDate>
-            <DivisionDescription />
-            <PriceTypeCode>PPUB</PriceTypeCode>
-            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
-            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
-            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
-            <PriceChangeTypeCode>NORMAL</PriceChangeTypeCode>
-            <PriceChangeTypeDescriptionDe>Normale Preismutation</PriceChangeTypeDescriptionDe>
-            <PriceChangeTypeDescriptionFr>Mutation de prix normale</PriceChangeTypeDescriptionFr>
-            <PriceChangeTypeDescriptionIt>Mutation de prix normale</PriceChangeTypeDescriptionIt>
-          </PublicPrice>
-        </Prices>
-        <Partners>
-          <Partner>
-            <PartnerType>V</PartnerType>
-            <Description>DiaMo Narcotics GmbH</Description>
-            <Street>Grabenstrasse 6</Street>
-            <ZipCode>3600</ZipCode>
-            <Place>Thun</Place>
-            <Phone>+41332220717</Phone>
-          </Partner>
-        </Partners>
-        <Status>
-          <IntegrationDate>01.07.2002</IntegrationDate>
-          <ValidFromDate>01.07.2002</ValidFromDate>
-          <ValidThruDate>31.12.9999</ValidThruDate>
-          <StatusTypeCodeSl>0</StatusTypeCodeSl>
-          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
-          <FlagApd>N</FlagApd>
-        </Status>
-      </Pack>
-    </Packs>
-    <Substances>
-      <Substance>
-        <DescriptionLa>Diamorphini hydrochloridum hydricum</DescriptionLa>
-        <Quantity>10</Quantity>
-        <QuantityUnit>g</QuantityUnit>
-      </Substance>
-    </Substances>
-    <Limitations>
-      <Limitation>
-        <LimitationCode>SUBUTEX</LimitationCode>
-        <LimitationType>DIA</LimitationType>
-        <LimitationNiveau>P</LimitationNiveau>
-        <DescriptionDe>Gemäss Anhang 1 zur KLV (SR 832.112.31), vgl. Ziffer 8, Psychiatrie, Substitutionsbehandlung bei Opiatabhängigkeit.</DescriptionDe>
-        <DescriptionFr>Conformément à l'annexe 1 de l'OPAS (RS 832.112.31), v. chiffre 8, psychiatrie, traitement de substitution en cas de dépendance aux opiacés.</DescriptionFr>
-        <DescriptionIt>Secondo l’allegato 1 dell’OPre (RS 832.112.31), cf. cifra 8, psichiatria, terapia sostitutiva in caso di dipendenza dagli oppiacei.</DescriptionIt>
-        <ValidFromDate>01.01.2007</ValidFromDate>
-        <ValidThruDate>31.12.9999</ValidThruDate>
-      </Limitation>
-    </Limitations>
-    <ItCodes>
-      <ItCode Code="01.">
-        <DescriptionDe>NERVENSYSTEM</DescriptionDe>
-        <DescriptionFr>SYSTEME NERVEUX</DescriptionFr>
-        <DescriptionIt>SISTEMA NERVOSO </DescriptionIt>
-        <Limitations />
-      </ItCode>
-      <ItCode Code="01.01.">
-        <DescriptionDe>Analgetica</DescriptionDe>
-        <DescriptionFr>Analgetica</DescriptionFr>
-        <DescriptionIt>Analgesici</DescriptionIt>
-        <Limitations />
-      </ItCode>
-      <ItCode Code="01.01.30.">
-        <DescriptionDe>Narkotische Analgetica</DescriptionDe>
-        <DescriptionFr>Analgésiques stupéfiants</DescriptionFr>
-        <DescriptionIt>Analgesici narcotici</DescriptionIt>
-        <Limitations />
-      </ItCode>
-    </ItCodes>
-    <Status>
-      <IntegrationDate>01.07.2002</IntegrationDate>
-      <ValidFromDate>01.07.2002</ValidFromDate>
-      <ValidThruDate>31.12.9999</ValidThruDate>
-      <StatusTypeCodeSl>0</StatusTypeCodeSl>
-      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
-      <FlagApd>N</FlagApd>
-    </Status>
-  </Preparation>
   <Preparation ProductCommercial="28891">
     <NameDe>Tebokan 240</NameDe>
     <NameFr>Tebokan 240</NameFr>
@@ -2573,6 +2448,256 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
       <StatusTypeCodeSl>2</StatusTypeCodeSl>
       <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
       <FlagApd>Y</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="20538">
+    <NameDe>Yondelis</NameDe>
+    <NameFr>Yondelis</NameFr>
+    <NameIt>Yondelis</NameIt>
+    <DescriptionDe>Trockensub 0.250 mg </DescriptionDe>
+    <DescriptionFr>subst sèche 0.250 mg </DescriptionFr>
+    <DescriptionIt>sost secca 0.250 mg </DescriptionIt>
+    <AtcCode>L01CX01</AtcCode>
+    <SwissmedicNo5>58734</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="20538" PackId="24253">
+        <DescriptionDe>Durchstf 1 Stk</DescriptionDe>
+        <DescriptionFr>flac 1 pce</DescriptionFr>
+        <DescriptionIt>fiala 1 pez</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>58734001</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>19024</BagDossierNo>
+        <GTIN>7680587340015</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>652.03</Price>
+            <ValidFromDate>01.11.2013</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>764.95</Price>
+            <ValidFromDate>01.11.2013</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>PharmaMar AG</Description>
+            <Street>Aeschenvorstadt 71</Street>
+            <ZipCode>4051</ZipCode>
+            <Place>Basel</Place>
+            <Phone>+41612254214</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.04.2010</IntegrationDate>
+          <ValidFromDate>01.04.2010</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>2</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Trabectedinum</DescriptionLa>
+        <Quantity>0.25</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>YONDELIS</LimitationCode>
+        <LimitationType>DIA</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <DescriptionDe>Behandlung von Patienten mit Liposarkom und Leimyosarkom nach Versagen oder Intoleranz von Anthrazyklinen und Ifosfamid.</DescriptionDe>
+        <DescriptionFr>Traitement de patients atteints de liposarcome et de léiomyosarcome, après échec ou intolérance des traitements à base d'anthracyclines et d'ifosfamide.</DescriptionFr>
+        <DescriptionIt>Trattamento dei pazienti affetti da liposarcoma e leiomiosarcoma dopo fallimento o intolleranza ai trattamenti a base di antracicline e di ifosfamide.</DescriptionIt>
+        <ValidFromDate>01.04.2010</ValidFromDate>
+        <ValidThruDate>31.12.9999</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="07.">
+        <DescriptionDe>STOFFWECHSEL</DescriptionDe>
+        <DescriptionFr>METABOLISME</DescriptionFr>
+        <DescriptionIt>METABOLISMO</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.16.">
+        <DescriptionDe>Oncologica</DescriptionDe>
+        <DescriptionFr>Oncologica</DescriptionFr>
+        <DescriptionIt>Oncologici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.16.10.">
+        <DescriptionDe>Cytostatica</DescriptionDe>
+        <DescriptionFr>Cytostatica</DescriptionFr>
+        <DescriptionIt>Citostatici </DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.04.2010</IntegrationDate>
+      <ValidFromDate>01.04.2010</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>2</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="9194">
+    <NameDe>Diaphin</NameDe>
+    <NameFr>Diaphin</NameFr>
+    <NameIt>Diaphin</NameIt>
+    <DescriptionDe>Trockensub 10 g i.v.</DescriptionDe>
+    <DescriptionFr>subst sèche 10 g i.v. </DescriptionFr>
+    <DescriptionIt>sost secca 10 g i.v. </DescriptionIt>
+    <AtcCode>N07BC06</AtcCode>
+    <SwissmedicNo5>55561</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="9194" PackId="13360">
+        <DescriptionDe>Amp 1 Stk</DescriptionDe>
+        <DescriptionFr>amp 1 pce</DescriptionFr>
+        <DescriptionIt>fiala 1 pez</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>55561004</SwissmedicNo8>
+        <FlagNarcosis>Y</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>17747</BagDossierNo>
+        <GTIN />
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>205</Price>
+            <ValidFromDate>01.08.2017</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>PEG</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preiserhöhungsgesuch</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preiserhöhungsgesuch</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preiserhöhungsgesuch</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>0</Price>
+            <ValidFromDate>01.07.2002</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>NORMAL</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Normale Preismutation</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Mutation de prix normale</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Mutation de prix normale</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>DiaMo Narcotics GmbH</Description>
+            <Street>Grabenstrasse 6</Street>
+            <ZipCode>3600</ZipCode>
+            <Place>Thun</Place>
+            <Phone>+41332220717</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.07.2002</IntegrationDate>
+          <ValidFromDate>01.07.2002</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Diamorphini hydrochloridum hydricum</DescriptionLa>
+        <Quantity>10</Quantity>
+        <QuantityUnit>g</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>SUBUTEX</LimitationCode>
+        <LimitationType>DIA</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <DescriptionDe>Gemäss Anhang 1 zur KLV (SR 832.112.31), vgl. Ziffer 8, Psychiatrie, Substitutionsbehandlung bei Opiatabhängigkeit.</DescriptionDe>
+        <DescriptionFr>Conformément à l'annexe 1 de l'OPAS (RS 832.112.31), v. chiffre 8, psychiatrie, traitement de substitution en cas de dépendance aux opiacés.</DescriptionFr>
+        <DescriptionIt>Secondo l’allegato 1 dell’OPre (RS 832.112.31), cf. cifra 8, psichiatria, terapia sostitutiva in caso di dipendenza dagli oppiacei.</DescriptionIt>
+        <ValidFromDate>01.01.2007</ValidFromDate>
+        <ValidThruDate>31.12.9999</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="01.">
+        <DescriptionDe>NERVENSYSTEM</DescriptionDe>
+        <DescriptionFr>SYSTEME NERVEUX</DescriptionFr>
+        <DescriptionIt>SISTEMA NERVOSO </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.01.">
+        <DescriptionDe>Analgetica</DescriptionDe>
+        <DescriptionFr>Analgetica</DescriptionFr>
+        <DescriptionIt>Analgesici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.01.30.">
+        <DescriptionDe>Narkotische Analgetica</DescriptionDe>
+        <DescriptionFr>Analgésiques stupéfiants</DescriptionFr>
+        <DescriptionIt>Analgesici narcotici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.07.2002</IntegrationDate>
+      <ValidFromDate>01.07.2002</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
     </Status>
   </Preparation>
 </Preparations>

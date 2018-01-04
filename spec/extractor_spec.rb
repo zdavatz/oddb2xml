@@ -4,7 +4,6 @@ require 'spec_helper'
 require "#{Dir.pwd}/lib/oddb2xml/downloader"
 ENV['TZ'] = 'UTC' # needed for last_change
 LAST_CHANGE = "2015-07-03 00:00:00 +0000"
-NR_PACKS = 24
 
 def common_before
   @savedDir = Dir.pwd
@@ -66,19 +65,19 @@ describe Oddb2xml::RefdataExtractor do
       pharma_code_LEVETIRACETAM = 5819012
       item_found = @pharma_items.values.find{ |x| x[:pharmacode].eql?(pharma_code_LEVETIRACETAM)}
       expect(item_found).not_to be nil
-      expected = { :refdata=>true,
+      expected = {:data_origin=>"refdata",
+        :refdata=>true,
         :_type=>:pharma,
         :ean=> Oddb2xml::LEVETIRACETAM_GTIN.to_i,
         :pharmacode=> pharma_code_LEVETIRACETAM,
-        :last_change => @@last_change,
         :data_origin => "refdata",
         :desc_de=>"LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
         :desc_fr=>"LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce",
         :atc_code=>"N03AX14",
+        :last_change => "2017-12-08 00:00:00 +0000",
         :company_name=>"Desitin Pharma GmbH",
         :company_ean=>"7601001320451"}
       expect(item_found).to eq(expected)
-      expect(@pharma_items.size).to eq(19)
     end
 	end
   context 'should handle nonpharma articles' do
@@ -105,7 +104,6 @@ describe Oddb2xml::RefdataExtractor do
       :company_name=>"IVF HARTMANN AG",
       :company_ean=>"7601001000896"}
       expect(item_found).to eq(expected)
-      expect(@non_pharma_items.size).to eq(9)
     end
   end
 end
@@ -127,7 +125,6 @@ describe Oddb2xml::BagXmlExtractor do
       expect(with_pharma[:packages].size).to eq(1)
       expect(with_pharma[:packages].first[0]).to eq(Oddb2xml::THREE_TC_GTIN)
       expect(with_pharma[:packages].first[1][:prices][:pub_price][:price]).to eq('205.3')
-      expect(@items.size).to eq(5)
     end
     it "should handle pub_price for 7680620690084 correctly" do
       @items = subject.to_hash
@@ -183,7 +180,7 @@ describe Oddb2xml::SwissmedicExtractor do
       @packs.find{|pack| pack[1][:ean] == ean13.to_s }[1]
     end
     it 'should have correct nr of packages' do
-      expect(@packs.size).to eq(NR_PACKS)
+      expect(@packs.size).to eq(34)
     end
 
     it 'should have serocytol' do
@@ -342,15 +339,10 @@ describe Oddb2xml::ZurroseExtractor do
         expect(ethacridin[:description]).to eq("EPIMINERAL Paste 20 g")
     end
 
-    it "should set the correct Ethacridin description" do
-        ethacridin = subject.to_hash.values.find{ |x| /Ethacridin/i.match(x[:description])}
-        expect(ethacridin[:description]).to eq("Ethacridin lactat 1‰ 100ml")
-    end
-    specials = { 'SEMPER Cookie' => 'SEMPER Cookie-O’s glutenfrei 150 g',
+    specials = { 'SEMPER Cookie' => "SEMPER Cookie-O's Biskuit glutenfrei 150 g",
                  'DermaSilk' => 'DermaSilk Set Body + Strumpfhöschen 24-36 Mon (98)',
-                 'after sting Roll-on' => 'CER’8 after sting Roll-on 20 ml',
-                 'Inkosport' => 'Inkosport Activ Pro 80 Himbeer - Joghurt Ds 750g',
-                 'Ethacridin' => "Ethacridin lactat 1‰ 100ml",}.
+                 'after sting Roll-on' => "CER'8 after sting Roll-on 20 ml",
+                 'Inkosport' => 'Inkosport Activ Pro 80 Himbeer - Joghurt Ds 750g',}.
     each{ | key, value |
             it "should set the correct #{key} description" do
                 item = subject.to_hash.values.find{ |x| /#{key}/i.match(x[:description])}

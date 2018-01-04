@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ARTIKELSTAMM xmlns="http://elexis.ch/Elexis_Artikelstamm_v003" CREATION_DATETIME="2017-12-01T03:34:58.000+01:00" LANG="de" MONTH="12" YEAR="2017" CUMUL_VER="60" TYPE="N" DATA_QUALITY="3">
+    <ITEM>
+        <GTIN>30065949</GTIN>
+        <PHAR>3064029</PHAR>
+        <DSCR>VICHY IS Stick empfindl Hautpartien SPF50+ 9 g</DSCR>
+        <PEXF>10.28</PEXF>
+        <PPUB>13.6</PPUB>
+    </ITEM>
+    <ITEM>
+        <GTIN>30070349</GTIN>
+        <PHAR>3607234</PHAR>
+        <DSCR>ROCHE POSAY Nutritic Lèvres 4.7 ml</DSCR>
+        <PEXF>6.17</PEXF>
+        <PPUB>8.15</PPUB>
+    </ITEM>
+</ARTIKELSTAMM>

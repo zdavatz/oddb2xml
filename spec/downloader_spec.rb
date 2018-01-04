@@ -205,7 +205,7 @@ def cleanPackungenXlsx(info)
   FileUtils.makedirs(swissmedic_dir)
   xlsx_name = File.join(swissmedic_dir, name + '.xlsx')
   if /Packungen/i.match(xlsx_name)
-      FileUtils.rm(xlsx_name, :verbose => true) if File.exists?(xlsx_name)
+    FileUtils.rm(xlsx_name, :verbose => false) if File.exists?(xlsx_name)
     File.open(xlsx_name, 'wb+') { |f| f.write(info.response.body) }
     FileUtils.cp(xlsx_name, File.join(Oddb2xml::SpecData, 'swissmedic_package_downloaded.xlsx'), :verbose => true, :preserve => true)
     puts "#{Time.now}:  #{__LINE__}: Openening saved #{xlsx_name} (#{File.size(xlsx_name)} bytes) will take some time. URI was #{info.request.uri}"
@@ -319,37 +319,23 @@ end
 
 describe Oddb2xml::EphaDownloader do
   include ServerMockHelper
-  before(:all) do
-    VCR.configure do |c|
-      c.before_record(:epha) do |i|
-        if /epha/.match(i.request.uri)
-          puts "#{Time.now}: #{__LINE__}: URI was #{i.request.uri}"
-          lines = i.response.body.split("\n")
-          to_add = lines[0..5]
-          iksnrs = []; Oddb2xml::GTINS_DRUGS.each{ |x| iksnrs << x[4..9] }
-          iksnrs.each{ |iksnr| to_add << lines.find{ |x| x.index(','+iksnr.to_s+',') } }
-          i.response.body = to_add.compact.join("\n")
-          i.response.body = i.response.body.split("\n")[0..5].join("\n")
-          i.response.headers['Content-Length'] = i.response.body.size
-        end
-      end
-    end
-    VCR.eject_cassette
-    VCR.insert_cassette('oddb2xml', :tag => :epha)
-    @downloader = Oddb2xml::EphaDownloader.new
-    common_before
-    @downloader.download
+  before(:each) do
+    buildr_capture(:stdout) {
+      @downloader = Oddb2xml::EphaDownloader.new
+      common_before
+      Oddb2xml.add_epha_changes_for_ATC(1, 3, force_run: true)
+      @csv = @downloader.download
+    }
+    expect(File.exist?(File.join(Oddb2xml::Downloads, 'epha_interactions.csv'))).to eq(true)
   end
   after(:all) do
     common_after
   end
+
   it_behaves_like 'any downloader'
 
   context 'when download is called' do
-    let(:csv) {
-      Oddb2xml.add_epha_changes_for_ATC(1, 3)
-      @downloader.download
-    }
+    let(:csv) { @csv  }
     it 'should read csv as String' do
       expect(csv).to be_a String
       expect(csv.bytes).not_to be nil

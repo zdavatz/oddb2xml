@@ -1,5 +1,6 @@
 # encoding: utf-8
 require 'trollop'
+require 'oddb2xml/version'
 
 module Oddb2xml
   module Options
@@ -11,12 +12,13 @@ module Oddb2xml
       @opts = Trollop::options(args) do
         version "#$0 ver.#{Oddb2xml::VERSION}"
         banner <<-EOS
+        #{File.expand_path($0)} version #{Oddb2xml::VERSION}
         Usage:
         oddb2xml [option]
           produced files are found under data
 EOS
         opt :append,       "Additional target nonpharma", :default => false
-        opt :artikelstamm_v5, "Create Artikelstamm Version 5 for Elexis >= 3.3"
+        opt :artikelstamm, "Create Artikelstamm Version 3 and 5 for Elexis >= 3.1"
         opt :compress_ext,     "format F. {tar.gz|zip}", :type => :string, :default => nil, :short => 'c'
         opt :extended,     "pharma, non-pharma plus prices and non-pharma from zurrose.
                             Products without EAN-Code will also be listed.
@@ -58,7 +60,7 @@ EOS
         @opts[:price] = :zurrose
         @opts[:calc] = true
       end
-      if @opts[:artikelstamm_v5]
+      if @opts[:artikelstamm]
         @opts[:extended] = true
         @opts[:price] = :zurrose
       end      

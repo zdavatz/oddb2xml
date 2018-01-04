@@ -46,7 +46,7 @@ module Oddb2xml
                   '7680555610041', # Diaphin 10 g i.v. drug
     ]
   FRIDGE_GTIN = '7680002770014'   # fridge drug 7680002770014 Coeur-Vaisseaux Sérocytol, suppositoire
-  ORPHAN_GTIN = '7680621320010'   # orphan drug IKSNR 62132: Adcetris, Pulver zur Herstellung einer Infusionslösung
+  ORPHAN_GTIN = '7680587340015'   # orphan drug IKSNR 62132: Adcetris, Pulver zur Herstellung einer Infusionslösung
   GTINS_DRUGS = [ '733905577161', # 1-DAY ACUVUE Moist Tag -2.00dpt BC 8.5
                   FRIDGE_GTIN,
                   ORPHAN_GTIN,
@@ -246,9 +246,8 @@ def mock_downloads
       }.each do |zip, entries|
         zip_file = File.join(Oddb2xml::SpecData,zip)
         files = entries.collect{|entry| File.join(Oddb2xml::SpecData, entry)}
-        FileUtils.rm(zip_file, :verbose => true) if File.exist?(zip_file)
-        cmd = "zip  --junk-paths #{zip_file} #{files.join(' ')}"
-        puts cmd
+        FileUtils.rm(zip_file, :verbose => false) if File.exist?(zip_file)
+        cmd = "zip --quiet --junk-paths #{zip_file} #{files.join(' ')}"
         system(cmd)
     end
     { 'https://download.epha.ch/cleaned/matrix.csv' =>  'epha_interactions.csv',

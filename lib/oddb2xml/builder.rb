@@ -63,7 +63,6 @@ module Oddb2xml
       @companies  = []
       @people     = []
       @tag_suffix = nil
-      @preparations_only = []
       @pharmacode = {} # index pharmacode => item
       @@emitted_v3_gtins ||= []
       @@emitted_v5_gtins ||= []
@@ -122,7 +121,7 @@ module Oddb2xml
           @articles << entry
         end unless SkipMigelDownloader
         nrAdded = 0
-        if @options[:extended] || @options[:artikelstamm_v5]
+        if @options[:extended] || @options[:artikelstamm]
           Oddb2xml.log("prepare_articles extended prepare_local_index having already #{@articles.size} articles")
           nrItems = 0
           @infos_zur_rose.each do |ean13, info|
@@ -160,7 +159,7 @@ module Oddb2xml
               obj = entry
             end
             if not found and obj.size > 0
-              @articles << obj unless @options[:artikelstamm_v5]
+              @articles << obj unless @options[:artikelstamm]
               nrAdded += 1
             end
           end
@@ -181,7 +180,7 @@ module Oddb2xml
         @substances.uniq!
         @substances.sort!
         Oddb2xml.log("prepare_substances done. Total #{@substances.size} from #{@items.size} items")
-        exit 2 if (@options[:extended] || @options[:artikelstamm_v5]) and @substances.size == 0
+        exit 2 if (@options[:extended] || @options[:artikelstamm]) and @substances.size == 0
       end
     end
     def prepare_limitations
@@ -283,7 +282,7 @@ module Oddb2xml
           XML_OPTIONS
         ) {
           Oddb2xml.log "build_substance #{@substances.size} substances"
-        exit 2 if (@options[:extended] || @options[:artikelstamm_v5]) and @substances.size == 0
+        exit 2 if (@options[:extended] || @options[:artikelstamm]) and @substances.size == 0
         nbr_records = 0
         @substances.each_with_index do |sub_name, i|
             xml.SB('DT' => '') do
@@ -475,6 +474,7 @@ module Oddb2xml
               :eht=>  de_idx.last[:einheit_swissmedic],
               :sub=>  de_idx.last[:substance_swissmedic],
               :comp=> de_idx.last[:composition_swissmedic],
+              :drug_index => de_idx.last[:drug_index],
             }
         end
         ean13_to_product[ean] = de_idx[1]
@@ -558,9 +558,9 @@ module Oddb2xml
               #xml.ADNAMF
               #xml.SIZE
               if seq
-                xml.ADINFD seq[:comment_de]   unless seq[:comment_de].empty?
-                xml.ADINFF seq[:comment_fr]   unless seq[:comment_fr].empty?
-                xml.GENCD  seq[:org_gen_code] unless seq[:org_gen_code].empty?
+                xml.ADINFD seq[:comment_de]   unless seq[:comment_de] && seq[:comment_de].empty?
+                xml.ADINFF seq[:comment_fr]   unless seq[:comment_fr] && seq[:comment_fr].empty?
+                xml.GENCD  seq[:org_gen_code] unless seq[:org_gen_code] && seq[:org_gen_code].empty?
               end
               #xml.GENGRP
               xml.ATC obj[:atc] unless obj[:atc].empty?
@@ -818,16 +818,17 @@ module Oddb2xml
         missing_eans = []
         eans_from_preparations.each do |ean|
           next if ean.to_i == 0
-          unless eans_from_refdata.index(ean)
-            @preparations_only << ean
-            missing_eans << ean
+          unless @articles.collect {|x| x[:ean] }.index(ean)
             item = @items[ean].clone
-            next if defined?(RSpec) && !item[:pharmacode]
+            item[:pharmacode] ||= '123456' if defined?(RSpec)
             item[:ean] = ean
             item[:_type] = :preparations_xml
             item[:desc_de] = item[:name_de] + ' ' + item[:desc_de]
             item[:desc_fr] = item[:name_fr] + ' ' + item[:desc_fr]
             @articles << item
+          end
+          unless eans_from_refdata.index(ean)
+            missing_eans << ean
           end
         end
         xml.ARTICLE(XML_OPTIONS) {
@@ -1366,12 +1367,12 @@ module Oddb2xml
     end
 
     def build_artikelstamm_v3_pharma
-      build_artikelstamm_v5(false, true)
+      build_artikelstamm(false, true)
     end
     def build_artikelstamm_v3_nonpharma
-      build_artikelstamm_v5(false, false)
+      build_artikelstamm(false, false)
     end
-    def build_artikelstamm_v5(emit_v5 = true, emit_pharma = false)
+    def build_artikelstamm(emit_v5 = true, emit_pharma = false)
       @break_id = 7680626030129
       @emit_v5 = emit_v5
       @emit_pharma = emit_pharma
@@ -1379,7 +1380,7 @@ module Oddb2xml
         @csv_file = CSV.open(File.join(WorkDir, "Elexis_Artikelstamm_v5.csv"), "w+")
         @csv_file << ['gtin', 'price', 'galenic_form', 'pkg_size', 'pexf', 'ppub', 'iksnr', 'atc_code', 'active_substance', 'original', 'it-code']
       end
-      variant = emit_v5 ? "build_artikelstamm_v5" : ("build_artikelstamm_v3_" + (emit_pharma ? 'P' : 'N'))
+      variant = emit_v5 ? "build_artikelstamm" : ("build_artikelstamm_v3_" + (emit_pharma ? 'P' : 'N'))
       Oddb2xml.log "#{variant}: @@emitted_v3_gtins #{@@emitted_v3_gtins.size} v5 #{@@emitted_v5_gtins.size}"
       def check_name(obj, lang = :de)
         ean = obj[:ean].to_i
@@ -1588,7 +1589,7 @@ module Oddb2xml
         @prepared = true
         @old_rose_size = @infos_zur_rose.size
         @infos_zur_rose.each do |ean13, value|
-          if /^7680/.match(ean13.to_s) && @options[:artikelstamm_v5]
+          if /^7680/.match(ean13.to_s) && @options[:artikelstamm]
             @infos_zur_rose.delete(ean13)
           end
         end if false
@@ -1625,6 +1626,7 @@ module Oddb2xml
           }
         end
         emitted_prodno = []
+        xml.comment("Produced by #{__FILE__} version #{VERSION} at #{Time.now}")
         xml.ARTIKELSTAMM(options_xml) do
           xml.PRODUCTS do
             products = @products.sort_by { |ean13, obj| ean13 }

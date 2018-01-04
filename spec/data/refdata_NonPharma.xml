@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <soap:Body>
+    <ARTICLE xmlns="http://refdatabase.refdata.ch/Article_out" CREATION_DATETIME="2017-11-03T18:59:24.1641101+01:00">
+      <ITEM DT="2015-11-24 00:00:00 +000">
+        <ATYPE>NONPHARMA</ATYPE>
+        <GTIN>7611600441020</GTIN>
+        <PHAR>0058519</PHAR>
+        <NAME_DE>TUBEGAZE Verband weiss Nr 12 20m Finger gross</NAME_DE>
+        <NAME_FR>TUBEGAZE pans tubul blanc Nr 12 20m doigts grands</NAME_FR>
+        <AUTH_HOLDER_NAME>IVF HARTMANN AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001000896</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2015-11-24 00:00:00 +000">
+        <ATYPE>NONPHARMA</ATYPE>
+        <GTIN>00040565124308</GTIN>
+        <PHAR>4236863</PHAR>
+        <NAME_DE>ACTICOAT Flex 7 Wundverband 10x12.5cm 5 Stk</NAME_DE>
+        <NAME_FR>ACTICOAT Flex 7 pansement vulné 10x12.5cm 5 pce</NAME_FR>
+        <AUTH_HOLDER_NAME>Smith &amp; Nephew Schweiz AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001251861</AUTH_HOLDER_GLN>
+      </ITEM>
+      <ITEM DT="2015-11-24 00:00:00 +000">
+        <ATYPE>NONPHARMA</ATYPE>
+        <GTIN>00040565124346</GTIN>
+        <PHAR>4236857</PHAR>
+        <NAME_DE>ACTICOAT Flex 7 Wundverband 5x5cm 5 Stk</NAME_DE>
+        <NAME_FR>ACTICOAT Flex 7 pansement vulné 5x5cm 5 pce</NAME_FR>
+        <AUTH_HOLDER_NAME>Smith &amp; Nephew Schweiz AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001251861</AUTH_HOLDER_GLN>
+      </ITEM>
+      <RESULT>
+        <OK_ERROR>OK</OK_ERROR>
+        <NBR_RECORD>33727</NBR_RECORD>
+      </RESULT>
+    </ARTICLE>
+  </soap:Body>
+</soap:Envelope>

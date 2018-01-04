@@ -35,9 +35,12 @@ module Oddb2xml
             end
           end
         end
-        if File.exists? @compress_file and not defined?(Rspec)
+        if File.exists? @compress_file
+          puts "#{__LINE__}: @compress_file"
           @contents.each do |file|
-            FileUtils.rm(file)
+            @tmpfile = file
+          puts "#{__LINE__}: @tmpfile"
+            FileUtils.rm(file) if file && File.exists?(file)
           end
         end
         rescue Errno::ENOENT, StandardError => e

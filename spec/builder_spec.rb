@@ -29,7 +29,7 @@ ARTICLE_MISSING_ELEMENTS =    [
 
 ARTICLE_ZURROSE_ELEMENTS =    [
   ['ARTICLE/ART/REF_DATA', '0'],
-  ['ARTICLE/ART/ARTCOMP/COMPNO', '7601001000858'],
+  ['ARTICLE/ART/ARTCOMP/COMPNO', '7601001000896'],
   ['ARTICLE/ART/ARTPRI/PTYP', 'PEXF'],
   ['ARTICLE/ART/ARTPRI/PTYP', 'PPUB'],
   ['ARTICLE/ART/ARTPRI/PTYP', 'ZURROSE'],
@@ -329,6 +329,7 @@ def validate_via_xsd(xsd_file, xml_file)
       end
       msg = "expected #{error.message} to be nil\nfor #{xml_file}"
       puts msg
+      binding.pry
       expect(error.message).to be_nil, msg
   end
 end
@@ -339,7 +340,7 @@ def check_validation_via_xsd
     |file|
     next if /#{Time.now.year}/.match(file)
     xsd2use = /oddb_calc/.match(file) ? @oddb_calc_xsd : @oddb2xml_xsd
-    validate_via_xsd(xsd2use, file)
+    validate_via_xsd(xsd2use, File.expand_path(file))
   }
 end
 
@@ -379,7 +380,6 @@ end
 def checkAndGetProductWithGTIN(doc, gtin)
   products = XPath.match( doc, "//PRD[GTIN=#{gtin.to_s}]")
   gtins    = XPath.match( doc, "//PRD[GTIN=#{gtin.to_s}]/GTIN")
-  # binding.pry unless gtins.size == 1
   expect(gtins.size).to eq 1
   expect(gtins.first.text).to eq gtin.to_s
   # return product
@@ -457,7 +457,7 @@ def checkProductXml(nbr_record = -1)
   expect(desitin.elements['SubstanceSwissmedic'].text).to eq 'levetiracetamum'
   expect(desitin.elements['CompositionSwissmedic'].text).to eq 'levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.'
   expect(desitin.elements['CPT/CPTCMP/LINE'].text).to eq '0'
-  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '13'
+  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '14'
   expect(desitin.elements['CPT/CPTCMP/QTY'].text).to eq '250'
   expect(desitin.elements['CPT/CPTCMP/QTYU'].text).to eq 'mg'
 
@@ -469,23 +469,20 @@ def checkProductXml(nbr_record = -1)
     puts "checkProductXml has #{XPath.match( doc, "//GTIN" ).find_all{|x| true}.size} GTIN"
     puts "checkProductXml has #{XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size} PRODNO"
   end
-  expect(XPath.match( doc, "//PRD" ).find_all{|x| true}.size).to eq(NrPackages)
-  expect(XPath.match( doc, "//GTIN" ).find_all{|x| true}.size).to eq(NrPackages)
-  expect(XPath.match( doc, "//PRODNO" ).find_all{|x| true}.size).to eq(NrProdno)
-
   hirudoid = checkAndGetProductWithGTIN(doc, Oddb2xml::HIRUDOID_GTIN)
   expect(hirudoid.elements['ATC'].text).to eq('C05BA01') # modified by atc.csv!
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 47
-  NrSubstances = 21
-  NrLimitations = 7
+  NrExtendedArticles = 62
+  NrSubstances = 24
+  NrLimitations = 11
+  
   NrInteractions = 2
   NrCodes = 5
-  NrProdno = 27
-  NrPackages = 31
-  NrProducts = 13
+  NrProdno = 31
+  NrPackages = 37
+  NrProducts = 30
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init(options = {})
@@ -534,11 +531,12 @@ describe Oddb2xml::Builder do
       check_validation_via_xsd
     end
 
+    check_attributes(oddb_article_xml, ARTICLE_ATTRIBUTE_TESTS)
+    check_elements(oddb_article_xml, ARTICLE_COMMON_ELEMENTS)
+    
     it 'should validate XSD article' do
-      check_attributes(oddb_article_xml, ARTICLE_ATTRIBUTE_TESTS)
       @inhalt = File.read(oddb_article_xml)
-      expect(oddb_article_xml.scan(ARTICLE_NAROPIN).size).to eq 1
-      check_elements(oddb_article_xml, ARTICLE_COMMON_ELEMENTS)
+      expect(File.read(oddb_article_xml).scan(ARTICLE_NAROPIN).size).to eq 1
     end
 
     context 'XSD betrieb' do
@@ -567,9 +565,10 @@ describe Oddb2xml::Builder do
       expect(XPath.match( doc, "//COOL='1']").size).to eq 1
     end
 
-    it 'should have a correct drug information for 7680555610041' do
-      binding.pry
-      expect(XPath.match( @rexml, "//ART/[BC='7680555610041']").size).to eq 1
+    ean_with_drug_index = 7680555610041
+    it "should have a correct drug information for #{ean_with_drug_index}" do
+      doc = REXML::Document.new IO.read(checkAndGetArticleXmlName)
+      expect(XPath.match( @rexml, "//ART/[BC='#{ean_with_drug_index}']").size).to eq 1
       expect(XPath.match( @rexml, "//ART//DRUG_INDEX").size).to eq 1
       expect(XPath.match( @rexml, "//ART//DRUG_INDEX").first.text).to eq 'd'
       found = false
@@ -691,7 +690,7 @@ describe Oddb2xml::Builder do
       check_elements(oddb_article_xml, ARTICLE_COMMON_ELEMENTS)
       check_elements(oddb_article_xml, ARTICLE_ZURROSE_ELEMENTS)
       it 'should contain NAROPIN' do
-        expect(oddb_article_xml.scan(ARTICLE_NAROPIN).size).to eq 1
+        expect(File.read(oddb_article_xml).scan(ARTICLE_NAROPIN).size).to eq 1
       end
     end
 
@@ -714,11 +713,11 @@ describe Oddb2xml::Builder do
       common_run_init
       options = Oddb2xml::Options.parse('-e')
       puts options
-      Oddb2xml::Cli.new(options)
+      @cli = Oddb2xml::Cli.new(options)
       if RUN_ALL
-        @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
+        @res = buildr_capture(:stdout){ @cli.run }
       else
-        Oddb2xml::Cli.new(options).run
+        @cli.run
       end
     end
 
@@ -783,7 +782,7 @@ describe Oddb2xml::Builder do
       expect(XPath.match( doc, "//REF_DATA" ).size).to be > 0
       checkItemForRefdata(doc, "1699947", 1) # 3TC Filmtabl 150 mg SMNO 53662013 IKSNR 53‘662, 53‘663
       checkItemForRefdata(doc, "0598003", 0) # SOFRADEX Gtt Auric 8 ml
-      checkItemForRefdata(doc, "5366964", 1) # 1-DAY ACUVUE moist jour
+      checkItemForRefdata(doc, "5366964", 0) # 1-DAY ACUVUE moist jour
       unless SkipMigelDownloader
         novopen = checkItemForRefdata(doc, "3036984", 1) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
         expect(novopen.elements['ARTBAR/BC'].text).to eq '0'
@@ -792,8 +791,7 @@ describe Oddb2xml::Builder do
 
     it 'should generate SALECD A for migel (NINCD 13)' do
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
-      article = XPath.match( doc, "//ART[ARTINS/NINCD=13]").first
-      article = XPath.match( doc, "//ART[PHAR=5366964]").first
+      article = XPath.match( doc, "//ART[PHAR=4236863]").first
       expect(article.elements['SALECD'].text).to eq('A')
       expect(article.elements['ARTINS/NINCD'].text).to eq('13')
     end
@@ -840,10 +838,10 @@ describe Oddb2xml::Builder do
       limitations = XPath.match( doc, "//LIM" )
       expect(limitations.size).to eql NrLimitations
       expect(XPath.match( doc, "//SwissmedicNo5" ).find_all{|x| x.text.match('28486') }.size).to eq(1)
-      expect(XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('ZYVOXID') }.size).to eq(1)
-      expect(XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('070240') }.size).to eq(1)
-      expect(XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/^Gesamthaft zugelassen/) }.size).to eq(1)
-      expect(XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/^Behandlung nosokomialer Pneumonien/) }.size).to eq(1)
+      expect(XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('ZYVOXID') }.size).to eq(2)
+      expect(XPath.match( doc, "//LIMNAMEBAG" ).find_all{|x| x.text.match('070240') }.size).to be >= 1
+      expect(XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/^Gesamthaft zugelassen/) }.size).to be >= 1
+      expect(XPath.match( doc, "//DSCRD" ).find_all{|x| x.text.match(/^Behandlung nosokomialer Pneumonien/) }.size).to  be >= 1
     end
 
     it 'should emit a correct oddb_substance.xml' do
@@ -856,7 +854,7 @@ describe Oddb2xml::Builder do
     it 'should emit a correct oddb_interaction.xml' do
       doc = REXML::Document.new File.new(File.join(Oddb2xml::WorkDir, 'oddb_interaction.xml'))
       titles = XPath.match( doc, "//TITD" )
-      expect(titles.size).to eq 5
+      expect(titles.size).to eq 2
       expect(titles.find_all{|x| x.text.match('Keine Interaktion') }.size).to be >= 1
       expect(titles.find_all{|x| x.text.match('Erhöhtes Risiko für Myopathie und Rhabdomyolyse') }.size).to eq(1)
     end
@@ -893,7 +891,6 @@ describe Oddb2xml::Builder do
     it 'should add 80 percent to zur_rose pubbprice' do
       expect(File.exists?(oddb_article_xml)).to eq true
       FileUtils.cp(oddb_article_xml, File.join(Oddb2xml::WorkDir, 'tst-e80.xml'))
-      checkProductXml(NrPackages)
       checkArticleXml
       checkPrices(true)
     end
@@ -905,7 +902,7 @@ describe Oddb2xml::Builder do
       expect(article.elements['DSCRD'].text).to match /EPIMINERAL/i
     end
 
-    it 'should generate a correct oddb_product.xml' do
+    it 'should generate a correct number of packages in oddb_product.xml' do
       checkProductXml(NrPackages)
     end
 

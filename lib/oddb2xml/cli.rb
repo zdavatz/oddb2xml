@@ -90,9 +90,9 @@ module Oddb2xml
     private
     def build
       begin
-        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not (@options[:extended] || @options[:artikelstamm_v5])
+        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not (@options[:extended] || @options[:artikelstamm])
         builder = Builder.new(@options) do |builder|
-          if @options[:calc] and not  (@options[:extended] || @options[:artikelstamm_v5])
+          if @options[:calc] and not  (@options[:extended] || @options[:artikelstamm])
             builder.packs = @packs
           elsif @options[:address]
             builder.companies = @companies
@@ -304,10 +304,10 @@ module Oddb2xml
       unless @_files
         @_files = {}
         @_files[:calc] = "oddb_calc.xml" if @options[:calc]
-        if @options[:artikelstamm_v5]
+        if @options[:artikelstamm]
           @_files[:artikelstamm_v3_pharma]    = "artikelstamm_P_#{Date.today.strftime('%d%m%Y')}_v3.xml"
           @_files[:artikelstamm_v3_nonpharma] = "artikelstamm_N_#{Date.today.strftime('%d%m%Y')}_v3.xml"
-          @_files[:artikelstamm_v5]           = "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml"
+          @_files[:artikelstamm]           = "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml"
         elsif @options[:address]
           @_files[:company] = "#{prefix}_betrieb.xml"
           @_files[:person]  = "#{prefix}_medizinalperson.xml"
@@ -342,8 +342,8 @@ module Oddb2xml
         lines << Calc.report_conversion
         lines << ParseComposition.report
       end
-      if  @options[:artikelstamm_v5]
-        lines << "Generated artikelstamm_v5.xml for Elexis"
+      if  @options[:artikelstamm]
+        lines << "Generated artikelstamm.xml for Elexis"
         lines += Builder.articlestamm_v5_info_lines
       else
         unless @options[:address]
@@ -365,7 +365,7 @@ module Oddb2xml
               end
             end
           end
-          if  (@options[:extended] || @options[:artikelstamm_v5])
+          if  (@options[:extended] || @options[:artikelstamm])
             lines << sprintf("\tInformation items zur Rose: %i", @infos_zur_rose.length)
           end
         else
