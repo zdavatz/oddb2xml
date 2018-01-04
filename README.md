@@ -41,9 +41,7 @@ The following additional data is in the files:
 The top elements of all XML files have a SHA256 attribute over their content. The content corresponds to Nokogiris text method of the node which is essentially join by "\n" + some whitespaces of each element.
 Consumers of the data file may use it to check whether they have to replace the corresponding nodes.
 
-With the option --artikelstamm_v5 it can also generate directly an artikelstamm usabel for Elexis which is needed for Elexis >= 3.3.
-
-With the option --artikelstamm_v3 it should also generate directly an artikelstamm usabel for Elexis which is needed for 3.0.x or 3.1.x.
+Generating files for Elexis Artikelstamm is discussed in the [Readme for the Artikelstamm](artikelstamm.md)
 
 
 ## usage
@@ -53,33 +51,37 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-/usr/local/bin/oddb2xml ver.1.9.4
-Usage:
-  oddb2xml [option]
-    produced files are found under data
-    -a,   --append       Additional target nonpharma
-    -c F, --compress=F   Compress format F. {tar.gz|zip}
-    -e    --extended     pharma, non-pharma plus prices and non-pharma from zurrose. Products without EAN-Code will also be listed.
-    -f F, --format=F     File format F, default is xml. {xml|dat}
-                         If F is given, -o option is ignored.
-    -I x, --increment=x  Increment price by x percent. Forces -f dat -p zurrose.
-    -I x, --increment=x  create additional field price_resellerpub as
-                         price_extfactory incremented by x percent (rounded to the next 0.05 francs)
-                         in oddb_article.xml. In generated zurrose_transfer.dat PRPU is set to this price
-                         Forces -f dat -p zurrose.
-    -i,   --include      Include target option for ean14  for 'dat' format.
-                         'xml' format includes always ean14 records.
-    -o,   --option       Optional fachinfo output.
-    -p,   --price        Price source (transfer.dat) from ZurRose
-    -t S, --tag-suffix=S XML tag suffix S. Default is none. [A-z0-9]
-                         If S is given, it is also used as prefix of filename.
-    -x N, --context=N    context N {product|address}. product is default.
-
-                         For debugging purposes
-    --skip-download      skips downloading files it the file is already under downloads.
-                         Downloaded files are saved under downloads
-    --log                log important actions
-    -h,   --help         Show this help message.
+    /opt/src/oddb2xml_v5/bin/oddb2xml version 2.4.3
+    Usage:
+    oddb2xml [option]
+      produced files are found under data
+    -a, --append              Additional target nonpharma
+    -r, --artikelstamm        Create Artikelstamm Version 3 and 5 for Elexis >= 3.1
+    -c, --compress-ext=<s>    format F. {tar.gz|zip}
+    -e, --extended            pharma, non-pharma plus prices and non-pharma from zurrose.
+                                                          Products without EAN-Code will also be listed.
+                                                          File oddb_calc.xml will also be generated
+    -f, --format=<s>          File format F, default is xml. {xml|dat}
+                                                          If F is given, -o option is ignored. (Default: xml)
+    -i, --include             Include target option for ean14  for 'dat' format.
+                                                          'xml' format includes always ean14 records.
+    -I, --increment=<i>       Increment price by x percent. Forces -f dat -p zurrose.
+                                                          create additional field price_resellerpub as
+                                                          price_extfactory incremented by x percent (rounded to the next 0.05 francs)
+                                                          in oddb_article.xml. In generated zurrose_transfer.dat PRPU is set to this price
+                                                          Forces -f dat -p zurrose.
+    -o, --fi                  Optional fachinfo output.
+    -p, --price               Price source (transfer.dat) from ZurRose
+    -t, --tag-suffix=<s>      XML tag suffix S. Default is none. [A-z0-9]
+                                                          If S is given, it is also used as prefix of filename.
+    -x, --context=<s>         {product|address}. product is default. (Default: product)
+    -l, --calc                create only oddb_calc.xml with GTIN, name and galenic information
+    -s, --skip-download       skips downloading files it the file is already under downloads.
+                                                          Downloaded files are saved under downloads
+    --log                     log important actions
+    -u, --use-ra11zip=<s>     Use the ra11.zip (a zipped transfer.dat from Galexis)
+    -v, --version             Print version and exit
+    -h, --help                Show this message
 ```
 
 ## Option examples
