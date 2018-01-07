@@ -151,7 +151,7 @@ DIBASE 25'000 - 7210539
     )
       expect(@inhalt.index('<GTIN>7680658560014</GTIN>')).not_to be nil
     end
-            
+    
     it 'should contain a public price if the item was only in the SL liste (Preparations.xml)' do
       # same as 7680403330459 CARBADERM
       expect(@inhalt.index('<PPUB>27.70</PPUB>')).not_to be nil
@@ -177,7 +177,7 @@ DIBASE 25'000 - 7210539
         'item 4042809018288 TENSOPLAST' =>
       %(<ITEM PHARMATYPE="N">
             <GTIN>4042809018288</GTIN>
-            <PHAR>55805</PHAR>
+            <PHAR>0055805</PHAR>
             <SALECD>A</SALECD>
             <DSCR>TENSOPLAST Kompressionsbinde 5cmx4.5m</DSCR>
             <DSCRF>--missing--</DSCRF>
@@ -186,7 +186,7 @@ DIBASE 25'000 - 7210539
         </ITEM>),
          'product 3247501 LANSOYL' => '<ITEM PHARMATYPE="P">
             <GTIN>7680324750190</GTIN>
-            <PHAR>23722</PHAR>
+            <PHAR>0023722</PHAR>
             <SALECD>A</SALECD>
             <DSCR>LANSOYL Gel 225 g</DSCR>
             <DSCRF>LANSOYL gel 225 g</DSCRF>
@@ -205,7 +205,7 @@ DIBASE 25'000 - 7210539
         'product 5366201 3TC' =>
       '<ITEM PHARMATYPE="P">
             <GTIN>7680353660163</GTIN>
-            <PHAR>20273</PHAR>
+            <PHAR>0020273</PHAR>
             <SALECD>A</SALECD>
             <DSCR>KENDURAL Depottabl 30 Stk</DSCR>
             <DSCRF>KENDURAL cpr dépôt 30 pce</DSCRF>
@@ -249,7 +249,7 @@ DIBASE 25'000 - 7210539
         </ITEM>),
         'item 7680284860144 ANCOPIR' =>'<ITEM PHARMATYPE="P">
             <GTIN>7680284860144</GTIN>
-            <PHAR>177804</PHAR>
+            <PHAR>0177804</PHAR>
             <SALECD>A</SALECD>
             <DSCR>Ancopir, Injektionslösung</DSCR>
             <DSCRF>--missing--</DSCRF>
@@ -277,7 +277,7 @@ DIBASE 25'000 - 7210539
         </PRODUCT>),
         'nur aus Packungen Coeur-Vaisseaux Sérocytol,' => %(<ITEM PHARMATYPE="P">
             <GTIN>7680002770014</GTIN>
-            <PHAR>361815</PHAR>
+            <PHAR>0361815</PHAR>
             <SALECD>A</SALECD>
             <DSCR>SEROCYTOL Herz-Gefässe Supp 3 Stk</DSCR>
             <DSCRF>SEROCYTOL Coeur-Vaisseaux supp 3 pce</DSCRF>

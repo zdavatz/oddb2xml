@@ -305,9 +305,9 @@ module Oddb2xml
         @_files = {}
         @_files[:calc] = "oddb_calc.xml" if @options[:calc]
         if @options[:artikelstamm]
+          @_files[:artikelstamm]           = "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml"
           @_files[:artikelstamm_v3_pharma]    = "artikelstamm_P_#{Date.today.strftime('%d%m%Y')}_v3.xml"
           @_files[:artikelstamm_v3_nonpharma] = "artikelstamm_N_#{Date.today.strftime('%d%m%Y')}_v3.xml"
-          @_files[:artikelstamm]           = "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml"
         elsif @options[:address]
           @_files[:company] = "#{prefix}_betrieb.xml"
           @_files[:person]  = "#{prefix}_medizinalperson.xml"

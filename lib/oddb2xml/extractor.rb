@@ -16,8 +16,8 @@ module Oddb2xml
       data = {}
       while line = @io.gets
         next unless line =~ /\d{13}/
-        ean = line.chomp.gsub("\"", '')
-        data[ean] = true
+        ean13 = line.chomp.gsub("\"", '')
+        data[ean13] = true
       end
       data
     end
@@ -84,7 +84,7 @@ module Oddb2xml
               puts "BagXmlExtractor: Setting missing GTIN  #{pac.GTIN} in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}."
             end
           end
-          ean = pac.GTIN.to_i
+          ean13 = pac.GTIN.to_s
           # packages
           exf = {:price => '', :valid_date => '', :price_code => ''}
           if pac.Prices and pac.Prices.ExFactoryPrice
@@ -98,14 +98,14 @@ module Oddb2xml
             pub[:valid_date] =  pac.Prices.PublicPrice.ValidFromDate if pac.Prices.PublicPrice.ValidFromDate
             pub[:price_code] =  pac.Prices.PublicPrice.PriceTypeCode if pac.Prices.PublicPrice.PriceTypeCode
           end
-          item[:packages][ean] = {
-            :ean                 => ean,
+          item[:packages][ean13] = {
+            :ean13               => ean13,
             :swissmedic_category => (cat = pac.SwissmedicCategory) ? cat : '',
             :swissmedic_number8  => (num = pac.SwissmedicNo8)      ? num : '',
             :prices              => { :exf_price => exf, :pub_price => pub },
           }
           # related all limitations
-          item[:packages][ean][:limitations] = []
+          item[:packages][ean13][:limitations] = []
           limitations = Hash.new{|h,k| h[k] = [] }
           if seq.Limitations
             limitations[:seq] = seq.Limitations.Limitation.collect { |x| x }
@@ -134,11 +134,11 @@ module Oddb2xml
               id  = item[key].to_s
             when :pac
               key = :swissmedic_number8
-              id  = item[:packages][ean][key].to_s
+              id  = item[:packages][ean13][key].to_s
             end
-            if id.empty? && item[:packages][ean][ :swissmedic_number8]
+            if id.empty? && item[:packages][ean13][ :swissmedic_number8]
               key = :swissmedic_number8
-              id  = item[:packages][ean][key].to_s
+              id  = item[:packages][ean13][key].to_s
             end
             lims.each do |lim|
               limitation = {
@@ -162,13 +162,13 @@ module Oddb2xml
                 end
               end
               limitation[:del] = deleted
-              item[:packages][ean][:limitations] << limitation
+              item[:packages][ean13][:limitations] << limitation
             end if lims
           end
           # limitation points
           pts = pac.PointLimitations.PointLimitation.first # only first points
-          item[:packages][ean][:limitation_points] = pts ? pts.Points : ''
-          data[ean] = item
+          item[:packages][ean13][:limitation_points] = pts ? pts.Points : ''
+          data[ean13] = item
         end
       end
       data
@@ -189,8 +189,8 @@ module Oddb2xml
         item[:data_origin]     = 'refdata'
         item[:refdata]         = true
         item[:_type]           = (typ  = pac.ATYPE.downcase.to_sym)  ? typ: ''
-        item[:ean]             = (gtin = pac.GTIN.to_i)   ? gtin: 0
-        item[:pharmacode]      = (phar = pac.PHAR.to_i)   ? phar: 0
+        item[:ean13]           = (gtin = pac.GTIN.to_s)   ? gtin: '0'
+        item[:pharmacode]      = (phar = pac.PHAR.to_s)   ? phar: '0'
         item[:last_change]     = (date = Time.parse(pac.DT).to_s)  ? date: ''  # Date and time of last data change
         item[:desc_de]         = (dscr = pac.NAME_DE)   ? dscr: ''
         item[:desc_fr]         = (dscr = pac.NAME_FR)   ? dscr: ''
@@ -200,10 +200,10 @@ module Oddb2xml
         unless item[:pharmacode]
           item[:pharmacode] = phar
           unless data[item[:pharmacode]] # pharmacode => GTINs
-            data[item[:ean]] = []
+            data[item[:ean13]] = []
           end
         end
-        data[item[:ean]] = item
+        data[item[:ean13]] = item
       end
       data
     end
@@ -285,7 +285,7 @@ module Oddb2xml
             next if no8.to_i == 0
             ean_base12 = "7680#{no8}"
             data[no8] = {
-              :ean                  => (ean_base12.ljust(12, '0') + Oddb2xml.calc_checksum(ean_base12)),
+              :ean13                => (ean_base12.ljust(12, '0') + Oddb2xml.calc_checksum(ean_base12)),
               :prodno               => prodno ? prodno : '',
               :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
               :swissmedic_category  => row[cat].value.to_s,
@@ -331,19 +331,20 @@ module Oddb2xml
       data = {}
       @sheet.each_with_index do |row, i|
         next if i.zero?
-        phar = row[1].to_i
+        phar = row[1]
         next if phar == 0
-        ean = row[0].to_i
-        ean = phar unless ean.to_s.length == 13
+        ean13 = row[0]
+        require 'pry'; binding.pry unless ean13.to_s.length == 13
+        ean13 = phar unless ean13.to_s.length == 13
         data[ean] = {
           :refdata         => true,
-          :ean             => ean,
-          :pharmacode      => phar.to_i,
+          :ean13           => ean13,
+          :pharmacode      => phar,
           :desc_de         => row[3],
           :desc_fr         => row[4],
           :quantity        => row[5], # quantity
           :company_name    => row[6],
-          :company_ean     => row[7].to_i,
+          :company_ean     => row[7],
           :data_origin     => 'migel'
         }
       end
@@ -492,12 +493,12 @@ module Oddb2xml
         else
           next unless line =~ /(7680\d{9})(\d{1})$/
         end
-        pharma_code = line[3..9].to_i
+        pharma_code = line[3..9]
         if $1.to_s == '0000000000000'
           @@items_without_ean13s += 1
-          ean13 = pharma_code # dummy ean13
+          ean13 = '999999' + pharma_code.to_s # dummy ean13
         else
-          ean13 = $1.to_i
+          ean13 = $1
         end
         if data[ean13]
           @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"
@@ -509,7 +510,7 @@ module Oddb2xml
         data[ean13] = {
           :data_origin   => 'zur_rose',
           :line   => line.chomp,
-          :ean   => ean13,
+          :ean13 => ean13,
           :clag  => line[73],
           :vat   => line[96],
           :description => line[10..59].sub(/\s+$/, ''),

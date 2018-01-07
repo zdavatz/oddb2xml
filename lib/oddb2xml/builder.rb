@@ -39,7 +39,8 @@ module Oddb2xml
     @@article_overrides  = YAML.load_file(File.join(Data_dir, 'article_overrides.yaml'))
     @@product_overrides  = YAML.load_file(File.join(Data_dir, 'product_overrides.yaml'))
     @@ignore_file        = File.join(Data_dir, 'gtin2ignore.yaml')
-    @@gtin2ignore        = YAML.load_file(@@ignore_file)
+    @@gtin2ignore        = YAML.load_file(@@ignore_file) if File.exist?(@@ignore_file)
+    @@gtin2ignore ||= []
     attr_accessor :subject, :refdata, :items, :flags, :lppvs,
                   :actions, :migel, :orphan,
                   :infos, :packs, :infos_zur_rose,
@@ -97,7 +98,7 @@ module Oddb2xml
             # delete duplicates
             @migel[ean13] = nil
           end unless SkipMigelDownloader
-          if seq = @items[obj[:ean]]
+          if seq = @items[obj[:ean13]]
             obj[:seq] = seq
           end
           @articles << obj
@@ -107,11 +108,11 @@ module Oddb2xml
         @migel.values.compact.each do |migel|
           next unless migel[:pharmacode]
           entry = {
-            :ean             => migel[:ean].to_i,
+            :ean13           => migel[:ean13],
             :pharmacode      => migel[:pharmacode],
             :stat_date       => '',
-            :desc_de            => migel[:desc_de],
-            :desc_fr            => migel[:desc_fr],
+            :desc_de         => migel[:desc_de],
+            :desc_fr         => migel[:desc_fr],
             :atc_code        => '',
             :quantity        => migel[:quantity],
             :company_ean     => migel[:company_ean],
@@ -145,7 +146,7 @@ module Oddb2xml
                         :desc_de         => info[:description],
                         :status          => info[:status] == '3' ? 'I' : 'A', # from ZurRose, we got 1,2 or 3 means aktive, aka available in trade
                         :atc_code        => '',
-                        :ean             => ean13,
+                        :ean13           => ean13,
                         :pharmacode      => pharmacode,
                         :price           => info[:price],
                         :pub_price       => info[:pub_price],
@@ -226,10 +227,10 @@ module Oddb2xml
           next if item and item.is_a?(Hash) and item[:atc_code] and /^Q/i.match(item[:atc_code])
           next if item[:prodno] and @products[item[:prodno]]
           obj = {
-            :seq => @items[ean13] ? @items[ean13] : @items[item[:ean]],
+            :seq => @items[ean13] ? @items[ean13] : @items[item[:ean13]],
             :pac => nil,
             :no8 => nil,
-            :ean => item[:ean],
+            :ean13 => item[:ean13],
             :atc => item[:atc_code],
             :ith => '',
             :siz => '',
@@ -240,14 +241,14 @@ module Oddb2xml
           # obj[:pexf_refdata] = item[:price]
           # obj[:ppub_refdata] = item[:pub_price=]
           # obj[:pharmacode=]  = item[:pharmacode=]
-          if obj[:ean] # via EAN-Code
-            obj[:no8] = obj[:ean].to_s[4..11]
+          if obj[:ean13] # via EAN-Code
+            obj[:no8] = obj[:ean13].to_s[4..11]
           end
           if obj[:no8] && (ppac = @packs[obj[:no8]]) && # Packungen.xls
               !ppac[:is_tier]
             # If RefData does not have EAN
-            if obj[:ean].nil?
-              obj[:ean] = ppac[:ean].to_i
+            if obj[:ean13].nil?
+              obj[:ean13] = ppac[:ean13]
             end
             # If RefData dose not have ATC-Code
             if obj[:atc].nil? or obj[:atc].empty?
@@ -262,7 +263,7 @@ module Oddb2xml
           obj[:price] = item[:price]
           obj[:pub_price] = item[:pub_price]
 
-          if obj[:ean].to_s[0..3] == '7680'
+          if obj[:ean13].to_s[0..3] == '7680'
             if item[:prodno]
               @products[item[:prodno]] = obj
             else
@@ -452,7 +453,7 @@ module Oddb2xml
       @missing = []
       Oddb2xml.log "build_product add_missing_products_from_swissmedic. Imported #{size_old} ean13_to_product from @products. Checking #{@packs.size} @packs"
       @packs.each_with_index do |de_idx, index|
-        ean = de_idx[1][:ean].to_i
+        ean = de_idx[1][:ean13]
         next if @refdata[ean]
         list_code = de_idx[1][:list_code]
         next if list_code and /Tierarzneimittel/.match(list_code)
@@ -467,7 +468,7 @@ module Oddb2xml
               :pac=>nil,
               :sequence_name => de_idx.last[:sequence_name],
               :no8=>  de_idx.last[:prodno],
-              :ean=>  ean,
+              :ean13=>  ean,
               :atc=>  de_idx.last[:atc_code],
               :ith=>  de_idx.last[:ith_swissmedic],
               :siz=>  de_idx.last[:package_size],
@@ -487,7 +488,7 @@ module Oddb2xml
 
     def build_product
       def check_name(obj, lang = :de)
-        ean = obj[:ean].to_i
+        ean = obj[:ean13]
         refdata = @refdata[ean]
         if lang == :de
           name = (refdata && refdata[:desc_de]) ? refdata[:desc_de] : obj[:sequence_name]
@@ -513,7 +514,7 @@ module Oddb2xml
         xml.PRODUCT(XML_OPTIONS) {
           list = []
           @missing.each do |obj|
-            ean = obj[:ean].to_i
+            ean = obj[:ean13]
             next unless check_name(obj, :de)
             next unless check_name(obj, :fr)
             next if /^Q/i.match(obj[:atc])
@@ -535,11 +536,10 @@ module Oddb2xml
             xml.CompositionSwissmedic obj[:composition_swissmedic]  if obj[:composition_swissmedic]
                                }
           end
-          # @products.sort! { |a,b| a[:ean] <=> b[:ean] }
-          @products.each do |ean13, obj|
+          @products.sort.to_h.each do |ean13, obj|
             next if /^Q/i.match(obj[:atc])
             seq = obj[:seq]
-              ean = obj[:ean]
+              ean = obj[:ean13]
               next unless check_name(obj, :de)
               next unless check_name(obj, :fr)
               xml.PRD('DT' => obj[:last_change]) do
@@ -719,7 +719,7 @@ module Oddb2xml
         end
         ean12 = '7680' + no8
         ean13 = (ean12 + Oddb2xml.calc_checksum(ean12))
-        @calc_items[ean13.to_i] = info
+        @calc_items[ean13] = info
       end
     end
     def build_calc
@@ -813,15 +813,15 @@ module Oddb2xml
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
-        eans_from_refdata = @articles.collect{|refdata|  refdata[:ean] }
+        eans_from_refdata = @articles.collect{|refdata|  refdata[:ean13] }
         eans_from_preparations = @items.keys
         missing_eans = []
         eans_from_preparations.each do |ean|
           next if ean.to_i == 0
-          unless @articles.collect {|x| x[:ean] }.index(ean)
+          unless @articles.collect {|x| x[:ean13] }.index(ean)
             item = @items[ean].clone
             item[:pharmacode] ||= '123456' if defined?(RSpec)
-            item[:ean] = ean
+            item[:ean13] = ean
             item[:_type] = :preparations_xml
             item[:desc_de] = item[:name_de] + ' ' + item[:desc_de]
             item[:desc_fr] = item[:name_fr] + ' ' + item[:desc_fr]
@@ -832,20 +832,20 @@ module Oddb2xml
           end
         end
         xml.ARTICLE(XML_OPTIONS) {
-        @articles.sort! { |a,b| a[:ean] <=> b[:ean] }
+        @articles.sort! { |a,b| a[:ean13] <=> b[:ean13] }
         @articles.each do |obj|
           idx += 1
           Oddb2xml.log "build_article #{idx} of #{@articles.size} articles" if idx % 500 == 0
-            item = @items[obj[:ean]]
-            pac,no8 = nil,obj[:ean].to_s[4..11] # BAG-XML(SL/LS)
+            item = @items[obj[:ean13]]
+            pac,no8 = nil,obj[:ean13].to_s[4..11] # BAG-XML(SL/LS)
             pack_info = nil
             pack_info = @packs[no8] if no8 # info from Packungen.xlsx from swissmedic_info
             ppac = nil                        # Packungen
-            ean = obj[:ean]
+            ean = obj[:ean13]
             next if pack_info and /Tierarzneimittel/.match(pack_info[:list_code])
             next if obj[:desc_de] and /ad us vet/i.match(obj[:desc_de])
             pharma_code = obj[:pharmacode]
-            ean = 0 if sprintf('%013d', ean).match(/^000000/)
+            # ean = 0 if sprintf('%013d', ean).match(/^000000/)
             if obj[:seq]
               pac = obj[:seq][:packages][obj[:pharmacode]]
               pac = obj[:seq][:packages][ean] unless pac
@@ -862,7 +862,8 @@ module Oddb2xml
             xml.ART('DT' => obj[:last_change] ? obj[:last_change] : '') do
               nbr_records += 1
               xml.REF_DATA (obj[:refdata] || @migel[pharma_code]) ? '1' : '0'
-              xml.PHAR  sprintf('%07d', obj[:pharmacode]) if obj[:pharmacode]
+              # xml.PHAR  sprintf('%07d', obj[:pharmacode]) if obj[:pharmacode]
+              xml.PHAR  obj[:pharmacode] if obj[:pharmacode]
               #xml.GRPCD
               #xml.CDS01
               #xml.CDS02
@@ -961,7 +962,7 @@ module Oddb2xml
               }
               xml.ARTBAR {
                 xml.CDTYP  'E13'
-                xml.BC     /^9999|^0000|^0$/.match(ean.to_s) ? 0 : sprintf('%013d', ean)
+                xml.BC     ean #  /^9999|^0000|^0$/.match(ean.to_s) ? 0 : sprintf('%013d', ean)
                 xml.BCSTAT 'A' # P is alternative
                 #xml.PHAR2
               } if ean
@@ -1161,7 +1162,7 @@ module Oddb2xml
       Oddb2xml.add_hash(_builder.to_xml)
     end
     def detect_nincd(de_idx)
-      if @lppvs[de_idx[:ean].to_s] # LPPV
+      if @lppvs[de_idx[:ean13].to_s] # LPPV
         20
       elsif @items[de_idx[:pharmacode]] # BAG-XML (SL/LS)
         10
@@ -1172,7 +1173,7 @@ module Oddb2xml
         # fallback via EAN
         bag_entry_via_ean = @items.values.select do |i|
           next unless i[:packages]
-          i[:packages].values.select {|_pac| _pac[:ean].to_s == de_idx[:ean].to_s }.length != 0
+          i[:packages].values.select {|_pac| _pac[:ean13].to_s == de_idx[:ean13].to_s }.length != 0
         end
         if bag_entry_via_ean.length > 0
           10
@@ -1240,12 +1241,12 @@ module Oddb2xml
       prepare_articles
       rows = []
       @articles.each do |obj|
-          ean = obj[:ean]
+          ean = obj[:ean13]
           next if ((ean.to_s.length != 13) and !ean14)
           next if obj[:type] == :nonpharma
           row = ''
           pack_info = nil
-          if (x = @packs.find{|k,v| v[:ean].to_i == ean})
+          if (x = @packs.find{|k,v| v[:ean13].eql?(ean)})
             pack_info = x[1]
           end
           # Oddb2tdat.parse
@@ -1329,7 +1330,7 @@ module Oddb2xml
       rows = []
       @articles.each do |obj|
           row = ''
-          next if ((obj[:ean].to_s.length != 13) and !ean14)
+          next if ((obj[:ean13].to_s.length != 13) and !ean14)
           # Oddb2tdat.parse_migel
           row << "%#{DAT_LEN[:RECA]}s"  % '11'
           row << "%#{DAT_LEN[:CMUT]}s"  % if (phar = obj[:pharmacode] and phar.size > 3)
@@ -1350,7 +1351,7 @@ module Oddb2xml
           row << "%#{DAT_LEN[:CBGG]}s"  % '0'
           row << "%#{DAT_LEN[:CIKS]}s"  % ' ' # no category
           row << "%0#{DAT_LEN[:ITHE]}d" %  0
-          row << obj[:ean].to_s.rjust(DAT_LEN[:CEAN], '0')
+          row << obj[:ean13].to_s.rjust(DAT_LEN[:CEAN], '0')
           row << "%#{DAT_LEN[:CMWS]}s"  % '1' # nonpharma
           rows << row
         end
@@ -1383,7 +1384,7 @@ module Oddb2xml
       variant = emit_v5 ? "build_artikelstamm" : ("build_artikelstamm_v3_" + (emit_pharma ? 'P' : 'N'))
       Oddb2xml.log "#{variant}: @@emitted_v3_gtins #{@@emitted_v3_gtins.size} v5 #{@@emitted_v5_gtins.size}"
       def check_name(obj, lang = :de)
-        ean = obj[:ean].to_i
+        ean = obj[:ean13]
         refdata = @refdata[ean]
         if lang == :de
           name = (refdata && refdata[:desc_de]) ? refdata[:desc_de] : obj[:sequence_name]
@@ -1414,13 +1415,12 @@ module Oddb2xml
       def emit_items(xml)
         nr_items = 0
         gtins_to_article = {}
-        @articles.each {|article| gtins_to_article[article[:ean].to_i] = article }
-        gtins = gtins_to_article.keys + @infos_zur_rose.keys + @packs.values.collect{|x| x[:ean].to_i}
+        @articles.each {|article| gtins_to_article[article[:ean13]] = article }
+        gtins = gtins_to_article.keys + @infos_zur_rose.keys + @packs.values.collect{|x| x[:ean13]}
         gtins = (gtins-@@gtin2ignore)
         gtins.sort!.uniq!
         @nr_items = gtins.size
         gtins.each do |ean13|
-          ean13 = 0 if sprintf('%013d', ean13).match(/^000000/)
           pac,no8 = nil,ean13.to_s[4..11] # BAG-XML(SL/LS)
           next if ean13 == 0
           obj = gtins_to_article[ean13] || @infos_zur_rose[ean13]
@@ -1452,7 +1452,7 @@ module Oddb2xml
               next
             end
             sequence[:packages].each do |gtin, package|
-              pkg_gtin = package[:ean].to_i
+              pkg_gtin = package[:ean13]
               pharma_code = @refdata[pkg_gtin]
               if @refdata[pkg_gtin] && @refdata[pkg_gtin][:pharmacode]
                 pharma_code = @refdata[pkg_gtin][:pharmacode]
@@ -1477,6 +1477,7 @@ module Oddb2xml
               options = @emit_v5 ? {'PHARMATYPE' => 'P'} : {}
               xml.ITEM(options) do
                 name = (@refdata[pkg_gtin] ? @refdata[pkg_gtin][:desc_de] : nil) || obj[:desc_de] || obj[:sequence_name]
+                binding.pry unless pkg_gtin.to_s.rjust(13, '0').size == 13
                 xml.GTIN pkg_gtin.to_s.rjust(13, '0')
                 override(xml, pkg_gtin, :PHAR, pharma_code)
                 xml.SALECD('A') if @emit_v5 # these products are always active!
@@ -1564,6 +1565,7 @@ module Oddb2xml
             patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) ? 'P': 'N' )
             options = @emit_v5 ? {'PHARMATYPE' => patched_pharma_type } : {}
             xml.ITEM(options) do
+              binding.pry unless ean13.to_s.rjust(13, '0').size == 13
               xml.GTIN ean13.to_s.rjust(13, '0')
               xml.PHAR obj[:pharmacode]
               emit_salecd(xml, ean13, obj)  if @emit_v5
@@ -1577,7 +1579,7 @@ module Oddb2xml
             end
           end
         end
-        @csv_file.close if @csv_file
+        @csv_file.close if @csv_file && !@csv_file.closed?
         nr_items
       end
       unless @prepared
@@ -1600,7 +1602,7 @@ module Oddb2xml
       @nr_articles = 0
       used_limitations = []
       Oddb2xml.log "#{variant}: Deleted #{@old_rose_size - @new_rose_size} entries from ZurRose where GTIN start with 7680 (Swissmedic)"
-      Oddb2xml.log "#{variant} #{nr_products} of #{@products.size} articles and ignore #{@@gtin2ignore.size} GTINS specified via #{@@ignore_file}"
+      # Oddb2xml.log "#{variant} #{nr_products} of #{@products.size} articles and ignore #{@@gtin2ignore.size} GTINS specified via #{@@ignore_file}"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -1635,7 +1637,7 @@ module Oddb2xml
               obj = product[1]
               next if /^Q/i.match(obj[:atc])
               sequence = obj[:seq]
-              ean = obj[:ean]
+              ean = obj[:ean13]
               next unless check_name(obj, :de)
               ppac = ((_ppac = @packs[ean.to_s[4..11]] and !_ppac[:is_tier]) ? _ppac : {})
               unless ppac

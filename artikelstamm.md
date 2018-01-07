@@ -11,7 +11,9 @@ Die für den Artikelstamm gebrauchten Ursprungs-Dateien werden
 
 * unter downloads in einem leicht lesbaren Format abgespeichert 
 ** CSV für XLSX-Dateien. Dazu wird die Utility ssconvert des Gnumeric verwendet, was viel schneller geht, als die Dateien per Ruby-Script zu laden
-** mit xmllint --format schön formattierten XML 
+** mit xmllint --format schön formattierten XML
+
+Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B. grep 7680563320017 downloads/*.
 
 ### Herkunft der einzelenen Dateien
 
@@ -23,6 +25,10 @@ Die für den Artikelstamm gebrauchten Ursprungs-Dateien werden
 ** Preparations.xml
 * transfer.zip            http://pillbox.oddb.org/TRANSFER.ZIP Dieses enthält
 ** transfer.dat
+
+## Offene Fragen
+
+Im transfer.dat von Zur Rose hat es viele Einträge, wo nur ein Pharmacode, jedoch keine GTIN drin ist. In diesem Fall wird ein Pseudo GTIN beginnend mit einer sechstelling  999999 und geflogt vom 7-stelligen Pharmacode erzeugt.
 
 ## UnitTests
 

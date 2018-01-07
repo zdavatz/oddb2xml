@@ -34,7 +34,7 @@ module Oddb2xml
     1128111611,
     ] 
     
-    gtins = GTINS_DRUGS + [ FERRO_GRADUMET_GTIN,FIRST_DAY_ACUVUE_GTIN,
+    gtins = GTINS_DRUGS + [ FERRO_GRADUMET_GTIN,
                   HIRUDOID_GTIN,LANSOYL_GTIN, LEVETIRACETAM_GTIN,
                   SOFRADEX_GTIN, THREE_TC_GTIN, ZYVOXID_GTIN]
     gtins.each{|gtin| Oddb2xml.check_gtin(gtin)}
