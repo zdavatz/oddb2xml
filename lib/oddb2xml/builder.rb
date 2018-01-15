@@ -1222,20 +1222,10 @@ module Oddb2xml
       end
       date[0,len]
     end
-    def format_name(name)
-      if RUBY_VERSION.to_f < 1.9 # for multibyte chars length support
-        chars = name.scan(/./mu).to_a
-        diff  = DAT_LEN[:ABEZ] - chars.length
-        if diff > 0
-          chars += Array.new(diff, ' ')
-        elsif diff < 0
-          chars = chars[0,DAT_LEN[:ABEZ]]
-        end
-        chars.to_s
-      else
-        name = name[0,DAT_LEN[:ABEZ]] if name.length > DAT_LEN[:ABEZ]
-        "%-#{DAT_LEN[:ABEZ]}s" % name
-      end
+
+    # The migel name must be always 50 chars wide and in ISO 8859-1 format
+    def format_name(name, length)
+      ("%-#{length}s" % name)[0..length-1]
     end
     def build_dat
       prepare_articles
@@ -1288,7 +1278,12 @@ module Oddb2xml
             price_exf     = sprintf('%06i', (pac[:prices][:exf_price][:price].to_f*100).to_i) if pac[:prices][:exf_price] and pac[:prices][:exf_price][:price]
             price_public  = sprintf('%06i', (pac[:prices][:pub_price][:price].to_f*100).to_i) if pac[:prices][:pub_price] and pac[:prices][:pub_price][:price]
           end
-          row << format_name(abez)
+          row << format_name(Oddb2xml.patch_some_utf8(abez), DAT_LEN[:ABEZ])
+          if price_exf.to_s.length > DAT_LEN[:PRMO] ||
+             price_public.to_s.length > DAT_LEN[:PRPU]
+            puts "Price exfactory #{price_exf} or public #{price_public} is too high to be added into transfer.dat"
+            break
+          end
           row << "%#{DAT_LEN[:PRMO]}s"  % (price_exf ? price_exf.to_s : ('0' * DAT_LEN[:PRMO]))
           row << "%#{DAT_LEN[:PRPU]}s"  % (price_public ? price_public.to_s : ('0' * DAT_LEN[:PRPU]))
           row << "%#{DAT_LEN[:CKZL]}s"  % if (@lppvs[ean])
@@ -1343,9 +1338,9 @@ module Oddb2xml
             obj[:desc_de].to_s + " " +
           (obj[:quantity] ? obj[:quantity] : '')
           ).gsub(/"/, '')
-          row << format_name(abez)
-          row << "%#{DAT_LEN[:PRMO]}s"  % ('0' * DAT_LEN[:PRMO])
-          row << "%#{DAT_LEN[:PRPU]}s"  % ('0' * DAT_LEN[:PRPU])
+          row << format_name(Oddb2xml.patch_some_utf8(abez), DAT_LEN[:ABEZ])
+          row << '0' * DAT_LEN[:PRMO]
+          row << '0' * DAT_LEN[:PRPU]
           row << "%#{DAT_LEN[:CKZL]}s"  % '3' # sl_entry and lppv
           row << "%#{DAT_LEN[:CLAG]}s"  % '0'
           row << "%#{DAT_LEN[:CBGG]}s"  % '0'

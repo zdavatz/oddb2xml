@@ -486,7 +486,7 @@ module Oddb2xml
     def to_hash
       data = {}
       while line = @io.gets
-        line = line.encode('utf-8').gsub("\u0089", "‰").gsub("\u0092", '’').gsub("\u0096", '-').chomp
+        line = Oddb2xml.patch_some_utf8(line)
         next if line =~ /(ad us\.* vet)|(\(vet\))/i
         if @@extended
           next unless line =~ /(\d{13})(\d{1})$/
