@@ -7,6 +7,35 @@
 ** Better spec tests for options
 ** Trollop instead of optparse
 
+=== 2.4.9 / 15.01.2018
+
+* Adapt to new link of epha atc.csv
+
+=== 2.4.8 / 20.11.2017
+
+* Adapt to new links of swissmedic download files
+
+=== 2.4.7 / 26.10.2017
+
+* Only emit PHAR if present
+
+=== 2.4.6 / 25.10.2017
+
+* PHAR is optional in oddb2xml.xsd
+* Minimal length of DSCRD is 3. Emit BC/EAN 0 as required by XSD
+
+=== 2.4.5 / 25.10.2017
+
+* Fix parsing shire products
+* Don't emit barcode if 0.
+* Do not get price for barcode 0
+* Fix some failing spec tests
+
+=== 2.4.4 / 23.10.2017
+
+* Add articles which are only found in the Preparation.xml (e.g. Mutagrid)
+* Correct SwissmedicNo8 when less than 8 chars long
+
 === 2.4.3 / 11.09.2017
 
 * Never drop lines with UTF-8 problems while creating XML files
