@@ -20,25 +20,24 @@ module Oddb2xml
   @atc_csv_origin = 'http://download.epha.ch/data/atc/atc.csv'
   @atc_csv_content = {}
 
+  def Oddb2xml.patch_some_utf8(line)
+    begin
+      line.gsub("\u0089", "‰").gsub("\u0092", '’').gsub("\u0096", '-').gsub("\u2013",'-').gsub("\u201D", '"').chomp
+    rescue => error
+      puts "#{error}: in #{line}"
+      line
+    end
+  end
+
   def Oddb2xml.convert_to_8859_1(line)
     begin
       # We want to ignore lines which are not really UTF-8 encoded
-      return line.encode('ISO-8859-1')
+        ausgabe = Oddb2xml.patch_some_utf8(line).encode('ISO-8859-1')
+        ausgabe.encode('ISO-8859-1')
     rescue => error
-      ausgabe = ''
-      0.upto(line.size-1).each do |idx|
-        begin
-          if line[idx].ord == 8211
-            ausgabe += '-'
-          else
-            ausgabe += line[idx].encode('ISO-8859-1')
-          end
-        rescue => error
-          puts "#{error}: in #{line} at #{idx}"
-        end
-      end
+      puts "#{error}: in #{line}"
+      require 'pry'; binding.pry
     end
-    ausgabe.encode('ISO-8859-1')
   end
 
   def Oddb2xml.add_epha_changes_for_ATC(iksnr, atc_code)
