@@ -1,3 +1,7 @@
+=== 2.4.9 / 15.01.2018
+
+* Adapt to new link of epha atc.csv
+
 === 2.4.8 / 20.11.2017
 
 * Adapt to new links of swissmedic download files

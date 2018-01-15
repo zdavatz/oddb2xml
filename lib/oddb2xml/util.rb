@@ -17,7 +17,7 @@ module Oddb2xml
     Downloads     = "#{Dir.pwd}/downloads"
   end
   @options = {}
-  @atc_csv_origin = 'https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv'
+  @atc_csv_origin = 'http://download.epha.ch/data/atc/atc.csv'
   @atc_csv_content = {}
 
   def Oddb2xml.convert_to_8859_1(line)
