@@ -121,11 +121,9 @@ describe Oddb2xml::Builder do
       skip("Where does the DSCR for 4042809018288 come from. It should be TENSOPLAST bande compression 5cmx4.5m")
     end
 
-    it 'should ignore GTIN 7680172330414' do
-      # Took to much time to construct an example. Should change VCR
-      skip("No time to check that data/gtin2ignore.yaml has an effect")
+    it 'should add GTIN 7680172330414 which is marked as inactive in transfer.dat' do
       @inhalt = IO.read(@artikelstamm_name)
-      expect(@inhalt.index('7680172330414')).to be nil
+      expect(@inhalt.index('7680172330414')).not_to be nil
     end
 
     it 'should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
@@ -168,7 +166,7 @@ DIBASE 25'000 - 7210539
         %(<ITEM PHARMATYPE="P">
             <GTIN>7680403330459</GTIN>
             <PHAR>3603779</PHAR>
-            <SALECD>I</SALECD>
+            <SALECD>A</SALECD>
             <DSCR>CARBADERM Creme Tb 300 ml</DSCR>
             <DSCRF>--missing--</DSCRF>
             <PEXF>16.22</PEXF>

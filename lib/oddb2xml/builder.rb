@@ -1382,6 +1382,8 @@ module Oddb2xml
         @csv_file << ['gtin', 'price', 'galenic_form', 'pkg_size', 'pexf', 'ppub', 'iksnr', 'atc_code', 'active_substance', 'original', 'it-code']
       end
       variant = emit_v5 ? "build_artikelstamm" : ("build_artikelstamm_v3_" + (emit_pharma ? 'P' : 'N'))
+      # @infos_zur_rose.delete_if { |key, val| val[:cmut].eql?('3') } # collect only active zur rose item
+      # No. Marco did not filter it, eg. 8804121 in rtikelstamm_oddb2xml_051217_v5.xm
       Oddb2xml.log "#{variant}: @@emitted_v3_gtins #{@@emitted_v3_gtins.size} v5 #{@@emitted_v5_gtins.size}"
       def check_name(obj, lang = :de)
         ean = obj[:ean13]
