@@ -22,6 +22,10 @@ module Oddb2xml
 
   def Oddb2xml.patch_some_utf8(line)
     begin
+      line = line.encode('utf-8')
+    rescue => error
+    end
+    begin
       line.gsub("\u0089", "‰").gsub("\u0092", '’').gsub("\u0096", '-').gsub("\u2013",'-').gsub("\u201D", '"').chomp
     rescue => error
       puts "#{error}: in #{line}"
