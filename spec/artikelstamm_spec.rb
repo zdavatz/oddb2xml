@@ -24,7 +24,7 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
-    binding.pry unless @inhalt.index(expected_value)
+    # binding.pry unless @inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
   def common_run_init(options = {})
@@ -117,13 +117,35 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index('GTIN>0')).to be > 0
     end
 
+    it 'should contain a PHAR 4236857 from refdata_NonPharma.xml' do
+      expect(@inhalt.index('<PHAR>4236863</PHAR>')).to be > 0
+      # Marco leaves the 14 GTIN digit. I change to the 13 digits by removing t
+      expect(@inhalt.index('<GTIN>00040565124346</GTIN>')).to be > 0
+    end
+
     it 'should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
       skip("Where does the DSCR for 4042809018288 come from. It should be TENSOPLAST bande compression 5cmx4.5m")
     end
 
-    it 'should add GTIN 7680172330414 which is marked as inactive in transfer.dat' do
+    it 'should NOT add GTIN 7680172330414 SELSUN and ean13 start with 7680 (Swissmedic) which is marked as inactive in transfer.dat' do
       @inhalt = IO.read(@artikelstamm_name)
-      expect(@inhalt.index('7680172330414')).not_to be nil
+      expect(@inhalt.index('7680172330414')).to be nil
+    end
+
+    it 'should add GTIN 3605520301605 Armani Attitude which is marked as inactive in transfer.dat' do
+      @inhalt = IO.read(@artikelstamm_name)
+      expect(@inhalt.index('3605520301605')).not_to be nil
+    end
+
+    it 'should add BIOMARIS Voll Meersalz which is marked as inactive in transfer.dat but has PPUB and PEXF' do
+      @inhalt = IO.read(@artikelstamm_name)
+      expect(@inhalt.index('BIOMARIS Voll Meersalz 500 g')).not_to be nil
+    end
+    
+    it 'Should not contain PHAR 8809544 Sildenavil wiht pexf and ppub 0.0' do
+#1128809544Sildenafil Suspension 7mg/ml 100ml                0030850045801000000000000000000000002
+      @inhalt = IO.read(@artikelstamm_name)
+      expect(@inhalt.index('ildenafil Suspension')).to be nil
     end
 
     it 'should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do

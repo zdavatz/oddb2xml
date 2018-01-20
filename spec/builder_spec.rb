@@ -474,7 +474,7 @@ def checkProductXml(nbr_record = -1)
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 62
+  NrExtendedArticles = 65
   NrSubstances = 24
   NrLimitations = 11
   
@@ -683,6 +683,19 @@ describe Oddb2xml::Builder do
 
     it "oddb_article with stuf from ZurRose", :skip => "ZurRose contains ERYTHROCIN i.v. Troc*esteekensub 1000 mg Amp [!]" do
       checkArticleXml
+    end
+
+     # Zeno used oddb2xml -e -I 45 -c zip for oddb_arcticle for artikelstamm 7680172330414 3605520301605
+    it 'should add GTIN 7680172330414 which is marked as inactive in transfer.dat' do
+      @inhalt = IO.read(oddb_article_xml)
+      expect(@inhalt.index('7680172330414')).not_to be nil
+    end
+
+    it 'should add GTIN 3605520301605 Armani Attitude which is marked as inactive in transfer.dat' do
+      @inhalt = IO.read(oddb_article_xml)
+      #     <SALECD>I</SALECD>
+
+      expect(@inhalt.index('3605520301605')).not_to be nil
     end
 
     context 'XSD' do

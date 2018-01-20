@@ -261,7 +261,7 @@ module Oddb2xml
           xml = downloader.download
           Oddb2xml.log("ZurroseDownloader xml #{xml.size} bytes")
           @mutex.synchronize do
-            hsh = ZurroseExtractor.new(xml, @options[:extended]).to_hash
+            hsh = ZurroseExtractor.new(xml, @options[:extended], @options[:artikelstamm]).to_hash
             Oddb2xml.log("ZurroseExtractor added #{hsh.size} items from xml with #{xml.size} bytes")
             @infos_zur_rose = hsh
           end
@@ -382,7 +382,7 @@ module Oddb2xml
     end
     def types # RefData
       @_types ||=
-        if @options[:nonpharma]
+        if @options[:nonpharma] || @options[:artikelstamm]
           [:pharma, :nonpharma]
         else
           [:pharma]

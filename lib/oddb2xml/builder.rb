@@ -1562,7 +1562,6 @@ module Oddb2xml
             patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) ? 'P': 'N' )
             options = @emit_v5 ? {'PHARMATYPE' => patched_pharma_type } : {}
             xml.ITEM(options) do
-              binding.pry unless ean13.to_s.rjust(13, '0').size == 13
               xml.GTIN ean13.to_s.rjust(13, '0')
               xml.PHAR obj[:pharmacode]
               emit_salecd(xml, ean13, obj)  if @emit_v5

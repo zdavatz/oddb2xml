@@ -185,11 +185,12 @@ module Oddb2xml
       result = SwissRegArticleEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
       items = result.ARTICLE.ITEM
       items.each do |pac|
+        ean13 = (gtin = pac.GTIN.to_s) ? gtin: '0'
         item = {}
         item[:data_origin]     = 'refdata'
         item[:refdata]         = true
         item[:_type]           = (typ  = pac.ATYPE.downcase.to_sym)  ? typ: ''
-        item[:ean13]           = (gtin = pac.GTIN.to_s)   ? gtin: '0'
+        item[:ean13]           = ean13
         item[:pharmacode]      = (phar = pac.PHAR.to_s)   ? phar: '0'
         item[:last_change]     = (date = Time.parse(pac.DT).to_s)  ? date: ''  # Date and time of last data change
         item[:desc_de]         = (dscr = pac.NAME_DE)   ? dscr: ''
@@ -197,6 +198,7 @@ module Oddb2xml
         item[:atc_code]        = (code = pac.ATC)    ? code.to_s : ''
         item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam: ''
         item[:company_ean]  = (gln = pac.AUTH_HOLDER_GLN)  ? gln: ''
+        puts "Refdata #{@type} ean13: incorrect lenght #{ean13.size} for #{ean13}" if ean13.size != 13
         unless item[:pharmacode]
           item[:pharmacode] = phar
           unless data[item[:pharmacode]] # pharmacode => GTINs
@@ -465,8 +467,9 @@ module Oddb2xml
   end
   class ZurroseExtractor < Extractor
     # see http://dev.ywesee.com/Bbmb/TransferDat
-    def initialize(dat, extended = false)
+    def initialize(dat, extended = false, artikelstamm = false)
       @@extended = extended
+      @artikelstamm = artikelstamm
       FileUtils.makedirs(WorkDir)
       @@error_file ||= File.open(File.join(WorkDir, "duplicate_ean13_from_zur_rose.txt"), 'wb+:ISO-8859-14')
       @@items_without_ean13s ||= 0
@@ -500,6 +503,7 @@ module Oddb2xml
         else
           ean13 = $1
         end
+        next if @artikelstamm && /(0{13})(\d{1})$/.match(line)
         if data[ean13]
           @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"
           @@items_without_ean13s -= 1
@@ -507,6 +511,10 @@ module Oddb2xml
           next
         end
 
+        pexf = sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f)
+        ppub =  sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f)
+        next if  @artikelstamm && /^113/.match(line) && /^7680/.match(ean13)
+        next if  @artikelstamm && /^113/.match(line) && ppub.eql?('0.0') && pexf.eql?('0.0')
         data[ean13] = {
           :data_origin   => 'zur_rose',
           :line   => line.chomp,
@@ -516,8 +524,8 @@ module Oddb2xml
           :description => line[10..59].sub(/\s+$/, ''),
           :quantity => '',
           :pharmacode => pharma_code,
-          :price => sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f),
-          :pub_price => sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f),
+          :price => pexf,
+          :pub_price => ppub,
           :type => :nonpharma,
           :cmut => line[2],
         }
