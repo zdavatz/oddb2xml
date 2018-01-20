@@ -65,7 +65,6 @@ module Oddb2xml
       @people     = []
       @tag_suffix = nil
       @pharmacode = {} # index pharmacode => item
-      @@emitted_v3_gtins ||= []
       @@emitted_v5_gtins ||= []
       if block_given?
         yield self
@@ -1362,24 +1361,14 @@ module Oddb2xml
       xml.SALECD(status) { xml.comment( "expiry_date #{obj[:expiry_date]}") if obj[:expiry_date] }
     end
 
-    def build_artikelstamm_v3_pharma
-      build_artikelstamm(false, true)
-    end
-    def build_artikelstamm_v3_nonpharma
-      build_artikelstamm(false, false)
-    end
-    def build_artikelstamm(emit_v5 = true, emit_pharma = false)
+    def build_artikelstamm
       @break_id = 7680626030129
-      @emit_v5 = emit_v5
-      @emit_pharma = emit_pharma
-      if @emit_v5
-        @csv_file = CSV.open(File.join(WorkDir, "Elexis_Artikelstamm_v5.csv"), "w+")
-        @csv_file << ['gtin', 'price', 'galenic_form', 'pkg_size', 'pexf', 'ppub', 'iksnr', 'atc_code', 'active_substance', 'original', 'it-code']
-      end
-      variant = emit_v5 ? "build_artikelstamm" : ("build_artikelstamm_v3_" + (emit_pharma ? 'P' : 'N'))
+      @csv_file = CSV.open(File.join(WorkDir, "Elexis_Artikelstamm_v5.csv"), "w+")
+      @csv_file << ['gtin', 'price', 'galenic_form', 'pkg_size', 'pexf', 'ppub', 'iksnr', 'atc_code', 'active_substance', 'original', 'it-code']
+      variant = "build_artikelstamm"
       # @infos_zur_rose.delete_if { |key, val| val[:cmut].eql?('3') } # collect only active zur rose item
       # No. Marco did not filter it, eg. 8804121 in rtikelstamm_oddb2xml_051217_v5.xm
-      Oddb2xml.log "#{variant}: @@emitted_v3_gtins #{@@emitted_v3_gtins.size} v5 #{@@emitted_v5_gtins.size}"
+      Oddb2xml.log "#{variant}: v5 #{@@emitted_v5_gtins.size}"
       def check_name(obj, lang = :de)
         ean = obj[:ean13]
         refdata = @refdata[ean]
@@ -1443,7 +1432,7 @@ module Oddb2xml
           if no8
             ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
           end
-          if sequence && (@emit_v5 || @emit_pharma)
+          if sequence
             unless obj[:seq][:packages].keys.index(ean13)
               # puts "unable to find  #{ean13} in #{obj[:seq][:packages].keys}"
               next
@@ -1458,31 +1447,23 @@ module Oddb2xml
               end
 # 
               info = @calc_items[pkg_gtin]
-              if @emit_pharma
-                if @@emitted_v3_gtins.index(pkg_gtin)
-                  next
-                else
-                  @@emitted_v3_gtins << pkg_gtin
-                end
+              if @@emitted_v5_gtins.index(pkg_gtin)
+                next
               else
-                if @@emitted_v5_gtins.index(pkg_gtin)
-                  next
-                else
-                  @@emitted_v5_gtins << pkg_gtin
-                end
+                @@emitted_v5_gtins << pkg_gtin
               end
-              options = @emit_v5 ? {'PHARMATYPE' => 'P'} : {}
+              options = {'PHARMATYPE' => 'P'}
               xml.ITEM(options) do
                 name = (@refdata[pkg_gtin] ? @refdata[pkg_gtin][:desc_de] : nil) || obj[:desc_de] || obj[:sequence_name]
                 binding.pry unless pkg_gtin.to_s.rjust(13, '0').size == 13
                 xml.GTIN pkg_gtin.to_s.rjust(13, '0')
                 override(xml, pkg_gtin, :PHAR, pharma_code)
-                xml.SALECD('A') if @emit_v5 # these products are always active!
+                xml.SALECD('A')
                 # maxLength for DSCR is 50 for Artikelstamm v3
-                xml.DSCR(@emit_v5 ? name : name[0..49]) # for description for zur_rose
-                xml.DSCRF(obj[:desc_fr] || '--missing--') if @emit_v5
+                xml.DSCR(name) # for description for zur_rose
+                xml.DSCRF(obj[:desc_fr] || '--missing--')
                 xml.COMP  do # Manufacturer
-                  xml.NAME  obj[:company_name] if @emit_v5
+                  xml.NAME  obj[:company_name]
                   xml.GLN   obj[:company_ean]
                 end
                 if package[:prices]
@@ -1493,37 +1474,25 @@ module Oddb2xml
                 end
                 measure = ''
                 if info
-                  if @emit_v5
-                    # MEASSURE Measurement Unit,e.g. Pills or milliliters
-                    #             <DSCR>HIRUDOID Creme 3 mg/g 40 g</DSCR>
-                    xml.PKG_SIZE info.pkg_size.to_i if info.pkg_size
-                    if info.measure
-                      measure = info.measure
-                    elsif info.pkg_size && info.unit
-                      measure = info.pkg_size + ' ' + info.unit
-                    elsif info.pkg_size
-                      measure = info.pkg_size
-                    end
-                    xml.MEASURE   measure
-                    xml.MEASUREF  measure
-                    # Die Darreichungsform dieses Items. zB Tablette(n) oder Spritze(n)
-                    xml.DOSAGE_FORM  info.galenic_form.descriptions['de'] if info.galenic_form.descriptions['de']
-                    xml.DOSAGE_FORMF info.galenic_form.descriptions['fr'] if info.galenic_form.descriptions['fr']
-                  else
-                    xml.PKG_SIZE info.pkg_size.to_i if info.pkg_size
+                  # MEASSURE Measurement Unit,e.g. Pills or milliliters
+                  #             <DSCR>HIRUDOID Creme 3 mg/g 40 g</DSCR>
+                  xml.PKG_SIZE info.pkg_size.to_i if info.pkg_size
+                  if info.measure
+                    measure = info.measure
+                  elsif info.pkg_size && info.unit
+                    measure = info.pkg_size + ' ' + info.unit
+                  elsif info.pkg_size
+                    measure = info.pkg_size
                   end
+                  xml.MEASURE   measure
+                  xml.MEASUREF  measure
+                  # Die Darreichungsform dieses Items. zB Tablette(n) oder Spritze(n)
+                  xml.DOSAGE_FORM  info.galenic_form.descriptions['de'] if info.galenic_form.descriptions['de']
+                  xml.DOSAGE_FORMF info.galenic_form.descriptions['fr'] if info.galenic_form.descriptions['fr']
                 end
                 xml.SL_ENTRY          'true' if  @items[pkg_gtin]
                 xml.IKSCAT            package[:swissmedic_category]
-                xml.GENERIC_TYPE sequence[:org_gen_code] if @emit_v5 && sequence[:org_gen_code] && !sequence[:org_gen_code].empty?
-                if item && item[:packages] && item[:packages][pkg_gtin] 
-                  lim = item[:packages][pkg_gtin][:limitations]
-                  if lim && lim.size > 0
-                    xml.LIMITATION      'true'
-                    xml.LIMITATION_PTS  (lim.first[:value].to_s.length > 1 ? lim.first[:value] : 1)
-                    xml.LIMITATION_TEXT lim.first[:desc_de]
-                  end
-                end unless @emit_v5
+                xml.GENERIC_TYPE sequence[:org_gen_code] if sequence[:org_gen_code] && !sequence[:org_gen_code].empty?
                 xml.LPPV              'true' if @lppvs[pkg_gtin.to_s] # detect_nincd
                 case item[:deductible]
                 when 'Y'; xml.DEDUCTIBLE 20; # 20%
@@ -1532,41 +1501,30 @@ module Oddb2xml
                 end if item && item[:deductible]
                 xml.PRODNO            ppac[:prodno] if ppac && ppac[:prodno] # pkg_gtin.to_s[4..11]
                 csv = []
-                if @emit_v5
-                  @csv_file << [pkg_gtin, name, package[:unit], measure,
-                               package[:prices] ? package[:prices][:exf_price][:price] : '',
-                               package[:prices] ? package[:prices][:pub_price][:price] : '',
-                               package[:prodno],  package[:atc_code], package[:substance_swissmedic],
-                               sequence[:org_gen_code],  package[:ith_swissmedic] ]
-                end
+                @csv_file << [pkg_gtin, name, package[:unit], measure,
+                              package[:prices] ? package[:prices][:exf_price][:price] : '',
+                              package[:prices] ? package[:prices][:pub_price][:price] : '',
+                              package[:prodno],  package[:atc_code], package[:substance_swissmedic],
+                              sequence[:org_gen_code],  package[:ith_swissmedic] ]
               end
             end
           else # non pharma
-            next if @emit_pharma
-            if @emit_v5
-              @csv_file << [ ean13, (obj[:desc_de] || obj[:description]), '', '',
-                            obj[:price], obj[:pub_price], '', '', '', '', '' ]
-              if @@emitted_v5_gtins.index(ean13)
-                next
-              else
-                @@emitted_v5_gtins << ean13
-              end
+             @csv_file << [ ean13, (obj[:desc_de] || obj[:description]), '', '',
+                          obj[:price], obj[:pub_price], '', '', '', '', '' ]
+            if @@emitted_v5_gtins.index(ean13)
+              next
             else
-              if @@emitted_v3_gtins.index(ean13)
-                next
-              end
-              @@emitted_v3_gtins << ean13
+              @@emitted_v5_gtins << ean13
             end
             # Set the pharmatype to 'Y' for outdated products, which are no longer found
             # in refdata/packungen
             patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) ? 'P': 'N' )
-            options = @emit_v5 ? {'PHARMATYPE' => patched_pharma_type } : {}
-            xml.ITEM(options) do
+            xml.ITEM({'PHARMATYPE' => patched_pharma_type }) do
               xml.GTIN ean13.to_s.rjust(13, '0')
               xml.PHAR obj[:pharmacode]
-              emit_salecd(xml, ean13, obj)  if @emit_v5
+              emit_salecd(xml, ean13, obj)
               xml.DSCR(obj[:desc_de] || obj[:description]) # for description for zur_rose
-              xml.DSCRF(obj[:desc_fr] || '--missing--') if @emit_v5
+              xml.DSCRF(obj[:desc_fr] || '--missing--')
               xml.COMP  do
                 xml.GLN obj[:company_ean]
               end if obj[:company_ean] && !obj[:company_ean].empty?
@@ -1604,25 +1562,12 @@ module Oddb2xml
         datetime = Time.new.strftime('%FT%T%z')
         elexis_strftime_format = "%FT%T\.%L%:z"
         @@cumul_ver = (Date.today.year-2013)*12+Date.today.month
-        if emit_v5
-          options_xml =  {
-            'xmlns'  => 'http://elexis.ch/Elexis_Artikelstamm_v5',
-            'CREATION_DATETIME' => Time.new.strftime(elexis_strftime_format),
-            'BUILD_DATETIME'    => Time.new.strftime(elexis_strftime_format),
-            'DATA_SOURCE'       => 'oddb2xml'
-          }
-        else
-          options_xml =  {
-            'xmlns'        => 'http://elexis.ch/Elexis_Artikelstamm_v003',
-            'CREATION_DATETIME' => Time.new.strftime(elexis_strftime_format),
-            'LANG'         => 'de',
-            'MONTH'        => Time.new.strftime('%m'),
-            'YEAR'         => Time.new.strftime('%Y'),
-            'CUMUL_VER'    => @@cumul_ver,
-            'TYPE'         =>  (@emit_pharma ? 'P' : 'N'),
-            'DATA_QUALITY' => '3'
-          }
-        end
+        options_xml =  {
+          'xmlns'  => 'http://elexis.ch/Elexis_Artikelstamm_v5',
+          'CREATION_DATETIME' => Time.new.strftime(elexis_strftime_format),
+          'BUILD_DATETIME'    => Time.new.strftime(elexis_strftime_format),
+          'DATA_SOURCE'       => 'oddb2xml'
+        }
         emitted_prodno = []
         xml.comment("Produced by #{__FILE__} version #{VERSION} at #{Time.now}")
         xml.ARTIKELSTAMM(options_xml) do
@@ -1672,7 +1617,7 @@ module Oddb2xml
                 end
               end
             end
-          end if emit_v5
+          end
           emitted_lim_code = []
           xml.LIMITATIONS do
             @limitations.sort! { |left, right| left[:code] <=> right[:code] }
@@ -1687,17 +1632,13 @@ module Oddb2xml
                 xml.LIMITATION_PTS  (lim[:value].to_s.length > 1 ? lim[:value] : 1)
               end
             end
-          end  if emit_v5
-          if emit_v5
-            xml.ITEMS do
-              nr_articles = emit_items(xml)
-            end
-          else
+          end
+          xml.ITEMS do
             nr_articles = emit_items(xml)
           end
         end
       end
-      Oddb2xml.log "#{variant}. Done #{nr_products} of #{@products.size} products, #{@limitations.size} limitations and #{nr_articles}/#{@nr_articles} articles. @@emitted_v3_gtins #{@@emitted_v3_gtins.size} v5 #{@@emitted_v5_gtins.size}"
+      Oddb2xml.log "#{variant}. Done #{nr_products} of #{@products.size} products, #{@limitations.size} limitations and #{nr_articles}/#{@nr_articles} articles. @@emitted_v5_gtins #{@@emitted_v5_gtins.size}"
       # we don't add a SHA256 hash for each element in the article
       # Oddb2xml.add_hash(_builder.to_xml)
       # doc = REXML::Document.new( source, { :raw => :all })

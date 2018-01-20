@@ -21,25 +21,7 @@ module Oddb2xml
       if @version == 5
         @hash = load_file(@filename)
       else
-        [ @filename.sub(V3_NAME_REG, '_P_'),
-          @filename.sub(V3_NAME_REG, '_N_'),
-        ].each do |fname|
-          raise "File #{filename} must exist" unless File.exist?(filename)
-          @hash = load_file(fname)
-          version_from_xml = hash['DATA_QUALITY'].to_i
-          items = @hash['ITEM']
-          items.each { |item| item['PHARMATYPE'] =  V3_NAME_REG.match(fname)[1]}
-          @sub_key_names = items.collect{|item| item.keys}.flatten.uniq
-          @keys  = items.collect{|item| item['GTIN'].first.to_i }
-          if V3_NAME_REG.match(fname)[0].eql?('_P_')
-            @p_items = items
-          else
-            @n_items = items
-          end
-          raise "Unexpected version #{version_from_xml} in #{fname}" unless version_from_xml == 3
-        end
-        @hash['ITEMS'] = @p_items + @n_items
-        Oddb2xml.log_timestamp "V3 #{filename} has #{@p_items.size} Pharma and #{@n_items.size} NonPharma items"
+        raise "Unsupported version #{@version}"
       end
     end
     def self.get_component_key_name(component_name)
@@ -94,9 +76,6 @@ module Oddb2xml
     end
     def compare
       show_header("Start comparing #{@left.filename} with #{@right.filename}")
-      @comp_v3_with_v5 = !!(@left.version != @right.version)
-      @options[:fields_to_ignore] +=  ['DEDUCTIBLE', 'MEASURE', 'MEASUREF',
-                                       'DOSAGE_FORM', 'DOSAGE_FORMF'] if @comp_v3_with_v5
       (@left.components & @right.components).each do |name|
         begin
           puts "\n#{Time.now.strftime("%H:%M:%S")}: Comparing #{name} in #{@left.basename} with #{@right.basename}"
@@ -176,23 +155,6 @@ module Oddb2xml
           l_float = l_value ? l_value.first.to_f : 0.0
           r_float = r_value ? r_value.first.to_f : 0.0
           next if (l_float - r_float).abs < @options[:min_diff_for_floats]
-        end
-        if @comp_v3_with_v5
-          if ['ATC', 'LIMITATION', 'LIMITATION_PTS', 'LIMITATION_TEXT', 'LIMNAMEBAG'].index(sub_key)
-            if @right.version == 5
-              if sub_key.eql?('LIMITATION')
-                r_value = @right.get_limitation_from_v5(r_item)
-              else
-                r_value = @right.get_field_from_v5_product(r_item, sub_key)
-              end
-            else
-              if sub_key.eql?('LIMITATION')
-                l_value = @left.get_limitation_from_v5(r_item)
-              else
-                l_value = @left.get_field_from_v5_product(r_item, sub_key)
-              end
-            end
-          end
         end
         next if (r_value.is_a?(Array) && '--missing--'.eql?(r_value.first)) || (l_value.is_a?(Array) && '--missing--'.eql?(l_value.first))
                 # TODO: get_field_from_v5_product

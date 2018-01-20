@@ -12,8 +12,9 @@ Die für den Artikelstamm gebrauchten Ursprungs-Dateien werden
 * unter downloads in einem leicht lesbaren Format abgespeichert 
 ** CSV für XLSX-Dateien. Dazu wird die Utility ssconvert des Gnumeric verwendet, was viel schneller geht, als die Dateien per Ruby-Script zu laden
 ** mit xmllint --format schön formattierten XML
+** transfer.utf8           ISO8859-1 transfer.dat als utf-8 um leichter unter Linux greppen zu können
 
-Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B. grep 7680563320017 downloads/*.
+Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B. 
 
 ### Herkunft der einzelenen Dateien
 
@@ -26,9 +27,11 @@ Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B
 * transfer.zip            http://pillbox.oddb.org/TRANSFER.ZIP Dieses enthält
 ** transfer.dat
 
-## Offene Fragen
+Beim Tranfer.dat werden Zeilen ausgelassen, wenn eine der folgenden Bedingungen zutrifft (siehe extractor.rb ZurroseExtractor)
 
-Im transfer.dat von Zur Rose hat es viele Einträge, wo nur ein Pharmacode, jedoch keine GTIN drin ist. In diesem Fall wird ein Pseudo GTIN beginnend mit einer sechstelling  999999 und geflogt vom 7-stelligen Pharmacode erzeugt.
+    * Die GTIN ist 0000000000000
+    * Die Zeile beginnt mit 113 (inaktiv) und die GTIN beginnt mit 7580 (aka Swissmedic)
+    * Die Zeile beginnt mit 113 (inaktiv) und sowohl der Public als auch der Extfactory Preis is 0
 
 ## UnitTests
 
@@ -49,4 +52,4 @@ Bis Ende 2017 wurde
 
 Bei dieser Ueberarbeitung wurden dann auch noch gleichzeitig eine Version 3 erstellt.
 
-Dazu kam auch das Werkzeug compare_v5 um zwei v5 (oder v3) XML-Dateien zu vergleichen, womit die pro Monat neu eintreffenden Anpassungen leicht vervolgbar werden.
+Dazu kam auch das Werkzeug compare_v5 um zwei v5 XML-Dateien zu vergleichen, womit die pro Monat neu eintreffenden Anpassungen leicht vervolgbar werden.

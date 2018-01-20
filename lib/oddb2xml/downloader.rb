@@ -159,6 +159,11 @@ module Oddb2xml
       dest = File.join(Downloads, 'transfer.dat')
       cmd = "unzip -o '#{zipfile}' -d '#{Downloads}'"
       system(cmd)
+      if @options[:artikelstamm]
+        cmd = "iconv -f ISO8859-1 -t utf-8 -o #{dest.sub('.dat','.utf8')} #{dest}"
+        Oddb2xml.log(cmd)
+        system(cmd)
+      end
       # read file and convert it to utf-8
       File.open(dest, 'r:iso-8859-1:utf-8').read
     ensure

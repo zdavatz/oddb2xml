@@ -31,12 +31,10 @@ describe Oddb2xml::Builder do
     @savedDir = Dir.pwd
     @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
     @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
-    @elexis_v3_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v003.xsd'))
     @elexis_v5_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v5.xsd'))
     @elexis_v5_csv = File.join(Oddb2xml::WorkDir, 'Elexis_Artikelstamm_v5.csv')
     expect(File.exist?(@oddb2xml_xsd)).to eq true
     expect(File.exist?(@oddb_calc_xsd)).to eq true
-    expect(File.exist?(@elexis_v3_xsd)).to eq true
     expect(File.exist?(@elexis_v5_xsd)).to eq true
     cleanup_directories_before_run
     FileUtils.makedirs(Oddb2xml::WorkDir)
@@ -63,6 +61,10 @@ describe Oddb2xml::Builder do
       expect(File.exists?(@artikelstamm_name)).to eq true
     end
 
+    it 'should create transfer.ut8' do
+      expect(File.exists?(File.join(Oddb2xml::Downloads, 'transfer.utf8'))).to eq true
+    end
+
     it 'should have a comment' do
       expect(@inhalt).to match /<!--Produced by/
     end
@@ -74,24 +76,14 @@ describe Oddb2xml::Builder do
       expect(inhalt).to match /7680284860144/
     end
 
-    it 'should generate a valid v3 nonpharma xml' do
+    it 'should NOT generate a v3 nonpharma xml' do
       v3_name = @artikelstamm_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_N_')
-      expect(File.exist?(v3_name)).to eq true
-      validate_via_xsd(@elexis_v3_xsd, v3_name)
-      expect(IO.read(v3_name)).not_to match(/<LIMITATION/)
-      expect(IO.read(v3_name)).not_to match(/GTIN>7680161050583/)
-      expect(IO.read(v3_name)).to match(/GTIN>4042809018288/)
-      expect(IO.read(v3_name)).not_to match(/<LPPV>true</)
+      expect(File.exist?(v3_name)).to eq false
     end
 
-    it 'should generate a valid v3 pharma xml' do
+    it 'should NOT generate a vx pharma xml' do
       v3_name = @artikelstamm_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_P_')
-      expect(File.exist?(v3_name)).to eq true
-      validate_via_xsd(@elexis_v3_xsd, v3_name)
-      expect(IO.read(v3_name)).to match(/<LIMITATION/)
-      expect(IO.read(v3_name)).to match(/GTIN>7680161050583/)
-      expect(IO.read(v3_name)).not_to match(/GTIN>4042809018288/)
-      expect(IO.read(v3_name)).to match(/<LPPV>true</)
+      expect(File.exist?(v3_name)).to eq false
     end
 
     it 'should contain a LIMITATION_PTS' do
