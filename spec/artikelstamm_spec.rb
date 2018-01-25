@@ -101,6 +101,17 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
+    it 'should trim the ean13 to 13 length' do
+      gtin14 = "00040565124346"
+      expect(gtin14.length).to eq 14
+      expected14 = %(<GTIN>#{gtin14}</GTIN>)
+      expect(@inhalt.index(expected14)).to be nil
+      gtin13 = gtin14[1..-1]
+      expect(gtin13.length).to eq 13
+      expected13 = %(<GTIN>#{gtin13}</GTIN>)
+      expect(@inhalt.index(expected13)).not_to be nil
+    end
+
     it 'should not contain a GTIN=0' do
       expect(@inhalt.index('GTIN>0</GTIN')).to be nil
     end
@@ -111,8 +122,8 @@ describe Oddb2xml::Builder do
 
     it 'should contain a PHAR 4236857 from refdata_NonPharma.xml' do
       expect(@inhalt.index('<PHAR>4236863</PHAR>')).to be > 0
-      # Marco leaves the 14 GTIN digit. I change to the 13 digits by removing t
-      expect(@inhalt.index('<GTIN>00040565124346</GTIN>')).to be > 0
+      # Marco leaves the 14 GTIN digit in previous importes. As of January 2018 force it to the 13 digits
+      expect(@inhalt.index('<GTIN>0040565124346</GTIN>')).to be > 0
     end
 
     it 'should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do

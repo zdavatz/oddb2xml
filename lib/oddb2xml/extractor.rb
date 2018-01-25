@@ -186,6 +186,10 @@ module Oddb2xml
       items = result.ARTICLE.ITEM
       items.each do |pac|
         ean13 = (gtin = pac.GTIN.to_s) ? gtin: '0'
+        if ean13.size != 13
+          puts "Refdata #{@type} ean13: Fixed incorrect length #{ean13.size} for #{ean13}"
+          ean13 = ean13[1..-1]
+        end
         item = {}
         item[:data_origin]     = 'refdata'
         item[:refdata]         = true
@@ -198,7 +202,6 @@ module Oddb2xml
         item[:atc_code]        = (code = pac.ATC)    ? code.to_s : ''
         item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam: ''
         item[:company_ean]  = (gln = pac.AUTH_HOLDER_GLN)  ? gln: ''
-        puts "Refdata #{@type} ean13: incorrect lenght #{ean13.size} for #{ean13}" if ean13.size != 13
         unless item[:pharmacode]
           item[:pharmacode] = phar
           unless data[item[:pharmacode]] # pharmacode => GTINs
@@ -336,7 +339,6 @@ module Oddb2xml
         phar = row[1]
         next if phar == 0
         ean13 = row[0]
-        require 'pry'; binding.pry unless ean13.to_s.length == 13
         ean13 = phar unless ean13.to_s.length == 13
         data[ean] = {
           :refdata         => true,

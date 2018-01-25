@@ -1455,7 +1455,6 @@ module Oddb2xml
               options = {'PHARMATYPE' => 'P'}
               xml.ITEM(options) do
                 name = (@refdata[pkg_gtin] ? @refdata[pkg_gtin][:desc_de] : nil) || obj[:desc_de] || obj[:sequence_name]
-                binding.pry unless pkg_gtin.to_s.rjust(13, '0').size == 13
                 xml.GTIN pkg_gtin.to_s.rjust(13, '0')
                 override(xml, pkg_gtin, :PHAR, pharma_code)
                 xml.SALECD('A')
@@ -1491,7 +1490,7 @@ module Oddb2xml
                   xml.DOSAGE_FORMF info.galenic_form.descriptions['fr'] if info.galenic_form.descriptions['fr']
                 end
                 xml.SL_ENTRY          'true' if  @items[pkg_gtin]
-                xml.IKSCAT            package[:swissmedic_category]
+                xml.IKSCAT            package[:swissmedic_category] if package[:swissmedic_category] && package[:swissmedic_category].length > 0
                 xml.GENERIC_TYPE sequence[:org_gen_code] if sequence[:org_gen_code] && !sequence[:org_gen_code].empty?
                 xml.LPPV              'true' if @lppvs[pkg_gtin.to_s] # detect_nincd
                 case item[:deductible]

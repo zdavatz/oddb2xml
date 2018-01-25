@@ -40,7 +40,6 @@ module Oddb2xml
         ausgabe.encode('ISO-8859-1')
     rescue => error
       puts "#{error}: in #{line}"
-      require 'pry'; binding.pry
     end
   end
 
@@ -164,4 +163,21 @@ module Oddb2xml
     end
     return true
   end
+
+  def Oddb2xml.validate_via_xsd(xsd_file, xml_file)
+    xsd =open(xsd_file).read
+    xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
+    doc = Nokogiri::XML(File.read(xml_file))
+    xsd_rtikelstamm_xml.validate(doc).each do
+      |error|
+        if error.message
+          puts "Failed validating #{xml_file} with #{File.size(xml_file)} bytes using XSD from #{xsd_file}"
+          puts "CMD: xmllint --noout --schema #{xsd_file} #{xml_file}"
+        end
+        msg = "expected #{error.message} to be nil\nfor #{xml_file}"
+        puts msg
+        expect(error.message).to be_nil, msg
+    end
+  end
+
 end

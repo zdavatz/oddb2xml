@@ -98,7 +98,6 @@ module Oddb2xml
           key_results_details(name, compare_names, l_keys, r_keys)
         rescue => error
           puts "Execution failed with #{error}"
-          binding.pry  if defined?(RSpec)
         end
       end
       show_header("Summary comparing #{@left.filename} with #{@right.filename}")
@@ -115,7 +114,6 @@ module Oddb2xml
       @diff_stat
     rescue => error
       puts "Execution failed with #{error}"
-      # binding.pry if defined?(RSpec)
       raise error
     end
     private

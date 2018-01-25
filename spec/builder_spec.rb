@@ -329,7 +329,6 @@ def validate_via_xsd(xsd_file, xml_file)
       end
       msg = "expected #{error.message} to be nil\nfor #{xml_file}"
       puts msg
-      binding.pry
       expect(error.message).to be_nil, msg
   end
 end

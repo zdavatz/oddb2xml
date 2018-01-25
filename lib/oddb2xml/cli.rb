@@ -81,6 +81,16 @@ module Oddb2xml
         exit
       end
       build
+      if @options[:artikelstamm]
+        elexis_v5_xsd = File.expand_path(File.join(__FILE__, '..', '..', '..', 'Elexis_Artikelstamm_v5.xsd'))
+         cmd = "xmllint --noout --schema #{elexis_v5_xsd} #{@_files[:artikelstamm]}"
+         if system(cmd)
+            puts "Validatied #{@_files[:artikelstamm]}"
+         else
+            puts "Validating failed using #{cmd}"
+            exit(2)
+         end
+      end
       compress if @options[:compress_ext]
       res = report
       nrSecs =  (Time.now - startTime).to_i
