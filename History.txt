@@ -1,3 +1,7 @@
+=== 2.5.0 / 06.02.2018
+
+* Adapt to swissmedic fixing a typo in Packungen.XLSX header row
+
 === 2.4.9 / 15.01.2018
 
 * Adapt to new link of epha atc.csv
