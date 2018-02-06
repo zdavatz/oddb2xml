@@ -1,3 +1,3 @@
 module Oddb2xml
-  VERSION = "2.4.9"
+  VERSION = "2.5.0"
 end
