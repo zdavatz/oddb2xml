@@ -65,7 +65,6 @@ module Oddb2xml
       @people     = []
       @tag_suffix = nil
       @pharmacode = {} # index pharmacode => item
-      @@emitted_v5_gtins ||= []
       if block_given?
         yield self
       end
@@ -98,7 +97,7 @@ module Oddb2xml
             @migel[ean13] = nil
           end unless SkipMigelDownloader
           if seq = @items[obj[:ean13]]
-            obj[:seq] = seq
+            obj[:seq] = seq.clone
           end
           @articles << obj
           @pharmacode[obj[:pharmacode]] = obj
@@ -1170,9 +1169,9 @@ module Oddb2xml
         13
       else
         # fallback via EAN
-        bag_entry_via_ean = @items.values.select do |i|
-          next unless i[:packages]
-          i[:packages].values.select {|_pac| _pac[:ean13].to_s == de_idx[:ean13].to_s }.length != 0
+        bag_entry_via_ean = @items.values.select do |item|
+          next unless item[:packages]
+          item[:packages].values.select {|_pac| _pac[:ean13].to_s.eql?(de_idx[:ean13].to_s) }.length != 0
         end
         if bag_entry_via_ean.length > 0
           10
@@ -1362,13 +1361,13 @@ module Oddb2xml
     end
 
     def build_artikelstamm
-      @break_id = 7680626030129
+      @@emitted_v5_gtins = []
       @csv_file = CSV.open(File.join(WorkDir, "Elexis_Artikelstamm_v5.csv"), "w+")
-      @csv_file << ['gtin', 'price', 'galenic_form', 'pkg_size', 'pexf', 'ppub', 'iksnr', 'atc_code', 'active_substance', 'original', 'it-code']
+      @csv_file << ['gtin', 'price', 'galenic_form', 'pkg_size', 'pexf', 'ppub', 'iksnr', 'atc_code', 'active_substance', 'original', 'it-code', 'sl-liste']
+      @csv_file.sync = true
       variant = "build_artikelstamm"
       # @infos_zur_rose.delete_if { |key, val| val[:cmut].eql?('3') } # collect only active zur rose item
       # No. Marco did not filter it, eg. 8804121 in rtikelstamm_oddb2xml_051217_v5.xm
-      Oddb2xml.log "#{variant}: v5 #{@@emitted_v5_gtins.size}"
       def check_name(obj, lang = :de)
         ean = obj[:ean13]
         refdata = @refdata[ean]
@@ -1419,14 +1418,14 @@ module Oddb2xml
           Oddb2xml.log "build_article #{nr_items} of #{gtins.size} articles" if nr_items % 5000 == 0
           item = @items[ean13]
           pack_info = nil
-          pack_info = @packs[no8] if no8 # info from Packungen.xlsx from swissmedic_info
+          pack_info = @packs[no8] if no8 && /#{ean13}/.match(@packs[no8].to_s) # info from Packungen.xlsx from swissmedic_info
           next if pack_info && /Tierarzneimittel/.match(pack_info[:list_code])
           next if obj[:desc_de] && /ad us vet/i.match(obj[:desc_de])
           sequence    = obj[:seq]
           unless sequence
-            if  @packs[no8]
+            if  @packs[no8] && /#{ean13}/.match(@packs[no8].to_s)
               sequence = {:packages =>{ean13 => @packs[no8]}}
-              obj[:seq] = sequence
+              obj[:seq] = sequence.clone
             end
           end
           if no8
@@ -1438,7 +1437,7 @@ module Oddb2xml
               next
             end
             sequence[:packages].each do |gtin, package|
-              pkg_gtin = package[:ean13]
+              pkg_gtin = package[:ean13].clone
               pharma_code = @refdata[pkg_gtin]
               if @refdata[pkg_gtin] && @refdata[pkg_gtin][:pharmacode]
                 pharma_code = @refdata[pkg_gtin][:pharmacode]
@@ -1450,7 +1449,7 @@ module Oddb2xml
               if @@emitted_v5_gtins.index(pkg_gtin)
                 next
               else
-                @@emitted_v5_gtins << pkg_gtin
+                @@emitted_v5_gtins << pkg_gtin.clone
               end
               options = {'PHARMATYPE' => 'P'}
               xml.ITEM(options) do
@@ -1465,12 +1464,21 @@ module Oddb2xml
                   xml.NAME  obj[:company_name]
                   xml.GLN   obj[:company_ean]
                 end
+                pexf = ppub = nil
                 if package[:prices]
-                  xml.PEXF package[:prices][:exf_price][:price] if package[:prices][:exf_price][:price] &&
-                      !package[:prices][:exf_price][:price].empty?
-                  xml.PPUB package[:prices][:pub_price][:price] if package[:prices][:pub_price][:price] &&
-                      !package[:prices][:pub_price][:price].empty?
+                  pexf ||= package[:prices][:exf_price][:price]
+                  ppub ||= package[:prices][:pub_price][:price]
+                elsif @items[ean13] &&  @items[ean13][:packages] && @items[ean13][:packages][ean13] && (bag_prices = @items[ean13][:packages][ean13][:prices])
+                  pexf ||= bag_prices[:exf_price][:price]
+                  ppub ||= bag_prices[:pub_price][:price]
+                else
+                  pexf ||= obj[:price]
+                  ppub ||= obj[:pub_price]
                 end
+                ppub = nil if ppub && ppub.size == 0
+                pexf = nil if pexf && pexf.size == 0
+                xml.PEXF pexf if pexf
+                xml.PPUB ppub if ppub
                 measure = ''
                 if info
                   # MEASSURE Measurement Unit,e.g. Pills or milliliters
@@ -1501,19 +1509,21 @@ module Oddb2xml
                 xml.PRODNO            ppac[:prodno] if ppac && ppac[:prodno] # pkg_gtin.to_s[4..11]
                 csv = []
                 @csv_file << [pkg_gtin, name, package[:unit], measure,
-                              package[:prices] ? package[:prices][:exf_price][:price] : '',
-                              package[:prices] ? package[:prices][:pub_price][:price] : '',
+                              pexf ? pexf : '',
+                              ppub ? ppub : '',
                               package[:prodno],  package[:atc_code], package[:substance_swissmedic],
-                              sequence[:org_gen_code],  package[:ith_swissmedic] ]
+                              sequence[:org_gen_code],  package[:ith_swissmedic],
+                              @items[pkg_gtin] ? 'SL' : '',
+                              ]
               end
             end
           else # non pharma
              @csv_file << [ ean13, (obj[:desc_de] || obj[:description]), '', '',
-                          obj[:price], obj[:pub_price], '', '', '', '', '' ]
+                          obj[:price], obj[:pub_price], '', '', '', '', '', '' ]
             if @@emitted_v5_gtins.index(ean13)
               next
             else
-              @@emitted_v5_gtins << ean13
+              @@emitted_v5_gtins << ean13.clone
             end
             # Set the pharmatype to 'Y' for outdated products, which are no longer found
             # in refdata/packungen

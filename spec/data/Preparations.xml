@@ -2700,4 +2700,143 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
       <FlagApd>N</FlagApd>
     </Status>
   </Preparation>
+  <Preparation ProductCommercial="28378">
+    <NameDe>Lynparza</NameDe>
+    <NameFr>Lynparza</NameFr>
+    <NameIt>Lynparza</NameIt>
+    <DescriptionDe>Kaps 50 mg </DescriptionDe>
+    <DescriptionFr>caps 50 mg </DescriptionFr>
+    <DescriptionIt>caps 50 mg </DescriptionIt>
+    <AtcCode>L01XX46</AtcCode>
+    <SwissmedicNo5>65160</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="28378" PackId="36087">
+        <DescriptionDe>448 Stk</DescriptionDe>
+        <DescriptionFr>448 pce</DescriptionFr>
+        <DescriptionIt>448 pce</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>65160001</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>20460</BagDossierNo>
+        <GTIN>7680651600014</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>5562.48</Price>
+            <ValidFromDate>01.08.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>5947.55</Price>
+            <ValidFromDate>01.08.2016</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>AstraZeneca AG</Description>
+            <Street>Grafenauweg 10</Street>
+            <ZipCode>6300</ZipCode>
+            <Place>Zug</Place>
+            <Phone>+41417257575</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.08.2016</IntegrationDate>
+          <ValidFromDate>01.08.2016</ValidFromDate>
+          <ValidThruDate>31.07.2018</ValidThruDate>
+          <StatusTypeCodeSl>2</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Olaparibum</DescriptionLa>
+        <Quantity>50</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>LYNPARZA</LimitationCode>
+        <LimitationType>DIA</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <DescriptionDe>Zur Erhaltungstherapie (Monotherapie) bei erwachsenen Patientinnen mit rezidiviertem, fortgeschrittenem Ovarialkarzinom mit BRCA Mutation im Anschluss an eine platinhaltige Chemotherapie bei Vorliegen einer kompletten oder partiellen Remission.&lt;br&gt;
+Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorgegebenen Internettool des Registers, abrufbar auf http://www.olaparib-registry.ch, zu erfassen. Eine schriftliche Einwilligung der Patientin muss vorliegen. Es sind folgende Daten zu erfassen:&lt;br&gt;
+1)	Geburtsjahr, sowie Vortherapien für das OC&lt;br&gt;
+2)	Datum Therapiestart, Dosierung, Dosisanpassungen, Datum Therapieende.
+
+</DescriptionDe>
+        <DescriptionFr>Pour le traitement d'entretien (en monothérapie) chez les patientes adultes atteintes d’un cancer de l'ovaire avancé, récidivant, avec une mutation du gène BRCA, chez les patientes en rémission complète ou partielle suite à une chimiothérapie à base de platine.&lt;br&gt;
+Le médecin traitant est tenu de saisir en continu les données requises dans l'outil internet accessible sur http://www.olaparib-registry.ch. Le consentement écrit de la patiente doit être obtenu. Les données à saisir sont les suivantes:&lt;br&gt;
+1)         Année de naissance, ainsi que les traitements antérieurs pour le CO&lt;br&gt;
+2)         Date du début de traitement, posologie, ajustements posologiques, date de fin de traitement.
+
+</DescriptionFr>
+        <DescriptionIt>Per la terapia di mantenimento (monoterapia) in pazienti adulte con carcinoma ovarico avanzato e recidivo, con mutazione BRCA, successivamente a una chemioterapia a base di platino e in presenza di una remissione parziale o completa.&lt;br&gt; 
+Il medico curante è tenuto a raccogliere costantemente i dati necessari nell’apposito strumento internet del registro, disponibile su http://www.olaparib-registry.ch. È necessario il consenso scritto della paziente. Devono essere raccolti i seguenti dati:&lt;br&gt; 
+1)         Anno di nascita e terapie precedenti per il carcinoma ovarico&lt;br&gt;
+2)         Data di inizio della terapia, dosaggio, aggiustamenti del dosaggio, data di conclusione della terapia.
+</DescriptionIt>
+        <ValidFromDate>01.08.2016</ValidFromDate>
+        <ValidThruDate>31.07.2018</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="07.">
+        <DescriptionDe>STOFFWECHSEL</DescriptionDe>
+        <DescriptionFr>METABOLISME</DescriptionFr>
+        <DescriptionIt>METABOLISMO</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.16.">
+        <DescriptionDe>Oncologica</DescriptionDe>
+        <DescriptionFr>Oncologica</DescriptionFr>
+        <DescriptionIt>Oncologici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="07.16.10.">
+        <DescriptionDe>Cytostatica</DescriptionDe>
+        <DescriptionFr>Cytostatica</DescriptionFr>
+        <DescriptionIt>Citostatici </DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.08.2016</IntegrationDate>
+      <ValidFromDate>01.08.2016</ValidFromDate>
+      <ValidThruDate>31.07.2018</ValidThruDate>
+      <StatusTypeCodeSl>2</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
 </Preparations>

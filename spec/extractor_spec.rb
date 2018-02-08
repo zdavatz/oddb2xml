@@ -180,7 +180,7 @@ describe Oddb2xml::SwissmedicExtractor do
       @packs.find{|pack| pack[1][:ean13] == ean13.to_s }[1]
     end
     it 'should have correct nr of packages' do
-      expect(@packs.size).to eq(34)
+      expect(@packs.size).to eq(35)
     end
 
     it 'should have serocytol' do
@@ -220,7 +220,7 @@ describe Oddb2xml::SwissmedicExtractor do
         @filename = File.join(Oddb2xml::SpecData, 'swissmedic_orphan.xlsx')
         expect(File.exists?(@filename)).to eq(true), "File #{@filename} must exists"
         @packs = Oddb2xml::SwissmedicExtractor.new(@filename, :orphan).to_arry
-        expect(@packs.size).to eq 95
+        expect(@packs.size).to eq 96
         expect(@packs.first).to eq("62132")
         expect(@packs[7]).to eq("00687")
     end

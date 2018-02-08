@@ -473,15 +473,15 @@ def checkProductXml(nbr_record = -1)
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 65
-  NrSubstances = 24
-  NrLimitations = 11
+  NrExtendedArticles = 67
+  NrSubstances = 25
+  NrLimitations = 12
   
   NrInteractions = 2
   NrCodes = 5
   NrProdno = 31
-  NrPackages = 37
-  NrProducts = 30
+  NrPackages = 38
+  NrProducts = 31
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init(options = {})

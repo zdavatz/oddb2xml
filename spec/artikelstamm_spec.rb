@@ -90,6 +90,13 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index('<LIMITATION_PTS>40</LIMITATION_PTS>')).not_to be nil
     end
 
+    it 'should find price from Preparations.xml by setting' do
+      expect(File.exists?(@elexis_v5_csv)).to eq true
+      inhalt = File.open(@elexis_v5_csv, 'r+').read
+      expected = %(7680658560014,"DIBASE 10'000, orale Tropflösung",Flasche(n),Flasche(n),5,9.25,6585601,A11CC05,cholecalciferolum,,07.02.3.,SL)
+      expect(inhalt.index(expected)).to be > 0
+    end
+
     it 'should contain a PRODUCT which was not in refdata' do
       expected = %(<PRODUCT>
             <PRODNO>6118601</PRODNO>
@@ -101,6 +108,11 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
+    it 'should have a price for Lynparza' do
+      expect(File.exists?(@elexis_v5_csv)).to eq true
+      inhalt = File.open(@elexis_v5_csv, 'r+').read
+      expect(inhalt.index('7680651600014,LYNPARZA Kaps 50 mg 448 Stk,,Kapsel(n),5562.48,5947.55')).not_to be nil
+    end
     it 'should trim the ean13 to 13 length' do
       gtin14 = "00040565124346"
       expect(gtin14.length).to eq 14
@@ -226,28 +238,29 @@ DIBASE 25'000 - 7210539
             <PRODNO>3247501</PRODNO>
         </ITEM>',
         'product 5366201 3TC' =>
-      '<ITEM PHARMATYPE="P">
-            <GTIN>7680353660163</GTIN>
-            <PHAR>0020273</PHAR>
+      %(<ITEM PHARMATYPE="P">
+            <GTIN>7680536620137</GTIN>
+            <PHAR>1699947</PHAR>
             <SALECD>A</SALECD>
-            <DSCR>KENDURAL Depottabl 30 Stk</DSCR>
-            <DSCRF>KENDURAL cpr dépôt 30 pce</DSCRF>
+            <DSCR>3TC Filmtabl 150 mg 60 Stk</DSCR>
+            <DSCRF>3TC cpr pell 150 mg 60 pce</DSCRF>
             <COMP>
-                <NAME>Farmaceutica Teofarma Suisse SA</NAME>
-                <GLN>7601001374539</GLN>
+                <NAME>ViiV Healthcare GmbH</NAME>
+                <GLN>7601001392175</GLN>
             </COMP>
-            <PEXF>4.4606</PEXF>
-            <PPUB>8.25</PPUB>
-            <PKG_SIZE>30</PKG_SIZE>
+            <PEXF>164.55</PEXF>
+            <PPUB>205.3</PPUB>
+            <PKG_SIZE>60</PKG_SIZE>
             <MEASURE>Tablette(n)</MEASURE>
             <MEASUREF>Tablette(n)</MEASUREF>
-            <DOSAGE_FORM>Tupfer</DOSAGE_FORM>
-            <DOSAGE_FORMF>Compresse</DOSAGE_FORMF>
+            <DOSAGE_FORM>Filmtabletten</DOSAGE_FORM>
+            <DOSAGE_FORMF>Comprimés filmés</DOSAGE_FORMF>
             <SL_ENTRY>true</SL_ENTRY>
-            <IKSCAT>C</IKSCAT>
+            <IKSCAT>A</IKSCAT>
+            <GENERIC_TYPE>O</GENERIC_TYPE>
             <DEDUCTIBLE>10</DEDUCTIBLE>
-            <PRODNO>3536601</PRODNO>
-        </ITEM>',
+            <PRODNO>5366201</PRODNO>
+        </ITEM>),
         'item 7680161050583 HIRUDOID' =>
          %(<ITEM PHARMATYPE="P">
             <GTIN>7680161050583</GTIN>
@@ -280,6 +293,8 @@ DIBASE 25'000 - 7210539
                 <NAME>Dr. Grossmann AG, Pharmaca</NAME>
                 <GLN/>
             </COMP>
+            <PEXF>3.89</PEXF>
+            <PPUB>8.55</PPUB>
             <PKG_SIZE>5</PKG_SIZE>
             <MEASURE>Ampulle(n)</MEASURE>
             <MEASUREF>Ampulle(n)</MEASUREF>
@@ -290,6 +305,26 @@ DIBASE 25'000 - 7210539
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>2848601</PRODNO>
         </ITEM>',
+                'FERROUMET pice from ZurRose  ' => %(<ITEM PHARMATYPE="P">
+            <GTIN>7680316440115</GTIN>
+            <PHAR>0020244</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>FERRO-GRADUMET Depottabl 30 Stk</DSCR>
+            <DSCRF>FERRO-GRADUMET cpr dépôt 30 pce</DSCRF>
+            <COMP>
+                <NAME>Farmaceutica Teofarma Suisse SA</NAME>
+                <GLN>7601001374539</GLN>
+            </COMP>
+            <PEXF>8.96</PEXF>
+            <PPUB>13.80</PPUB>
+            <PKG_SIZE>30</PKG_SIZE>
+            <MEASURE>Tablette(n)</MEASURE>
+            <MEASUREF>Tablette(n)</MEASUREF>
+            <DOSAGE_FORM>Tupfer</DOSAGE_FORM>
+            <DOSAGE_FORMF>Compresse</DOSAGE_FORMF>
+            <IKSCAT>C</IKSCAT>
+            <PRODNO>3164402</PRODNO>
+        </ITEM>), 
       'product 3TC Filmtabl' => %(<PRODUCT>
             <PRODNO>5366201</PRODNO>
             <SALECD>A</SALECD>

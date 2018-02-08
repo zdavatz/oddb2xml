@@ -1,6 +1,7 @@
 === Upcoming
 
 * Artikelstamm_V5 seems to work with the following additions
+** Create Elexis_Artikelstamm_v5.csv with most used fields, including SL
 ** Better reporting of downloads
 ** Allow overriding a specific field of an item
 ** trace data_origin
@@ -11,7 +12,7 @@
 
 * Adapt to swissmedic fixing a typo in Packungen.XLSX header row
 
-=== 2.4.9 / 15.01.2018
+  === 2.4.9 / 15.01.2018
 
 * Adapt to new link of epha atc.csv
 * Ensure that transfer.dat lines have always the correct line length of 97
