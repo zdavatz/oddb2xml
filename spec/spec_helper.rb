@@ -15,6 +15,7 @@ require 'pp'
 
 begin # load pry if is available
 require 'pry'
+Pry.config.output = STDOUT
 rescue LoadError
 end
 
@@ -134,7 +135,6 @@ require 'oddb2xml'
 
 module Kernel
   def buildr_capture(stream)
-    Pry.config.output = STDOUT
     begin
       stream = stream.to_s
       eval "$#{stream} = StringIO.new"
