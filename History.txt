@@ -1,5 +1,6 @@
 === 2.5.1 / 09.02.2018
 
+* Updated requirement for nokogiri to >= 1.8.2
 * Artikelstamm_V5 seems to work with the following additions
 ** Create Elexis_Artikelstamm_v5.csv with most used fields, including SL
 ** Better reporting of downloads

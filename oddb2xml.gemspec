@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubyzip'#, '~> 1.1.3'
   spec.add_dependency 'minitar'#, '~> 0.5.2'
   spec.add_dependency 'mechanize'#, '~> 2.5.1'
-  spec.add_dependency 'nokogiri', '~> 1.6.0'
+  spec.add_dependency 'nokogiri', '>= 1.8.2'
   spec.add_dependency 'savon'#, '~> 2.11.0'
   spec.add_dependency 'spreadsheet'#, '~> 1.0.0'
   spec.add_dependency 'rubyXL'#, '~> 3.3.1'
