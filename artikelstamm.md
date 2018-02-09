@@ -15,12 +15,14 @@ Die für den Artikelstamm gebrauchten Ursprungs-Dateien werden
 ** transfer.utf8           ISO8859-1 transfer.dat als utf-8 um leichter unter Linux greppen zu können
 
 Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B. `grep -r 7680273040281 downloads` git dann folgende Zeilen zurück
+
     downloads/transfer.dat:1120098878HALDOL Tabl 1 mg 50 Stk                           000278000660100B010500076802730402812
     downloads/transfer.utf8:1120098878HALDOL Tabl 1 mg 50 Stk                           000278000660100B010500076802730402812
     downloads/Preparations.xml:        <GTIN>7680273040281</GTIN>
     downloads/refdata_Pharma.xml:        <GTIN>7680273040281</GTIN>
 
 Oder
+
     > grep -ri FERRO-GRADUMET downloads
     downloads/transfer.dat:1120020244FERRO-GRADUMET Depottabl 30 Stk                   000896001380300C060710076803164401152
     downloads/transfer.dat:1121245933FERRO-GRADUMET Depottabl 90 Stk                   002296003540300C060710076803164403822
