@@ -481,7 +481,7 @@ describe Oddb2xml::Builder do
   NrCodes = 5
   NrProdno = 31
   NrPackages = 38
-  NrProducts = 31
+  NrProducts = 32
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init(options = {})
