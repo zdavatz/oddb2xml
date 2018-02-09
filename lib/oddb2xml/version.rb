@@ -1,3 +1,3 @@
 module Oddb2xml
-  VERSION = "2.5.0-artikelstamm"
+  VERSION = "2.5.1"
 end
