@@ -8,6 +8,7 @@
 
 require 'fileutils'
 require 'socket'
+require 'oddb2xml/version'
 
 def test_one_call(cmd)
   dest = File.join(Ausgabe, cmd.gsub(/[ -]/, '_'))
@@ -46,7 +47,7 @@ def prepare_for_gem_test
   }
 end
 
-Ausgabe = File.join(Dir.pwd, 'ausgabe', Time.now.strftime('%Y.%m.%d-%H:%M'))
+Ausgabe = File.join(Dir.pwd, 'ausgabe', "#{Oddb2xml::VERSION}-#{Time.now.strftime('%Y.%m.%d')}") 
 puts "FQDN hostname #{Socket.gethostbyname(Socket.gethostname).inspect}"
 FileUtils.makedirs(Ausgabe)
 prepare_for_gem_test
@@ -54,6 +55,7 @@ prepare_for_gem_test
 # unfortunately it returns a very common name
 unless 'localhost.localdomain'.eql?(Socket.gethostbyname(Socket.gethostname).first)
   test_one_call('oddb2xml -e')
+  test_one_call('oddb2xml --artikelstamm')
   test_one_call('oddb2xml -e -I80')
   test_one_call('oddb2xml -f dat --append -I 80')
   test_one_call('oddb2xml -f dat --append')
@@ -65,5 +67,4 @@ test_one_call('oddb2xml -o')
 test_one_call('oddb2xml -f xml')
 test_one_call('oddb2xml -f dat')
 test_one_call('oddb2xml -t md')
-test_one_call('oddb2xml --artikelstamm')
-test_one_call('oddb2xml -x address')
+# test_one_call('oddb2xml -x address')

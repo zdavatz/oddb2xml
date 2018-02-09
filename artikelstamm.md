@@ -14,7 +14,22 @@ Die für den Artikelstamm gebrauchten Ursprungs-Dateien werden
 ** mit xmllint --format schön formattierten XML
 ** transfer.utf8           ISO8859-1 transfer.dat als utf-8 um leichter unter Linux greppen zu können
 
-Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B. 
+Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B. `grep -r 7680273040281 downloads` git dann folgende Zeilen zurück
+    downloads/transfer.dat:1120098878HALDOL Tabl 1 mg 50 Stk                           000278000660100B010500076802730402812
+    downloads/transfer.utf8:1120098878HALDOL Tabl 1 mg 50 Stk                           000278000660100B010500076802730402812
+    downloads/Preparations.xml:        <GTIN>7680273040281</GTIN>
+    downloads/refdata_Pharma.xml:        <GTIN>7680273040281</GTIN>
+
+Oder
+    > grep -ri FERRO-GRADUMET downloads
+    downloads/transfer.dat:1120020244FERRO-GRADUMET Depottabl 30 Stk                   000896001380300C060710076803164401152
+    downloads/transfer.dat:1121245933FERRO-GRADUMET Depottabl 90 Stk                   002296003540300C060710076803164403822
+    downloads/swissmedic_package.csv:31644,2,"Ferro-Gradumet, compresse a rilascio prolungato","FARMACEUTICA TEOFARMA SUISSE SA","Synthetika human",06.07.1.,B03AA07,1967/06/22,1994/03/28,2022/02/15,11,30,Tablette(n),C,C,C,ferrum(II),"ferrum(II) 105 mg ut ferrosi sulfas dessiccatus, arom.: saccharinum natricum, color.: E 127, excipiens pro compresso.","Anemia da carenza di ferro con carenza di ferro accertata",,,,
+    downloads/swissmedic_package.csv:31644,2,"Ferro-Gradumet, compresse a rilascio prolungato","FARMACEUTICA TEOFARMA SUISSE SA","Synthetika human",06.07.1.,B03AA07,1967/06/22,1994/03/28,2022/02/15,38,90,Tablette(n),C,C,C,ferrum(II),"ferrum(II) 105 mg ut ferrosi sulfas dessiccatus, arom.: saccharinum natricum, color.: E 127, excipiens pro compresso.","Anemia da carenza di ferro con carenza di ferro accertata",,,,
+    downloads/refdata_Pharma.xml:        <NAME_DE>FERRO-GRADUMET Depottabl 30 Stk</NAME_DE>
+    downloads/refdata_Pharma.xml:        <NAME_FR>FERRO-GRADUMET cpr dépôt 30 pce</NAME_FR>
+    downloads/refdata_Pharma.xml:        <NAME_DE>FERRO-GRADUMET Depottabl 90 Stk</NAME_DE>
+    downloads/refdata_Pharma.xml:        <NAME_FR>FERRO-GRADUMET cpr dépôt 90 pce</NAME_FR>
 
 ### Herkunft der einzelenen Dateien
 
@@ -30,7 +45,7 @@ Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B
 Beim Tranfer.dat werden Zeilen ausgelassen, wenn eine der folgenden Bedingungen zutrifft (siehe extractor.rb ZurroseExtractor)
 
     * Die GTIN ist 0000000000000
-    * Die Zeile beginnt mit 113 (inaktiv) und die GTIN beginnt mit 7580 (aka Swissmedic)
+    * Die Zeile beginnt mit 113 (inaktiv) und die GTIN beginnt mit 7680 (aka Swissmedic)
     * Die Zeile beginnt mit 113 (inaktiv) und sowohl der Public als auch der Extfactory Preis is 0
 
 ## UnitTests
@@ -50,6 +65,4 @@ Bis Ende 2017 wurde
 
 2017 investierte Niklaus Giger über 60 Arbeitsstunden, um für die neue Version 5 die Dateien direkt via oddb2xml zu erstellen.
 
-Bei dieser Ueberarbeitung wurden dann auch noch gleichzeitig eine Version 3 erstellt.
-
-Dazu kam auch das Werkzeug compare_v5 um zwei v5 XML-Dateien zu vergleichen, womit die pro Monat neu eintreffenden Anpassungen leicht vervolgbar werden.
+Dazu kam auch das Werkzeug compare_v5 um zwei v5 XML-Dateien zu vergleichen, womit die pro Monat neu eintreffenden Anpassungen leicht verfolgbar werden.
