@@ -81,7 +81,7 @@ module Oddb2xml
         exit
       end
       build
-      if @options[:artikelstamm]
+      if @options[:artikelstamm] && system("which xmllint")
         elexis_v5_xsd = File.expand_path(File.join(__FILE__, '..', '..', '..', 'Elexis_Artikelstamm_v5.xsd'))
          cmd = "xmllint --noout --schema #{elexis_v5_xsd} #{@_files[:artikelstamm]}"
          if system(cmd)
