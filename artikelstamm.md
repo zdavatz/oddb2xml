@@ -50,6 +50,17 @@ Beim Tranfer.dat werden Zeilen ausgelassen, wenn eine der folgenden Bedingungen 
     * Die Zeile beginnt mit 113 (inaktiv) und die GTIN beginnt mit 7680 (aka Swissmedic)
     * Die Zeile beginnt mit 113 (inaktiv) und sowohl der Public als auch der Extfactory Preis is 0
 
+### GTIN
+
+GTIN may be  8, 12, 13 or 14 chars long (https://en.wikipedia.org/wiki/Global_Trade_Item_Number)
+
+The EAN-8 code is an eight-digit barcode used usually for very small articles, such as a battery for hearing aid, where fitting a larger code onto the item would be difficult
+
+You may test GTIN via the  GS1 information GEPIR for Switzerland, eg www.gepir.ch or globally http://gepir.gs1.org/
+
+Drugs registered in Switzerland have GTINs starting with 7680 (which is reserved by Swissmedic)
+
+
 ## UnitTests
 
 Dafür werden Ruby RSpec tests verwendet. Die Testabdeckung ist gut.

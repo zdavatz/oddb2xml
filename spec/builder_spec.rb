@@ -473,7 +473,7 @@ def checkProductXml(nbr_record = -1)
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 67
+  NrExtendedArticles = 68
   NrSubstances = 25
   NrLimitations = 12
   

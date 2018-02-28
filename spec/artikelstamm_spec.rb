@@ -69,6 +69,20 @@ describe Oddb2xml::Builder do
       expect(@inhalt).to match /<!--Produced by/
     end
 
+    it 'should have a GTIN with 14 chars (ean14)' do
+      expected = %( <ITEM PHARMATYPE="N">
+            <GTIN>30040565124255</GTIN>
+            <PHAR>3999949</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>NPWT Transparente Folie 20x30cm gross 10 Stk</DSCR>
+            <DSCRF>NPWT pans transparent 20x30cm grand 10 pce</DSCRF>
+            <COMP>
+                <GLN>7601001251861</GLN>
+            </COMP>
+        </ITEM>)
+      expect(@inhalt.index(expected)).not_to be nil
+    end
+
     it 'should produce a Elexis_Artikelstamm_v5.csv' do
       expect(File.exists?(@elexis_v5_csv)).to eq true
       inhalt = File.open(@elexis_v5_csv, 'r+').read

@@ -29,6 +29,15 @@
         <AUTH_HOLDER_NAME>Smith &amp; Nephew Schweiz AG</AUTH_HOLDER_NAME>
         <AUTH_HOLDER_GLN>7601001251861</AUTH_HOLDER_GLN>
       </ITEM>
+      <ITEM DT="2018-02-09T00:00:00">
+        <ATYPE>NONPHARMA</ATYPE>
+        <GTIN>30040565124255</GTIN>
+        <PHAR>3999949</PHAR>
+        <NAME_DE>NPWT Transparente Folie 20x30cm gross 10 Stk</NAME_DE>
+        <NAME_FR>NPWT pans transparent 20x30cm grand 10 pce</NAME_FR>
+        <AUTH_HOLDER_NAME>Smith &amp; Nephew Schweiz AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001251861</AUTH_HOLDER_GLN>
+      </ITEM>
       <RESULT>
         <OK_ERROR>OK</OK_ERROR>
         <NBR_RECORD>33727</NBR_RECORD>

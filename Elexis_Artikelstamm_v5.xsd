@@ -135,6 +135,10 @@
 													Reference number
 													(GTIN = Global trade
 													item number)
+													GTIN may be  8, 12, 13 or 14 chars long (https://en.wikipedia.org/wiki/Global_Trade_Item_Number)
+													The EAN-8 code is an eight-digit barcode used usually for very small articles, such as battery for hearing aid, where fitting a larger code onto the item would be difficult
+													you may test GTIN via the  GS1 information GEPIR, eg www.gepir.ch or globally http://gepir.gs1.org/
+													Drugs registered in Switzerland have GTINs starting with 7680 (which is reserved by Swissmedic)
 												</xs:documentation>
 											</xs:annotation>
 											<xs:simpleType>
