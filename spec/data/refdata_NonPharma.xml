@@ -29,14 +29,14 @@
         <AUTH_HOLDER_NAME>Smith &amp; Nephew Schweiz AG</AUTH_HOLDER_NAME>
         <AUTH_HOLDER_GLN>7601001251861</AUTH_HOLDER_GLN>
       </ITEM>
-      <ITEM DT="2018-02-09T00:00:00">
+      <ITEM DT="2018-03-16T00:00:00">
         <ATYPE>NONPHARMA</ATYPE>
-        <GTIN>30040565124255</GTIN>
-        <PHAR>3999949</PHAR>
-        <NAME_DE>NPWT Transparente Folie 20x30cm gross 10 Stk</NAME_DE>
-        <NAME_FR>NPWT pans transparent 20x30cm grand 10 pce</NAME_FR>
-        <AUTH_HOLDER_NAME>Smith &amp; Nephew Schweiz AG</AUTH_HOLDER_NAME>
-        <AUTH_HOLDER_GLN>7601001251861</AUTH_HOLDER_GLN>
+        <GTIN>68711428066649</GTIN>
+        <PHAR>5863450</PHAR>
+        <NAME_DE>3M MEDIPORE+PAD Absorbtionsverb 10x15cm 8 x 25 Stk</NAME_DE>
+        <NAME_FR>3M MEDIPORE+PAD compr absorb 10x15cm 8 x 25 pce</NAME_FR>
+        <AUTH_HOLDER_NAME>3M (Schweiz) GmbH (Professional Health Care)</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7610182000007</AUTH_HOLDER_GLN>
       </ITEM>
       <RESULT>
         <OK_ERROR>OK</OK_ERROR>

@@ -506,11 +506,11 @@ module Oddb2xml
         pharma_code = line[3..9]
         if $1.to_s == '0000000000000'
           @@items_without_ean13s += 1
+          next if @artikelstamm && pharma_code.to_i == 0
           ean13 = '999999' + pharma_code.to_s # dummy ean13
         else
           ean13 = $1
         end
-        next if @artikelstamm && /(0{13})(\d{1})$/.match(line)
         if data[ean13]
           @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"
           @@items_without_ean13s -= 1

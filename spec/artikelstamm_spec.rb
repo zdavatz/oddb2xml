@@ -69,16 +69,18 @@ describe Oddb2xml::Builder do
       expect(@inhalt).to match /<!--Produced by/
     end
 
-    it 'should have a GTIN with 14 chars (ean14)' do
-      expected = %( <ITEM PHARMATYPE="N">
-            <GTIN>30040565124255</GTIN>
-            <PHAR>3999949</PHAR>
+    it 'should have a GTIN and a public price with 14 chars (ean14)' do
+      expected = %(<ITEM PHARMATYPE="N">
+            <GTIN>68711428066649</GTIN>
+            <PHAR>5863450</PHAR>
             <SALECD>A</SALECD>
-            <DSCR>NPWT Transparente Folie 20x30cm gross 10 Stk</DSCR>
-            <DSCRF>NPWT pans transparent 20x30cm grand 10 pce</DSCRF>
+            <DSCR>3M MEDIPORE+PAD Absorbtionsverb 10x15cm 8 x 25 Stk</DSCR>
+            <DSCRF>3M MEDIPORE+PAD compr absorb 10x15cm 8 x 25 pce</DSCRF>
             <COMP>
-                <GLN>7601001251861</GLN>
+                <GLN>7610182000007</GLN>
             </COMP>
+            <PEXF>108.01</PEXF>
+            <PPUB>178.20</PPUB>
         </ITEM>)
       expect(@inhalt.index(expected)).not_to be nil
     end
@@ -182,10 +184,19 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index('BIOMARIS Voll Meersalz 500 g')).not_to be nil
     end
     
-    it 'Should not contain PHAR 8809544 Sildenavil wiht pexf and ppub 0.0' do
+    it 'Should contain PHAR 8809544 Sildenavil with pexf and ppub 0.0' do
 #1128809544Sildenafil Suspension 7mg/ml 100ml                0030850045801000000000000000000000002
       @inhalt = IO.read(@artikelstamm_name)
-      expect(@inhalt.index('ildenafil Suspension')).to be nil
+      expected = %(<ITEM PHARMATYPE="N">
+            <GTIN>9999998809544</GTIN>
+            <PHAR>8809544</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>Sildenafil Suspension 7mg/ml 100ml</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>30.85</PEXF>
+            <PPUB>45.80</PPUB>
+        </ITEM>)
+      expect(@inhalt.index(expected)).not_to be nil
     end
 
     it 'should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
