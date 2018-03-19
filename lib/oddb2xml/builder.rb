@@ -1586,8 +1586,9 @@ module Oddb2xml
               ean13 = product[0]
               obj = product[1]
               next if /^Q/i.match(obj[:atc])
-              sequence = obj[:seq]
               ean = obj[:ean13]
+              sequence = obj[:seq]
+              sequence ||= @products[ean][:seq] if @products[ean]
               next unless check_name(obj, :de)
               ppac = ((_ppac = @packs[ean.to_s[4..11]] and !_ppac[:is_tier]) ? _ppac : {})
               unless ppac
@@ -1595,7 +1596,6 @@ module Oddb2xml
               end
               prodno = ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
               next unless prodno
-              next unless sequence && sequence[:name_de]
               next if emitted_prodno.index(prodno)
               emitted_prodno << prodno
               nr_products += 1
@@ -1605,9 +1605,18 @@ module Oddb2xml
                   xml.SALECD('A') # these products are always active!
                   override(xml, prodno, :DSCR,  (sequence[:name_de] + ' ' + sequence[:desc_de]).strip)
                   override(xml, prodno, :DSCRF, (sequence[:name_fr] + ' ' + sequence[:desc_fr]).strip)
+                else
+                  sequence ||= @articles.find{|x| x[:ean13].eql?(ean)}
+                  if 
+                    xml.SALECD('A')
+                    xml.DSCR(sequence[:desc_de])
+                    xml.DSCRF(sequence[:desc_fr])
+                  else
+                    puts "no sequence for #{ean} prodno #{prodno}"
+                  end
                 end
-                xml.ATC sequence[:atc_code] if sequence[:atc_code] && !sequence[:atc_code].empty?
-                if sequence[:packages] && (first_package = sequence[:packages].values.first) &&
+                xml.ATC sequence[:atc_code] if sequence && sequence[:atc_code] && !sequence[:atc_code].empty?
+                if sequence && sequence[:packages] && (first_package = sequence[:packages].values.first) &&
                    (first_limitation = first_package[:limitations].first)
                   lim_code = first_limitation[:code]
                   used_limitations << lim_code unless used_limitations.index(lim_code)

@@ -83,6 +83,17 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
+    it 'should have a ATC for product PRIORIX TETRA' do
+      expected = %(<PRODUCT>
+            <PRODNO>5815801</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>PRIORIX TETRA Trockensub c Solv Fertspr</DSCR>
+            <DSCRF>PRIORIX TETRA subst sèche c solv ser pré</DSCRF>
+            <ATC>J07BD54</ATC>
+        </PRODUCT>)
+      expect(@inhalt.index(expected)).not_to be nil
+    end
+
     it 'should produce a Elexis_Artikelstamm_v5.csv' do
       expect(File.exists?(@elexis_v5_csv)).to eq true
       inhalt = File.open(@elexis_v5_csv, 'r+').read

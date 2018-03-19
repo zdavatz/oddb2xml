@@ -211,6 +211,17 @@
         <AUTH_HOLDER_NAME>Farmaceutica Teofarma Suisse SA</AUTH_HOLDER_NAME>
         <AUTH_HOLDER_GLN>7601001374539</AUTH_HOLDER_GLN>
       </ITEM>
+      <ITEM DT="2018-03-16T00:00:00">
+        <ATYPE>PHARMA</ATYPE>
+        <GTIN>7680581580011</GTIN>
+        <PHAR>3656617</PHAR>
+        <SWMC_AUTHNR>58158001</SWMC_AUTHNR>
+        <NAME_DE>PRIORIX TETRA Trockensub c Solv Fertspr</NAME_DE>
+        <NAME_FR>PRIORIX TETRA subst sèche c solv ser pré</NAME_FR>
+        <ATC>J07BD54</ATC>
+        <AUTH_HOLDER_NAME>GlaxoSmithKline AG</AUTH_HOLDER_NAME>
+        <AUTH_HOLDER_GLN>7601001000674</AUTH_HOLDER_GLN>
+      </ITEM>
       <RESULT>
         <OK_ERROR>OK</OK_ERROR>
         <NBR_RECORD>15169</NBR_RECORD>

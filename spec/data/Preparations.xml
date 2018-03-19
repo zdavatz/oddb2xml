@@ -2839,4 +2839,142 @@ Il medico curante è tenuto a raccogliere costantemente i dati necessari nell’
       <FlagApd>N</FlagApd>
     </Status>
   </Preparation>
+  <Preparation ProductCommercial="6280">
+    <NameDe>Priorix</NameDe>
+    <NameFr>Priorix</NameFr>
+    <NameIt>Priorix</NameIt>
+    <DescriptionDe>Trockensub c Solv</DescriptionDe>
+    <DescriptionFr>subst sèche c solv </DescriptionFr>
+    <DescriptionIt>sost secca c solv </DescriptionIt>
+    <AtcCode>J07BD52</AtcCode>
+    <SwissmedicNo5>615</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="6280" PackId="9038">
+        <DescriptionDe>Fertspr 1 Stk</DescriptionDe>
+        <DescriptionFr>ser prê 1 pce</DescriptionFr>
+        <DescriptionIt>sir preriempita 1 pez</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>615001</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>17289</BagDossierNo>
+        <GTIN>7680006150010</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>20.2902</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>39.7</Price>
+            <ValidFromDate>01.11.2014</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>GlaxoSmithKline AG</Description>
+            <Street>Talstrasse 3-5</Street>
+            <ZipCode>3053</ZipCode>
+            <Place>Münchenbuchsee</Place>
+            <Phone>+41318622111</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1999</IntegrationDate>
+          <ValidFromDate>15.03.1999</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Vaccinum morbillorum vivum</DescriptionLa>
+        <Quantity />
+        <QuantityUnit />
+      </Substance>
+      <Substance>
+        <DescriptionLa>Vaccinum parotitidis vivum</DescriptionLa>
+        <Quantity />
+        <QuantityUnit />
+      </Substance>
+      <Substance>
+        <DescriptionLa>Vaccinum rubellae vivum attenuatum (cellulae HDC), Wistar RA 27/3</DescriptionLa>
+        <Quantity>min. 10^3</Quantity>
+        <QuantityUnit>TCID50</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="08.">
+        <DescriptionDe>INFEKTIONSKRANKHEITEN</DescriptionDe>
+        <DescriptionFr>MALADIES INFECTIEUSES</DescriptionFr>
+        <DescriptionIt>MALATTIE INFETTIVE </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="08.08.">
+        <DescriptionDe>Impfstoffe</DescriptionDe>
+        <DescriptionFr>Vaccins</DescriptionFr>
+        <DescriptionIt>Vaccini </DescriptionIt>
+        <Limitations>
+          <Limitation>
+            <LimitationCode>0808</LimitationCode>
+            <LimitationType>KOM</LimitationType>
+            <LimitationNiveau>I</LimitationNiveau>
+            <DescriptionDe>Die Kostenübernahme der Impfstoffe für präventive Massnahmen in der obligatorischen Krankenpflegeversicherung wird in Art. 12a KLV geregelt. Die Voraussetzungen, damit die Impfungen bezahlt werden, sind in Bst. a bis m dieses Artikels abschliessend umschrieben.&lt;br&gt;
+Die Preise der Impfstoffe sind Höchstpreise (Art. 52 Abs. 3 KVG) und kommen bei Reihenimpfungen (z.B. im schulärztlichen Dienst) nicht zur Anwendung. In diesen Fällen gelten die von den Krankenversicherern mit den zuständigen Behörden ausgehandelten bzw. die allenfalls von den Behörden festgesetzten Tarife.&lt;br&gt;
+Für Hepatitis-B-Reihenimpfungen von Kindern und Jugendlichen gilt der Preis von Fr. 19.80 für eine Dose unter der Voraussetzung einer minimalen Bestellung von 100 Dosen an eine Lieferadresse.&lt;br&gt;
+Wenn der Impfstoff zum obgenannten Serienpreis bezogen wird, darf der Arzt, die Ärztin nicht zum Einzelpreis (= Publikumspreis) der SL weiterverrechnen. Dies würde eine klare Umgehung von Art. 56 Absätze 3 und 4 des KVG bedeuten und wäre als Rechtsmissbrauch zu ahnden.</DescriptionDe>
+            <DescriptionFr>L'article 12a de l'OPAS règle la prise en charge par l'assurance obligatoire des soins des vaccins pour les mesures médicales de prévention. Les conditions de remboursement de ces vaccins sont énoncées de manière exhaustive aux lettres a à m de cet article.&lt;br&gt;
+Les prix des vaccins sont des prix maximum (art. 52, 3èeme al, LAMal). Ils ne s'appliquent pas aux vaccinations en série (p. ex. à celles effectuées par les services médicaux dans les écoles). Sont applicables pour ces cas, les tarifs fixés par convention entre les assureurs et les autorités compétentes ou, le cas échéant, ceux fixés par les autorités compétentes.&lt;br&gt;
+Pour les vaccinations en série contre l'hépatite B pour les enfants et les jeunes, le prix est de Fr. 19.80 pour une dose à condition d'une commande minimale de 100 doses à l'adresse d'un déstinataire.&lt;br&gt;
+Si le vaccin est obtenu au prix de série susmentionné, le médecin ne peut pas le facturer au prix par unité (= prix publique) de la LS. Cela équivaudrait à éluder manifestement l'article 56 alinéas 3 et 4 LAMal et serait considéré comme un abus de droit.</DescriptionFr>
+            <DescriptionIt>L'articolo 12a OPre regola la rimunerazione nell'assicurazione obbligatoria delle cure medico-sanitarie dei vaccini per le misure di prevenzione. Le condizioni della rimunerazione di questi vaccini sono definite esaurientemente alle lettere a - m di detto articolo.&lt;br&gt;
+I prezzi dei vaccini sono prezzi massimi (art. 52 cpv. 3 LAMal) e non si applicano alle vaccinazioni in serie (ad es. a quelle effettuate nel servizio medico scolastico). In questi casi sono applicabili le tariffe stabilite per convenzione tra gli assicuratori e le autorità competenti o eventualmente quelli stabiliti dalle autorità.&lt;br&gt;
+Per le vaccinazioni in serie contro l'epatite B per bambini e adolescenti, il prezzo è di Fr. 19.80 per una dose a condizione di un'ordinazione minima di 100 dosi all'indirizzo del destinatario.&lt;br&gt;
+Se il vaccino viene ottentuto al prezzo di serie summenzionato, il medico non può fatturarlo al prezzo per unità (= prezzo pubblico). Ciò rappresenterebbe una manifesta disattenzione dell'articolo 56 capoversi 3 e 4 LAMal e quindi un abuso di diritto.</DescriptionIt>
+            <ValidFromDate>01.01.2000</ValidFromDate>
+            <ValidThruDate>31.12.9999</ValidThruDate>
+          </Limitation>
+        </Limitations>
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>15.03.1999</IntegrationDate>
+      <ValidFromDate>15.03.1999</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
 </Preparations>
