@@ -1,3 +1,12 @@
+=== 2.5.2 / 21.03.2018
+
+*  Artikelstamm
+** Add prices for GTIN with 14 chars
+** Add ATC-Code for products like priorix
+* Handle GTIN with size of 8,12,14 correctly
+* Don't call exit(2) if xmllint is not present
+* Corrected formatting of artikelstamm.md
+
 === 2.5.1 / 09.02.2018
 
 * Updated requirement for nokogiri to >= 1.8.2
