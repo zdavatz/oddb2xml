@@ -24,7 +24,7 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
-    # binding.pry unless @inhalt.index(expected_value)
+    binding.pry unless @inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
   def common_run_init(options = {})
@@ -184,7 +184,7 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index('BIOMARIS Voll Meersalz 500 g')).not_to be nil
     end
     
-    it 'Should contain PHAR 8809544 Sildenavil with pexf and ppub 0.0' do
+    it 'Should not contain PHAR 8809544 Sildenavil with pexf and ppub 0.0' do
 #1128809544Sildenafil Suspension 7mg/ml 100ml                0030850045801000000000000000000000002
       @inhalt = IO.read(@artikelstamm_name)
       expected = %(<ITEM PHARMATYPE="N">
@@ -196,7 +196,7 @@ describe Oddb2xml::Builder do
             <PEXF>30.85</PEXF>
             <PPUB>45.80</PPUB>
         </ITEM>)
-      expect(@inhalt.index(expected)).not_to be nil
+      expect(@inhalt.index(expected)).to be nil
     end
 
     it 'should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
@@ -212,15 +212,13 @@ describe Oddb2xml::Builder do
     end
     
     it 'should contain DIBASE with phar' do
-      info = %(DIBASE 10'000 - 7199565
-DIBASE 25'000 - 7210539
-  )
-      expected = %(
-                      <GTIN>7680658560014</GTIN>
+      expected = %(<ITEM PHARMATYPE="P">
+            <GTIN>7680658560014</GTIN>
+            <!--override  with-->
             <SALECD>A</SALECD>
             <DSCR>DIBASE 10'000, orale Tropflösung</DSCR>
-    )
-      expect(@inhalt.index('<GTIN>7680658560014</GTIN>')).not_to be nil
+            <DSCRF>--missing--</DSCRF>)
+      expect(@inhalt.index(expected)).not_to be nil
     end
     
     it 'should contain a public price if the item was only in the SL liste (Preparations.xml)' do

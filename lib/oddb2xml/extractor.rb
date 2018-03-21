@@ -80,8 +80,8 @@ module Oddb2xml
               puts "BagXmlExtractor: Skipping as missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}. Skipping"
             else
               ean12 = '7680' + pac.SwissmedicNo8
-              pac.GTIN  = (ean12 + Oddb2xml.calc_checksum(ean12))
-              puts "BagXmlExtractor: Setting missing GTIN  #{pac.GTIN} in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}."
+              # pac.GTIN  = (ean12 + Oddb2xml.calc_checksum(ean12))
+              puts "BagXmlExtractor: Missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}."
             end
           end
           ean13 = pac.GTIN.to_s
@@ -496,6 +496,7 @@ module Oddb2xml
     def to_hash
       data = {}
       while line = @io.gets
+        ean13 = "-1"
         line = Oddb2xml.patch_some_utf8(line).chomp
         next if line =~ /(ad us\.* vet)|(\(vet\))/i
         if @@extended
@@ -507,7 +508,7 @@ module Oddb2xml
         if $1.to_s == '0000000000000'
           @@items_without_ean13s += 1
           next if @artikelstamm && pharma_code.to_i == 0
-          ean13 = '999999' + pharma_code.to_s # dummy ean13
+          ean13 = Oddb2xml::FAKE_GTIN_START + pharma_code.to_s unless @artikelstamm
         else
           ean13 = $1
         end
@@ -522,7 +523,10 @@ module Oddb2xml
         ppub =  sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f)
         next if  @artikelstamm && /^113/.match(line) && /^7680/.match(ean13)
         next if  @artikelstamm && /^113/.match(line) && ppub.eql?('0.0') && pexf.eql?('0.0')
-        data[ean13] = {
+        next unless ean13
+        key = ean13
+        key =  (Oddb2xml::FAKE_GTIN_START + pharma_code.to_s) if ean13.to_i <= 0 # dummy ean13
+        data[key] = {
           :data_origin   => 'zur_rose',
           :line   => line.chomp,
           :ean13 => ean13,

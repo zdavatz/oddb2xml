@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'open-uri'
 module Oddb2xml
+  FAKE_GTIN_START = '999999'
   def Oddb2xml.calc_checksum(str)
     str = str.strip
     sum = 0

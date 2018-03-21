@@ -1528,6 +1528,7 @@ module Oddb2xml
             # Set the pharmatype to 'Y' for outdated products, which are no longer found
             # in refdata/packungen
             patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) ? 'P': 'N' )
+            next if /^#{Oddb2xml::FAKE_GTIN_START}/.match(ean13.to_s)
             xml.ITEM({'PHARMATYPE' => patched_pharma_type }) do
               xml.GTIN ean13.to_s.rjust(13, '0')
               xml.PHAR obj[:pharmacode]
@@ -1597,23 +1598,16 @@ module Oddb2xml
               prodno = ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
               next unless prodno
               next if emitted_prodno.index(prodno)
+              sequence ||= @articles.find{|x| x[:ean13].eql?(ean)}
+              next unless sequence && (sequence[:name_de] || sequence[:desc_de])
               emitted_prodno << prodno
               nr_products += 1
               xml.PRODUCT do
                 xml.PRODNO prodno
                 if sequence
                   xml.SALECD('A') # these products are always active!
-                  override(xml, prodno, :DSCR,  (sequence[:name_de] + ' ' + sequence[:desc_de]).strip)
-                  override(xml, prodno, :DSCRF, (sequence[:name_fr] + ' ' + sequence[:desc_fr]).strip)
-                else
-                  sequence ||= @articles.find{|x| x[:ean13].eql?(ean)}
-                  if 
-                    xml.SALECD('A')
-                    xml.DSCR(sequence[:desc_de])
-                    xml.DSCRF(sequence[:desc_fr])
-                  else
-                    puts "no sequence for #{ean} prodno #{prodno}"
-                  end
+                  override(xml, prodno, :DSCR,  ((sequence[:name_de] ? sequence[:name_de] : '') + ' ' + sequence[:desc_de]).strip)
+                  override(xml, prodno, :DSCRF, ((sequence[:name_fr] ? sequence[:name_fr] : '') + ' ' + sequence[:desc_fr]).strip)
                 end
                 xml.ATC sequence[:atc_code] if sequence && sequence[:atc_code] && !sequence[:atc_code].empty?
                 if sequence && sequence[:packages] && (first_package = sequence[:packages].values.first) &&
