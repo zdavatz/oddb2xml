@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Produced by /opt/ngiger/oddb2xml/lib/oddb2xml/builder.rb version 2.5.3 at 2018-03-23 14:20:23 +0100-->
+<ARTIKELSTAMM xmlns="http://elexis.ch/Elexis_Artikelstamm_v5" CREATION_DATETIME="2018-03-23T14:20:23.916+01:00" BUILD_DATETIME="2018-03-23T14:20:23.916+01:00" DATA_SOURCE="oddb2xml">
+    <PRODUCTS>
+        <PRODUCT>
+            <PRODNO>2848601</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>Ancopir Inj Lös</DSCR>
+            <DSCRF>Ancopir sol inj</DSCRF>
+            <ATC>A11DB</ATC>
+            <LIMNAMEBAG>070240</LIMNAMEBAG>
+            <SUBSTANCE>Verschiedene Kombinationen</SUBSTANCE>
+        </PRODUCT>
+        <PRODUCT>
+            <PRODNO>3001502</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>Lidocain 1% Streuli, Injektionslösung (Ampullen)</DSCR>
+            <DSCRF/>
+            <ATC>N01BB02</ATC>
+        </PRODUCT>
+    </PRODUCTS>
+    <LIMITATIONS>
+        <LIMITATION>
+            <LIMNAMEBAG>070240</LIMNAMEBAG>
+            <DSCR>Gesamthaft zugelassen: &lt;b&gt;40&lt;/b&gt; Punkte</DSCR>
+            <DSCRF>Prescription limitée au maximum à: &lt;b&gt;40&lt;/b&gt; points</DSCRF>
+            <LIMITATION_PTS>40</LIMITATION_PTS>
+        </LIMITATION>
+        <LIMITATION>
+            <LIMNAMEBAG>BLUTPRODUKTE</LIMNAMEBAG>
+            <DSCR>Preisberechnung für Blutpräparate aufgrund des Fabrikabgabepreises zuzüglich einer Fixmarge wegen der speziellen Verteilersituation (praktisch kein Zwischenhandel) von Fr. 40.-- zuzüglich MWST.  Diese Berechnung gilt nicht für die Humanalbumine.</DSCR>
+            <DSCRF>Calculation des prix pour préparations sanguines sur la base des prix "ex factory" plus une marge fixe de fr. 40.-- à cause de la situation particulière de distribution (pratiquement pas de commerce de grossiste et détailliste) plus la TVA. Cette calculation n'est pas valable pour l'albumine humaine.</DSCRF>
+            <LIMITATION_PTS>1</LIMITATION_PTS>
+        </LIMITATION>
+    </LIMITATIONS>
+    <ITEMS>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680300150105</GTIN>
+            <PHAR>0177804</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>Ancopir, Injektionslösung</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <COMP>
+                <NAME>Dr. Grossmann AG, Pharmaca</NAME>
+                <GLN/>
+            </COMP>
+            <PEXF>3.89</PEXF>
+            <PPUB>8.55</PPUB>
+            <PKG_SIZE>5</PKG_SIZE>
+            <MEASURE>Ampulle(n)</MEASURE>
+            <MEASUREF>Ampulle(n)</MEASUREF>
+            <DOSAGE_FORM>Injektionslösung</DOSAGE_FORM>
+            <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>B</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>2848601</PRODNO>
+        </ITEM>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680300150105</GTIN>
+            <PHAR>0850684</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>Lidocain 1% Streuli, Injektionslösung (Ampullen)</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <COMP>
+                <NAME>Streuli Pharma AG</NAME>
+                <GLN/>
+            </COMP>
+            <PEXF>5.56</PEXF>
+            <PPUB>9.75</PPUB>
+            <PKG_SIZE>10</PKG_SIZE>
+            <MEASURE>ml</MEASURE>
+            <MEASUREF>ml</MEASUREF>
+            <DOSAGE_FORM>Streuli</DOSAGE_FORM>
+            <IKSCAT>B</IKSCAT>
+            <PRODNO>3001502</PRODNO>
+        </ITEM>
+    </ITEMS>
+</ARTIKELSTAMM>
