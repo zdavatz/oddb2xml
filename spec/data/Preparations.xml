@@ -957,7 +957,7 @@
         <FlagNarcosis>N</FlagNarcosis>
         <FlagModal>Y</FlagModal>
         <BagDossierNo>20639</BagDossierNo>
-        <GTIN />
+        <GTIN>7680658560014</GTIN>
         <Limitations />
         <PointLimitations />
         <Prices>
@@ -2700,6 +2700,118 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
       <FlagApd>N</FlagApd>
     </Status>
   </Preparation>
+  <Preparation ProductCommercial="22921">
+    <NameDe>Diaphin IR</NameDe>
+    <NameFr>Diaphin IR</NameFr>
+    <NameIt>Diaphin IR</NameIt>
+    <DescriptionDe>Tabl 200 mg </DescriptionDe>
+    <DescriptionFr>cpr 200 mg </DescriptionFr>
+    <DescriptionIt>cpr 200 mg </DescriptionIt>
+    <AtcCode>N07BC06</AtcCode>
+    <SwissmedicNo5>57724</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="22921" PackId="28200">
+        <DescriptionDe>100 Stk</DescriptionDe>
+        <DescriptionFr>100 pce</DescriptionFr>
+        <DescriptionIt>100 pez</DescriptionIt>
+        <SwissmedicCategory>A</SwissmedicCategory>
+        <SwissmedicNo8>57724001</SwissmedicNo8>
+        <FlagNarcosis>Y</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>20521</BagDossierNo>
+        <GTIN />
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>309</Price>
+            <ValidFromDate>01.01.2017</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>SLAUFNAHME</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preismutation bei Erstaufnahme</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>DiaMo Narcotics GmbH</Description>
+            <Street>Grabenstrasse 6</Street>
+            <ZipCode>3600</ZipCode>
+            <Place>Thun</Place>
+            <Phone>+41332220717</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.01.2017</IntegrationDate>
+          <ValidFromDate>01.01.2017</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>2</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Diamorphini hydrochloridum anhydricum</DescriptionLa>
+        <Quantity>200</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations>
+      <Limitation>
+        <LimitationCode>SUBUTEX</LimitationCode>
+        <LimitationType>DIA</LimitationType>
+        <LimitationNiveau>P</LimitationNiveau>
+        <DescriptionDe>Gemäss Anhang 1 zur KLV (SR 832.112.31), vgl. Ziffer 8, Psychiatrie, Substitutionsbehandlung bei Opiatabhängigkeit.</DescriptionDe>
+        <DescriptionFr>Conformément à l'annexe 1 de l'OPAS (RS 832.112.31), v. chiffre 8, psychiatrie, traitement de substitution en cas de dépendance aux opiacés.</DescriptionFr>
+        <DescriptionIt>Secondo l’allegato 1 dell’OPre (RS 832.112.31), cf. cifra 8, psichiatria, terapia sostitutiva in caso di dipendenza dagli oppiacei.</DescriptionIt>
+        <ValidFromDate>01.01.2017</ValidFromDate>
+        <ValidThruDate>31.12.9999</ValidThruDate>
+      </Limitation>
+    </Limitations>
+    <ItCodes>
+      <ItCode Code="01.">
+        <DescriptionDe>NERVENSYSTEM</DescriptionDe>
+        <DescriptionFr>SYSTEME NERVEUX</DescriptionFr>
+        <DescriptionIt>SISTEMA NERVOSO </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.01.">
+        <DescriptionDe>Analgetica</DescriptionDe>
+        <DescriptionFr>Analgetica</DescriptionFr>
+        <DescriptionIt>Analgesici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="01.01.30.">
+        <DescriptionDe>Narkotische Analgetica</DescriptionDe>
+        <DescriptionFr>Analgésiques stupéfiants</DescriptionFr>
+        <DescriptionIt>Analgesici narcotici</DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.01.2017</IntegrationDate>
+      <ValidFromDate>01.01.2017</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>2</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Neuaufnahme</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
   <Preparation ProductCommercial="28378">
     <NameDe>Lynparza</NameDe>
     <NameFr>Lynparza</NameFr>
@@ -2971,6 +3083,173 @@ Se il vaccino viene ottentuto al prezzo di serie summenzionato, il medico non pu
     <Status>
       <IntegrationDate>15.03.1999</IntegrationDate>
       <ValidFromDate>15.03.1999</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
+  <Preparation ProductCommercial="4559">
+    <NameDe>Lopresor Retard</NameDe>
+    <NameFr>Lopresor Retard</NameFr>
+    <NameIt>Lopresor Retard</NameIt>
+    <DescriptionDe>Divitabs 200 mg </DescriptionDe>
+    <DescriptionFr>Divitabs 200 mg </DescriptionFr>
+    <DescriptionIt>Divitabs 200 mg </DescriptionIt>
+    <AtcCode>C07AB02</AtcCode>
+    <SwissmedicNo5>44447</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="4559" PackId="6586">
+        <DescriptionDe>14 Stk</DescriptionDe>
+        <DescriptionFr>14 pce</DescriptionFr>
+        <DescriptionIt>14 pez</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>44447010</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>N</FlagModal>
+        <BagDossierNo>14168</BagDossierNo>
+        <GTIN>7680444470107</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>3.71</Price>
+            <ValidFromDate>01.11.2013</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>8.35</Price>
+            <ValidFromDate>01.11.2013</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Daiichi Sankyo (Schweiz) AG</Description>
+            <Street>Gewerbestrasse 16</Street>
+            <ZipCode>8800</ZipCode>
+            <Place>Thalwil</Place>
+            <Phone>+41434333300</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1983</IntegrationDate>
+          <ValidFromDate>15.03.1983</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+      <Pack ProductKey="4559" PackId="6587">
+        <DescriptionDe>56 Stk</DescriptionDe>
+        <DescriptionFr>56 pce</DescriptionFr>
+        <DescriptionIt>56 pez</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>44447029</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal>Y</FlagModal>
+        <BagDossierNo>14168</BagDossierNo>
+        <GTIN>7680444470299</GTIN>
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>12.6</Price>
+            <ValidFromDate>01.11.2013</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>26.75</Price>
+            <ValidFromDate>01.11.2013</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>AUSLANDPV</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Auslandspreisvergleich</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Comparaison des prix avec l'étranger</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>Daiichi Sankyo (Schweiz) AG</Description>
+            <Street>Gewerbestrasse 16</Street>
+            <ZipCode>8800</ZipCode>
+            <Place>Thalwil</Place>
+            <Phone>+41434333300</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>15.03.1983</IntegrationDate>
+          <ValidFromDate>15.03.1983</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Metoprololi tartras (2:1)</DescriptionLa>
+        <Quantity>200</Quantity>
+        <QuantityUnit>mg</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="02.">
+        <DescriptionDe>HERZ UND KREISLAUF</DescriptionDe>
+        <DescriptionFr>COEUR ET CIRCULATION</DescriptionFr>
+        <DescriptionIt>SISTEMA CARDIOVASCOLARE </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="02.03.">
+        <DescriptionDe>Betablocker</DescriptionDe>
+        <DescriptionFr>Bêtabloqueurs</DescriptionFr>
+        <DescriptionIt>Betabloccanti </DescriptionIt>
+        <Limitations />
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>15.03.1983</IntegrationDate>
+      <ValidFromDate>15.03.1983</ValidFromDate>
       <ValidThruDate>31.12.9999</ValidThruDate>
       <StatusTypeCodeSl>0</StatusTypeCodeSl>
       <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>

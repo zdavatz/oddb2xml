@@ -32,7 +32,8 @@ describe Oddb2xml::Builder do
     @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
     @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
     @elexis_v5_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v5.xsd'))
-    @elexis_v5_csv = File.join(Oddb2xml::WorkDir, 'Elexis_Artikelstamm_v5.csv')
+    @elexis_v5_csv = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.csv")
+
     expect(File.exist?(@oddb2xml_xsd)).to eq true
     expect(File.exist?(@oddb_calc_xsd)).to eq true
     expect(File.exist?(@elexis_v5_xsd)).to eq true
@@ -126,9 +127,9 @@ describe Oddb2xml::Builder do
 
     it 'should contain a PRODUCT which was not in refdata' do
       expected = %(<PRODUCT>
-            <PRODNO>6118601</PRODNO>
+            <PRODNO>5559401</PRODNO>
             <SALECD>A</SALECD>
-            <DSCR>Nutriflex Omega special, Infusionsemulsion 625 ml</DSCR>
+            <DSCR>Nutriflex Lipid plus, Infusionsemulsion, 1250ml</DSCR>
             <DSCRF/>
             <ATC>B05BA10</ATC>
         </PRODUCT>)

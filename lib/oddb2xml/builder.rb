@@ -51,7 +51,7 @@ module Oddb2xml
       @options    = args
       @subject    = nil
       @refdata    = {}
-      @items      = {} # Items from Preparations.xml in BAG, using GTINs as key
+      @items      = {} # Items from Preparations.xml in BAG, using @gtins as key
       @flags      = {}
       @lppvs      = {}
       @infos      = {}
@@ -1362,7 +1362,7 @@ module Oddb2xml
 
     def build_artikelstamm
       @@emitted_v5_gtins = []
-      @csv_file = CSV.open(File.join(WorkDir, "Elexis_Artikelstamm_v5.csv"), "w+")
+      @csv_file = CSV.open(File.join(WorkDir,  "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.csv"), "w+")
       @csv_file << ['gtin', 'price', 'galenic_form', 'pkg_size', 'pexf', 'ppub', 'iksnr', 'atc_code', 'active_substance', 'original', 'it-code', 'sl-liste']
       @csv_file.sync = true
       variant = "build_artikelstamm"
@@ -1399,23 +1399,18 @@ module Oddb2xml
       end
       def emit_items(xml)
         nr_items = 0
-        gtins_to_article = {}
-        @articles.each {|article| gtins_to_article[article[:ean13]] = article }
-        gtins = gtins_to_article.keys + @infos_zur_rose.keys + @packs.values.collect{|x| x[:ean13]}
-        gtins = (gtins-@@gtin2ignore)
-        gtins.sort!.uniq!
-        @nr_items = gtins.size
-        gtins.each do |ean13|
+        @nr_items = @gtins.size
+        @gtins.each do |ean13|
           pac,no8 = nil,ean13.to_s[4..11] # BAG-XML(SL/LS)
           next if ean13 == 0
-          obj = gtins_to_article[ean13] || @infos_zur_rose[ean13]
+          obj = @gtins_to_article[ean13] || @infos_zur_rose[ean13]
           if obj
             obj = @packs[no8].merge(obj) if @packs[no8]
           else
             obj = @packs[no8] # obj not yet in refdata. Use data from swissmedic_package.xlsx
           end
           nr_items += 1
-          Oddb2xml.log "build_article #{nr_items} of #{gtins.size} articles" if nr_items % 5000 == 0
+          Oddb2xml.log "build_article #{nr_items} of #{@gtins.size} articles" if nr_items % 5000 == 0
           item = @items[ean13]
           pack_info = nil
           pack_info = @packs[no8] if no8 && /#{ean13}/.match(@packs[no8].to_s) # info from Packungen.xlsx from swissmedic_info
@@ -1506,7 +1501,8 @@ module Oddb2xml
                 when 'N'; xml.DEDUCTIBLE 10; # 10%
                 else #     xml.DEDUCTIBLE '' # k.A.
                 end if item && item[:deductible]
-                xml.PRODNO            ppac[:prodno] if ppac && ppac[:prodno] # pkg_gtin.to_s[4..11]
+                prodno = SwissmedicExtractor.getProdnoForEan13(pkg_gtin)
+                xml.PRODNO prodno if prodno
                 csv = []
                 @csv_file << [pkg_gtin, name, package[:unit], measure,
                               pexf ? pexf : '',
@@ -1566,7 +1562,7 @@ module Oddb2xml
       @nr_articles = 0
       used_limitations = []
       Oddb2xml.log "#{variant}: Deleted #{@old_rose_size - @new_rose_size} entries from ZurRose where GTIN start with 7680 (Swissmedic)"
-      # Oddb2xml.log "#{variant} #{nr_products} of #{@products.size} articles and ignore #{@@gtin2ignore.size} GTINS specified via #{@@ignore_file}"
+      # Oddb2xml.log "#{variant} #{nr_products} of #{@products.size} articles and ignore #{@@gtin2ignore.size} @gtins specified via #{@@ignore_file}"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -1579,7 +1575,14 @@ module Oddb2xml
           'DATA_SOURCE'       => 'oddb2xml'
         }
         emitted_prodno = []
+        no8_to_prodno = {}
+        @packs.collect{ |key, val| no8_to_prodno[key] = val [:prodno] }
         xml.comment("Produced by #{__FILE__} version #{VERSION} at #{Time.now}")
+        @gtins_to_article = {}
+        @articles.each {|article| @gtins_to_article[article[:ean13]] = article }
+        @gtins = @gtins_to_article.keys + @infos_zur_rose.keys + @packs.values.collect{|x| x[:ean13]}
+        @gtins = (@gtins-@@gtin2ignore)
+        @gtins.sort!.uniq!
         xml.ARTIKELSTAMM(options_xml) do
           xml.PRODUCTS do
             products = @products.sort_by { |ean13, obj| ean13 }
@@ -1600,6 +1603,11 @@ module Oddb2xml
               next if emitted_prodno.index(prodno)
               sequence ||= @articles.find{|x| x[:ean13].eql?(ean)}
               next unless sequence && (sequence[:name_de] || sequence[:desc_de])
+              require 'pry'
+              if SwissmedicExtractor.getEan13forProdno(prodno).size == 0
+                puts "No item found for prodno #{prodno} no8 #{obj[:no8]} #{sequence[:name_de]} "
+                next
+              end
               emitted_prodno << prodno
               nr_products += 1
               xml.PRODUCT do
@@ -1659,7 +1667,7 @@ module Oddb2xml
       lines << "  - #{sprintf('%5d', @products.size)} products"
       lines << "  - #{sprintf('%5d', @limitations.size)} limitations"
       lines << "  - #{sprintf('%5d', @nr_articles)} articles"
-      lines << "  - #{sprintf('%5d', @@gtin2ignore.size)} ignored GTINS"
+      lines << "  - #{sprintf('%5d', @@gtin2ignore.size)} ignored @gtins"
       @@articlestamm_v5_info_lines = lines
       _builder.to_xml({:indent => 4, :encoding => 'UTF-8'})
     end

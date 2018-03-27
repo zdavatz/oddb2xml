@@ -456,7 +456,7 @@ def checkProductXml(nbr_record = -1)
   expect(desitin.elements['SubstanceSwissmedic'].text).to eq 'levetiracetamum'
   expect(desitin.elements['CompositionSwissmedic'].text).to eq 'levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.'
   expect(desitin.elements['CPT/CPTCMP/LINE'].text).to eq '0'
-  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '14'
+  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '15'
   expect(desitin.elements['CPT/CPTCMP/QTY'].text).to eq '250'
   expect(desitin.elements['CPT/CPTCMP/QTYU'].text).to eq 'mg'
 
@@ -473,15 +473,15 @@ def checkProductXml(nbr_record = -1)
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 70
-  NrSubstances = 28
-  NrLimitations = 13
+  NrExtendedArticles = 74
+  NrSubstances = 30
+  NrLimitations = 14
   
   NrInteractions = 2
   NrCodes = 5
   NrProdno = 31
-  NrPackages = 39
-  NrProducts = 34
+  NrPackages = 43
+  NrProducts = 39
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init(options = {})

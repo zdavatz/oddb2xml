@@ -80,7 +80,7 @@ module Oddb2xml
               puts "BagXmlExtractor: Skipping as missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}. Skipping"
             else
               ean12 = '7680' + pac.SwissmedicNo8
-              # pac.GTIN  = (ean12 + Oddb2xml.calc_checksum(ean12))
+              pac.GTIN  = (ean12 + Oddb2xml.calc_checksum(ean12)) unless @artikelstamm
               puts "BagXmlExtractor: Missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}."
             end
           end
@@ -187,11 +187,11 @@ module Oddb2xml
       items.each do |pac|
         ean13 = (gtin = pac.GTIN.to_s) ? gtin: '0'
         if ean13.size < 13
-          puts "Refdata #{@type} use 13 chars not #{ean13.size} for #{ean13}"
+          puts "Refdata #{@type} use 13 chars not #{ean13.size} for #{ean13}" if $VERBOSE
           ean13 = ean13.rjust(13, '0')
         end
         if ean13.size == 14 && ean13[0] == '0'
-          puts "Refdata #{@type} remove leading '0' for #{ean13}"
+          puts "Refdata #{@type} remove leading '0' for #{ean13}" if $VERBOSE
           ean13 = ean13[1..-1]
         end
         # but in refdata_nonPharma we have a about 700 GTINs which are 14 characters and longer
@@ -225,7 +225,16 @@ module Oddb2xml
       @type  = type
       Oddb2xml.log("SwissmedicExtractor #{@filename} #{File.size(@filename)} bytes")
       return unless File.exists?(@filename)
+      @@prodno_to_ean13 = {}
+      @@ean13_to_prodno = {}
       @sheet = RubyXL::Parser.parse(File.expand_path(@filename)).worksheets[0]
+    end
+    # Needed for ensuring consitency for the Artikelstamm
+    def self.getEan13forProdno(prodno)
+      @@prodno_to_ean13[prodno] || []
+    end
+    def self.getProdnoForEan13(ean13)
+      @@ean13_to_prodno[ean13]
     end
     def to_arry
       data = []
@@ -255,10 +264,10 @@ module Oddb2xml
       when :package
         Oddb2xml.check_column_indices(@sheet)
         ith       = COLUMNS_JULY_2015.keys.index(:index_therapeuticus)
-        i_5       = COLUMNS_JULY_2015.keys.index(:iksnr)
+        iksnr       = COLUMNS_JULY_2015.keys.index(:iksnr)
         seq_name  = COLUMNS_JULY_2015.keys.index(:name_base)
         i_3       = COLUMNS_JULY_2015.keys.index(:ikscd)
-        p_1_2     = COLUMNS_JULY_2015.keys.index(:seqnr)
+        seqnr     = COLUMNS_JULY_2015.keys.index(:seqnr)
         cat       = COLUMNS_JULY_2015.keys.index(:ikscat)
         siz       = COLUMNS_JULY_2015.keys.index(:size)
         atc       = COLUMNS_JULY_2015.keys.index(:atc_class)
@@ -287,19 +296,25 @@ module Oddb2xml
         @sheet.each_with_index do |row, i|
 
           next if (i <= 1)
-          next unless row and row[i_5] and row[i_3]
-          next unless row[i_5].value.to_i > 0 and row[i_3].value.to_i > 0
-          no8 = sprintf('%05d',row[i_5].value.to_i) + sprintf('%03d',row[i_3].value.to_i)
-          prodno = sprintf('%05d',row[i_5].value.to_i) + sprintf('%02d', row[p_1_2].value.to_i).to_s
+          next unless row and row[iksnr] and row[i_3]
+          next unless row[iksnr].value.to_i > 0 and row[i_3].value.to_i > 0
+          no8 = sprintf('%05d',row[iksnr].value.to_i) + sprintf('%03d',row[i_3].value.to_i)
           unless no8.empty?
             next if no8.to_i == 0
             ean_base12 = "7680#{no8}"
+            prodno =  Oddb2xml.gen_prodno(row[iksnr].value.to_i, row[seqnr].value.to_i)
+            ean13 = (ean_base12.ljust(12, '0') + Oddb2xml.calc_checksum(ean_base12))
+            @@prodno_to_ean13[prodno] ||= []
+            @@prodno_to_ean13[prodno] << ean13
+            @@ean13_to_prodno[ean13] = prodno
             data[no8] = {
-              :ean13                => (ean_base12.ljust(12, '0') + Oddb2xml.calc_checksum(ean_base12)),
-              :prodno               => prodno ? prodno : '',
+              :ean13                => ean13,
+              :prodno               => prodno,
+              :seqnr                => row[seqnr].value,
+              :iksnr                => row[iksnr].value,
               :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
               :swissmedic_category  => row[cat].value.to_s,
-              :atc_code             => row[atc] ? Oddb2xml.add_epha_changes_for_ATC(row[i_5].value.to_s, row[atc].value.to_s) : '',
+              :atc_code             => row[atc] ? Oddb2xml.add_epha_changes_for_ATC(row[iksnr].value.to_s, row[atc].value.to_s) : '',
               :list_code            => row[list_code] ? row[list_code].value.to_s : '',
               :package_size         => row[siz] ? row[siz].value.to_s : '',
               :einheit_swissmedic   => row[eht] ? row[eht].value.to_s : '',
