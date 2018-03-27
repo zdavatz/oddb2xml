@@ -1,3 +1,8 @@
+=== 2.5.3 / 27.03.2018
+
+* Added bin/check_artikelstamm
+* Fixed problem with prodno in Artikeltstamm
+
 === 2.5.2 / 21.03.2018
 
 *  Artikelstamm

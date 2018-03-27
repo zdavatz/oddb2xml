@@ -18,14 +18,12 @@ describe Oddb2xml::SemanticCheck do
     Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
   end
   context 'checking' do
-    before(:all) do
+    before(:each) do
       common_run_init
-#      options = Oddb2xml::Options.parse(['--artikelstamm']) # , '--log'])
-      # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
-#      Oddb2xml::Cli.new(options).run # to debug
     end
     
     files2check = Dir.glob(CheckDir + '/*.xml')
+
     files2check.each do |file2check|
       it 'should exist' do
         expect(File.exists?(file2check)).to eq true
