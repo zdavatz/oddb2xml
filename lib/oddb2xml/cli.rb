@@ -94,7 +94,7 @@ module Oddb2xml
       compress if @options[:compress_ext]
       res = report
       nrSecs =  (Time.now - startTime).to_i
-      if defined?(RSpec) && (nrSecs).to_i > 10 then require 'pry'; binding.pry ; end
+      if defined?(RSpec) && (nrSecs).to_i > 10 && ENV['TRAVIS'].to_s.empty? then require 'pry'; binding.pry ; end
       res
     end
     private

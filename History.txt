@@ -1,5 +1,7 @@
-=== 2.5.3 / 27.03.2018
+=== 2.5.3 / 28.03.2018
 
+* Test using Ruby 2.5.0 on tracis-ci, too
+* Fix spec tests on travis-ci
 * Added bin/check_artikelstamm
 * Fixed problem with prodno in Artikeltstamm
 

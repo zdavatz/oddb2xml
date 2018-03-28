@@ -544,7 +544,7 @@ describe ParseComposition do
     specify { expect(info.size).to eq  2 }
     specify { expect(info.first.substances.size).to eq  14 }
     toxoidum =  info.first.substances.find{ |x| x.name.match(/Toxoidum Diphtheriae/i) }
-    specify { expect(toxoidum.class).to eq  Struct::ParseSubstance }
+    specify { expect(toxoidum.class).to eq  ParseSubstance }
     if toxoidum
       specify { expect(toxoidum.name).to eq  'Toxoidum Diphtheriae' }
       specify { expect(toxoidum.qty.to_f).to eq  30.0 }
