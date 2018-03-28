@@ -1603,7 +1603,6 @@ module Oddb2xml
               next if emitted_prodno.index(prodno)
               sequence ||= @articles.find{|x| x[:ean13].eql?(ean)}
               next unless sequence && (sequence[:name_de] || sequence[:desc_de])
-              require 'pry'
               if SwissmedicExtractor.getEan13forProdno(prodno).size == 0
                 puts "No item found for prodno #{prodno} no8 #{obj[:no8]} #{sequence[:name_de]} "
                 next

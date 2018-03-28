@@ -8,7 +8,7 @@ module Oddb2xml
     STDOUT.flush
     full_msg
   end
-  class StammXML
+  class SemanticCheckXML
     attr_accessor :components
     attr_reader :keys, :sub_key_names, :filename, :basename, :version, :hash
     def initialize(filename, components = ["PRODUCTS", "LIMITATIONS", "ITEMS",])
@@ -35,7 +35,8 @@ module Oddb2xml
   class SemanticCheck
     attr_accessor :items, :products, :limitations
     def initialize(filename)
-      @stammdaten = StammXML.new(filename)
+      @filename = filename
+      @stammdaten = SemanticCheckXML.new(filename)
     end
 
     def everyProductNumberIsUnique
@@ -134,11 +135,7 @@ module Oddb2xml
   end
 end
 
-puts $0
-puts __FILE__
 if $0.eql?(__FILE__)
-  begin require 'pry'; rescue LoadError; end
-  puts ARGV
   daten = Oddb2xml::SemanticCheck.new(ARGV.first)
   daten.allSemanticChecks
 end
