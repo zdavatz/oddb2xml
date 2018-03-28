@@ -106,14 +106,8 @@ FR
 
 ## Supported ruby version
 
-We run tests on travis-ci.org for the Ruby versions mentioned in the .travis.yml file. These are
-* 1.9.3
-* 2.0.0
-* 2.1
-* ruby-head
-
-If you are running an older Ruby-Version (eg. 1.8 or 1.9.1), please upgrade before reporting a bug.
-See also http://bugs.ruby-lang.org/projects/ruby/wiki/ReleaseEngineering
+We run tests on travis-ci.org for the Ruby versions mentioned in the .travis.yml file. You will need ruby > 2.4 to work correctly.
+Ruby 2.2/2.3 have problems with i18n encoding and fail a spec test for Naropin
 
 
 ## XSD files

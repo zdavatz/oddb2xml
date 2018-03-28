@@ -535,6 +535,7 @@ describe Oddb2xml::Builder do
     
     it 'should validate XSD article' do
       @inhalt = File.read(oddb_article_xml)
+      # This fails on Ruby < 2.4 as NAROPIN INJ LÖS 0.2 % 10 is wrongly encoded
       expect(File.read(oddb_article_xml).scan(ARTICLE_NAROPIN).size).to eq 1
     end
 
@@ -702,6 +703,7 @@ describe Oddb2xml::Builder do
       check_elements(oddb_article_xml, ARTICLE_COMMON_ELEMENTS)
       check_elements(oddb_article_xml, ARTICLE_ZURROSE_ELEMENTS)
       it 'should contain NAROPIN' do
+        # This fails on Ruby < 2.4 as NAROPIN INJ LÖS 0.2 % 10 is wrongly encoded
         expect(File.read(oddb_article_xml).scan(ARTICLE_NAROPIN).size).to eq 1
       end
     end

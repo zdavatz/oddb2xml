@@ -1,5 +1,6 @@
 === 2.5.3 / 28.03.2018
 
+* Updated needed Ruby version in README.md
 * Test using Ruby 2.5.0 on tracis-ci, too
 * Fix spec tests on travis-ci
 * Added bin/check_artikelstamm
