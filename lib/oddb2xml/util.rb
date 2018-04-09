@@ -185,4 +185,41 @@ module Oddb2xml
     end
   end
 
+  # Needed for ensuring consistency for the Artikelstamm
+  @@prodno_to_ean13 = {}
+  @@no8_to_ean13 = {}
+  @@ean13_to_prodno = {}
+  @@ean13_to_no8 = {}
+    def Oddb2xml.setEan13forProdno(prodno, ean13)
+      if ean13.to_i == 7680006660045  ||  ean13.to_i == 7680006660014
+        puts "setEan13forProdno #{prodno} ean13 #{ean13}"
+      end
+      @@prodno_to_ean13[prodno] ||= []
+      @@prodno_to_ean13[prodno] << ean13
+      @@ean13_to_prodno[ean13] = prodno
+    end
+    def Oddb2xml.setEan13forNo8(no8, ean13)
+      if ean13.to_i == 7680006660045  ||  ean13.to_i == 7680006660014
+        puts "setEan13forNo8 #{no8} ean13 #{ean13}"
+      end
+      if @@no8_to_ean13[no8].nil?
+        @@no8_to_ean13[no8] = ean13
+        @@ean13_to_no8[ean13] = no8
+      elsif !@@no8_to_ean13[no8].eql?(ean13)
+        puts "@@no8_to_ean13[no8] #{@@no8_to_ean13[no8]} not overridden by #{ean13}"
+      end
+    end
+    def Oddb2xml.getEan13forProdno(prodno)
+      @@prodno_to_ean13[prodno] || []
+    end
+    def Oddb2xml.getEan13forNo8(no8)
+      @@no8_to_ean13[no8] || []
+    end
+    def Oddb2xml.getProdnoForEan13(ean13)
+      @@ean13_to_prodno[ean13]
+    end
+    def Oddb2xml.getNo8ForEan13(ean13)
+      @@ean13_to_no8[ean13]
+    end
+
 end

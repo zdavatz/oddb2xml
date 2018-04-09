@@ -38,6 +38,10 @@ module Oddb2xml
       data = {}
       result = PreparationsEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
       result.Preparations.Preparation.each do |seq|
+        if seq.SwissmedicNo5.eql?('0')
+          puts "BagXmlExtractor Skipping SwissmedicNo5 0 for #{seq.NameDe} #{seq.DescriptionDe} #{seq.CommentDe}"
+          next
+        end
         item = {}
         item[:data_origin]  = 'bag_xml'
         item[:refdata]      = true
@@ -72,19 +76,21 @@ module Oddb2xml
         item[:packages]    = {} # pharmacode => package
         seq.Packs.Pack.each do |pac|
           if pac.SwissmedicNo8 && pac.SwissmedicNo8.length < 8
-            puts "BagXmlExtractor: Adding leading zeros for SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}"
+            puts "BagXmlExtractor: Adding leading zeros for SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}" if $VERBOSE
             pac.SwissmedicNo8  = pac.SwissmedicNo8.rjust(8, '0')
           end
           unless pac.GTIN
             unless pac.SwissmedicNo8
-              puts "BagXmlExtractor: Skipping as missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}. Skipping"
+              puts "BagXmlExtractor: Missing GTIN and SwissmedicNo8 in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}"
+              next
             else
               ean12 = '7680' + pac.SwissmedicNo8
               pac.GTIN  = (ean12 + Oddb2xml.calc_checksum(ean12)) unless @artikelstamm
-              puts "BagXmlExtractor: Missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}."
+              # puts "BagXmlExtractor: Missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}."
             end
           end
           ean13 = pac.GTIN.to_s
+          Oddb2xml.setEan13forNo8(pac.SwissmedicNo8, ean13) if pac.SwissmedicNo8
           # packages
           exf = {:price => '', :valid_date => '', :price_code => ''}
           if pac.Prices and pac.Prices.ExFactoryPrice
@@ -100,6 +106,11 @@ module Oddb2xml
           end
           item[:packages][ean13] = {
             :ean13               => ean13,
+            :name_de             => (desc = seq.NameDe) ? desc : '',
+            :name_fr             => (desc = seq.NameFr) ? desc : '',
+            :desc_de             => (desc = pac.DescriptionDe) ? desc : '',
+            :desc_fr             => (desc = pac.DescriptionFr) ? desc : '',
+            :sl_entry            => true,
             :swissmedic_category => (cat = pac.SwissmedicCategory) ? cat : '',
             :swissmedic_number8  => (num = pac.SwissmedicNo8)      ? num : '',
             :prices              => { :exf_price => exf, :pub_price => pub },
@@ -168,6 +179,14 @@ module Oddb2xml
           # limitation points
           pts = pac.PointLimitations.PointLimitation.first # only first points
           item[:packages][ean13][:limitation_points] = pts ? pts.Points : ''
+          if pac.SwissmedicNo8
+              ean12 = '7680' + pac.SwissmedicNo8
+              correct_ean13 = ean12+ Oddb2xml.calc_checksum(ean12)
+              unless pac.GTIN.eql?(correct_ean13)
+                puts "pac.GTIN #{pac.GTIN} should be #{correct_ean13}"
+                item[:packages][ean13][:CORRECT_EAN13] = correct_ean13
+              end
+          end
           data[ean13] = item
         end
       end
@@ -196,11 +215,12 @@ module Oddb2xml
         end
         # but in refdata_nonPharma we have a about 700 GTINs which are 14 characters and longer
         item = {}
+        item[:ean13]           = ean13
+        item[:no8]             = pac.SWMC_AUTHNR
+        item[:pharmacode]      = (phar = pac.PHAR.to_s)   ? phar: '0'
         item[:data_origin]     = 'refdata'
         item[:refdata]         = true
         item[:_type]           = (typ  = pac.ATYPE.downcase.to_sym)  ? typ: ''
-        item[:ean13]           = ean13
-        item[:pharmacode]      = (phar = pac.PHAR.to_s)   ? phar: '0'
         item[:last_change]     = (date = Time.parse(pac.DT).to_s)  ? date: ''  # Date and time of last data change
         item[:desc_de]         = (dscr = pac.NAME_DE)   ? dscr: ''
         item[:desc_fr]         = (dscr = pac.NAME_FR)   ? dscr: ''
@@ -225,16 +245,7 @@ module Oddb2xml
       @type  = type
       Oddb2xml.log("SwissmedicExtractor #{@filename} #{File.size(@filename)} bytes")
       return unless File.exists?(@filename)
-      @@prodno_to_ean13 = {}
-      @@ean13_to_prodno = {}
       @sheet = RubyXL::Parser.parse(File.expand_path(@filename)).worksheets[0]
-    end
-    # Needed for ensuring consitency for the Artikelstamm
-    def self.getEan13forProdno(prodno)
-      @@prodno_to_ean13[prodno] || []
-    end
-    def self.getProdnoForEan13(ean13)
-      @@ean13_to_prodno[ean13]
     end
     def to_arry
       data = []
@@ -304,15 +315,14 @@ module Oddb2xml
             ean_base12 = "7680#{no8}"
             prodno =  Oddb2xml.gen_prodno(row[iksnr].value.to_i, row[seqnr].value.to_i)
             ean13 = (ean_base12.ljust(12, '0') + Oddb2xml.calc_checksum(ean_base12))
-            @@prodno_to_ean13[prodno] ||= []
-            @@prodno_to_ean13[prodno] << ean13
-            @@ean13_to_prodno[ean13] = prodno
+            Oddb2xml.setEan13forProdno(prodno, ean13)
+            Oddb2xml.setEan13forNo8(no8, ean13)
             data[no8] = {
+              :no8                  => no8,
               :ean13                => ean13,
               :prodno               => prodno,
               :seqnr                => row[seqnr].value,
-              :iksnr                => row[iksnr].value,
-              :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
+               :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
               :swissmedic_category  => row[cat].value.to_s,
               :atc_code             => row[atc] ? Oddb2xml.add_epha_changes_for_ATC(row[iksnr].value.to_s, row[atc].value.to_s) : '',
               :list_code            => row[list_code] ? row[list_code].value.to_s : '',
@@ -513,6 +523,7 @@ module Oddb2xml
       while line = @io.gets
         ean13 = "-1"
         line = Oddb2xml.patch_some_utf8(line).chomp
+        # next unless /(7680\d{9})(\d{1})$/.match(line) # Skip non pharma
         next if line =~ /(ad us\.* vet)|(\(vet\))/i
         if @@extended
           next unless line =~ /(\d{13})(\d{1})$/
