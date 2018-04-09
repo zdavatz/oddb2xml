@@ -1,3 +1,8 @@
+=== 2.5.4 / 09.04.2018
+
+* Correct name in Artikelstamm, when several packages exist in Preparions.xml (SL)
+* Mark correctly all SL-Entries in Artikeltstamm
+
 === 2.5.3 / 28.03.2018
 
 * Updated needed Ruby version in README.md
