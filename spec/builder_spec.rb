@@ -456,7 +456,7 @@ def checkProductXml(nbr_record = -1)
   expect(desitin.elements['SubstanceSwissmedic'].text).to eq 'levetiracetamum'
   expect(desitin.elements['CompositionSwissmedic'].text).to eq 'levetiracetamum 250 mg, excipiens pro compressi obducti pro charta.'
   expect(desitin.elements['CPT/CPTCMP/LINE'].text).to eq '0'
-  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '15'
+  expect(desitin.elements['CPT/CPTCMP/SUBNO'].text).to eq '13'
   expect(desitin.elements['CPT/CPTCMP/QTY'].text).to eq '250'
   expect(desitin.elements['CPT/CPTCMP/QTYU'].text).to eq 'mg'
 
@@ -474,7 +474,7 @@ end
 
 describe Oddb2xml::Builder do
   NrExtendedArticles = 74
-  NrSubstances = 30
+  NrSubstances = 27
   NrLimitations = 14
   
   NrInteractions = 2

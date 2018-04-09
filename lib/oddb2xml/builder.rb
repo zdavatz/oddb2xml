@@ -1,10 +1,8 @@
 # encoding: utf-8
-
 require 'nokogiri'
 require 'oddb2xml/util'
 require 'oddb2xml/calc'
 require 'csv'
-
 class Numeric
   # round a given number to the nearest step
   def round_by(increment)
@@ -51,7 +49,7 @@ module Oddb2xml
       @options    = args
       @subject    = nil
       @refdata    = {}
-      @items      = {} # Items from Preparations.xml in BAG, using @gtins as key
+      @items      = {} # Spezailitäteniste: SL-Items from Preparations.xml in BAG, using GTINS as key
       @flags      = {}
       @lppvs      = {}
       @infos      = {}
@@ -1399,47 +1397,57 @@ module Oddb2xml
       end
       def emit_items(xml)
         nr_items = 0
-        @nr_items = @gtins.size
-        @gtins.each do |ean13|
+        gtins_to_article = {}
+        @articles.each {|article| gtins_to_article[article[:ean13]] = article }
+        sl_gtins = @items.values.collect{|x| x[:packages].keys}.flatten.uniq;
+        gtins = gtins_to_article.keys + @infos_zur_rose.keys + @packs.values.collect{|x| x[:ean13]} + sl_gtins
+        gtins = (gtins-@@gtin2ignore)
+        gtins.sort!.uniq!
+        gtins.each do |ean13|
           pac,no8 = nil,ean13.to_s[4..11] # BAG-XML(SL/LS)
           next if ean13 == 0
-          obj = @gtins_to_article[ean13] || @infos_zur_rose[ean13]
+          obj = gtins_to_article[ean13] || @items.values.find{|x| x[:packages].keys.index(ean13) } || @infos_zur_rose[ean13]
           if obj
             obj = @packs[no8].merge(obj) if @packs[no8]
           else
             obj = @packs[no8] # obj not yet in refdata. Use data from swissmedic_package.xlsx
           end
           nr_items += 1
-          Oddb2xml.log "build_article #{nr_items} of #{@gtins.size} articles" if nr_items % 5000 == 0
+          Oddb2xml.log "build_article #{nr_items} of #{gtins.size} articles" if nr_items % 5000 == 0
           item = @items[ean13]
           pack_info = nil
           pack_info = @packs[no8] if no8 && /#{ean13}/.match(@packs[no8].to_s) # info from Packungen.xlsx from swissmedic_info
           next if pack_info && /Tierarzneimittel/.match(pack_info[:list_code])
           next if obj[:desc_de] && /ad us vet/i.match(obj[:desc_de])
           sequence    = obj[:seq]
-          unless sequence
-            if  @packs[no8] && /#{ean13}/.match(@packs[no8].to_s)
-              sequence = {:packages =>{ean13 => @packs[no8]}}
-              obj[:seq] = sequence.clone
-            end
+          if sequence.nil? && @packs[no8] && /#{ean13}/.match(@packs[no8].to_s)
+            sequence = {:packages =>{ean13 => @packs[no8]}}
+            obj[:seq] = sequence.clone
           end
-          if no8
-            ppac = ((_ppac = pack_info and !_ppac[:is_tier]) ? _ppac : nil)
+          if sequence.nil? && @items[ean13] && @items[ean13][:packages][ean13]
+            sequence =  @items[ean13]
           end
           if sequence
-            unless obj[:seq][:packages].keys.index(ean13)
+            if obj[:seq] && !obj[:seq][:packages].keys.index(ean13)
               # puts "unable to find  #{ean13} in #{obj[:seq][:packages].keys}"
               next
             end
             sequence[:packages].each do |gtin, package|
               pkg_gtin = package[:ean13].clone
+              if package[:no8] && (newEan13 = Oddb2xml.getEan13forNo8(package[:no8]))
+                if !newEan13.eql?(pkg_gtin)
+                  puts "Setting #{newEan13} for #{pkg_gtin}"
+                  pkg_gtin = newEan13
+                end
+              end
               pharma_code = @refdata[pkg_gtin]
               if @refdata[pkg_gtin] && @refdata[pkg_gtin][:pharmacode]
                 pharma_code = @refdata[pkg_gtin][:pharmacode]
-              else
+              elsif obj[:pharmacode]
                 pharma_code = obj[:pharmacode]
+              elsif @infos_zur_rose[ean13]
+                 pharma_code = @infos_zur_rose[ean13][:pharmacode]
               end
-# 
               info = @calc_items[pkg_gtin]
               if @@emitted_v5_gtins.index(pkg_gtin)
                 next
@@ -1448,17 +1456,30 @@ module Oddb2xml
               end
               options = {'PHARMATYPE' => 'P'}
               xml.ITEM(options) do
-                name = (@refdata[pkg_gtin] ? @refdata[pkg_gtin][:desc_de] : nil) || obj[:desc_de] || obj[:sequence_name]
+                # require 'pry'; binding.pry if pkg_gtin.to_i == 7680665990026
+                name =  item[:name_de] + ' ' +  item[:desc_de].strip + ' ' + package[:desc_de] if package && package[:desc_de]
+                name ||= @refdata[pkg_gtin] ? @refdata[pkg_gtin][:desc_de] : nil
+                name ||= @infos_zur_rose[ean13][:description] if @infos_zur_rose[ean13]
+                name ||= obj[:name_de] + ', ' + obj[:desc_de].strip if  obj[:name_de]
+                name ||= (item[:desc_de] + item[:name_de]) if item
+                name ||= obj[:sequence_name]
                 xml.GTIN pkg_gtin.to_s.rjust(13, '0')
                 override(xml, pkg_gtin, :PHAR, pharma_code)
                 xml.SALECD('A')
                 # maxLength for DSCR is 50 for Artikelstamm v3
                 xml.DSCR(name) # for description for zur_rose
-                xml.DSCRF(obj[:desc_fr] || '--missing--')
+                name_fr =  item[:name_fr] + ' ' +  item[:desc_fr].strip + ' ' + package[:desc_fr] if package && package[:desc_fr]
+                name_fr ||= @refdata[pkg_gtin] ? @refdata[pkg_gtin][:desc_fr] : nil
+                # Zugelassenen Packungen has only german names
+                name_fr ||= (obj[:name_fr] + ', ' + obj[:desc_fr]).strip if  obj[:name_fr]
+                # ZuRorse has only german names
+                name_fr ||= (item[:name_fr] + ', ' + item[:desc_fr]) if item
+                name_fr ||= '--missing--'
+                xml.DSCRF(name_fr)
                 xml.COMP  do # Manufacturer
                   xml.NAME  obj[:company_name]
                   xml.GLN   obj[:company_ean]
-                end
+                end if obj[:company_name] || obj[:company_ean]
                 pexf = ppub = nil
                 if package[:prices]
                   pexf ||= package[:prices][:exf_price][:price]
@@ -1492,16 +1513,15 @@ module Oddb2xml
                   xml.DOSAGE_FORM  info.galenic_form.descriptions['de'] if info.galenic_form.descriptions['de']
                   xml.DOSAGE_FORMF info.galenic_form.descriptions['fr'] if info.galenic_form.descriptions['fr']
                 end
-                xml.SL_ENTRY          'true' if  @items[pkg_gtin]
+                xml.SL_ENTRY          'true' if sl_gtins.index(pkg_gtin)
                 xml.IKSCAT            package[:swissmedic_category] if package[:swissmedic_category] && package[:swissmedic_category].length > 0
                 xml.GENERIC_TYPE sequence[:org_gen_code] if sequence[:org_gen_code] && !sequence[:org_gen_code].empty?
                 xml.LPPV              'true' if @lppvs[pkg_gtin.to_s] # detect_nincd
                 case item[:deductible]
-                when 'Y'; xml.DEDUCTIBLE 20; # 20%
-                when 'N'; xml.DEDUCTIBLE 10; # 10%
-                else #     xml.DEDUCTIBLE '' # k.A.
+                  when 'Y'; xml.DEDUCTIBLE 20; # 20%
+                  when 'N'; xml.DEDUCTIBLE 10; # 10%
                 end if item && item[:deductible]
-                prodno = SwissmedicExtractor.getProdnoForEan13(pkg_gtin)
+                prodno = Oddb2xml.getProdnoForEan13(pkg_gtin)
                 xml.PRODNO prodno if prodno
                 csv = []
                 @csv_file << [pkg_gtin, name, package[:unit], measure,
@@ -1562,7 +1582,7 @@ module Oddb2xml
       @nr_articles = 0
       used_limitations = []
       Oddb2xml.log "#{variant}: Deleted #{@old_rose_size - @new_rose_size} entries from ZurRose where GTIN start with 7680 (Swissmedic)"
-      # Oddb2xml.log "#{variant} #{nr_products} of #{@products.size} articles and ignore #{@@gtin2ignore.size} @gtins specified via #{@@ignore_file}"
+      # Oddb2xml.log "#{variant} #{nr_products} of #{@products.size} articles and ignore #{@@gtin2ignore.size} gtins specified via #{@@ignore_file}"
       _builder = Nokogiri::XML::Builder.new(:encoding => 'utf-8') do |xml|
         xml.doc.tag_suffix = @tag_suffix
         datetime = Time.new.strftime('%FT%T%z')
@@ -1578,11 +1598,6 @@ module Oddb2xml
         no8_to_prodno = {}
         @packs.collect{ |key, val| no8_to_prodno[key] = val [:prodno] }
         xml.comment("Produced by #{__FILE__} version #{VERSION} at #{Time.now}")
-        @gtins_to_article = {}
-        @articles.each {|article| @gtins_to_article[article[:ean13]] = article }
-        @gtins = @gtins_to_article.keys + @infos_zur_rose.keys + @packs.values.collect{|x| x[:ean13]}
-        @gtins = (@gtins-@@gtin2ignore)
-        @gtins.sort!.uniq!
         xml.ARTIKELSTAMM(options_xml) do
           xml.PRODUCTS do
             products = @products.sort_by { |ean13, obj| ean13 }
@@ -1603,7 +1618,7 @@ module Oddb2xml
               next if emitted_prodno.index(prodno)
               sequence ||= @articles.find{|x| x[:ean13].eql?(ean)}
               next unless sequence && (sequence[:name_de] || sequence[:desc_de])
-              if SwissmedicExtractor.getEan13forProdno(prodno).size == 0
+              if Oddb2xml.getEan13forProdno(prodno).size == 0
                 puts "No item found for prodno #{prodno} no8 #{obj[:no8]} #{sequence[:name_de]} "
                 next
               end
@@ -1666,7 +1681,7 @@ module Oddb2xml
       lines << "  - #{sprintf('%5d', @products.size)} products"
       lines << "  - #{sprintf('%5d', @limitations.size)} limitations"
       lines << "  - #{sprintf('%5d', @nr_articles)} articles"
-      lines << "  - #{sprintf('%5d', @@gtin2ignore.size)} ignored @gtins"
+      lines << "  - #{sprintf('%5d', @@gtin2ignore.size)} ignored GTINS"
       @@articlestamm_v5_info_lines = lines
       _builder.to_xml({:indent => 4, :encoding => 'UTF-8'})
     end

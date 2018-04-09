@@ -40,7 +40,7 @@ Oder
 * swissmedic_package.csv  https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx
 * oddb2xml_files_lppv.txt https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt
 * XMLPublications.zip     http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip   Dieses enthält
-** Preparations.xml
+** Preparations.xml       Hier sind alle Artikel aufgeführt, welche zur Spezialitätenliste (aka SL_ENTRY) gehören
 * transfer.zip            http://pillbox.oddb.org/TRANSFER.ZIP Dieses enthält
 ** transfer.dat
 

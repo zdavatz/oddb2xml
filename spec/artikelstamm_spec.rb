@@ -24,7 +24,7 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
-    binding.pry unless @inhalt.index(expected_value)
+    # binding.pry unless @inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
   def common_run_init(options = {})
@@ -121,7 +121,7 @@ describe Oddb2xml::Builder do
     it 'should find price from Preparations.xml by setting' do
       expect(File.exists?(@elexis_v5_csv)).to eq true
       inhalt = File.open(@elexis_v5_csv, 'r+').read
-      expected = %(7680658560014,"DIBASE 10'000, orale Tropflösung",Flasche(n),Flasche(n),5,9.25,6585601,A11CC05,cholecalciferolum,,07.02.3.,SL)
+      expected = %(7680658560014,"Dibase 10'000, Tropfen 10000 IE/ml",Flasche(n),Flasche(n),5,9.25,6585601,A11CC05,cholecalciferolum,,07.02.3.,SL)
       expect(inhalt.index(expected)).to be > 0
     end
 
@@ -139,7 +139,7 @@ describe Oddb2xml::Builder do
     it 'should have a price for Lynparza' do
       expect(File.exists?(@elexis_v5_csv)).to eq true
       inhalt = File.open(@elexis_v5_csv, 'r+').read
-      expect(inhalt.index('7680651600014,LYNPARZA Kaps 50 mg 448 Stk,,Kapsel(n),5562.48,5947.55')).not_to be nil
+      expect(inhalt.index('7680651600014,Lynparza Kaps 50 mg 448 Stk,,Kapsel(n),5562.48,5947.55,,,,"",,SL')).not_to be nil
     end
     it 'should trim the ean13 to 13 length' do
       gtin14 = "00040565124346"
@@ -217,32 +217,46 @@ describe Oddb2xml::Builder do
             <GTIN>7680658560014</GTIN>
             <!--override  with-->
             <SALECD>A</SALECD>
-            <DSCR>DIBASE 10'000, orale Tropflösung</DSCR>
-            <DSCRF>--missing--</DSCRF>)
+            <DSCR>Dibase 10'000, Tropfen 10000 IE/ml</DSCR>
+            <DSCRF>Dibase 10'000, gouttes 10000 UI/ml</DSCRF>
+            <COMP>
+                <NAME>Gebro Pharma AG</NAME>
+                <GLN/>
+            </COMP>
+            <PEXF>5</PEXF>
+            <PPUB>9.25</PPUB>
+            <PKG_SIZE>1</PKG_SIZE>
+            <MEASURE>Flasche(n)</MEASURE>
+            <MEASUREF>Flasche(n)</MEASUREF>
+            <DOSAGE_FORM>orale Tropflösung</DOSAGE_FORM>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>D</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>6585601</PRODNO>
+        </ITEM>)
       expect(@inhalt.index(expected)).not_to be nil
     end
     
-    it 'should contain a public price if the item was only in the SL liste (Preparations.xml)' do
-      # same as 7680403330459 CARBADERM
-      expect(@inhalt.index('<PPUB>27.70</PPUB>')).not_to be nil
-    end
     it 'should contain PEVISONE Creme 30 g' do
-      expect(@inhalt.index('PEVISONE Creme 15 g')).not_to be nil # 7680406620144
-      expect(@inhalt.index('PEVISONE Creme 30 g')).not_to be nil # 7680406620229
+      expect(@inhalt.index('Pevisone Creme 15 g')).not_to be nil # 7680406620144
+      expect(@inhalt.index('Pevisone Creme 30 g')).not_to be nil # 7680406620229
       # Should also check for price!
     end
     it 'should validate against artikelstamm.xsd' do
       validate_via_xsd(@elexis_v5_xsd, @artikelstamm_name)
     end
-      tests = { 'item 7680403330459 CARBADERM only in Preparations(SL)' =>
+      tests = { 'item 7680403330459 CARBADERM only in Preparations(SL) with public price' =>
         %(<ITEM PHARMATYPE="P">
             <GTIN>7680403330459</GTIN>
             <PHAR>3603779</PHAR>
             <SALECD>A</SALECD>
-            <DSCR>CARBADERM Creme Tb 300 ml</DSCR>
-            <DSCRF>--missing--</DSCRF>
-            <PEXF>16.22</PEXF>
-            <PPUB>27.70</PPUB>
+            <DSCR>Carbaderm Creme Tb 300 ml</DSCR>
+            <DSCRF>Carbaderm crème tb 300 ml</DSCRF>
+            <PEXF>14.61</PEXF>
+            <PPUB>26.95</PPUB>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>D</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
         </ITEM>),
         'item 4042809018288 TENSOPLAST' =>
       %(<ITEM PHARMATYPE="N">
@@ -296,13 +310,13 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>5366201</PRODNO>
         </ITEM>),
-        'item 7680161050583 HIRUDOID' =>
+        'item 7680161050583 HIRUDOID 40g' =>
          %(<ITEM PHARMATYPE="P">
             <GTIN>7680161050583</GTIN>
             <PHAR>2731179</PHAR>
             <SALECD>A</SALECD>
-            <DSCR>HIRUDOID Creme 3 mg/g 40 g</DSCR>
-            <DSCRF>HIRUDOID crème 3 mg/g 40 g</DSCRF>
+            <DSCR>Hirudoid Creme 3 mg/g 40 g</DSCR>
+            <DSCRF>Hirudoid crème 3 mg/g 40 g</DSCRF>
             <COMP>
                 <NAME>Medinova AG</NAME>
                 <GLN>7601001002258</GLN>
@@ -318,12 +332,29 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>1610501</PRODNO>
         </ITEM>),
+        'item 7680161050743 100g ' => 
+              %( <ITEM PHARMATYPE="P">
+            <GTIN>7680161050743</GTIN>
+            <PHAR>2731179</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>Hirudoid Creme 3 mg/g 100 g</DSCR>
+            <DSCRF>Hirudoid crème 3 mg/g 100 g</DSCRF>
+            <COMP>
+                <NAME>Medinova AG</NAME>
+                <GLN>7601001002258</GLN>
+            </COMP>
+            <PEXF>9.555316</PEXF>
+            <PPUB>17.65</PPUB>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>D</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+        </ITEM>), 
         'item 7680284860144 ANCOPIR' =>'<ITEM PHARMATYPE="P">
             <GTIN>7680284860144</GTIN>
             <PHAR>0177804</PHAR>
             <SALECD>A</SALECD>
-            <DSCR>Ancopir, Injektionslösung</DSCR>
-            <DSCRF>--missing--</DSCRF>
+            <DSCR>ANCOPIR Inj Lös 5 Amp 2 ml</DSCR>
+            <DSCRF>Ancopir, sol inj</DSCRF>
             <COMP>
                 <NAME>Dr. Grossmann AG, Pharmaca</NAME>
                 <GLN/>
@@ -340,7 +371,7 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>2848601</PRODNO>
         </ITEM>',
-                'FERROUMET pice from ZurRose  ' => %(<ITEM PHARMATYPE="P">
+                'FERRO-GRADUMET price from ZurRose  ' => %(<ITEM PHARMATYPE="P">
             <GTIN>7680316440115</GTIN>
             <PHAR>0020244</PHAR>
             <SALECD>A</SALECD>
@@ -389,8 +420,8 @@ describe Oddb2xml::Builder do
             <GTIN>7680532900196</GTIN>
             <PHAR>1699999</PHAR>
             <SALECD>A</SALECD>
-            <DSCR>HUMALOG Inj Lös 100 IE/ml Durchstf 10 ml</DSCR>
-            <DSCRF>HUMALOG sol inj 100 UI/ml flac 10 ml</DSCRF>
+            <DSCR>Humalog Inj Lös Durchstf 10 ml</DSCR>
+            <DSCRF>Humalog sol inj flac 10 ml</DSCRF>
             <COMP>
                 <NAME>Eli Lilly (Suisse) SA</NAME>
                 <GLN>7601001261853</GLN>
