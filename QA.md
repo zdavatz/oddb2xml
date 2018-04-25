@@ -13,6 +13,7 @@
 #### 3. Wo finde ich die Mehrwertsteuer?
 * Der Mwst.-Code ist bei allen Produkten bei denen der GTIN mit 7680 (Medi in der SL) beginnt bei 2.5% (reduzierter Satz, Art. 49 MWSTV). 
 * Siehe auch: http://www.estv.admin.ch/mwst/themen/00155/#sprungmarke0_4
+* Siehe auch VAT im XSD File: https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd#L43
 
 #### 4. Was für eine Nummer findet man im Feld PRODNO?
 * Mit dem Release 1.4.8 finden Sie auch die PRODNO im XML. Die PRODNO setzen wir zusammen aus der 5-stelligen Swissmedic-Nummer und der Swissmedic Sequenz Nummer. Die Squenznummer unterscheidet nicht nach Packungsgrösse. Produkte mit der gleichen Dosierung und der gleichen galenischen Form aber einer unterschiedlicher Packungsgrösse, haben die gleiche PRODNO.
