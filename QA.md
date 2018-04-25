@@ -27,3 +27,4 @@
 
 #### 7. Wie kann ich Medikamente und Nicht-Medikament unterscheiden?
 * Alle GTINs der Medikamente beginnen mit 7680 (76=Schweiz, 80=Swissmedic).
+* Siehe auch: http://www.ywesee.com/Main/EANCode
