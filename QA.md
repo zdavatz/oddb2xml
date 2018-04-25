@@ -38,5 +38,5 @@
 
 #### 9. Wie installiere ich _oddb2xml_?
 * Ruby installieren.
-* _gem install oddb2xml_
-* _oddb2xml_ mit der entsprechenden Option laufen lassen.
+* _gem install oddb2xml_ ausführen und Installation abwarten. Sollte auch auf Windows mit Ubuntu Bash funktionieren. Mindestens 8 GB RAM notwending.
+* _oddb2xml_ mit der entsprechenden Option laufen lassen, z.B. _oddb2xml -r_
