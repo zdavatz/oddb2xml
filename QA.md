@@ -8,31 +8,32 @@
 * Die Daten unter https://www.hin.ch/services/mediupdate-xml/ werden täglich generiert.
 
 #### 2. Haben Sie eine Spezifikation der XML Files? 
-* Ja, siehe: https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd
+* Ja, siehe [oddb2xml.xsd](https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd)
 
 #### 3. Wo finde ich die Mehrwertsteuer?
 * Der Mwst.-Code ist bei allen Produkten bei denen der GTIN mit 7680 (Medi in der SL) beginnt bei 2.5% (reduzierter Satz, Art. 49 MWSTV). 
-* Siehe auch: http://www.estv.admin.ch/mwst/themen/00155/#sprungmarke0_4
-* Siehe auch VAT im XSD File: https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd#L43
+* Siehe auch [ESTV](http://www.estv.admin.ch/mwst/themen/00155/#sprungmarke0_4)
+* Siehe auch VAT im [XSD](https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd#L43) File.
 
 #### 4. Was für eine Nummer findet man im Feld PRODNO?
 * Die PRODNO setzen wir zusammen aus der 5-stelligen Swissmedic-Nummer und der Swissmedic Sequenz Nummer. Die Squenznummer unterscheidet nicht nach Packungsgrösse. Produkte mit der gleichen Dosierung und der gleichen galenischen Form aber einer unterschiedlicher Packungsgrösse, haben die gleiche PRODNO.
-* Sequenznamen ohne Packungsgrösse aber mit Dosisstärke und galenischer Form findet man im https://download.hin.ch/download/oddb2xml/oddb2xml_swissmedic_sequences.csv
-* Damit man _Registrations-_ und _Sequenznummer_ besser verstehen kann, sollte man einmal das Swissmedic-Packungen.xlsx öffnen und die ersten paar Spalten anschauen: https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx
+* Sequenznamen ohne Packungsgrösse aber mit Dosisstärke und galenischer Form findet man im [oddb2xml_swissmedic_sequences.csv](https://download.hin.ch/download/oddb2xml/oddb2xml_swissmedic_sequences.csv)
+* Damit man _Registrations-_ und _Sequenznummer_ besser verstehen kann, muss man einmal das File [excel-version_zugelasseneverpackungen.xlsx](https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx) öffnen und die ersten paar Spalten anschauen.
 
 #### 5. Was ist der Unterschied zwischen oddb_article.xml und oddb_product.xml
-* http://download.hin.ch/download/oddb2xml/oddb_article.xml enhält alle Artikel. http://download.hin.ch/download/oddb2xml/oddb_product.xml enthält nur die Produkte von der Swissmedic, also die Medikamente.
+* [oddb_article.xml](http://download.hin.ch/download/oddb2xml/oddb_article.xml) enhält alle Artikel. 
+* [oddb_product.xml](http://download.hin.ch/download/oddb2xml/oddb_product.xml) enthält nur die Produkte von der Swissmedic, also die Medikamente.
 
 #### 6. Warum hat nicht jedes Produkt im oddb_article.xml einen GTIN?
 * Nicht alle Produkte haben zur Zeit einen GTIN. Dieser wird jedoch laufend ergänzt. Ab 1.1.2019 sollte der Pharmacode komplett verschwinden.
 
 #### 7. Wie kann ich Medikamente und Nicht-Medikament unterscheiden?
 * Alle GTINs der Medikamente beginnen mit 7680 (76=Schweiz, 80=Swissmedic).
-* Siehe auch: http://www.ywesee.com/Main/EANCode
+* Siehe [EANCode](http://www.ywesee.com/Main/EANCode)
 
 #### 8. Ich möchte gerne ein XML-File welches alle Produkte (Pharma und Non-Pharma) und die dazugehörigen Sequenznamen enthält. Gibt es das?
-* Ja! Einfach _oddb2xml_ mit der Option _-r_ laufen lassen, siehe: https://github.com/zdavatz/oddb2xml#usage - Option "_--artikelstamm_".
-* Dieses File wird zur Zeit nicht via https://www.hin.ch/services/mediupdate-xml/ zum Download zur Verfügung gestellt. Es muss selber generiert werden mittels _oddb2xml -r_.
+* Ja! Einfach _oddb2xml_ mit der Option _-r_ laufen lassen, siehe [usage](https://github.com/zdavatz/oddb2xml#usage) - Option "_--artikelstamm_".
+* Dieses File wird zur Zeit nicht via [MEDIupdate XML](https://www.hin.ch/services/mediupdate-xml/) zum Download zur Verfügung gestellt. Es muss selber generiert werden mittels _oddb2xml -r_.
 
 #### 9. Wie installiere ich _oddb2xml_?
 a) Ruby installieren.
