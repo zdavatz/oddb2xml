@@ -36,6 +36,9 @@
 * Ja! Einfach _oddb2xml_ mit der Option _-r_ laufen lassen, siehe [usage](https://github.com/zdavatz/oddb2xml#usage) - Option "_--artikelstamm_".
 * Dieses File wird zur Zeit nicht via [MEDIupdate XML](https://www.hin.ch/services/mediupdate-xml/) zum Download zur Verfügung gestellt. Es muss selber generiert werden mittels _oddb2xml -r_.
 
+#### 9. Gültigkeitsdaten zu Preisen
+* Gültigkeitsdaten zu Preisen (VDAT) gibt es nur bei [SL-Produkten](http://www.spezialitätenliste.ch/File.axd?file=XMLPublications.zip).
+
 #### 9. Wie installiere ich _oddb2xml_?
 * Neuste, stabile Version von [Ruby](http://www.ruby-lang.org/de/) installieren.
 * _gem install oddb2xml_ ausführen und Installation abwarten. Sollte auch auf Windows mit [Ubuntu Bash](https://docs.microsoft.com/en-us/windows/wsl/install-win10) funktionieren. Mindestens 8 GB RAM notwending.
