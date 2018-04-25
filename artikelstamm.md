@@ -62,13 +62,11 @@ Im der Datei spec/spec_helper.rb findet man die Methode mock_downloads, welche m
 
 ## Entstehungsgeschichte
 
-Elexis braucht seit der Version 3.0 vom August 2014 eine XML-Datei mit den Stammdaten für Artikel.
-
 Bis Ende 2017 wurde
 * via oddb2xml die Dateien oddb_article.xml und oddb_product.xml generiert
-* mit einen AdHoc geschriebenen Tool von Marco Descher in das Artikelstamm Format (in Versionen 1,2,3,4) umgewandelt
+* mit einen AdHoc geschriebElexisenen Tool von Marco Descher in das Artikelstamm Format (in Versionen 1,2,3,4) umgewandelt
 * dann von Elexis eingelesen
 
-2017 investierte Niklaus Giger über 60 Arbeitsstunden, um für die neue Version 5 die Dateien direkt via oddb2xml zu erstellen.
+2017 erweiterte https://github.com/ngiger/ oddb2xml auf die Bedürfnisse von Elexis und dessen Artikelstammanforderungen, um für die neue Version 5 die Dateien direkt via oddb2xml zu erstellen.
 
 Dazu kam auch das Werkzeug compare_v5 um zwei v5 XML-Dateien zu vergleichen, womit die pro Monat neu eintreffenden Anpassungen leicht verfolgbar werden.
