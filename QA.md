@@ -8,13 +8,8 @@
 
 Wer will kann oddb2xml einmal pro Tag laufen lassen für die neusten Pharmacodes.
 
-#### 2. Haben Sie eine Spezifikation der XML Files? Was steht wo drin? Wenn ich ein XSD selbst generiere, stehen dort ja nicht mehr Informationen als jetzt schon. Ich muss aber wissen in welchem Attribut welcher Wert steht.
-
-Nein, das gibt es zur Zeit nicht (kommt ev. noch), die Felder sind
-aber grundsätzlich selbsterklärend.
-
-* im article.xml verwenden wird die Bezeichnungen von Refdata.ch
-* im product.xml verwenden wir die Bezeichnungen vom BAG-XML. Produkte die nicht in der SL sind haben dann im product.xml auch keine Bezeichnung.
+#### 2. Haben Sie eine Spezifikation der XML Files? 
+* Ja, siehe: https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd
 
 #### 3. Wo finde ich die Mehrwertsteuer?
 * Der Mwst.-Code ist bei allen Produkten bei denen der GTIN mit 7680 (Medi in der SL) beginnt bei 2.5% (reduzierter Satz, Art. 49 MWSTV). 
