@@ -2,8 +2,8 @@
 
 odd2xml unterstützt seit Ende 2017 den von Elexis gebrauchten Artikelstamm wie folgt:
 
-* Mit der Option --artikelstamm werden ArtikelstammDaten in der Version 3 und 5 erzeugt
-* compare_v5 erlaubt es, zwei v5 (oder v3) XML-Dateien zu vergleichen
+* Mit der Option _--artikelstamm_ werden ArtikelstammDaten in der Version 3 und 5 erzeugt
+* https://github.com/zdavatz/oddb2xml/blob/master/bin/compare_v5 erlaubt es, zwei v5 (oder v3) XML-Dateien zu vergleichen
 
 ## Herkunft der Artikelstamm Daten
 
