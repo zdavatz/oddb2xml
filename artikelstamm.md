@@ -7,12 +7,7 @@ odd2xml unterstützt seit Ende 2017 den von Elexis gebrauchten Artikelstamm wie 
 
 ## Herkunft der Artikelstamm Daten
 
-Die für den Artikelstamm gebrauchten Ursprungs-Dateien werden 
-
-* Unter downloads in einem leicht lesbaren Format abgespeichert. 
-* Dazu wird die Utility ssconvert des Gnumeric verwendet, was viel schneller geht, als die Dateien per Ruby-Script zu laden.
-* Mit _xmllint --format_ können die XML Daten schön formatiert werden.
-* _transfer.utf8 ISO8859-1 transfer.dat_ als utf-8 um leichter unter Linux greppen zu können
+Die für den Artikelstamm gebrauchten Ursprungs-Dateien werden unter _downloads_ in einem leicht lesbaren Format abgespeichert. Dazu wird die Utility _ssconvert_ von _Gnumeric_ verwendet, was viel schneller geht, als die Dateien per Ruby-Script zu laden. Mit _xmllint --format_ können die XML Daten schön formatiert werden.
 
 Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B. `grep -r 7680273040281 downloads` git dann folgende Zeilen zurück
 
