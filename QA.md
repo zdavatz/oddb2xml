@@ -37,6 +37,6 @@
 * Dieses File wird zur Zeit nicht via [MEDIupdate XML](https://www.hin.ch/services/mediupdate-xml/) zum Download zur Verfügung gestellt. Es muss selber generiert werden mittels _oddb2xml -r_.
 
 #### 9. Wie installiere ich _oddb2xml_?
-* Ruby installieren.
+* Neuste, stabile Version von [Ruby](http://www.ruby-lang.org/de/) installieren.
 * _gem install oddb2xml_ ausführen und Installation abwarten. Sollte auch auf Windows mit [Ubuntu Bash](https://docs.microsoft.com/en-us/windows/wsl/install-win10) funktionieren. Mindestens 8 GB RAM notwending.
 * _oddb2xml_ mit der entsprechenden Option laufen lassen, z.B. _oddb2xml -r_
