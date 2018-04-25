@@ -5,7 +5,7 @@
 * SL Preise werden am Anfang des Monats publiziert, jeweils immer am 1. Es kann auch vorkommen, dass das BAG die SL-Preise/Limitationen während dem Monat anpasst.
 * Fachinfos werden täglich publiziert.
 * Swissmedic-Codes erscheinen einmal pro Monat, normalerweise in der ersten Woche.
-* Die Daten unter https://www.hin.ch/services/mediupdate-xml/ werden täglich generiert.
+* Die Daten unter [MEDIupdate XML](https://www.hin.ch/services/mediupdate-xml/) werden täglich generiert.
 
 #### 2. Haben Sie eine Spezifikation der XML Files? 
 * Ja, siehe [oddb2xml.xsd](https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd)
@@ -36,6 +36,6 @@
 * Dieses File wird zur Zeit nicht via [MEDIupdate XML](https://www.hin.ch/services/mediupdate-xml/) zum Download zur Verfügung gestellt. Es muss selber generiert werden mittels _oddb2xml -r_.
 
 #### 9. Wie installiere ich _oddb2xml_?
-a) Ruby installieren.
-b) _gem install oddb2xml_
-c) _oddb2xml_ mit der entsprechenden Option laufen lassen.
+* Ruby installieren.
+* _gem install oddb2xml_
+* _oddb2xml_ mit der entsprechenden Option laufen lassen.
