@@ -8,9 +8,6 @@
 
 Wer will kann oddb2xml einmal pro Tag laufen lassen für die neusten Pharmacodes.
 
-Wir haben einen ganz grossen Vorteil: Bei uns erscheint [QAP?] nicht
-in den Daten weil wir Refdata als Quelle verwenden. ;)
-
 #### 2. Haben Sie eine Spezifikation der XML Files? Was steht wo drin? Wenn ich ein XSD selbst generiere, stehen dort ja nicht mehr Informationen als jetzt schon. Ich muss aber wissen in welchem Attribut welcher Wert steht.
 
 Nein, das gibt es zur Zeit nicht (kommt ev. noch), die Felder sind
