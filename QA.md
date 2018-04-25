@@ -26,3 +26,5 @@ aber grundsätzlich selbsterklärend.
 #### Was für eine Nummer findet man im Feld PRODNO?
 * Mit dem Release 1.4.8 finden Sie auch die PRODNO im XML. Die PRODNO setzen wir zusammen aus der 5-stelligen Swissmedic-Nummer und der Swissmedic Sequenz Nummer. Die Squenznummer unterscheidet nicht nach Packungsgrösse. Produkte mit der gleichen Dosierung und der gleichen galenischen Form aber einer unterschiedlicher Packungsgrösse, haben die gleiche PRODNO.
 
+#### Was ist der Unterschied zwischen oddb_article.xml und oddb_product.xml
+* oddb_article.xml enhält alle Artikel. oddb_product.xml enthält nur die Produkte von der Swissmedic, also die Medikamente.
