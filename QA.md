@@ -30,6 +30,7 @@
 #### 7. Wie kann ich Medikamente und Nicht-Medikament unterscheiden?
 * Alle GTINs der Medikamente beginnen mit 7680 (76=Schweiz, 80=Swissmedic).
 * Siehe [EANCode](http://www.ywesee.com/Main/EANCode)
+* Medikamente haben zudem auch eine [Swissmedic Kategorie](https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd#L78).
 
 #### 8. Ich möchte gerne ein XML-File welches alle Produkte (Pharma und Non-Pharma) und die dazugehörigen Sequenznamen enthält. Gibt es das?
 * Ja! Einfach _oddb2xml_ mit der Option _-r_ laufen lassen, siehe [usage](https://github.com/zdavatz/oddb2xml#usage) - Option "_--artikelstamm_".
