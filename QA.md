@@ -31,13 +31,11 @@
 * Alle GTINs der Medikamente beginnen mit 7680 (76=Schweiz, 80=Swissmedic).
 * Siehe [EANCode](http://www.ywesee.com/Main/EANCode)
 * Medikamente haben zudem auch eine [Swissmedic Kategorie](https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd#L78).
+* Gültigkeitsdaten zu Preisen (VDAT) gibt es nur bei [SL-Produkten](http://www.spezialitätenliste.ch/File.axd?file=XMLPublications.zip).
 
 #### 8. Ich möchte gerne ein XML-File welches alle Produkte (Pharma und Non-Pharma) und die dazugehörigen Sequenznamen enthält. Gibt es das?
 * Ja! Einfach _oddb2xml_ mit der Option _-r_ laufen lassen, siehe [usage](https://github.com/zdavatz/oddb2xml#usage) - Option "_--artikelstamm_".
 * Dieses File wird zur Zeit nicht via [MEDIupdate XML](https://www.hin.ch/services/mediupdate-xml/) zum Download zur Verfügung gestellt. Es muss selber generiert werden mittels _oddb2xml -r_.
-
-#### 9. Gültigkeitsdaten zu Preisen
-* Gültigkeitsdaten zu Preisen (VDAT) gibt es nur bei [SL-Produkten](http://www.spezialitätenliste.ch/File.axd?file=XMLPublications.zip).
 
 #### 9. Wie installiere ich _oddb2xml_?
 * Neuste, stabile Version von [Ruby](http://www.ruby-lang.org/de/) installieren.
