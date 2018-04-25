@@ -5,8 +5,7 @@
 * SL Preise werden am Anfang des Monats publiziert, jeweils immer am 1. Ganz selten auch am 15.
 * Fachinfos werden täglich publiziert.
 * Swissmedic-Codes erscheinen einmal pro Monat, normalerweise in der ersten Woche.
-
-Wer will kann oddb2xml einmal pro Tag laufen lassen für die neusten Pharmacodes.
+* Die Daten unte https://www.hin.ch/services/mediupdate-xml/ werden täglich generiert.
 
 #### 2. Haben Sie eine Spezifikation der XML Files? 
 * Ja, siehe: https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd
