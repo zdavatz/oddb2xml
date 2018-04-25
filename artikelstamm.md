@@ -9,10 +9,10 @@ odd2xml unterstützt seit Ende 2017 den von Elexis gebrauchten Artikelstamm wie 
 
 Die für den Artikelstamm gebrauchten Ursprungs-Dateien werden 
 
-* unter downloads in einem leicht lesbaren Format abgespeichert 
-** CSV für XLSX-Dateien. Dazu wird die Utility ssconvert des Gnumeric verwendet, was viel schneller geht, als die Dateien per Ruby-Script zu laden
-** mit xmllint --format schön formattierten XML
-** transfer.utf8           ISO8859-1 transfer.dat als utf-8 um leichter unter Linux greppen zu können
+* Unter downloads in einem leicht lesbaren Format abgespeichert. 
+* Dazu wird die Utility ssconvert des Gnumeric verwendet, was viel schneller geht, als die Dateien per Ruby-Script zu laden.
+* Mit _xmllint --format_ können die XML Daten schön formatiert werden.
+* _transfer.utf8 ISO8859-1 transfer.dat_ als utf-8 um leichter unter Linux greppen zu können
 
 Damit ist möglich nach einem Durchlauf den Ursprung der Daten zu ermitteln, z.B. `grep -r 7680273040281 downloads` git dann folgende Zeilen zurück
 
@@ -35,16 +35,9 @@ Oder
 
 ### Herkunft der einzelenen Dateien
 
-* epha_interactions.csv   https://download.epha.ch/cleaned/matrix.csv'
-* swissmedic_orphan.csv   https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/humanarzneimittel.orphan.xlsx.download.xlsx/humanarzneimittel.xlsx'
-* swissmedic_package.csv  https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx
-* oddb2xml_files_lppv.txt https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt
-* XMLPublications.zip     http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip   Dieses enthält
-** Preparations.xml       Hier sind alle Artikel aufgeführt, welche zur Spezialitätenliste (aka SL_ENTRY) gehören
-* transfer.zip            http://pillbox.oddb.org/TRANSFER.ZIP Dieses enthält
-** transfer.dat
+* Siehe: https://github.com/zdavatz/oddb2xml/blob/master/README.md#data-sources
 
-Beim Tranfer.dat werden Zeilen ausgelassen, wenn eine der folgenden Bedingungen zutrifft (siehe extractor.rb ZurroseExtractor)
+Beim Transfer.dat werden Zeilen ausgelassen, wenn eine der folgenden Bedingungen zutrifft (siehe extractor.rb ZurroseExtractor)
 
     * Die GTIN ist 0000000000000
     * Die Zeile beginnt mit 113 (inaktiv) und die GTIN beginnt mit 7680 (aka Swissmedic)
