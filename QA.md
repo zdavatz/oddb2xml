@@ -1,7 +1,7 @@
 # Fragen und Antworten zu oddb2xml
 
 #### 1. Wann werden Medikamenten-Stammdaten aktualisiert, an welchem Tag im Monat?
-* Refdata ändert täglich Pharmacodes.
+* [Refdata](http://www.refdata.ch/content/article_d.aspx?Nid=6&Aid=909&ID=411) ändert täglich Pharmacodes.
 * SL Preise werden am Anfang des Monats publiziert, jeweils immer am 1. Es kann auch vorkommen, dass das BAG die SL-Preise/Limitationen während dem Monat anpasst.
 * Fachinfos werden täglich publiziert.
 * Swissmedic-Codes erscheinen einmal pro Monat, normalerweise in der ersten Woche.
