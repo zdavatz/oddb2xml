@@ -17,6 +17,7 @@
 
 #### 4. Was für eine Nummer findet man im Feld PRODNO?
 * Mit dem Release 1.4.8 finden Sie auch die PRODNO im XML. Die PRODNO setzen wir zusammen aus der 5-stelligen Swissmedic-Nummer und der Swissmedic Sequenz Nummer. Die Squenznummer unterscheidet nicht nach Packungsgrösse. Produkte mit der gleichen Dosierung und der gleichen galenischen Form aber einer unterschiedlicher Packungsgrösse, haben die gleiche PRODNO.
+* Sequenznamen ohne Packungsgrösse aber mit Dosisstärke und galenischer Form findet man im https://download.hin.ch/download/oddb2xml/oddb2xml_swissmedic_sequences.csv
 
 #### 5. Was ist der Unterschied zwischen oddb_article.xml und oddb_product.xml
 * http://download.hin.ch/download/oddb2xml/oddb_article.xml enhält alle Artikel. http://download.hin.ch/download/oddb2xml/oddb_product.xml enthält nur die Produkte von der Swissmedic, also die Medikamente.
