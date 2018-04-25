@@ -18,7 +18,7 @@
 * Mit dem Release 1.4.8 finden Sie auch die PRODNO im XML. Die PRODNO setzen wir zusammen aus der 5-stelligen Swissmedic-Nummer und der Swissmedic Sequenz Nummer. Die Squenznummer unterscheidet nicht nach Packungsgrösse. Produkte mit der gleichen Dosierung und der gleichen galenischen Form aber einer unterschiedlicher Packungsgrösse, haben die gleiche PRODNO.
 
 #### 5. Was ist der Unterschied zwischen oddb_article.xml und oddb_product.xml
-* oddb_article.xml enhält alle Artikel. oddb_product.xml enthält nur die Produkte von der Swissmedic, also die Medikamente.
+* http://download.hin.ch/download/oddb2xml/oddb_article.xml enhält alle Artikel. http://download.hin.ch/download/oddb2xml/oddb_product.xml enthält nur die Produkte von der Swissmedic, also die Medikamente.
 
 #### 6. Warum hat nicht jedes Produkt im oddb_article.xml einen GTIN?
 * Nicht alle Produkte haben zur Zeit einen GTIN. Dieser wird jedoch laufend ergänzt. Ab 1.1.2019 sollte der Pharmacode komplett verschwinden.
