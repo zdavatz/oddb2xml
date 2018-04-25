@@ -31,3 +31,6 @@ aber grundsätzlich selbsterklärend.
 
 #### Warum hat nicht jedes Produkt im oddb_article.xml einen GTIN?
 * Nicht alle Produkte haben zur Zeit einen GTIN. Dieser wird jedoch laufend ergänzt. Ab 1.1.2019 sollte der Pharmacode komplett verschwinden.
+
+#### Wie kann ich Medikamente und Nicht-Medikament unterscheiden?
+* Alle Medikamente beginnen mit 7680 (76=Schweiz, 80=Swissmedic).
