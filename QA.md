@@ -25,7 +25,7 @@
 * [oddb_product.xml](http://download.hin.ch/download/oddb2xml/oddb_product.xml) enthält nur die Produkte von der Swissmedic, also die Medikamente.
 
 #### 6. Warum hat nicht jedes Produkt im oddb_article.xml einen GTIN?
-* Nicht alle Produkte haben zur Zeit einen GTIN. Dieser wird jedoch laufend ergänzt. Ab 1.1.2019 sollte der Pharmacode komplett verschwinden.
+* Nicht alle Produkte haben zur Zeit einen GTIN. Dieser wird jedoch laufend ergänzt. Ab 1.1.2019 sollte der Pharmacode komplett verschwinden. Dies wurde von der Stiftung [Refdata](http://www.refdata.ch) auch so bestätigt.
 
 #### 7. Wie kann ich Medikamente und Nicht-Medikament unterscheiden?
 * Alle GTINs der Medikamente beginnen mit 7680 (76=Schweiz, 80=Swissmedic).
