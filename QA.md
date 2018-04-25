@@ -1,6 +1,6 @@
 # Fragen und Antworten zu oddb2xml
 
-#### 1. Wann werden Medikamenten-Stammdaten aktualisiert, an welchem tag im Monat?
+#### 1. Wann werden Medikamenten-Stammdaten aktualisiert, an welchem Tag im Monat?
 * Refdata ändert täglich Pharmacodes.
 * SL Preise werden am Anfang des Monats publiziert, jeweils immer am 1. Ganz selten auch am 15.
 * Fachinfos werden täglich publiziert.
