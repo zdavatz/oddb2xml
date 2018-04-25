@@ -28,3 +28,6 @@ aber grundsätzlich selbsterklärend.
 
 #### Was ist der Unterschied zwischen oddb_article.xml und oddb_product.xml
 * oddb_article.xml enhält alle Artikel. oddb_product.xml enthält nur die Produkte von der Swissmedic, also die Medikamente.
+
+#### Warum hat nicht jedes Produkt im oddb_article.xml einen GTIN?
+* Nicht alle Produkte haben zur Zeit einen GTIN. Dieser wird jedoch laufend ergänzt. Ab 1.1.2019 sollte der Pharmacode komplett verschwinden.
