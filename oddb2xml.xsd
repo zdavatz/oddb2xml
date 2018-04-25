@@ -76,7 +76,7 @@
 
       then you add the following flags via Packungen.xls
       * Abgabekategorie (column 'N') as field SMCAT with the possible value
-        see also [Abgabekategorien](https://www.swissmedic.ch/swissmedic/de/home/services/zugelassene-praeparate/human--und-tierarzneimittel.html)
+        see also Abgabekategorien: https://www.swissmedic.ch/swissmedic/de/home/services/zugelassene-praeparate/human--und-tierarzneimittel.html
         A   Einmalige Abgabe auf ärztliche oder tierärztliche Verschreibung
         B   Abgabe auf ärztliche oder tierärztliche Verschreibung
         C   Abgabe nach Fachberatung durch Medizinalpersonen
