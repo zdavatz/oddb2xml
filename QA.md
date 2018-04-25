@@ -31,3 +31,4 @@
 
 #### 8. Ich möchte gerne ein XML-File welches alle Produkte (Pharma und Non-Pharma) und die dazugehörigen Sequenznamen enthält. Gibt es das?
 * Ja! Einfach _oddb2xml_ mit der Option _-r_ laufen lassen, siehe: https://github.com/zdavatz/oddb2xml#usage - Option "_--artikelstamm_".
+* Dieses File wird zur Zeit nicht via https://www.hin.ch/services/mediupdate-xml/ zum Download zur Verfügung gestellt. Es muss selber generiert werden mittels _oddb2xml -r_.
