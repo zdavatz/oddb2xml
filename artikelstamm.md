@@ -62,11 +62,8 @@ Im der Datei spec/spec_helper.rb findet man die Methode mock_downloads, welche m
 
 ## Entstehungsgeschichte
 
-Bis Ende 2017 wurde
-* via oddb2xml die Dateien oddb_article.xml und oddb_product.xml generiert
-* mit einen AdHoc geschriebElexisenen Tool von Marco Descher in das Artikelstamm Format (in Versionen 1,2,3,4) umgewandelt
-* dann von Elexis eingelesen
+Bis Ende 2017 wurden via oddb2xml die Dateien oddb_article.xml und oddb_product.xml generiert und mit einen AdHoc geschrieben Tool von Marco Descher in das Artikelstamm Format (in Versionen 1,2,3,4) umgewandelt und dann von Elexis eingelesen.
 
 2017 erweiterte https://github.com/ngiger/ oddb2xml auf die Bedürfnisse von Elexis und dessen Artikelstammanforderungen, um für die neue Version 5 die Dateien direkt via oddb2xml zu erstellen.
 
-Dazu kam auch das Werkzeug compare_v5 um zwei v5 XML-Dateien zu vergleichen, womit die pro Monat neu eintreffenden Anpassungen leicht verfolgbar werden.
+Dazu kam auch das Werkzeug https://github.com/zdavatz/oddb2xml/blob/master/bin/compare_v5 um zwei v5 XML-Dateien zu vergleichen, womit die pro Monat neu eintreffenden Anpassungen leicht verfolgbar werden.
