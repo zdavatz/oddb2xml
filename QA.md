@@ -1,6 +1,6 @@
 # Fragen und Antworten zu oddb2xml
 
-#### 1. Wann werden Medikamenten-Stammdaten aktualisiert, an welchem Tag im Monat?
+#### 1. Wann werden die Stammdaten unter https://www.hin.ch/services/mediupdate-xml aktualisiert, an welchem Tag im Monat?
 * [Refdata](http://www.refdata.ch/content/article_d.aspx?Nid=6&Aid=909&ID=411) ändert täglich Pharmacodes.
 * SL Preise werden am Anfang des Monats publiziert, jeweils immer am 1. Es kann auch vorkommen, dass das BAG die SL-Preise/Limitationen während dem Monat anpasst.
 * Fachinfos werden täglich publiziert.
