@@ -7,7 +7,7 @@
 * Swissmedic-Codes erscheinen einmal pro Monat, normalerweise in der ersten Woche.
 * Die Daten unter [MEDIupdate XML](https://www.hin.ch/services/mediupdate-xml/) werden täglich generiert.
 
-#### 2. Haben Sie eine Spezifikation der XML Files? 
+#### 2. Gibt es eine Spezifikation der XML Files? 
 * Ja, siehe [oddb2xml.xsd](https://github.com/zdavatz/oddb2xml/blob/master/oddb2xml.xsd)
 
 #### 3. Wo finde ich die Mehrwertsteuer?
