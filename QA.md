@@ -35,7 +35,9 @@
 
 #### 8. Ich möchte gerne ein XML-File welches alle Produkte (Pharma und Non-Pharma) und die dazugehörigen Sequenznamen enthält. Gibt es das?
 * Ja. _oddb2xml_ mit der Option _-r_ laufen lassen, siehe [usage](https://github.com/zdavatz/oddb2xml#usage) - Option "_--artikelstamm_".
-* Dieses File wird zur Zeit nicht via [MEDIupdate XML](https://www.hin.ch/services/mediupdate-xml/) zum Download zur Verfügung gestellt. Es muss selber generiert werden mittels _oddb2xml -r_ [CSV](http://pillbox.oddb.org/artikelstamm_26042018_v5.csv), [XML](http://pillbox.oddb.org/artikelstamm_26042018_v5.xml)
+* Dieses File wird zur Zeit nicht via [MEDIupdate XML](https://www.hin.ch/services/mediupdate-xml/) zum Download zur Verfügung gestellt. Es muss selber generiert werden mittels _oddb2xml -r_ 
+* [CSV vom 26.4.2018](http://pillbox.oddb.org/artikelstamm_26042018_v5.csv)
+* [XML vom 26.4.2018](http://pillbox.oddb.org/artikelstamm_26042018_v5.xml)
 
 #### 9. Wie installiere ich _oddb2xml_?
 * Neuste, stabile Version von [Ruby](http://www.ruby-lang.org/de/) installieren.
