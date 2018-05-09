@@ -72,7 +72,7 @@ module ParseUtil
   end
 
   def ParseUtil.parse_compositions(composition_text, active_agents_string = '')
-    active_agents = active_agents_string ? active_agents_string.downcase.split(/,\s+/) : []
+    active_agents = active_agents_string ? active_agents_string.gsub('[', '').downcase.split(/,\s+/) : []
     key = [ composition_text, active_agents ]
     saved_value = @@saved_parsed[key]
     if saved_value

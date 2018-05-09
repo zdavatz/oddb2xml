@@ -26,6 +26,21 @@ if RunFailingSpec
 end
 
 describe ParseComposition do
+  context "should handle 66540 Tektrotyd, Markierungsbesteck" do
+    string = "conserv.: E 216, E 218, excipiens pro suppositorio."
+    composition = ParseComposition.from_string(string)
+    active_agent = ["hynic-[d-phe(1)", "tyr(3)-octeotridum]trifluoroacetum", "acidum ethylendiamini-n,n'-diaceticum"]
+
+    active_substance = "HYNIC-[D-Phe(1)"
+    composition_text = "II) Durchstechflasche 2: acidum ethylendiamini-N,N'-diaceticum 10 mg, dinatrii phosphas dodecahydricus, natrii hydroxidum, pro vitro."
+    composition = ParseUtil.parse_compositions(composition_text, active_substance).first
+
+    specify { expect( composition.substances.size).to eq 3 }
+    specify { expect( composition.label).to eq 'II' }
+    specify { expect( composition.excipiens.name).to match /pro vitro/i }
+    specify { expect( composition.substances.first.name).to eq "Acidum Ethylendiamini-n,n'-diaceticum" }
+  end
+
   context "should handle excipiens" do
     string = "conserv.: E 216, E 218, excipiens pro suppositorio."
     composition = ParseComposition.from_string(string)
