@@ -446,4 +446,21 @@ describe Oddb2xml::Builder do
         end
       end
   end
+  context 'chapter 70 hack' do
+    before(:all) do
+      @chapter_html = File.join(Oddb2xml::SpecData, "varia_De.htm")
+    end
+    it 'varia_De to parse' do
+      expect(File.exists?(@chapter_html)).to eq true
+    end
+    it 'parsing' do
+      expect(File.exists?(@chapter_html)).to eq true
+      require 'oddb2xml/chapter_70_hack'
+      result = Oddb2xml::Chapter70xtractor.parse(@chapter_html)
+      expect(result.class).to eq Array
+      expect(result.first).to eq ["2069562", "70.01.10", "Urtinktur", "1--10 g/ml", "13.40", ""]
+      expect(result.last).to eq  ["6516727", "70.02", "Allergenorum extractum varium / Inj. Susp. \tFortsetzungsbehandlung", "1 Durchstfl 1.5 ml", "311.85", "L"]
+    end
+
+  end
 end
