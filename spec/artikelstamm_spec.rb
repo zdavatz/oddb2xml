@@ -437,7 +437,35 @@ describe Oddb2xml::Builder do
             <IKSCAT>B</IKSCAT>
             <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>5329001</PRODNO>
-        </ITEM>)
+        </ITEM>),
+        'Chapter 70 limitation' => %(<LIMITATION>
+            <!--Chapter70 hack-->
+            <LIMNAMEBAG>L1,L2</LIMNAMEBAG>
+            <DSCR>Eine Flasche zu 20 ml Urtinktur einer bestimmten Pflanze pro Monat. Für Aesculus, Carduus Marianus, Ginkgo, Hedera helix, Hypericum perforatum, Lavandula, Rosmarinus officinalis, Taraxacum officinale.</DSCR>
+            <DSCRF/>
+            <LIMITATION_PTS>1</LIMITATION_PTS>
+        </LIMITATION>),
+        'Chapter 70 product' => %(<PRODUCT>
+            <PRODNO>99992069639</PRODNO>
+            <!--Chapter70 hack-->
+            <SALECD>A</SALECD>
+            <DSCR>Ceres Urtinkturen gem&amp;auml;ss L2</DSCR>
+            <DSCRF/>
+            <LIMNAMEBAG>L1, L2</LIMNAMEBAG>
+        </PRODUCT>),
+        'Chapter 70 item' => %(<ITEM PHARMATYPE="N">
+            <GTIN>2500000588525</GTIN>
+            <PHAR>2069622</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>EINF ARZNEI Ceres Urtinktur 20ml</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <PEXF>18.87</PEXF>
+            <PPUB>25.20</PPUB>
+            <!--Chapter70 hack-->
+            <SL_ENTRY>true</SL_ENTRY>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>2500000588525</PRODNO>
+        </ITEM>),
               }
 
       tests.each do |key, expected|
@@ -448,15 +476,11 @@ describe Oddb2xml::Builder do
   end
   context 'chapter 70 hack' do
     before(:all) do
-      @chapter_html = File.join(Oddb2xml::SpecData, "varia_De.htm")
-    end
-    it 'varia_De to parse' do
-      expect(File.exists?(@chapter_html)).to eq true
+      mock_downloads
     end
     it 'parsing' do
-      expect(File.exists?(@chapter_html)).to eq true
       require 'oddb2xml/chapter_70_hack'
-      result = Oddb2xml::Chapter70xtractor.parse(@chapter_html)
+      result = Oddb2xml::Chapter70xtractor.parse()
       expect(result.class).to eq Array
       expect(result.first).to eq ["2069562", "70.01.10", "Urtinktur", "1--10 g/ml", "13.40", ""]
       expect(result.last).to eq  ["6516727", "70.02", "Allergenorum extractum varium / Inj. Susp. \tFortsetzungsbehandlung", "1 Durchstfl 1.5 ml", "311.85", "L"]

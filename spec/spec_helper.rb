@@ -256,6 +256,7 @@ def mock_downloads
       'https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv' => 'atc.csv',
       'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt' => 'oddb2xml_files_lppv.txt',
       'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip' => 'XMLPublications.zip',
+      'http://bag.e-mediat.net/Sl2007.web.external/varia_De.htm' => 'varia_De.htm',
 #      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml',
       }.each do |url, file|
       inhalt = File.read(File.join(Oddb2xml::SpecData, file))

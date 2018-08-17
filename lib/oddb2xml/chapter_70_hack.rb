@@ -1,6 +1,7 @@
 # encoding: utf-8
 require 'oddb2xml/extractor'
 require 'ox'
+require 'open-uri'
 
 module Oddb2xml
   class Chapter70xtractor < Extractor
@@ -16,20 +17,26 @@ module Oddb2xml
       end
       res.flatten # .join("\t")
     end
-    def self.parse(html_file)
+    LIMITATIONS = {
+      'L'  => 'Kostenübernahme nur nach vorgängiger allergologischer Abklärung.',
+      'L1' => 'Eine Flasche zu 20 ml Urtinktur einer bestimmten Pflanze pro Monat.',
+      'L1,L2' => 'Eine Flasche zu 20 ml Urtinktur einer bestimmten Pflanze pro Monat. Für Aesculus, Carduus Marianus, Ginkgo, Hedera helix, Hypericum perforatum, Lavandula, Rosmarinus officinalis, Taraxacum officinale.',
+      'L3' => 'Alle drei Monate wird eine Verordnung/Originalpackung pro Mittel vergütet.',
+    }
+    def self.items
+      @@items
+    end
+    def self.parse(html_file = 'http://bag.e-mediat.net/Sl2007.web.external/varia_De.htm')
       data = Hash.new{|h,k| h[k] = [] }
       Ox.default_options = {
           mode:   :generic,
           effort: :tolerant,
           smart:  true
       }
-      res = Ox.load(IO.read(html_file), mode: :hash_no_attrs).values.first['body']
-      # item[4].values.flatten[3].values.flatten.collect{|x| x.is_a?(Hash) ? x.values : x.gsub(/\r\n/,'')}.flatten
-      #item[4].values.flatten[3].keys.first.eql?('td')
-      # res.values.last.each{ |item| puts "keys #{item.keys} #{item.values.first.size}"; item.values.first.each { |subElem| puts "#{subElem}" } }; 7
+      res = Ox.load(open(html_file).read, mode: :hash_no_attrs).values.first['body']
       result = []
-      # result = res.values.last.each{ |item| puts "keys #{item.keys} #{item.values.first.size}"; item.values.first.each { |subElem| result << Chapter70xtractor.parse_td(subElem) } }; 7
       idx = 0
+      @@items = {}
       res.values.last.each do |item|
         item.values.first.each do |subElem|
           what =  Chapter70xtractor.parse_td(subElem)
@@ -39,6 +46,23 @@ module Oddb2xml
         end
       end
       result2 = result.find_all{ |x| (x.is_a?(Array) && x.first.is_a?(String)) && x.first.to_i > 100}
+      result2.each do |entry|
+        data = {}
+        pharma_code = entry.first
+        ean13 =  (Oddb2xml::FAKE_GTIN_START + pharma_code.to_s)
+        @@items[ean13] = {
+          :data_origin   => 'Chapter70',
+          :line   => entry.join(","),
+          :ean13 => ean13,
+          :description => entry[2],
+          :quantity => entry[3],
+          :pharmacode => pharma_code,
+          :pub_price => entry[4],
+          :limitation => entry[5],
+          :type => :pharma,
+        }
+      end
+      result2
     end
   end
 end

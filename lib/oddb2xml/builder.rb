@@ -219,6 +219,31 @@ module Oddb2xml
     def prepare_products
       unless @products
         @products = {}
+        if @chapter70items
+          Chapter70xtractor::LIMITATIONS.each do |key, desc_de|
+            puts "Chapter70: Adding lim #{key} #{desc_de}" if $VERBOSE
+            @limitations<< {:code => key,
+                            :id => ( key.eql?('L') ? '70.02' :'70.01'),
+                            :desc_de => desc_de,
+                            :desc_fr => '',
+                            :chap70 => true,
+                            }
+          end
+          @chapter70items.values.each do |item|
+            next unless item[:limitation] && item[:limitation].length > 0
+            rose = @infos_zur_rose.values.find {|x| x[:pharmacode] && x[:pharmacode].eql?(item[:pharmacode])}
+            ean13 =  rose[:ean13] if rose
+            ean13 ||=  '9999'+item[:pharmacode]
+            obj = {
+              :chapter70 => true,
+              :ean13 => ean13,
+              :description => item[:description],
+              :code => item[:limitation], # LIMNAMEBAG
+            }
+            @products[ean13] = obj
+            puts "Chapter70: Adding product #{ean13} #{obj}" if $VERBOSE
+          end
+        end
         @refdata.each_pair do |ean13, item|
           next if item and item.is_a?(Hash) and item[:atc_code] and /^Q/i.match(item[:atc_code])
           next if item[:prodno] and @products[item[:prodno]]
@@ -442,7 +467,7 @@ module Oddb2xml
       @products.each{
         |ean13, obj|
               ean13_to_product[ean13] = obj
-              obj[:pharmacode] ||= @refdata[ean13][:pharmacode]
+              obj[:pharmacode] ||= @refdata[ean13][:pharmacode] if @refdata[ean13]
       }
       ausgabe = File.open(File.join(WorkDir, 'missing_in_refdata.txt'), 'w+')
       size_old = ean13_to_product.size
@@ -1543,7 +1568,12 @@ module Oddb2xml
             end
             # Set the pharmatype to 'Y' for outdated products, which are no longer found
             # in refdata/packungen
-            patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) ? 'P': 'N' )
+            chap70 = nil
+            if @chapter70items.values.find {|x| x[:pharmacode] && x[:pharmacode].eql?(obj[:pharmacode])}
+              Oddb2xml.log "found chapter #{obj[:pharmacode]}"
+              chap70 = true
+            end
+            patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0') || chap70) ? 'P': 'N' )
             next if /^#{Oddb2xml::FAKE_GTIN_START}/.match(ean13.to_s)
             xml.ITEM({'PHARMATYPE' => patched_pharma_type }) do
               xml.GTIN ean13.to_s.rjust(13, '0')
@@ -1556,6 +1586,12 @@ module Oddb2xml
               end if obj[:company_ean] && !obj[:company_ean].empty?
               xml.PEXF obj[:price]      if obj[:price] && !obj[:price].empty?
               xml.PPUB obj[:pub_price]  if obj[:pub_price] && !obj[:pub_price].empty?
+              if chap70
+                xml.comment "Chapter70 hack" 
+                xml.SL_ENTRY 'true'
+                xml.DEDUCTIBLE 10; # 10%
+                xml.PRODNO ean13
+              end
             end
           end
         end
@@ -1563,6 +1599,9 @@ module Oddb2xml
         nr_items
       end
       unless @prepared
+        require 'oddb2xml/chapter_70_hack'
+        Oddb2xml::Chapter70xtractor.parse()
+        @chapter70items = Oddb2xml::Chapter70xtractor.items
         prepare_limitations
         prepare_articles
         prepare_products
@@ -1614,13 +1653,16 @@ module Oddb2xml
                 ppac = @packs.find{|pac| pac.ean == ean }.first
               end
               prodno = ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
+              prodno = obj[:ean13] if obj[:chapter70]
               next unless prodno
               next if emitted_prodno.index(prodno)
               sequence ||= @articles.find{|x| x[:ean13].eql?(ean)}
-              next unless sequence && (sequence[:name_de] || sequence[:desc_de])
-              if Oddb2xml.getEan13forProdno(prodno).size == 0
-                puts "No item found for prodno #{prodno} no8 #{obj[:no8]} #{sequence[:name_de]} "
-                next
+              unless obj[:chapter70]
+                next unless sequence && (sequence[:name_de] || sequence[:desc_de])
+                if Oddb2xml.getEan13forProdno(prodno).size == 0
+                  puts "No item found for prodno #{prodno} no8 #{obj[:no8]} #{sequence[:name_de]} "
+                  next
+                end
               end
               emitted_prodno << prodno
               nr_products += 1
@@ -1637,6 +1679,13 @@ module Oddb2xml
                   lim_code = first_limitation[:code]
                   used_limitations << lim_code unless used_limitations.index(lim_code)
                   xml.LIMNAMEBAG lim_code
+                elsif obj[:chapter70]
+                  used_limitations << obj[:code]
+                  xml.comment "Chapter70 hack"
+                  xml.SALECD('A') # these products are always active!
+                  xml.DSCR obj[:description]
+                  xml.DSCRF ''
+                  xml.LIMNAMEBAG obj[:code]
                 end
                 if sequence && sequence[:substances]
                   value = nil
@@ -1656,10 +1705,13 @@ module Oddb2xml
           xml.LIMITATIONS do
             @limitations.sort! { |left, right| left[:code] <=> right[:code] }
             @limitations.each do |lim|
-              next unless used_limitations.index(lim[:code])
-              next if emitted_lim_code.index(lim[:code])
+              unless lim[:chap70]
+                next unless used_limitations.index(lim[:code])
+                next if emitted_lim_code.index(lim[:code])
+              end
               emitted_lim_code << lim[:code]
               xml.LIMITATION do
+                xml.comment "Chapter70 hack" if lim[:chap70]
                 xml.LIMNAMEBAG lim[:code] # original LIMCD
                 xml.DSCR       lim[:desc_de]
                 xml.DSCRF      lim[:desc_fr]
