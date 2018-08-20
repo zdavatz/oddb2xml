@@ -25,7 +25,11 @@ module Oddb2xml
         raise "Cannot determine keyname for component #{component_name}"
     end
     def get_items(component_name)
-      @hash[:ARTIKELSTAMM][component_name.to_sym].values.first
+      # hack to make it spec/check_artikelstamm.rb work if called alone or as part
+      # of the whole spec suite
+      xx= @hash[:ARTIKELSTAMM] ||@hash['ARTIKELSTAMM']
+      comps = xx[component_name.to_sym] || xx[component_name]
+      comps.values.first
     end
     def load_file(name)
       Oddb2xml.log_timestamp "Reading #{name} #{(File.size(name)/1024/1024).to_i} MB. This may take some time"

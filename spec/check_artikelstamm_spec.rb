@@ -37,7 +37,6 @@ describe Oddb2xml::SemanticCheck do
       end if /okay/i.match(File.basename(file2check))
 
       it "#{File.basename(file2check)} should return an error" do
-        skip("Do not run these tests under travis") unless ENV['TRAVIS'].nil?
         result = Oddb2xml::SemanticCheck.new(file2check).allSemanticChecks
         expect(result).to eq false
       end unless /okay/i.match(File.basename(file2check))
