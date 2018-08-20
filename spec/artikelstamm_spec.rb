@@ -438,34 +438,41 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>5329001</PRODNO>
         </ITEM>),
-        'Chapter 70 limitation' => %(<LIMITATION>
+        'Chapter 70 limitation' => %(        <LIMITATION>
             <!--Chapter70 hack-->
-            <LIMNAMEBAG>L1,L2</LIMNAMEBAG>
+            <LIMNAMEBAG>L1, L2</LIMNAMEBAG>
             <DSCR>Eine Flasche zu 20 ml Urtinktur einer bestimmten Pflanze pro Monat. Für Aesculus, Carduus Marianus, Ginkgo, Hedera helix, Hypericum perforatum, Lavandula, Rosmarinus officinalis, Taraxacum officinale.</DSCR>
             <DSCRF/>
             <LIMITATION_PTS>1</LIMITATION_PTS>
         </LIMITATION>),
         'Chapter 70 product' => %(<PRODUCT>
-            <PRODNO>99992069639</PRODNO>
+            <PRODNO>2069639</PRODNO>
             <!--Chapter70 hack-->
             <SALECD>A</SALECD>
-            <DSCR>Ceres Urtinkturen gem&amp;auml;ss L2</DSCR>
+            <DSCR>Ceres Urtinkturen gemäss L2</DSCR>
             <DSCRF/>
             <LIMNAMEBAG>L1, L2</LIMNAMEBAG>
         </PRODUCT>),
-        'Chapter 70 item' => %(<ITEM PHARMATYPE="N">
-            <GTIN>2500000588525</GTIN>
-            <PHAR>2069622</PHAR>
+        'Chapter 70 item' => %(<ITEM PHARMATYPE="P">
+            <GTIN>2500000588532</GTIN>
+            <PHAR>2069639</PHAR>
             <SALECD>A</SALECD>
-            <DSCR>EINF ARZNEI Ceres Urtinktur 20ml</DSCR>
+            <DSCR>EINF ARZNEI Ceres Urtinktur spez 20ml</DSCR>
             <DSCRF>--missing--</DSCRF>
-            <PEXF>18.87</PEXF>
-            <PPUB>25.20</PPUB>
+            <PEXF>23.44</PEXF>
+            <PPUB>31.30</PPUB>
             <!--Chapter70 hack-->
             <SL_ENTRY>true</SL_ENTRY>
-            <DEDUCTIBLE>10</DEDUCTIBLE>
-            <PRODNO>2500000588525</PRODNO>
+            <PRODNO>2069639</PRODNO>
         </ITEM>),
+        'HTML-encoded limitation' => %(<DSCR>Zur Erhaltungstherapie (Monotherapie) bei erwachsenen Patientinnen mit rezidiviertem, fortgeschrittenem Ovarialkarzinom mit BRCA Mutation im Anschluss an eine platinhaltige Chemotherapie bei Vorliegen einer kompletten oder partiellen Remission.
+
+Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorgegebenen Internettool des Registers, abrufbar auf http://www.olaparib-registry.ch, zu erfassen. Eine schriftliche Einwilligung der Patientin muss vorliegen. Es sind folgende Daten zu erfassen:
+
+1\)	Geburtsjahr, sowie Vortherapien für das OC
+
+2\)	Datum Therapiestart, Dosierung, Dosisanpassungen, Datum Therapieende.
+</DSCR>),
               }
 
       tests.each do |key, expected|

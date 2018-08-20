@@ -234,13 +234,14 @@ module Oddb2xml
             rose = @infos_zur_rose.values.find {|x| x[:pharmacode] && x[:pharmacode].eql?(item[:pharmacode])}
             ean13 =  rose[:ean13] if rose
             ean13 ||=  '9999'+item[:pharmacode]
+            prodno = item[:pharmacode]
             obj = {
               :chapter70 => true,
               :ean13 => ean13,
               :description => item[:description],
               :code => item[:limitation], # LIMNAMEBAG
             }
-            @products[ean13] = obj
+            @products[prodno] = obj
             puts "Chapter70: Adding product #{ean13} #{obj}" if $VERBOSE
           end
         end
@@ -1573,7 +1574,7 @@ module Oddb2xml
               Oddb2xml.log "found chapter #{obj[:pharmacode]}"
               chap70 = true
             end
-            patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0') || chap70) ? 'P': 'N' )
+            patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) || chap70 ? 'P': 'N' )
             next if /^#{Oddb2xml::FAKE_GTIN_START}/.match(ean13.to_s)
             xml.ITEM({'PHARMATYPE' => patched_pharma_type }) do
               xml.GTIN ean13.to_s.rjust(13, '0')
@@ -1589,8 +1590,7 @@ module Oddb2xml
               if chap70
                 xml.comment "Chapter70 hack" 
                 xml.SL_ENTRY 'true'
-                xml.DEDUCTIBLE 10; # 10%
-                xml.PRODNO ean13
+                xml.PRODNO obj[:pharmacode]
               end
             end
           end
@@ -1653,7 +1653,7 @@ module Oddb2xml
                 ppac = @packs.find{|pac| pac.ean == ean }.first
               end
               prodno = ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
-              prodno = obj[:ean13] if obj[:chapter70]
+              prodno = obj[:pharmacode] if obj[:chapter70]
               next unless prodno
               next if emitted_prodno.index(prodno)
               sequence ||= @articles.find{|x| x[:ean13].eql?(ean)}
@@ -1667,6 +1667,8 @@ module Oddb2xml
               emitted_prodno << prodno
               nr_products += 1
               xml.PRODUCT do
+                            binding.pry if '2500000588532'.eql?(prodno)
+
                 xml.PRODNO prodno
                 if sequence
                   xml.SALECD('A') # these products are always active!
@@ -1713,8 +1715,8 @@ module Oddb2xml
               xml.LIMITATION do
                 xml.comment "Chapter70 hack" if lim[:chap70]
                 xml.LIMNAMEBAG lim[:code] # original LIMCD
-                xml.DSCR       lim[:desc_de]
-                xml.DSCRF      lim[:desc_fr]
+                xml.DSCR       Oddb2xml.html_decode(lim[:desc_de])
+                xml.DSCRF      Oddb2xml.html_decode(lim[:desc_fr])
                 xml.LIMITATION_PTS  (lim[:value].to_s.length > 1 ? lim[:value] : 1)
               end
             end

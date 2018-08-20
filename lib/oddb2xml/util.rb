@@ -1,5 +1,7 @@
 # encoding: utf-8
 require 'open-uri'
+require 'htmlentities'
+
 module Oddb2xml
   FAKE_GTIN_START = '999999'
   def Oddb2xml.gen_prodno(iksnr, seqnr)
@@ -24,6 +26,15 @@ module Oddb2xml
   @atc_csv_origin = 'http://download.epha.ch/data/atc/atc.csv'
   @atc_csv_content = {}
 
+  def Oddb2xml.html_decode(string)
+    german = string
+    german = string.force_encoding('ISO-8859-1').encode('UTF-8') if string.encoding.to_s.eql?('ASCII')
+    while !german.eql?(HTMLEntities.new.decode(german))
+      german = HTMLEntities.new.decode(german)
+    end
+    Oddb2xml.patch_some_utf8(german).gsub('<br>',"\n")
+  end
+  
   def Oddb2xml.patch_some_utf8(line)
     begin
       line = line.encode('utf-8')

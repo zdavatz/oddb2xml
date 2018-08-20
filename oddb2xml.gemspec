@@ -36,6 +36,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'trollop' #, '>= 2.4.1'
   spec.add_dependency 'xml-simple'
   spec.add_dependency 'ox'
+  spec.add_dependency 'htmlentities'
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
