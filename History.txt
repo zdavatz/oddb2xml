@@ -1,3 +1,13 @@
+=== 2.5.6 / 21.08.2018
+
+* Artikelstamm: Add homeopathic drugs of chapter 70 http://bag.e-mediat.net/Sl2007.web.external/varia_De.htm
+* Artikelstamm: Replace HTML entities by UTF-8 characters for limitations
+
+=== 2.5.5 / 09.05.2018
+
+* Fix parsing 66540 Tektrotyd, Markierungsbesteck
+* Update QA.md/artikelstamm.md
+
 === 2.5.4 / 09.04.2018
 
 * Correct name in Artikelstamm, when several packages exist in Preparions.xml (SL)
