@@ -480,7 +480,7 @@ describe Oddb2xml::Builder do
   NrInteractions = 2
   NrCodes = 5
   NrProdno = 31
-  NrPackages = 43
+  NrPackages = 44
   NrProducts = 39
   RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
@@ -582,6 +582,29 @@ describe Oddb2xml::Builder do
       expect(found)
     end
 
+    it 'should generate ATC for 7680002770014' do
+      oddb_product_xml = IO.read(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
+      text = %(<GTIN>7680002770014</GTIN>
+    <PRODNO>0027701</PRODNO>
+    <DSCRD>SEROCYTOL Herz-Gefässe Supp 3 Stk</DSCRD>
+    <DSCRF>SEROCYTOL Coeur-Vaisseaux supp 3 pce</DSCRF>
+    <ATC>J06AA99</ATC>
+    <IT>08.07.</IT>
+    <CPT/>)
+      expect(oddb_product_xml.index(text)).to be >= 1
+    end
+
+    it 'should generate ATC for 7680002770021' do
+      oddb_product_xml = IO.read(File.join(Oddb2xml::WorkDir, 'oddb_product.xml'))
+      text2 = %( <GTIN>7680002770021</GTIN>
+    <PRODNO>0027701</PRODNO>
+    <DSCRD>Coeur-Vaisseaux Sérocytol, suppositoire</DSCRD>
+    <DSCRF>Coeur-Vaisseaux Sérocytol, suppositoire</DSCRF>
+    <ATC>J06AA</ATC>
+    <IT>08.07.</IT>
+    <CPT/>)
+      expect(oddb_product_xml.index(text2)).to be >= 1
+    end
   end
 
   context 'when -o for fachinfo is given' do

@@ -550,6 +550,7 @@ module Oddb2xml
             xml.PRODNO obj[:prodno]                                 if obj[:prodno]
             xml.DSCRD  check_name(obj, :de)
             xml.DSCRF  check_name(obj, :fr)
+            xml.ATC obj[:atc_code] unless obj[:atc_code].empty?
             xml.IT  obj[:ith_swissmedic]                            if obj[:ith_swissmedic]
             xml.CPT
             xml.PackGrSwissmedic      obj[:package_size]            if obj[:package_size]
@@ -1667,8 +1668,6 @@ module Oddb2xml
               emitted_prodno << prodno
               nr_products += 1
               xml.PRODUCT do
-                            binding.pry if '2500000588532'.eql?(prodno)
-
                 xml.PRODNO prodno
                 if sequence
                   xml.SALECD('A') # these products are always active!

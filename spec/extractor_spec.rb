@@ -182,7 +182,7 @@ describe Oddb2xml::SwissmedicExtractor do
       @packs.find{|pack| pack[1][:ean13] == ean13.to_s }[1]
     end
     it 'should have correct nr of packages' do
-      expect(@packs.size).to eq(39)
+      expect(@packs.size).to eq(40)
     end
 
     it 'should have serocytol' do
