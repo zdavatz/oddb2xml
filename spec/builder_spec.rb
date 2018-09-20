@@ -473,7 +473,7 @@ def checkProductXml(nbr_record = -1)
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 77
+  NrExtendedArticles = 76
   NrSubstances = 27
   NrLimitations = 14
   
@@ -605,6 +605,11 @@ describe Oddb2xml::Builder do
     <CPT/>)
       expect(oddb_product_xml.index(text2)).to be >= 1
     end
+    
+    it 'should generate SALECD A for swissmedic packages' do
+      expect(IO.read(oddb_article_xml).index('<SALECD>A<!--Overriding status I nincd 10 for 7680658560014 as in refdata_pharma--></SALECD>')).to be >= 1
+    end
+    
   end
 
   context 'when -o for fachinfo is given' do

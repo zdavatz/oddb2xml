@@ -121,7 +121,7 @@ describe Oddb2xml::Builder do
     it 'should find price from Preparations.xml by setting' do
       expect(File.exists?(@elexis_v5_csv)).to eq true
       inhalt = File.open(@elexis_v5_csv, 'r+').read
-      expected = %(7680658560014,"Dibase 10'000, Tropfen 10000 IE/ml",Flasche(n),Flasche(n),5,9.25,6585601,A11CC05,cholecalciferolum,,07.02.3.,SL)
+      expected = %(7680658560014,Dibase 10'000 Tropfen 10000 IE/ml Fl 10 ml,,Flasche(n),5,9.25,,,,"",,SL)
       expect(inhalt.index(expected)).to be > 0
     end
 
@@ -214,25 +214,22 @@ describe Oddb2xml::Builder do
     
     it 'should contain DIBASE with phar' do
       expected = %(<ITEM PHARMATYPE="P">
-            <GTIN>7680658560014</GTIN>
+            <GTIN>7680658570013</GTIN>
             <!--override  with-->
             <SALECD>A</SALECD>
-            <DSCR>Dibase 10'000, Tropfen 10000 IE/ml</DSCR>
-            <DSCRF>Dibase 10'000, gouttes 10000 UI/ml</DSCRF>
+            <DSCR>DIBASE 25'000, Lösung zum Einnehmen</DSCR>
+            <DSCRF>--missing--</DSCRF>
             <COMP>
                 <NAME>Gebro Pharma AG</NAME>
                 <GLN/>
             </COMP>
-            <PEXF>5</PEXF>
-            <PPUB>9.25</PPUB>
             <PKG_SIZE>1</PKG_SIZE>
             <MEASURE>Flasche(n)</MEASURE>
             <MEASUREF>Flasche(n)</MEASUREF>
-            <DOSAGE_FORM>orale Tropflösung</DOSAGE_FORM>
-            <SL_ENTRY>true</SL_ENTRY>
+            <DOSAGE_FORM>Lösung</DOSAGE_FORM>
+            <DOSAGE_FORMF>Solution</DOSAGE_FORMF>
             <IKSCAT>D</IKSCAT>
-            <DEDUCTIBLE>10</DEDUCTIBLE>
-            <PRODNO>6585601</PRODNO>
+            <PRODNO>6585701</PRODNO>
         </ITEM>)
       expect(@inhalt.index(expected)).not_to be nil
     end

@@ -828,6 +828,7 @@ module Oddb2xml
     end
 
     def build_article
+      @overriden_salecd = []
       prepare_limitations
       prepare_articles
       idx = 0
@@ -1035,7 +1036,7 @@ module Oddb2xml
           }
         }
       end
-      Oddb2xml.log "build_article. Done #{idx} of #{@articles.size} articles"
+      Oddb2xml.log "build_article. Done #{idx} of #{@articles.size} articles. Overrode #{@overriden_salecd.size} SALECD"
       Oddb2xml.add_hash(_builder.to_xml)
     end
     def build_fi
@@ -1381,8 +1382,16 @@ module Oddb2xml
         zur_rose = @infos_zur_rose[ean13] # zurrose
       end
       nincd = detect_nincd(obj)
+      in_refdata = !!( obj[:seq] && obj[:seq][:packages] && obj[:seq][:packages][ean13] && obj[:seq][:packages][ean13][:swissmedic_number8])
       status = (nincd && nincd == 13) ?  'A' : (zur_rose && zur_rose[:cmut] != '3') ? 'A' : 'I'
-      xml.SALECD(status) { xml.comment( "expiry_date #{obj[:expiry_date]}") if obj[:expiry_date] }
+      if in_refdata && !'A'.eql?(status)
+        msg = "Overriding status #{status} nincd #{nincd} for #{ean13} as in refdata_pharma"
+        # Oddb2xml.log msg
+        @overriden_salecd << ean13
+        xml.SALECD('A') { xml.comment(msg)}
+      else
+        xml.SALECD(status) { xml.comment( "expiry_date #{obj[:expiry_date]}") if obj[:expiry_date] }
+      end
     end
 
     def build_artikelstamm
