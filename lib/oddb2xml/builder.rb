@@ -1397,7 +1397,7 @@ module Oddb2xml
     def build_artikelstamm
       @@emitted_v5_gtins = []
       @csv_file = CSV.open(File.join(WorkDir,  "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.csv"), "w+")
-      @csv_file << ['gtin', 'price', 'galenic_form', 'pkg_size', 'pexf', 'ppub', 'iksnr', 'atc_code', 'active_substance', 'original', 'it-code', 'sl-liste']
+      @csv_file << ['gtin', 'name', 'pkg_size', 'galenic_form', 'price_ex_factory', 'price_public', 'prodno', 'atc_code', 'active_substance', 'original', 'it-code', 'sl-liste']
       @csv_file.sync = true
       variant = "build_artikelstamm"
       # @infos_zur_rose.delete_if { |key, val| val[:cmut].eql?('3') } # collect only active zur rose item
@@ -1581,7 +1581,7 @@ module Oddb2xml
             # in refdata/packungen
             chap70 = nil
             if @chapter70items.values.find {|x| x[:pharmacode] && x[:pharmacode].eql?(obj[:pharmacode])}
-              Oddb2xml.log "found chapter #{obj[:pharmacode]}"
+              Oddb2xml.log "found chapter #{obj[:pharmacode]}" if $VERBOSE
               chap70 = true
             end
             patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) || chap70 ? 'P': 'N' )
@@ -1680,8 +1680,17 @@ module Oddb2xml
                 xml.PRODNO prodno
                 if sequence
                   xml.SALECD('A') # these products are always active!
-                  override(xml, prodno, :DSCR,  ((sequence[:name_de] ? sequence[:name_de] : '') + ' ' + sequence[:desc_de]).strip)
-                  override(xml, prodno, :DSCRF, ((sequence[:name_fr] ? sequence[:name_fr] : '') + ' ' + sequence[:desc_fr]).strip)
+                  name_de = sequence[:name_de]
+                  unless name_de
+                    if ppac &&  /stk/i.match( sequence[:desc_de])
+                      name_de = ppac[:sequence_name]
+                    else
+                      name_de = sequence[:desc_de]
+                    end
+                  end
+                  name_fr = sequence[:name_fr] || (ppac && ppac[:sequence_name]) || sequence[:desc_fr]
+                  override(xml, prodno, :DSCR,  name_de.strip)
+                  override(xml, prodno, :DSCRF, name_fr.strip)
                 end
                 xml.ATC sequence[:atc_code] if sequence && sequence[:atc_code] && !sequence[:atc_code].empty?
                 if sequence && sequence[:packages] && (first_package = sequence[:packages].values.first) &&

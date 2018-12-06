@@ -315,6 +315,20 @@ Corresp. 5300 kJ.",
     specify { expect(res.first.class).to eq String }
   end
 
+  context 'should return correct value for 5 Ampullen a 10 mk' do
+    pkg_size_L = '5 Ampullen a 10 ml'
+    einheit_M  = 'Ampulle'
+    name_C = 'Suspension zur Injektion'
+
+    result = Calc.new(name_C, pkg_size_L, einheit_M, nil)
+    specify { expect(result.selling_units).to eq 5 }
+    specify { expect(result.measure).to eq einheit_M }
+    
+    res = Calc.report_conversion
+    specify { expect(res.class).to eq Array }
+    specify { expect(res.first.class).to eq String }
+  end
+
   context 'find correct result for Nutriflex' do
     info = Calc.new(Tst_nutriflex.name_C, Tst_nutriflex.package_size_L, Tst_nutriflex.einheit_M, Tst_nutriflex.active_substance_0, Tst_nutriflex.composition_P)
     specify { expect(info.selling_units).to eq  5 }

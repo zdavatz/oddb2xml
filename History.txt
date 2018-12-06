@@ -1,3 +1,9 @@
+=== 2.5.9 / 06.12.2018
+
+* Only changes when generating artikelstamm
+** Use sequence name from packages when there is no german name in the article (from refdata)
+** Correct header of artikelstamm-*.csv
+
 === 2.5.8 / 20.09.2018
 
 * Set SALECD to 'A' if article is from refdata_pharma/swissmedic
