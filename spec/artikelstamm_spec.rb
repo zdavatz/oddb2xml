@@ -91,7 +91,7 @@ describe Oddb2xml::Builder do
             <PRODNO>5815801</PRODNO>
             <SALECD>A</SALECD>
             <DSCR>PRIORIX TETRA Trockensub c Solv Fertspr</DSCR>
-            <DSCRF>PRIORIX TETRA subst sèche c solv ser pré</DSCRF>
+            <DSCRF>Priorix-Tetra, Pulver und Lösungsmittel zur Herstellung einer Injektionslösung</DSCRF>
             <ATC>J07BD54</ATC>
         </PRODUCT>)
       expect(@inhalt.index(expected)).not_to be nil
@@ -391,8 +391,8 @@ describe Oddb2xml::Builder do
       'product 3TC Filmtabl' => %(<PRODUCT>
             <PRODNO>5366201</PRODNO>
             <SALECD>A</SALECD>
-            <DSCR>3TC Filmtabl 150 mg</DSCR>
-            <DSCRF>3TC cpr pell 150 mg</DSCRF>
+            <DSCR>3TC</DSCR>
+            <DSCRF>3TC</DSCRF>
             <ATC>J05AF05</ATC>
             <SUBSTANCE>Lamivudinum</SUBSTANCE>
         </PRODUCT>),
@@ -435,7 +435,7 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>5329001</PRODNO>
         </ITEM>),
-        'Chapter 70 limitation' => %(        <LIMITATION>
+        'Chapter 70 limitation' => %(<LIMITATION>
             <!--Chapter70 hack-->
             <LIMNAMEBAG>L1, L2</LIMNAMEBAG>
             <DSCR>Eine Flasche zu 20 ml Urtinktur einer bestimmten Pflanze pro Monat. Für Aesculus, Carduus Marianus, Ginkgo, Hedera helix, Hypericum perforatum, Lavandula, Rosmarinus officinalis, Taraxacum officinale.</DSCR>
