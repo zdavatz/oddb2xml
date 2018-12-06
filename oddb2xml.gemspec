@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'parslet'#, '~> 1.7.0'
   spec.add_dependency 'rubyntlm', '0.5.1'
   spec.add_dependency 'multi_json'#, '>= 0.3.2'
-  spec.add_dependency 'rack', '< 2.0'
+  spec.add_dependency 'rack', '>= 2.0.6'
   spec.add_dependency 'httpi' #, '>= 2.4.1'
   spec.add_dependency 'trollop' #, '>= 2.4.1'
   spec.add_dependency 'xml-simple'
