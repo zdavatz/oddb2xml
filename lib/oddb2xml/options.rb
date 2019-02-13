@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'trollop'
+require 'optimist'
 require 'oddb2xml/version'
 
 module Oddb2xml
@@ -9,7 +9,7 @@ module Oddb2xml
         args = args.split(' ') 
       end
 
-      @opts = Trollop::options(args) do
+      @opts = Optimist::options(args) do
         version "#$0 ver.#{Oddb2xml::VERSION}"
         banner <<-EOS
         #{File.expand_path($0)} version #{Oddb2xml::VERSION}

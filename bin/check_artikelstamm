@@ -6,9 +6,9 @@ $:.unshift root.join('lib') if $0 == __FILE__
 
 require 'oddb2xml/version'
 require 'oddb2xml/semantic_check'
-require 'trollop'
+require 'optimist'
 
-@opts = Trollop::options(ARGV) do
+@opts = Optimist::options(ARGV) do
   version "#$0 ver.#{Oddb2xml::VERSION}"
   banner <<-EOS
     Runs various semanti_check for the Elexis artikelstamm

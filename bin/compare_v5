@@ -6,7 +6,7 @@ $:.unshift root.join('lib') if $0 == __FILE__
 
 require 'oddb2xml/version'
 require 'oddb2xml/compare'
-require 'trollop'
+require 'optimist'
     DEFAULTSx = {
       :components => ["PRODUCTS", "LIMITATIONS", "ITEMS",],
       :fields_to_ignore => ['COMP', 'DOSAGE_FORMF', 'MEASUREF'],
@@ -15,7 +15,7 @@ require 'trollop'
       :case_insensitive => true,
     }
 
-@opts = Trollop::options(ARGV) do
+@opts = Optimist::options(ARGV) do
   version "#$0 ver.#{Oddb2xml::VERSION}"
   banner <<-EOS
   Usage:
