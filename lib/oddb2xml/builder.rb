@@ -706,17 +706,17 @@ module Oddb2xml
             puts "#{Time.now}: At row #{row_nr} iksnr #{iksnr}";
             $stdout.flush
         end
-        ith       = COLUMNS_JULY_2015.keys.index(:index_therapeuticus)
-        seq_name  = COLUMNS_JULY_2015.keys.index(:name_base)
-        i_3       = COLUMNS_JULY_2015.keys.index(:ikscd)
-        p_1_2     = COLUMNS_JULY_2015.keys.index(:seqnr)
-        cat       = COLUMNS_JULY_2015.keys.index(:ikscat)
-        siz       = COLUMNS_JULY_2015.keys.index(:size)
-        atc       = COLUMNS_JULY_2015.keys.index(:atc_class)
-        list_code = COLUMNS_JULY_2015.keys.index(:production_science)
-        unit      = COLUMNS_JULY_2015.keys.index(:unit)
-        sub       = COLUMNS_JULY_2015.keys.index(:substances)
-        comp      = COLUMNS_JULY_2015.keys.index(:composition)
+        ith       = COLUMNS_FEBRUARY_2019.keys.index(:index_therapeuticus)
+        seq_name  = COLUMNS_FEBRUARY_2019.keys.index(:name_base)
+        i_3       = COLUMNS_FEBRUARY_2019.keys.index(:ikscd)
+        p_1_2     = COLUMNS_FEBRUARY_2019.keys.index(:seqnr)
+        cat       = COLUMNS_FEBRUARY_2019.keys.index(:ikscat)
+        siz       = COLUMNS_FEBRUARY_2019.keys.index(:size)
+        atc       = COLUMNS_FEBRUARY_2019.keys.index(:atc_class)
+        list_code = COLUMNS_FEBRUARY_2019.keys.index(:production_science)
+        unit      = COLUMNS_FEBRUARY_2019.keys.index(:unit)
+        sub       = COLUMNS_FEBRUARY_2019.keys.index(:substances)
+        comp      = COLUMNS_FEBRUARY_2019.keys.index(:composition)
 
         no8                 = iksnr + sprintf('%03d',row.cells[i_3].value.to_i)
         name                = row.cells[seq_name]  ? row.cells[seq_name].value  : nil

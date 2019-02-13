@@ -217,9 +217,9 @@ def cleanPackungenXlsx(info)
     puts "#{Time.now}: Finding items to delete will take some time"
     while (worksheet.sheet_data[idx])
     idx += 1
-    next unless worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_JULY_2015.keys.index(:iksnr)]
-    to_delete << (idx-1) unless drugs.find{ |x| x[0]== worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_JULY_2015.keys.index(:iksnr)].value.to_i and
-                                                x[1]== worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_JULY_2015.keys.index(:ikscd)].value.to_i
+    next unless worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_FEBRUARY_2019.keys.index(:iksnr)]
+    to_delete << (idx-1) unless drugs.find{ |x| x[0]== worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_FEBRUARY_2019.keys.index(:iksnr)].value.to_i and
+                                                x[1]== worksheet.sheet_data[idx-1][Oddb2xml::COLUMNS_FEBRUARY_2019.keys.index(:ikscd)].value.to_i
                                             }
     end
     if to_delete.size > 0
@@ -237,6 +237,7 @@ end
 describe Oddb2xml::SwissmedicDownloader do
   include ServerMockHelper
   before(:each) do
+    mock_downloads
     VCR.configure do |c|
       c.before_record(:swissmedic) do |i|
           config = c

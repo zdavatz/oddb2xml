@@ -253,7 +253,7 @@ module Oddb2xml
       case @type
       when :orphan
         i = 1
-        col_zulassung = 5
+        col_zulassung = 6
         raise "Could not find Zulassungsnummer in column #{col_zulassung} of #{@filename}" unless /Zulassungs.*nummer/.match(@sheet[3][col_zulassung].value)
         @sheet.each do |row|
           next unless row[col_zulassung]
@@ -268,24 +268,24 @@ module Oddb2xml
       data.uniq
     end
 
-    def to_hash # Packungen.xlsx COLUMNS_JULY_2015
+    def to_hash # Packungen.xlsx COLUMNS_FEBRUARY_2019
       data = {}
       return data unless @sheet
       case @type
       when :package
         Oddb2xml.check_column_indices(@sheet)
-        ith       = COLUMNS_JULY_2015.keys.index(:index_therapeuticus)
-        iksnr       = COLUMNS_JULY_2015.keys.index(:iksnr)
-        seq_name  = COLUMNS_JULY_2015.keys.index(:name_base)
-        i_3       = COLUMNS_JULY_2015.keys.index(:ikscd)
-        seqnr     = COLUMNS_JULY_2015.keys.index(:seqnr)
-        cat       = COLUMNS_JULY_2015.keys.index(:ikscat)
-        siz       = COLUMNS_JULY_2015.keys.index(:size)
-        atc       = COLUMNS_JULY_2015.keys.index(:atc_class)
-        list_code = COLUMNS_JULY_2015.keys.index(:production_science)
-        eht       = COLUMNS_JULY_2015.keys.index(:unit)
-        sub       = COLUMNS_JULY_2015.keys.index(:substances)
-        comp      = COLUMNS_JULY_2015.keys.index(:composition)
+        ith       = COLUMNS_FEBRUARY_2019.keys.index(:index_therapeuticus)
+        iksnr     = COLUMNS_FEBRUARY_2019.keys.index(:iksnr)
+        seq_name  = COLUMNS_FEBRUARY_2019.keys.index(:name_base)
+        i_3       = COLUMNS_FEBRUARY_2019.keys.index(:ikscd)
+        seqnr     = COLUMNS_FEBRUARY_2019.keys.index(:seqnr)
+        cat       = COLUMNS_FEBRUARY_2019.keys.index(:ikscat)
+        siz       = COLUMNS_FEBRUARY_2019.keys.index(:size)
+        atc       = COLUMNS_FEBRUARY_2019.keys.index(:atc_class)
+        list_code = COLUMNS_FEBRUARY_2019.keys.index(:production_science)
+        eht       = COLUMNS_FEBRUARY_2019.keys.index(:unit)
+        sub       = COLUMNS_FEBRUARY_2019.keys.index(:substances)
+        comp      = COLUMNS_FEBRUARY_2019.keys.index(:composition)
 
         # production_science Heilmittelcode, possible values are
         # Allergene
@@ -322,7 +322,7 @@ module Oddb2xml
               :ean13                => ean13,
               :prodno               => prodno,
               :seqnr                => row[seqnr].value,
-               :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
+              :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
               :swissmedic_category  => row[cat].value.to_s,
               :atc_code             => row[atc] ? Oddb2xml.add_epha_changes_for_ATC(row[iksnr].value.to_s, row[atc].value.to_s) : '',
               :list_code            => row[list_code] ? row[list_code].value.to_s : '',
@@ -332,14 +332,14 @@ module Oddb2xml
               :composition_swissmedic => row[comp] ? row[comp].value.to_s : '',
               :sequence_name        => row[seq_name] ? row[seq_name].value.to_s : '',
               :is_tier              => (row[list_code] == 'Tierarzneimittel' ? true : false),
-              :gen_production       => row[COLUMNS_JULY_2015.keys.index(:gen_production)].value.to_s,
-              :insulin_category     => row[COLUMNS_JULY_2015.keys.index(:insulin_category)].value.to_s,
-              :drug_index           => row[COLUMNS_JULY_2015.keys.index(:drug_index)].value.to_s,
+              :gen_production       => row[COLUMNS_FEBRUARY_2019.keys.index(:gen_production)].value.to_s,
+              :insulin_category     => row[COLUMNS_FEBRUARY_2019.keys.index(:insulin_category)].value.to_s,
+              :drug_index           => row[COLUMNS_FEBRUARY_2019.keys.index(:drug_index)].value.to_s,
               :data_origin          => 'swissmedic_package',
-              :expiry_date          => row[COLUMNS_JULY_2015.keys.index(:expiry_date)].value.to_s,
-              :company_name         => row[COLUMNS_JULY_2015.keys.index(:company)].value.to_s,
-              :size                 => row[COLUMNS_JULY_2015.keys.index(:size)].value.to_s,
-              :unit                 => row[COLUMNS_JULY_2015.keys.index(:unit)].value.to_s,
+              :expiry_date          => row[COLUMNS_FEBRUARY_2019.keys.index(:expiry_date)].value.to_s,
+              :company_name         => row[COLUMNS_FEBRUARY_2019.keys.index(:company)].value.to_s,
+              :size                 => row[COLUMNS_FEBRUARY_2019.keys.index(:size)].value.to_s,
+              :unit                 => row[COLUMNS_FEBRUARY_2019.keys.index(:unit)].value.to_s,
             }
           end
         end

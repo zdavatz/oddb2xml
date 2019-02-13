@@ -250,8 +250,9 @@ def mock_downloads
         system(cmd)
     end
     { 'https://download.epha.ch/cleaned/matrix.csv' =>  'epha_interactions.csv',
-      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/humanarzneimittel.orphan.xlsx.download.xlsx/humanarzneimittel.xlsx' =>  'swissmedic_orphan.xlsx',
-      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx' => 'swissmedic_package.xlsx',
+      'https://www.swissmedic.ch/swissmedic/de/home/services/listen_neu.html' => 'listen_neu.html',
+      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/internetlisten/status_ophan%20Drug.xlsx.download.xlsx/Liste_OrphanDrug_Internet_2019_01_31.xlsx' =>  'swissmedic_orphan.xlsx',
+      'https://www.swissmedic.ch/dam/swissmedic/de/dokumente/internetlisten/zugelassene_packungen_ham.xlsx.download.xlsx/Zugelassene_Packungen%20HAM_31012019.xlsx' => 'swissmedic_package.xlsx',
       'http://pillbox.oddb.org/TRANSFER.ZIP' =>  'transfer.zip',
       'https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv' => 'atc.csv',
       'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt' => 'oddb2xml_files_lppv.txt',

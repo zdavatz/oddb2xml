@@ -110,22 +110,52 @@ module Oddb2xml
 
   # please keep this constant in sync between (GEM) swissmedic-diff/lib/swissmedic-diff.rb and (GEM) oddb2xml/lib/oddb2xml/extractor.rb
   def Oddb2xml.check_column_indices(sheet)
-    row = sheet[4] # Headers are found at row 4
+    row = sheet[5] # Headers are found at row 5 since February 5
 
-    error_2015 = nil
-    COLUMNS_JULY_2015.each{
+    error_2019 = nil
+    0.upto((COLUMNS_FEBRUARY_2019.size) -1).each{ |idx| puts "#{idx}: #{row[idx].value}" }
+    COLUMNS_FEBRUARY_2019.each{
       |key, value|
-      header_name = row[COLUMNS_JULY_2015.keys.index(key)].value.to_s
+      header_name = row[COLUMNS_FEBRUARY_2019.keys.index(key)].value.to_s
       unless value.match(header_name)
-        puts "#{__LINE__}: #{key} ->  #{COLUMNS_JULY_2015.keys.index(key)} #{value}\nbut was  #{header_name}" if $VERBOSE
-        error_2015 = "Packungen.xlslx_has_unexpected_column_#{COLUMNS_JULY_2015.keys.index(key)}_#{key}_#{value.to_s}_but_was_#{header_name}"
-        break
+        puts "#{__LINE__}: #{key} ->  #{COLUMNS_FEBRUARY_2019.keys.index(key)} #{value}\nbut was  #{header_name}" if $VERBOSE
+        error_2019 = "Packungen.xlslx_has_unexpected_column_#{COLUMNS_FEBRUARY_2019.keys.index(key)}_#{key}_#{value.to_s}_but_was_#{header_name}"
+        # require 'pry'; binding.pry
+       break
       end
     }
-    raise "#{error_2015}" if error_2015
+    raise "#{error_2019}" if error_2019
   end
 
   # please keep this constant in sync between (GEM) swissmedic-diff/lib/swissmedic-diff.rb and (GEM) oddb2xml/lib/oddb2xml/extractor.rb
+COLUMNS_FEBRUARY_2019= {
+      :iksnr => /Zulassungs-Nummer/i,                  # column-nr: 0
+      :seqnr => /Dosisstärke-nummer/i,
+      :name_base => /Bezeichnung des Arzneimittels/i,
+      :company => /Zulassungsinhaberin/i,
+      :production_science => /Heilmittelcode/i,
+      :index_therapeuticus => /IT-Nummer/i,            # column-nr: 5
+      :atc_class => /ATC-Code/i,
+      :registration_date => /Erstzul.datum Arzneimittel/i,
+      :sequence_date => /Zul.datum Dosisstärke/i,
+      :expiry_date => /Gültigkeitsdauer der Zulassung/i,
+      :ikscd => /Packungscode/i,                 # column-nr: 10
+      :size => /Packungsgrösse/i,
+      :unit => /Einheit/i,
+      :ikscat => /Abgabekategorie Packung/i,
+      :ikscat_seq => /Abgabekategorie Dosisstärke/i,
+      :ikscat_preparation => /Abgabekategorie Arzneimittel/i, # column-nr: 15
+      :substances => /Wirkstoff/i,
+      :composition => /Zusammensetzung/i,
+      :composition_AMZV => /Volldeklaration rev. AMZV umgesetzt/i,
+      :indication_registration => /Anwendungsgebiet Arzneimittel/i,
+      :indication_sequence => /Anwendungsgebiet Dosisstärke/i, # column-nr 20
+      :gen_production => /Gentechnisch hergestellte Wirkstoffe/i,
+      :insulin_category => /Kategorie bei Insulinen/i,
+      # swissmedi corrected in february 2018 the typo  betäubunsmittel to  betäubungsmittel-
+        :drug_index       => /Verz. bei betäubungsmittel-haltigen Arzneimittel/i,
+    }
+
   COLUMNS_JULY_2015 = {
       :iksnr => /Zulassungs-Nummer/i,                  # column-nr: 0
       :seqnr => /Dosisstärke-nummer/i,
@@ -140,7 +170,7 @@ module Oddb2xml
       :ikscd => /Packungscode/i,                 # column-nr: 10
       :size => /Packungsgrösse/i,
       :unit => /Einheit/i,
-      :ikscat => /Abgabekategorie Packung/i,
+      :ikscat => /Abgabekategorie Arzneimittel/i,
       :ikscat_seq => /Abgabekategorie Dosisstärke/i,
       :ikscat_preparation => /Abgabekategorie Präparat/i, # column-nr: 15
       :substances => /Wirkstoff/i,
@@ -152,7 +182,6 @@ module Oddb2xml
       # swissmedi corrected in february 2018 the typo  betäubunsmittel to  betäubungsmittel-
         :drug_index       => /Verz. bei betäubun.*smittel-haltigen Präparaten/i,
     }
-
   def Oddb2xml.add_hash(string)
     doc = Nokogiri::XML.parse(string)
     nr = 0

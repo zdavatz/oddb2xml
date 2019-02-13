@@ -279,15 +279,18 @@ module Oddb2xml
     end
   end
   class SwissmedicDownloader < Downloader
+    BASE_URL = 'https://www.swissmedic.ch'
     include DownloadMethod
     def initialize(type=:orphan, options = {})
+      url = BASE_URL + '/swissmedic/de/home/services/listen_neu.html'
+      doc = Nokogiri::HTML(open(url))
       @type = type
       @options = options
       case @type
       when :orphan
-        @direct_url_link = "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/humanarzneimittel.orphan.xlsx.download.xlsx/humanarzneimittel.xlsx"
+        @direct_url_link = BASE_URL + doc.xpath("//a").find{|x| /Humanarzneimittel mit Status Orphan Drug/.match(x.children.text) }.attributes['href'].value
       when :package
-        @direct_url_link = "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/listen/excel-version_zugelasseneverpackungen.xlsx.download.xlsx/excel-version_zugelasseneverpackungen.xlsx"
+        @direct_url_link = BASE_URL + doc.xpath("//a").find{|x| /Zugelassene Verpackungen/.match(x.children.text) }.attributes['href'].value
       end
     end
     def download
