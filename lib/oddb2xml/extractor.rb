@@ -3,6 +3,7 @@ require 'nokogiri'
 require 'spreadsheet'
 require 'stringio'
 require 'rubyXL'
+require 'rubyXL/convenience_methods/workbook'
 require 'csv'
 require 'oddb2xml/xml_definitions'
 

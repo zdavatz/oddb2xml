@@ -26,7 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri', '>= 1.8.2'
   spec.add_dependency 'savon'#, '~> 2.11.0'
   spec.add_dependency 'spreadsheet'#, '~> 1.0.0'
-  spec.add_dependency 'rubyXL'#, '~> 3.3.1'
+  spec.add_dependency 'rubyXL', '~> 3.4.0'
   spec.add_dependency 'sax-machine'#,  '~> 0.1.0'
   spec.add_dependency 'parslet'#, '~> 1.7.0'
   spec.add_dependency 'rubyntlm', '0.5.1'
