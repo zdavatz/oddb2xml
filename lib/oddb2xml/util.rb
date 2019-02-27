@@ -113,7 +113,7 @@ module Oddb2xml
     row = sheet[5] # Headers are found at row 5 since February 5
 
     error_2019 = nil
-    0.upto((COLUMNS_FEBRUARY_2019.size) -1).each{ |idx| puts "#{idx}: #{row[idx].value}" }
+    0.upto((COLUMNS_FEBRUARY_2019.size) -1).each{ |idx| puts "#{idx}: #{row[idx].value}" }  if $VERBOSE
     COLUMNS_FEBRUARY_2019.each{
       |key, value|
       header_name = row[COLUMNS_FEBRUARY_2019.keys.index(key)].value.to_s
