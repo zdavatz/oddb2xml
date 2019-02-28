@@ -290,7 +290,7 @@ module Oddb2xml
       when :orphan
         @direct_url_link = BASE_URL + doc.xpath("//a").find{|x| /Humanarzneimittel mit Status Orphan Drug/.match(x.children.text) }.attributes['href'].value
       when :package
-        @direct_url_link = BASE_URL + doc.xpath("//a").find{|x| /Zugelassene Verpackungen/.match(x.children.text) }.attributes['href'].value
+        @direct_url_link = BASE_URL + doc.xpath("//a").find{|x| /Zugelassene Packungen/.match(x.children.text) }.attributes['href'].value
       end
     end
     def download
