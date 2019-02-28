@@ -1492,7 +1492,6 @@ module Oddb2xml
               end
               options = {'PHARMATYPE' => 'P'}
               xml.ITEM(options) do
-                # require 'pry'; binding.pry if pkg_gtin.to_i == 7680665990026
                 name =  item[:name_de] + ' ' +  item[:desc_de].strip + ' ' + package[:desc_de] if package && package[:desc_de]
                 name ||= @refdata[pkg_gtin] ? @refdata[pkg_gtin][:desc_de] : nil
                 name ||= @infos_zur_rose[ean13][:description] if @infos_zur_rose[ean13]
@@ -1680,15 +1679,16 @@ module Oddb2xml
                 xml.PRODNO prodno
                 if sequence
                   xml.SALECD('A') # these products are always active!
-                  name_de = sequence[:name_de]
-                  unless name_de
+                  name_de = "#{sequence[:name_de]} #{sequence[:desc_de]}".strip if sequence[:name_de]
+                  unless name_de # eg. 7680002770014 Coeur-Vaisseaux Sérocytol, suppositoire
                     if ppac &&  /stk/i.match( sequence[:desc_de])
                       name_de = ppac[:sequence_name]
                     else
                       name_de = sequence[:desc_de]
                     end
                   end
-                  name_fr = sequence[:name_fr] || (ppac && ppac[:sequence_name]) || sequence[:desc_fr]
+                  name_fr = "#{sequence[:name_fr]} #{sequence[:desc_fr]}".strip if sequence[:name_fr]
+                  name_fr ||= (ppac && ppac[:sequence_name])
                   override(xml, prodno, :DSCR,  name_de.strip)
                   override(xml, prodno, :DSCRF, name_fr.strip)
                 end

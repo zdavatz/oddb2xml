@@ -391,8 +391,8 @@ describe Oddb2xml::Builder do
       'product 3TC Filmtabl' => %(<PRODUCT>
             <PRODNO>5366201</PRODNO>
             <SALECD>A</SALECD>
-            <DSCR>3TC</DSCR>
-            <DSCRF>3TC</DSCRF>
+            <DSCR>3TC Filmtabl 150 mg</DSCR>
+            <DSCRF>3TC cpr pell 150 mg</DSCRF>
             <ATC>J05AF05</ATC>
             <SUBSTANCE>Lamivudinum</SUBSTANCE>
         </PRODUCT>),
