@@ -1,3 +1,9 @@
+=== 2.6.3 / 01.07.2019
+* Use https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt instead of http://download.epha.ch/data/atc/atc.csv
+
+=== 2.6.2 / 01.07.2019
+* Use https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/interactions_de_utf8.csv instead of https://download.epha.ch/cleaned/matrix.csv
+
 === 2.6.1 / 27.02.2019
 * Update rubyXL to 3.4.0 with fix to avoid problem reported via https://github.com/weshatheleopard/rubyXL/issues/325
 * When generating artikelstamm XML generate products (aka sequences) with name like "3TC Filmtabl 150 mg" instead of only "3TC"

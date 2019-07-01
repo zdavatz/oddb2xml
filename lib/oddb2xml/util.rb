@@ -23,7 +23,7 @@ module Oddb2xml
     Downloads     = "#{Dir.pwd}/downloads"
   end
   @options = {}
-  @atc_csv_origin = 'http://download.epha.ch/data/atc/atc.csv'
+  @atc_csv_origin = 'https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt'
   @atc_csv_content = {}
 
   def Oddb2xml.html_decode(string)

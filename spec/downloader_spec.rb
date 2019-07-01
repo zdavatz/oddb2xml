@@ -76,7 +76,7 @@ def common_before
   FileUtils.makedirs(Oddb2xml::WorkDir)
   Dir.chdir(Oddb2xml::WorkDir)
   WebMock.enable!
-  { 'https://download.epha.ch/cleaned/matrix.csv' =>  'epha_interactions.csv',
+  { 'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/interactions_de_utf8.csv' =>  'epha_interactions.csv',
     }.each do |url, file|
     inhalt = File.read(File.join(Oddb2xml::SpecData, file))
     stub_request(:get,url).to_return(body: inhalt)
