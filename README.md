@@ -273,7 +273,7 @@ product.xml has relation to substance as `<SUBNO>`.
 We use the following files:
 
 * https://www.swissmedic.ch/arzneimittel/00156/00221/00222/00230/index.html?lang=de (Präparateliste und zugelassene Packungen)
-* https://download.epha.ch/cleaned/matrix.csv (Interactions from epha)
+* https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/interactions_de_utf8.csv
 * http://refdatabase.refdata.ch/Service/Article.asmx
 * http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip
 * https://www.medregbm.admin.ch/Publikation/CreateExcelListBetriebs
