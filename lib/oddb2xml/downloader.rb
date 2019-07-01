@@ -136,7 +136,7 @@ module Oddb2xml
   class EphaDownloader < Downloader
     include DownloadMethod
     def download
-      @url ||= 'https://download.epha.ch/cleaned/matrix.csv'
+      @url ||= 'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/interactions_de_utf8.csv'
       file = 'epha_interactions.csv'
       content = download_as(file, 'w+')
       FileUtils.rm_f(file, :verbose => false)
