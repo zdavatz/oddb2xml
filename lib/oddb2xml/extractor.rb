@@ -319,6 +319,7 @@ module Oddb2xml
             Oddb2xml.setEan13forProdno(prodno, ean13)
             Oddb2xml.setEan13forNo8(no8, ean13)
             data[no8] = {
+              :iksnr                => row[iksnr].value.to_i,
               :no8                  => no8,
               :ean13                => ean13,
               :prodno               => prodno,

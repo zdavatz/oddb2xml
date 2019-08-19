@@ -121,7 +121,7 @@ describe Oddb2xml::Builder do
     it 'should find price from Preparations.xml by setting' do
       expect(File.exists?(@elexis_v5_csv)).to eq true
       inhalt = File.open(@elexis_v5_csv, 'r+').read
-      expected = %(7680658560014,Dibase 10'000 Tropfen 10000 IE/ml Fl 10 ml,,Flasche(n),5,9.25,,,,"",,SL)
+      expected = %(7680658560014,Dibase 10'000 Tropfen 10000 IE/ml Fl 10 ml,,Flasche(n),5,9.25,6585601,A11CC05,,"",,SL)
       expect(inhalt.index(expected)).to be > 0
     end
 
@@ -139,7 +139,7 @@ describe Oddb2xml::Builder do
     it 'should have a price for Lynparza' do
       expect(File.exists?(@elexis_v5_csv)).to eq true
       inhalt = File.open(@elexis_v5_csv, 'r+').read
-      expect(inhalt.index('7680651600014,Lynparza Kaps 50 mg 448 Stk,,Kapsel(n),5562.48,5947.55,,,,"",,SL')).not_to be nil
+      expect(inhalt.index('7680651600014,Lynparza Kaps 50 mg 448 Stk,,Kapsel(n),5562.48,5947.55,6516001,L01XX46,,"",,S')).not_to be nil
     end
     it 'should trim the ean13 to 13 length' do
       gtin14 = "00040565124346"
@@ -214,23 +214,27 @@ describe Oddb2xml::Builder do
     
     it 'should contain DIBASE with phar' do
       expected = %(<ITEM PHARMATYPE="P">
-            <GTIN>7680658570013</GTIN>
-            <!--override  with-->
+            <GTIN>7680658560014</GTIN>
+            <!--obsolete override-->
+            <PHAR>7199565</PHAR>
             <SALECD>A</SALECD>
-            <DSCR>DIBASE 25'000, Lösung zum Einnehmen</DSCR>
-            <DSCRF>--missing--</DSCRF>
+            <DSCR>Dibase 10'000 Tropfen 10000 IE/ml Fl 10 ml</DSCR>
+            <DSCRF>Dibase 10'000 gouttes 10000 UI/ml fl 10 ml</DSCRF>
             <COMP>
                 <NAME>Gebro Pharma AG</NAME>
-                <GLN/>
+                <GLN>7612053000000</GLN>
             </COMP>
+            <PEXF>5</PEXF>
+            <PPUB>9.25</PPUB>
             <PKG_SIZE>1</PKG_SIZE>
             <MEASURE>Flasche(n)</MEASURE>
             <MEASUREF>Flasche(n)</MEASUREF>
-            <DOSAGE_FORM>Lösung</DOSAGE_FORM>
-            <DOSAGE_FORMF>Solution</DOSAGE_FORMF>
+            <DOSAGE_FORM>orale Tropflösung</DOSAGE_FORM>
+            <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>D</IKSCAT>
-            <PRODNO>6585701</PRODNO>
-        </ITEM>)
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>6585601</PRODNO>
+        </ITEM)
       expect(@inhalt.index(expected)).not_to be nil
     end
     
@@ -329,7 +333,7 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>1610501</PRODNO>
         </ITEM>),
-        'item 7680161050743 100g ' => 
+        'item 7680161050743 Hirudoid Creme 3 mg/g 100 g' =>
               %( <ITEM PHARMATYPE="P">
             <GTIN>7680161050743</GTIN>
             <PHAR>2731179</PHAR>

@@ -859,7 +859,7 @@ module Oddb2xml
         @articles.sort! { |a,b| a[:ean13] <=> b[:ean13] }
         @articles.each do |obj|
           idx += 1
-          Oddb2xml.log "build_article #{idx} of #{@articles.size} articles" if idx % 500 == 0
+          Oddb2xml.log "build_article #{obj[:ean13]}: #{idx} of #{@articles.size} articles" if idx % 500 == 0
             item = @items[obj[:ean13]]
             pac,no8 = nil,obj[:ean13].to_s[4..11] # BAG-XML(SL/LS)
             pack_info = nil
@@ -1449,7 +1449,7 @@ module Oddb2xml
             obj = @packs[no8] # obj not yet in refdata. Use data from swissmedic_package.xlsx
           end
           nr_items += 1
-          Oddb2xml.log "build_article #{nr_items} of #{gtins.size} articles" if nr_items % 5000 == 0
+          Oddb2xml.log "build_artikelstamm #{ean13}: #{nr_items} of #{gtins.size} articles" if nr_items % 5000 == 0
           item = @items[ean13]
           pack_info = nil
           pack_info = @packs[no8] if no8 && /#{ean13}/.match(@packs[no8].to_s) # info from Packungen.xlsx from swissmedic_info
@@ -1509,7 +1509,7 @@ module Oddb2xml
                 name_fr ||= (obj[:name_fr] + ', ' + obj[:desc_fr]).strip if  obj[:name_fr]
                 # ZuRorse has only german names
                 name_fr ||= (item[:name_fr] + ', ' + item[:desc_fr]) if item
-                name_fr ||= '--missing--'
+                name_fr ||= name
                 xml.DSCRF(name_fr)
                 xml.COMP  do # Manufacturer
                   xml.NAME  obj[:company_name]
@@ -1558,11 +1558,13 @@ module Oddb2xml
                 end if item && item[:deductible]
                 prodno = Oddb2xml.getProdnoForEan13(pkg_gtin)
                 xml.PRODNO prodno if prodno
+                atc = package[:atc_code]
+                atc ||= @refdata[pkg_gtin][:seq][:atc_code] if @refdata[pkg_gtin]
                 csv = []
                 @csv_file << [pkg_gtin, name, package[:unit], measure,
                               pexf ? pexf : '',
                               ppub ? ppub : '',
-                              package[:prodno],  package[:atc_code], package[:substance_swissmedic],
+                              prodno,  atc, package[:substance_swissmedic],
                               sequence[:org_gen_code],  package[:ith_swissmedic],
                               @items[pkg_gtin] ? 'SL' : '',
                               ]
@@ -1658,18 +1660,20 @@ module Oddb2xml
               sequence ||= @products[ean][:seq] if @products[ean]
               next unless check_name(obj, :de)
               ppac = ((_ppac = @packs[ean.to_s[4..11]] and !_ppac[:is_tier]) ? _ppac : {})
-              unless ppac
-                ppac = @packs.find{|pac| pac.ean == ean }.first
-              end
               prodno = ppac[:prodno] if ppac[:prodno] and !ppac[:prodno].empty?
               prodno = obj[:pharmacode] if obj[:chapter70]
+              myPack = @packs.values.find{ |x| x[:iksnr].to_i == obj[:seq][:swissmedic_number5].to_i } if  obj[:seq]
+              if myPack && !prodno
+                prodno ||= myPack[:prodno]
+                puts "Setting prodno #{prodno} for #{ean13} Varilrix"
+              end
               next unless prodno
               next if emitted_prodno.index(prodno)
               sequence ||= @articles.find{|x| x[:ean13].eql?(ean)}
               unless obj[:chapter70]
                 next unless sequence && (sequence[:name_de] || sequence[:desc_de])
-                if Oddb2xml.getEan13forProdno(prodno).size == 0
-                  puts "No item found for prodno #{prodno} no8 #{obj[:no8]} #{sequence[:name_de]} "
+                if Oddb2xml.getEan13forProdno(prodno).size == 0 && !obj[:no8].eql?(Oddb2xml.getNo8ForEan13(ean))
+                  puts "No item found for prodno #{prodno} no8 #{obj[:no8]} #{sequence[:name_de]}"
                   next
                 end
               end
