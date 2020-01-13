@@ -256,7 +256,7 @@ def mock_downloads
       'http://pillbox.oddb.org/TRANSFER.ZIP' =>  'transfer.zip',
       'https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt' => 'atc.csv',
       'https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt' => 'oddb2xml_files_lppv.txt',
-      'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip' => 'XMLPublications.zip',
+      'http://www.xn--spezialittenliste-yqb.ch/File.axd?file=XMLPublications.zip' => 'XMLPublications.zip',
       'http://bag.e-mediat.net/Sl2007.web.external/varia_De.htm' => 'varia_De.htm',
 #      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml',
       }.each do |url, file|

@@ -197,7 +197,7 @@ module Oddb2xml
     include DownloadMethod
     def init
       super
-      @url ||= 'http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip'
+      @url ||= 'http://www.xn--spezialittenliste-yqb.ch/File.axd?file=XMLPublications.zip'
     end
     def download
       file = File.join(WorkDir, 'XMLPublications.zip')
