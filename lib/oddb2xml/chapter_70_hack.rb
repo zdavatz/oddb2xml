@@ -26,7 +26,7 @@ module Oddb2xml
     def self.items
       @@items
     end
-    def self.parse(html_file = 'http://bag.e-mediat.net/Sl2007.web.external/varia_De.htm')
+    def self.parse(html_file = 'http://www.spezialitaetenliste.ch/varia_De.htm')
       data = Hash.new{|h,k| h[k] = [] }
       Ox.default_options = {
           mode:   :generic,
