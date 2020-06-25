@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright (c) 2016 MEDEVIT. All rights reserved. This program and the 
-	accompanying materials are made available under the terms of the Eclipse 
-	Public License v1.0 which accompanies this distribution, and is available 
-	at http://www.eclipse.org/legal/epl-v10.html v002 - Ergänzung K Komplementärprodukt 
-	bei generic type, Consider ATC code of length 8 (on vet.med. articles) Relax 
-	ADDSCR occurence to 0 .. 1 v003 - PRODNO hinzugefügt LIMNAMEBAG zur formal-kennzeichnung 
-	von identen limitations v4 - Major refactoring, see https://redmine.medelexis.ch/issues/4405 
+<!-- Copyright (c) 2016 MEDEVIT. All rights reserved. This program and the
+	accompanying materials are made available under the terms of the Eclipse
+	Public License v1.0 which accompanies this distribution, and is available
+	at http://www.eclipse.org/legal/epl-v10.html v002 - Ergänzung K Komplementärprodukt
+	bei generic type, Consider ATC code of length 8 (on vet.med. articles) Relax
+	ADDSCR occurence to 0 .. 1 v003 - PRODNO hinzugefügt LIMNAMEBAG zur formal-kennzeichnung
+	von identen limitations v4 - Major refactoring, see https://redmine.medelexis.ch/issues/4405
 	Contributors: MEDEVIT <office@medevit.at> - initial API and implementation -->
 <xs:schema targetNamespace="http://elexis.ch/Elexis_Artikelstamm_v5"
 	elementFormDefault="qualified" attributeFormDefault="unqualified"
@@ -339,7 +339,6 @@
 										</xs:element>
 										<xs:element name="GENERIC_TYPE"
 											maxOccurs="1" minOccurs="0">
-
 											<xs:simpleType>
 												<xs:annotation>
 													<xs:documentation>
@@ -358,6 +357,9 @@
 													</xs:enumeration>
 													<xs:enumeration
 														value="K">
+													</xs:enumeration>
+													<xs:enumeration
+                            value="C"> <!-- BAG 9.6.2020: BDer Buchstabe C bei «Original Generika Code» steht für Co-Marketing Arzneimittel -->
 													</xs:enumeration>
 												</xs:restriction>
 											</xs:simpleType>
@@ -428,6 +430,9 @@
 													Artikels
 												</xs:documentation>
 											</xs:annotation>
+										</xs:element>
+										<xs:element name="Chapter70_HACK"
+											type="xs:string" minOccurs="0" maxOccurs="1">
 										</xs:element>
 									</xs:sequence>
 

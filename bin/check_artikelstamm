@@ -16,7 +16,7 @@ require 'optimist'
   #{File.basename(__FILE__)} xml_file_to_check
 EOS
 end
-$stdout.sync = false
+$stdout.sync = true
 
 args = ARGV
 if args.size != 1

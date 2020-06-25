@@ -64,7 +64,7 @@ module Oddb2xml
         end
       end
     end
-    
+
     def everyPharmaArticleHasAProductItem
       result = true
       puts "#{Time.now.strftime("%H:%M:%S")}: everyPharmaArticleHasAProductItem"
@@ -74,7 +74,7 @@ module Oddb2xml
         unless allProductNumbers.index(item[:PRODNO])
           puts "Item #{item[:GTIN]}  has no Product #{item[:PRODNO]}  #{item[:DSCR]}"
           result = false
-        end
+        end unless item[:Chapter70_HACK]
       end
       result
     end
@@ -91,17 +91,19 @@ module Oddb2xml
       end
       result
     end
-    
+
     def everyReferencedLimitationIsIncluded
+      result = true
       puts "#{Time.now.strftime("%H:%M:%S")}: everyReferencedLimitationIsIncluded"
       allLimitations = limitations.collect{ |lim| lim[:LIMNAMEBAG] }
       products.each do |product|
         next unless product[:LIMNAMEBAG]
         unless allLimitations.index(product[:LIMNAMEBAG])
           puts "product #{product[:PRODNO]}  has no limitation #{product[:LIMNAMEBAG]} #{product[:DSCR]}"
-          return false
+          result = false
         end
       end
+      result
     end
 
     def checkPackageSize
