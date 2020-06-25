@@ -23,7 +23,7 @@ module Oddb2xml
       else
         begin
           io = File.open(file, option)
-          data = open(@url).read
+          data = URI.open(@url).read
           io.write(data)
         rescue => error
           puts "error #{error} while fetching #{@url}"
@@ -283,7 +283,7 @@ module Oddb2xml
     include DownloadMethod
     def initialize(type=:orphan, options = {})
       url = BASE_URL + '/swissmedic/de/home/services/listen_neu.html'
-      doc = Nokogiri::HTML(open(url))
+      doc = Nokogiri::HTML(URI.open(url))
       @type = type
       @options = options
       case @type
