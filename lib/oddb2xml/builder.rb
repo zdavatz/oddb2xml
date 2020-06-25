@@ -1571,8 +1571,6 @@ module Oddb2xml
               end
             end
           else # non pharma
-             @csv_file << [ ean13, (obj[:desc_de] || obj[:description]), '', '',
-                          obj[:price], obj[:pub_price], '', '', '', '', '', '' ]
             if @@emitted_v5_gtins.index(ean13)
               next
             else
@@ -1591,17 +1589,38 @@ module Oddb2xml
               xml.GTIN ean13.to_s.rjust(13, '0')
               xml.PHAR obj[:pharmacode]
               emit_salecd(xml, ean13, obj)
-              xml.DSCR(obj[:desc_de] || obj[:description]) # for description for zur_rose
+              description = obj[:desc_de] || obj[:description] # for description for zur_rose
+              xml.DSCR(description)
               xml.DSCRF(obj[:desc_fr] || '--missing--')
               xml.COMP  do
                 xml.GLN obj[:company_ean]
               end if obj[:company_ean] && !obj[:company_ean].empty?
-              xml.PEXF obj[:price]      if obj[:price] && !obj[:price].empty?
-              xml.PPUB obj[:pub_price]  if obj[:pub_price] && !obj[:pub_price].empty?
+              if !(obj[:price] && !obj[:price].empty?) || !(obj[:pub_price] && !obj[:pub_price].empty?)
+                zur_rose_detail = @infos_zur_rose.values.find{|x| x[:ean13].to_i == ean13.to_i}
+              end
+              ppub = nil; pexf=nil
+              if obj[:price] && !obj[:price].empty?
+                xml.PEXF (pexf = obj[:price])
+              elsif zur_rose_detail
+                if zur_rose_detail[:price] && !zur_rose_detail[:price].empty? && !zur_rose_detail[:price].eql?('0.00')
+                  Oddb2xml.log "NonPharma: #{ean13} adding PEXF #{zur_rose_detail[:price]} #{description}"
+                  xml.PEXF (pexf = zur_rose_detail[:price])
+                end
+              end
+              if obj[:pub_price] && !obj[:pub_price].empty?
+                xml.PPUB  (ppub = obj[:pub_price])
+              elsif zur_rose_detail
+                if zur_rose_detail[:pub_price] && !zur_rose_detail[:pub_price].empty? && !zur_rose_detail[:pub_price].eql?('0.00')
+                  Oddb2xml.log "NonPharma: #{ean13} adding PPUB #{zur_rose_detail[:pub_price]} #{description}"
+                  xml.PPUB (ppub = zur_rose_detail[:pub_price])
+                end
+              end
+             @csv_file << [ ean13, description, '', '', pexf, ppub, '', '', '', '', '', '' ]
               if chap70
-                xml.comment "Chapter70 hack" 
+                xml.comment "Chapter70 hack"
                 xml.SL_ENTRY 'true'
                 xml.PRODNO obj[:pharmacode]
+                xml.Chapter70_HACK 'true'
               end
             end
           end
@@ -1665,7 +1684,7 @@ module Oddb2xml
               myPack = @packs.values.find{ |x| x[:iksnr].to_i == obj[:seq][:swissmedic_number5].to_i } if  obj[:seq]
               if myPack && !prodno
                 prodno ||= myPack[:prodno]
-                puts "Setting prodno #{prodno} for #{ean13} Varilrix"
+                puts "Setting prodno #{prodno} for #{ean13} #{myPack[:sequence_name]}"
               end
               next unless prodno
               next if emitted_prodno.index(prodno)
@@ -1703,12 +1722,14 @@ module Oddb2xml
                   used_limitations << lim_code unless used_limitations.index(lim_code)
                   xml.LIMNAMEBAG lim_code
                 elsif obj[:chapter70]
-                  used_limitations << obj[:code]
                   xml.comment "Chapter70 hack"
                   xml.SALECD('A') # these products are always active!
                   xml.DSCR obj[:description]
                   xml.DSCRF ''
-                  xml.LIMNAMEBAG obj[:code]
+                  if @limitations.index(obj[:code])
+                    xml.LIMNAMEBAG obj[:code]
+                    used_limitations << obj[:code]
+                  end
                 end
                 if sequence && sequence[:substances]
                   value = nil

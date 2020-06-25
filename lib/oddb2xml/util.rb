@@ -34,7 +34,7 @@ module Oddb2xml
     end
     Oddb2xml.patch_some_utf8(german).gsub('<br>',"\n")
   end
-  
+
   def Oddb2xml.patch_some_utf8(line)
     begin
       line = line.encode('utf-8')
@@ -86,7 +86,7 @@ module Oddb2xml
   def Oddb2xml.skip_download?
     @options[:skip_download]
   end
-  
+
   def Oddb2xml.skip_download(file)
     return false if defined?(VCR)
     dest = "#{Downloads}/#{File.basename(file)}"
@@ -96,7 +96,7 @@ module Oddb2xml
     end
     false
   end
-  
+
   def Oddb2xml.download_finished(file, remove_file = true)
     src  = "#{WorkDir}/#{File.basename(file)}"
     dest = "#{Downloads}/#{File.basename(file)}"
@@ -232,7 +232,7 @@ COLUMNS_FEBRUARY_2019= {
   @@ean13_to_no8 = {}
     def Oddb2xml.setEan13forProdno(prodno, ean13)
       if ean13.to_i == 7680006660045  ||  ean13.to_i == 7680006660014
-        puts "setEan13forProdno #{prodno} ean13 #{ean13}"
+        Oddb2xml.log "setEan13forProdno #{prodno} ean13 #{ean13}"
       end
       @@prodno_to_ean13[prodno] ||= []
       @@prodno_to_ean13[prodno] << ean13
@@ -240,13 +240,13 @@ COLUMNS_FEBRUARY_2019= {
     end
     def Oddb2xml.setEan13forNo8(no8, ean13)
       if ean13.to_i == 7680006660045  ||  ean13.to_i == 7680006660014
-        puts "setEan13forNo8 #{no8} ean13 #{ean13}"
+        Oddb2xml.log "setEan13forNo8 #{no8} ean13 #{ean13}"
       end
       if @@no8_to_ean13[no8].nil?
         @@no8_to_ean13[no8] = ean13
         @@ean13_to_no8[ean13] = no8
       elsif !@@no8_to_ean13[no8].eql?(ean13)
-        puts "@@no8_to_ean13[no8] #{@@no8_to_ean13[no8]} not overridden by #{ean13}"
+        Oddb2xml.log "@@no8_to_ean13[no8] #{@@no8_to_ean13[no8]} not overridden by #{ean13}"
       end
     end
     def Oddb2xml.getEan13forProdno(prodno)

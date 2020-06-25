@@ -24,7 +24,7 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
-    # binding.pry unless @inhalt.index(expected_value)
+    binding.pry unless @inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
   def common_run_init(options = {})
@@ -184,7 +184,7 @@ describe Oddb2xml::Builder do
       @inhalt = IO.read(@artikelstamm_name)
       expect(@inhalt.index('BIOMARIS Voll Meersalz 500 g')).not_to be nil
     end
-    
+
     it 'Should not contain PHAR 8809544 Sildenavil with pexf and ppub 0.0' do
 #1128809544Sildenafil Suspension 7mg/ml 100ml                0030850045801000000000000000000000002
       @inhalt = IO.read(@artikelstamm_name)
@@ -211,7 +211,7 @@ describe Oddb2xml::Builder do
     it 'shoud contain GENERIC_TYPE' do
       expect(@inhalt.index('<GENERIC_TYPE')).not_to be nil
     end
-    
+
     it 'should contain DIBASE with phar' do
       expected = %(<ITEM PHARMATYPE="P">
             <GTIN>7680658560014</GTIN>
@@ -237,7 +237,7 @@ describe Oddb2xml::Builder do
         </ITEM)
       expect(@inhalt.index(expected)).not_to be nil
     end
-    
+
     it 'should contain PEVISONE Creme 30 g' do
       expect(@inhalt.index('Pevisone Creme 15 g')).not_to be nil # 7680406620144
       expect(@inhalt.index('Pevisone Creme 30 g')).not_to be nil # 7680406620229
@@ -349,7 +349,7 @@ describe Oddb2xml::Builder do
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>D</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
-        </ITEM>), 
+        </ITEM>),
         'item 7680284860144 ANCOPIR' =>'<ITEM PHARMATYPE="P">
             <GTIN>7680284860144</GTIN>
             <PHAR>0177804</PHAR>
@@ -391,7 +391,7 @@ describe Oddb2xml::Builder do
             <DOSAGE_FORMF>Compresse</DOSAGE_FORMF>
             <IKSCAT>C</IKSCAT>
             <PRODNO>3164402</PRODNO>
-        </ITEM>), 
+        </ITEM>),
       'product 3TC Filmtabl' => %(<PRODUCT>
             <PRODNO>5366201</PRODNO>
             <SALECD>A</SALECD>
@@ -439,20 +439,12 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>5329001</PRODNO>
         </ITEM>),
-        'Chapter 70 limitation' => %(<LIMITATION>
-            <!--Chapter70 hack-->
-            <LIMNAMEBAG>L1, L2</LIMNAMEBAG>
-            <DSCR>Eine Flasche zu 20 ml Urtinktur einer bestimmten Pflanze pro Monat. Für Aesculus, Carduus Marianus, Ginkgo, Hedera helix, Hypericum perforatum, Lavandula, Rosmarinus officinalis, Taraxacum officinale.</DSCR>
-            <DSCRF/>
-            <LIMITATION_PTS>1</LIMITATION_PTS>
-        </LIMITATION>),
         'Chapter 70 product' => %(<PRODUCT>
             <PRODNO>2069639</PRODNO>
             <!--Chapter70 hack-->
             <SALECD>A</SALECD>
             <DSCR>Ceres Urtinkturen gemäss L2</DSCR>
             <DSCRF/>
-            <LIMNAMEBAG>L1, L2</LIMNAMEBAG>
         </PRODUCT>),
         'Chapter 70 item' => %(<ITEM PHARMATYPE="P">
             <GTIN>2500000588532</GTIN>
@@ -465,6 +457,7 @@ describe Oddb2xml::Builder do
             <!--Chapter70 hack-->
             <SL_ENTRY>true</SL_ENTRY>
             <PRODNO>2069639</PRODNO>
+            <Chapter70_HACK>true</Chapter70_HACK>
         </ITEM>),
         'HTML-encoded limitation' => %(<DSCR>Zur Erhaltungstherapie (Monotherapie) bei erwachsenen Patientinnen mit rezidiviertem, fortgeschrittenem Ovarialkarzinom mit BRCA Mutation im Anschluss an eine platinhaltige Chemotherapie bei Vorliegen einer kompletten oder partiellen Remission.
 

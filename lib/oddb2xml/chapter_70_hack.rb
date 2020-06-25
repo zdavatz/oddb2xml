@@ -12,7 +12,7 @@ module Oddb2xml
         puts "parse_td returns: #{res}" if $VERBOSE
       rescue => exc
         puts "Unable to pars #{elem} #{exc}"
-        binding.pry
+        # binding.pry
         return nil
       end
       res.flatten # .join("\t")
@@ -33,7 +33,7 @@ module Oddb2xml
           effort: :tolerant,
           smart:  true
       }
-      res = Ox.load(open(html_file).read, mode: :hash_no_attrs).values.first['body']
+      res = Ox.load(URI.open(html_file).read, mode: :hash_no_attrs).values.first['body']
       result = []
       idx = 0
       @@items = {}
@@ -50,15 +50,16 @@ module Oddb2xml
         data = {}
         pharma_code = entry.first
         ean13 =  (Oddb2xml::FAKE_GTIN_START + pharma_code.to_s)
-        german = entry[2].force_encoding('ISO-8859-1').encode('UTF-8')
-        while !german.eql?(HTMLEntities.new.decode(german))
-          german = HTMLEntities.new.decode(german)
+        if entry[2].encoding.to_s.eql?('ASCII-8BIT')
+          german = CGI.unescape(entry[2].force_encoding('ISO-8859-1'))
+        else
+          german = entry[2]
         end
         @@items[ean13] = {
           :data_origin   => 'Chapter70',
           :line   => entry.join(","),
           :ean13 => ean13,
-          :description => Oddb2xml.html_decode(entry[2]),
+          :description => german,
           :quantity => entry[3],
           :pharmacode => pharma_code,
           :pub_price => entry[4],
@@ -70,5 +71,3 @@ module Oddb2xml
     end
   end
 end
-
-  
