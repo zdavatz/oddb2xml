@@ -1,3 +1,8 @@
+=== 2.6.7 / 25.06.2020
+* Added value 'C' (Co-marketing) for field GENERIC_TYPE Elexis_Artikelstamm_v5.xsd from BAG Preparations.xml
+* Fixed limitations coming from the chapte 70 hack
+* Ruby 2.7 compatible (No URI.open warning)
+
 === 2.6.6 / 11.01.2020
 * Fix link for varia_De.htm
 
@@ -130,7 +135,7 @@
 
 === 2.4.1 / 2.12.2016
 
-* Update oddb2xml.gemspec to add GPL-3.0 as correct license for Rubygems as stated in LICENSE file 
+* Update oddb2xml.gemspec to add GPL-3.0 as correct license for Rubygems as stated in LICENSE file
 * Added a hack for 24 globulina equina which commas between brackets
 
 === 2.4.0 /25.08.2016
@@ -568,7 +573,7 @@
 
 * Improve NINCD detection
   - Update timeout handling
-  - Improve pharmacode detection                
+  - Improve pharmacode detection
 
 === 1.5.1 / 10.06.2013
 
