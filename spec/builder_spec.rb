@@ -59,7 +59,7 @@ ARTICLE_NAROPIN = %(<REF_DATA>1</REF_DATA>
       <BCSTAT>A</BCSTAT>
     </ARTBAR>
   </ART>)
-  
+
 ARTICLE_COMMON_ELEMENTS =    [
   ['ARTICLE/ART/REF_DATA', '1'],
   ['ARTICLE/ART/SMCAT', 'A'],
@@ -256,7 +256,7 @@ def check_result(inhalt, nbr_record)
   expect(inhalt.index('<ERROR_CODE/>')).to be > 0
   m = /<NBR_RECORD>(\d+)<\/NBR_RECORD>/.match(inhalt)
   expect(m).not_to be nil
-  expect(m[1].to_i).to eq  nbr_record 
+  expect(m[1].to_i).to eq  nbr_record
 end
 
 def checkItemForRefdata(doc, pharmacode, isRefdata)
@@ -476,7 +476,7 @@ describe Oddb2xml::Builder do
   NrExtendedArticles = 76
   NrSubstances = 27
   NrLimitations = 14
-  
+
   NrInteractions = 2
   NrCodes = 5
   NrProdno = 31
@@ -532,7 +532,7 @@ describe Oddb2xml::Builder do
 
     check_attributes(oddb_article_xml, ARTICLE_ATTRIBUTE_TESTS)
     check_elements(oddb_article_xml, ARTICLE_COMMON_ELEMENTS)
-    
+
     it 'should validate XSD article' do
       @inhalt = File.read(oddb_article_xml)
       # This fails on Ruby < 2.4 as NAROPIN INJ LÖS 0.2 % 10 is wrongly encoded
@@ -552,7 +552,7 @@ describe Oddb2xml::Builder do
     end
 
     it 'should have a correct insulin (gentechnik) for 7680532900196' do
-      expect(XPath.match( @rexml, "//ART/[BC='7680532900196']").size).to eq 1
+      expect(@inhalt.match(/.*<BC>7680532900196<\/BC>.*/).class).to be MatchData
       expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").size).to be >= 1
       expect(XPath.match( @rexml, "//ART//GEN_PRODUCTION").first.text).to eq 'X'
       expect(XPath.match( @rexml, "//ART//INSULIN_CATEGORY").size).to eq 1
@@ -568,7 +568,7 @@ describe Oddb2xml::Builder do
     ean_with_drug_index = 7680555610041
     it "should have a correct drug information for #{ean_with_drug_index}" do
       doc = REXML::Document.new IO.read(checkAndGetArticleXmlName)
-      expect(XPath.match( @rexml, "//ART/[BC='#{ean_with_drug_index}']").size).to eq 1
+      expect(@inhalt.match(/.*<BC>#{ean_with_drug_index}<\/BC>.*/).class).to be MatchData
       expect(XPath.match( @rexml, "//ART//DRUG_INDEX").size).to eq 1
       expect(XPath.match( @rexml, "//ART//DRUG_INDEX").first.text).to eq 'd'
       found = false
@@ -605,11 +605,11 @@ describe Oddb2xml::Builder do
     <CPT/>)
       expect(oddb_product_xml.index(text2)).to be >= 1
     end
-    
+
     it 'should generate SALECD A for swissmedic packages' do
       expect(IO.read(oddb_article_xml).index('<SALECD>A<!--Overriding status I nincd 10 for 7680658560014 as in refdata_pharma--></SALECD>')).to be >= 1
     end
-    
+
   end
 
   context 'when -o for fachinfo is given' do
