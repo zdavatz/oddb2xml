@@ -11,17 +11,16 @@ before_install:
 script: bundle exec rspec
 
 rvm:
-  - 2.4.1
-  - 2.5.0
-  - 2.4
+  # Building on Versions 2.4 or earlier of Ruby fail, because URI.open was priveate
+  # - 2.4
+  - 2.5
+  - 2.6
   - 2.7
   - ruby-head
 
 matrix:
   allow_failures:
     - rvm: ruby-head
-    - rvm: 2.2.7
-    - rvm: 2.3.4
 
 notifications:
   email:
