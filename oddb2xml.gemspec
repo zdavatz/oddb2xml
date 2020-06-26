@@ -16,6 +16,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
+  spec.required_ruby_version = ">= 2.2.0"
 
   # We fix the version of the spec to newer versions only in the third position
   # hoping that these version fix only security/severe bugs

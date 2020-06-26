@@ -1,3 +1,7 @@
+=== 2.6.8 / 26.06.2020
+
+* Re-Add support for Ruby Version since 2.2
+
 === 2.6.7 / 25.06.2020
 * Added value 'C' (Co-marketing) for field GENERIC_TYPE Elexis_Artikelstamm_v5.xsd from BAG Preparations.xml
 * Fixed limitations coming from the chapte 70 hack

@@ -33,7 +33,7 @@ module Oddb2xml
           effort: :tolerant,
           smart:  true
       }
-      res = Ox.load(URI.open(html_file).read, mode: :hash_no_attrs).values.first['body']
+      res = Ox.load(Oddb2xml.uri_open(html_file).read, mode: :hash_no_attrs).values.first['body']
       result = []
       idx = 0
       @@items = {}

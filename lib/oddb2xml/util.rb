@@ -7,6 +7,14 @@ module Oddb2xml
   def Oddb2xml.gen_prodno(iksnr, seqnr)
      sprintf('%05d',iksnr) + sprintf('%02d', seqnr)
   end
+  def Oddb2xml.uri_open(url)
+    version = RUBY_VERSION.split('.').map { |x| x.to_i }
+    if (version <=> [2,5,0]) >= 0
+      URI.open(url)
+    else
+      open(url)
+    end
+  end
   def Oddb2xml.calc_checksum(str)
     str = str.strip
     sum = 0
