@@ -1557,9 +1557,20 @@ module Oddb2xml
                   when 'N'; xml.DEDUCTIBLE 10; # 10%
                 end if item && item[:deductible]
                 prodno = Oddb2xml.getProdnoForEan13(pkg_gtin)
-                xml.PRODNO prodno if prodno
                 atc = package[:atc_code]
                 atc ||= @refdata[pkg_gtin][:seq][:atc_code] if @refdata[pkg_gtin]
+                unless prodno # find a prodno from packages for vaccinations
+                  if atc && /^J07/.match(atc) && !/^J07AX/.match(atc)
+                    pack = @packs.values.find{ |v| v && v[:atc_code].eql?(atc)}
+                    if pack
+                      prodno = pack[:prodno]
+                      Oddb2xml.log "Patching vaccination for #{pkg_gtin} #{atc} #{name} via prodno #{prodno}"
+                    else
+                      Oddb2xml.log "unable to find a pack/prodno for  vaccination for #{pkg_gtin} #{atc} #{name}"
+                    end
+                  end
+                end
+                xml.PRODNO prodno if prodno
                 csv = []
                 @csv_file << [pkg_gtin, name, package[:unit], measure,
                               pexf ? pexf : '',

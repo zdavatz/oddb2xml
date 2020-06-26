@@ -1,5 +1,141 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Preparations ReleaseDate="01.12.2013">
+  <Preparation ProductCommercial="9801">
+    <NameDe>Varilrix</NameDe>
+    <NameFr>Varilrix</NameFr>
+    <NameIt>Varilrix</NameIt>
+    <DescriptionDe>Trockensub c solv</DescriptionDe>
+    <DescriptionFr>subst sèche c solv </DescriptionFr>
+    <DescriptionIt>sost secca c solv </DescriptionIt>
+    <AtcCode>J07BK01</AtcCode>
+    <SwissmedicNo5>585</SwissmedicNo5>
+    <FlagItLimitation>Y</FlagItLimitation>
+    <OrgGenCode />
+    <FlagSB20>N</FlagSB20>
+    <CommentDe />
+    <CommentFr />
+    <CommentIt />
+    <VatInEXF>N</VatInEXF>
+    <Packs>
+      <Pack ProductKey="9801" PackId="14418">
+        <DescriptionDe>Fertspr 0.500 ml</DescriptionDe>
+        <DescriptionFr>ser prê 0.500 ml</DescriptionFr>
+        <DescriptionIt>sir preriempita 0.500 ml</DescriptionIt>
+        <SwissmedicCategory>B</SwissmedicCategory>
+        <SwissmedicNo8>585001</SwissmedicNo8>
+        <FlagNarcosis>N</FlagNarcosis>
+        <FlagModal />
+        <BagDossierNo>18076</BagDossierNo>
+        <GTIN>7680005850010</GTIN>
+        <SizePack />
+        <PrevPharmacode />
+        <Limitations />
+        <PointLimitations />
+        <Prices>
+          <ExFactoryPrice>
+            <Price>43.64</Price>
+            <ValidFromDate>01.12.2019</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PEXF</PriceTypeCode>
+            <PriceTypeDescriptionDe>Ex-Factory Preis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix ex-factory</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix ex-factory</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>3JUEBERPRUEF</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preisänderung nach 3-jährlicher Überprüfung der Aufnahmebedingungen</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Réduction de prix à cause du réexamen des conditions d’admission tous les trois ans</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preisänderung nach 3-jährlicher Überprüfung der Aufnahmebedingungen</PriceChangeTypeDescriptionIt>
+          </ExFactoryPrice>
+          <PublicPrice>
+            <Price>66.5</Price>
+            <ValidFromDate>01.12.2019</ValidFromDate>
+            <DivisionDescription />
+            <PriceTypeCode>PPUB</PriceTypeCode>
+            <PriceTypeDescriptionDe>Publikumspreis</PriceTypeDescriptionDe>
+            <PriceTypeDescriptionFr>Prix public</PriceTypeDescriptionFr>
+            <PriceTypeDescriptionIt>Prix public</PriceTypeDescriptionIt>
+            <PriceChangeTypeCode>3JUEBERPRUEF</PriceChangeTypeCode>
+            <PriceChangeTypeDescriptionDe>Preisänderung nach 3-jährlicher Überprüfung der Aufnahmebedingungen</PriceChangeTypeDescriptionDe>
+            <PriceChangeTypeDescriptionFr>Réduction de prix à cause du réexamen des conditions d’admission tous les trois ans</PriceChangeTypeDescriptionFr>
+            <PriceChangeTypeDescriptionIt>Preisänderung nach 3-jährlicher Überprüfung der Aufnahmebedingungen</PriceChangeTypeDescriptionIt>
+          </PublicPrice>
+        </Prices>
+        <Partners>
+          <Partner>
+            <PartnerType>V</PartnerType>
+            <Description>GlaxoSmithKline AG</Description>
+            <Street>Talstrasse 3-5</Street>
+            <ZipCode>3053</ZipCode>
+            <Place>Münchenbuchsee</Place>
+            <Phone>+41318622111</Phone>
+          </Partner>
+        </Partners>
+        <Status>
+          <IntegrationDate>01.01.2005</IntegrationDate>
+          <ValidFromDate>01.01.2005</ValidFromDate>
+          <ValidThruDate>31.12.9999</ValidThruDate>
+          <StatusTypeCodeSl>0</StatusTypeCodeSl>
+          <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+          <FlagApd>N</FlagApd>
+        </Status>
+      </Pack>
+    </Packs>
+    <Substances>
+      <Substance>
+        <DescriptionLa>Vaccinum virus varicellae vivus attenuat. (Stamm OKA)</DescriptionLa>
+        <Quantity>10^3.3</Quantity>
+        <QuantityUnit>U</QuantityUnit>
+      </Substance>
+    </Substances>
+    <Limitations />
+    <ItCodes>
+      <ItCode Code="08.">
+        <DescriptionDe>INFEKTIONSKRANKHEITEN</DescriptionDe>
+        <DescriptionFr>MALADIES INFECTIEUSES</DescriptionFr>
+        <DescriptionIt>MALATTIE INFETTIVE </DescriptionIt>
+        <Limitations />
+      </ItCode>
+      <ItCode Code="08.08.">
+        <DescriptionDe>Impfstoffe</DescriptionDe>
+        <DescriptionFr>Vaccins</DescriptionFr>
+        <DescriptionIt>Vaccini </DescriptionIt>
+        <Limitations>
+          <Limitation>
+            <LimitationCode>0808</LimitationCode>
+            <LimitationType>KOM</LimitationType>
+            <LimitationNiveau>I</LimitationNiveau>
+            <DescriptionDe>Die Kostenübernahme der Impfstoffe als Teil einer präventiven Massnahme im Rahmen der obligatorischen Krankenpflegeversicherung richtet sich nach den in Artikel 12a KLV für die jeweiligen Impfungen abschliessend festgelegten Voraussetzungen. Bei beruflicher und reisemedizinischer Indikation erfolgt keine Kostenübernahme durch die obligatorische Krankenpflegeversicherung.&lt;br&gt;
+Die Preise der Impfstoffe sind Höchstpreise (Art. 52 Abs. 3 KVG) und kommen bei Reihenimpfungen (z.B. im schulärztlichen Dienst) nicht zur Anwendung. In diesen Fällen gelten die von den Krankenversicherern mit den zuständigen Behörden ausgehandelten bzw. die allenfalls von den Behörden festgesetzten Tarife. Wenn der Impfstoff zu einem günstigeren Preis bezogen wird (z.B. im Rahmen von Reihenimpfungen), darf der Arzt oder die Ärztin nicht den Publikumspreis der SL verrechnen. Die Vergünstigung muss gemäss Artikel 56 Absatz 3 KVG weitergegeben werden.&lt;br&gt;
+&lt;br&gt;
+Die Vergünstigung muss gemäss Artikel 56 Absatz 3 KVG weitergegeben werden, ausser es bestehen Vereinbarungen nach Artikel 56 Absatz 3bis KVG.&lt;br&gt;
+&lt;br&gt;
+</DescriptionDe>
+            <DescriptionFr>La prise en charge des coûts des vaccins au titre de mesure préventive dans le cadre de l'assurance maladie obligatoire des soins est régie par les conditions contraignantes fixées à l'article 12a OPAS pour les vaccinations correspondantes. En cas d'indication professionnelle et de recommandation médicale aux voyageurs, la vaccination n'est pas prise en charge par l'assurance maladie obligatoire des soins. Les prix des vaccins sont des prix maximaux (art. 52, al. 3, LAMal) et ne s'appliquent pas aux vaccinations en série (par ex. dans le service médical scolaire). Dans ce cas, les tarifs négociés par les assureurs maladie avec les autorités compétentes ou, le cas échéant, ceux fixés par les autorités, sont applicables. Si le vaccin est acheté à un prix inférieur (par exemple dans le cadre d'une série de vaccinations), le médecin ne peut pas le facturer au prix public de la LS.  L'avantage doit être répercuté conformément à l'article 56, al. 3, LAMal.&lt;br&gt;
+&lt;br&gt;
+L'avantage doit être répercuté conformément à l'article 56, al. 3, LAMal, hormis si des conventions au sens de l'art. 56, al. 3bis, LAMal, ont été conclues.&lt;br&gt;
+&lt;br&gt;
+
+</DescriptionFr>
+            <DescriptionIt>L’assunzione dei costi dei vaccini, in quanto misura di prevenzione parziale nel quadro dell’assicurazione obbligatoria delle cure medico-sanitarie, è disciplinata in modo esauriente dalle condizioni fissate per i vaccini interessati nell’articolo 12a OPre. In caso di indicazione professionale e di medicina di viaggio, l’assicurazione obbligatoria delle cure medico-sanitarie non ne assume i costi.&lt;br&gt;
+I prezzi dei vaccini sono prezzi massimi (art. 52 cpv. 3 LAMal) e non si applicano alle vaccinazioni in serie (ad. es. quelle effettuate nell’ambito del servizio medico scolastico). In questi casi sono applicabili le tariffe negoziate dagli assicuratori malattie con le autorità competenti o quelle eventualmente stabilite dalle autorità. Se il vaccino è acquistato a un prezzo più conveniente (p. es. nel quadro di vaccinazioni in serie), il medico non può fatturare il prezzo per il pubblico che figura nell’ES. Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capoverso 3 LAMal.&lt;br&gt;
+&lt;br&gt;
+Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capoverso 3 LAMal, tranne in caso di accordi di cui all’articolo 56 capoverso 3bis LAMal.&lt;br&gt;
+&lt;br&gt;
+</DescriptionIt>
+            <ValidFromDate>01.01.2000</ValidFromDate>
+            <ValidThruDate>31.12.9999</ValidThruDate>
+          </Limitation>
+        </Limitations>
+      </ItCode>
+    </ItCodes>
+    <Status>
+      <IntegrationDate>01.01.2005</IntegrationDate>
+      <ValidFromDate>01.01.2005</ValidFromDate>
+      <ValidThruDate>31.12.9999</ValidThruDate>
+      <StatusTypeCodeSl>0</StatusTypeCodeSl>
+      <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
+      <FlagApd>N</FlagApd>
+    </Status>
+  </Preparation>
   <Preparation ProductCommercial="394">
     <NameDe>Ancopir</NameDe>
     <NameFr>Ancopir</NameFr>
@@ -1239,7 +1375,7 @@
       <StatusTypeDescriptionSl>Initialzustand</StatusTypeDescriptionSl>
       <FlagApd>N</FlagApd>
     </Status>
-  </Preparation>  
+  </Preparation>
   <Preparation ProductCommercial="25550">
     <NameDe>Adcetris</NameDe>
     <NameFr>Adcetris</NameFr>
@@ -2913,8 +3049,8 @@ Le médecin traitant est tenu de saisir en continu les données requises dans l'
 2)         Date du début de traitement, posologie, ajustements posologiques, date de fin de traitement.
 
 </DescriptionFr>
-        <DescriptionIt>Per la terapia di mantenimento (monoterapia) in pazienti adulte con carcinoma ovarico avanzato e recidivo, con mutazione BRCA, successivamente a una chemioterapia a base di platino e in presenza di una remissione parziale o completa.&lt;br&gt; 
-Il medico curante è tenuto a raccogliere costantemente i dati necessari nell’apposito strumento internet del registro, disponibile su http://www.olaparib-registry.ch. È necessario il consenso scritto della paziente. Devono essere raccolti i seguenti dati:&lt;br&gt; 
+        <DescriptionIt>Per la terapia di mantenimento (monoterapia) in pazienti adulte con carcinoma ovarico avanzato e recidivo, con mutazione BRCA, successivamente a una chemioterapia a base di platino e in presenza di una remissione parziale o completa.&lt;br&gt;
+Il medico curante è tenuto a raccogliere costantemente i dati necessari nell’apposito strumento internet del registro, disponibile su http://www.olaparib-registry.ch. È necessario il consenso scritto della paziente. Devono essere raccolti i seguenti dati:&lt;br&gt;
 1)         Anno di nascita e terapie precedenti per il carcinoma ovarico&lt;br&gt;
 2)         Data di inizio della terapia, dosaggio, aggiustamenti del dosaggio, data di conclusione della terapia.
 </DescriptionIt>

@@ -24,7 +24,7 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
-    binding.pry unless @inhalt.index(expected_value)
+    # binding.pry unless @inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
   def common_run_init(options = {})
@@ -439,6 +439,32 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>5329001</PRODNO>
         </ITEM>),
+        'Varilrix product' => %(<PRODUCT>
+            <PRODNO>0058501</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>Varilrix Trockensub c solv</DSCR>
+            <DSCRF>Varilrix subst sèche c solv</DSCRF>
+            <ATC>J07BK01</ATC>
+            <LIMNAMEBAG>0808</LIMNAMEBAG>
+            <SUBSTANCE>Vaccinum virus varicellae vivus attenuat. (Stamm OKA)</SUBSTANCE>
+        </PRODUCT>),
+        'Varilrix item' => %(<ITEM PHARMATYPE="P">
+            <GTIN>7680005850010</GTIN>
+            <PHAR>1770177</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>Varilrix Trockensub c solv Fertspr 0.500 ml</DSCR>
+            <DSCRF>Varilrix subst sèche c solv ser prê 0.500 ml</DSCRF>
+            <COMP>
+                <NAME>GlaxoSmithKline AG</NAME>
+                <GLN>7601001000674</GLN>
+            </COMP>
+            <PEXF>43.64</PEXF>
+            <PPUB>66.5</PPUB>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>B</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>0058501</PRODNO>
+        </ITEM),
         'Chapter 70 product' => %(<PRODUCT>
             <PRODNO>2069639</PRODNO>
             <!--Chapter70 hack-->
