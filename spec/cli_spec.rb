@@ -184,6 +184,32 @@ describe Oddb2xml::Cli do
             }
     end
   end
+  context 'when  -e and -f dat option is given' do
+    before(:all) do
+      cleanup_directories_before_run
+      options = Oddb2xml::Options.parse('-e -f dat')
+      @cli = Oddb2xml::Cli.new(options)
+      @cli_output = buildr_capture(:stdout) { @cli.run }
+    end
+    it_behaves_like 'any interface for product'
+    it 'should have calc option' do
+      expect(@cli).to have_option(:format => :dat)
+      expect(@cli).to have_option(:calc => true)
+      expect(@cli).to have_option(:extended => true)
+    end
+    it 'should create xml files' do
+      expect(@cli_output).to match(/NonPharma/)
+      file_today = "oddb_calc_#{Time.now.strftime("%d.%m.%Y_%H.%M")}.xml"
+      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WorkDir, file_today)).size).to eq 1
+    end
+    it 'should create migel files' do
+      expect(@cli_output).to match(/NonPharma/)
+      file_today = "oddb_with_migel_#{Time.now.strftime("%d.%m.%Y_%H.%M")}.dat"
+      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_with_migel.dat')).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WorkDir, file_today)).size).to eq 1
+    end
+  end
 
   context 'when -a nonpharma option is given' do
     before(:all) do

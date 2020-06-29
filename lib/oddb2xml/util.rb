@@ -69,7 +69,7 @@ module Oddb2xml
   def Oddb2xml.add_epha_changes_for_ATC(iksnr, atc_code, force_run: false)
     @atc_csv_content  =  {} if force_run
     if @atc_csv_content.size == 0
-      open(@atc_csv_origin).readlines.each{
+      Oddb2xml.uri_open(@atc_csv_origin).readlines.each{
         |line|
           items = line.split(',')
           @atc_csv_content[[items[0], items[1]]] = items[2]

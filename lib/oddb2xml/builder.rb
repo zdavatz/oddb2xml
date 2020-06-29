@@ -1337,7 +1337,7 @@ module Oddb2xml
                                           else
                                             ('0' * DAT_LEN[:ITHE])
                                           end.to_i
-          row << "%0#{DAT_LEN[:CEAN]}d" % (sprintf('%013d', ean).match(/^000000/) ? 0 : ean.to_i)
+          row << "%0#{DAT_LEN[:CEAN]}d" % (sprintf('%013d', ean.to_i).match(/^000000/) ? 0 : ean.to_i)
           row << "%#{DAT_LEN[:CMWS]}s"  % '2' # pharma
           rows << row
       end

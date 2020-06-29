@@ -157,7 +157,9 @@ module Oddb2xml
             end
           end
           if @options[:calc]
-            FileUtils.cp(File.join(WorkDir, file), File.join(WorkDir, file.sub('.xml', '_'+Time.now.strftime("%d.%m.%Y_%H.%M")+'.xml')), :verbose => false)
+            ext = File.extname(file)
+            dest = File.join(WorkDir, file.sub(ext, '_'+Time.now.strftime("%d.%m.%Y_%H.%M")+ext))
+            FileUtils.cp(File.join(WorkDir, file), dest, :verbose => false)
           end
         end
       rescue Interrupt
