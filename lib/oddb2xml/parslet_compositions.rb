@@ -88,7 +88,11 @@ module ParseUtil
         composition.substances.each do
           |substance_item|
           active_substance_name = substance_item.name.downcase.sub(/^cum\s/, '')
-          substance_item.is_active_agent = (active_agents.find {|x| /#{x.downcase.gsub('(', '\(').gsub(')', '\)')}($|\s)/.match(active_substance_name) } != nil)
+          substance_item.is_active_agent = (active_agents.find {|x| /#{x.downcase.
+                                                                gsub('(', '\(').
+                                                                gsub(')', '\)').
+                                                                gsub('[', '\[').
+                                                                gsub(']', '\]')}($|\s)/.match(active_substance_name) } != nil)
           substance_item.is_active_agent = true if substance_item.chemical_substance and active_agents.find {|x| x.downcase.eql?(substance_item.chemical_substance.name.downcase) }
          end
         comps << composition
