@@ -1,3 +1,8 @@
+=== 2.6.9 / 29.06.2020
+
+* Fix problem when running bin/oddb2xml -a -f dat. Thanks to Lukas Furre for reporting the problem
+* Fix warning with regular expression thas has ']'
+
 === 2.6.8 / 26.06.2020
 
 * Re-Add support for Ruby Version 2.4
