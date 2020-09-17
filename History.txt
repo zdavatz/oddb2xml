@@ -1,3 +1,6 @@
+=== 2.7.0 / 17.09.2020
+* Chapter70 hack nur als Kommentar
+
 === 2.6.9 / 29.06.2020
 
 * Fix problem when running bin/oddb2xml -a -f dat. Thanks to Lukas Furre for reporting the problem

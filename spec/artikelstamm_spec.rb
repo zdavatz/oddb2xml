@@ -24,7 +24,7 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
-    # binding.pry unless @inhalt.index(expected_value)
+    binding.pry unless @inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
   def common_run_init(options = {})
@@ -467,7 +467,7 @@ describe Oddb2xml::Builder do
         </ITEM),
         'Chapter 70 product' => %(<PRODUCT>
             <PRODNO>2069639</PRODNO>
-            <!--Chapter70 hack-->
+            <!--Chapter70 hack prodno 2069639 Ceres Urtinkturen gemäss L2-->
             <SALECD>A</SALECD>
             <DSCR>Ceres Urtinkturen gemäss L2</DSCR>
             <DSCRF/>
@@ -480,10 +480,9 @@ describe Oddb2xml::Builder do
             <DSCRF>--missing--</DSCRF>
             <PEXF>23.44</PEXF>
             <PPUB>31.30</PPUB>
-            <!--Chapter70 hack-->
+            <!--Chapter70 hack 2500000588532 EINF ARZNEI Ceres Urtinktur spez 20ml-->
             <SL_ENTRY>true</SL_ENTRY>
             <PRODNO>2069639</PRODNO>
-            <Chapter70_HACK>true</Chapter70_HACK>
         </ITEM>),
         'HTML-encoded limitation' => %(<DSCR>Zur Erhaltungstherapie (Monotherapie) bei erwachsenen Patientinnen mit rezidiviertem, fortgeschrittenem Ovarialkarzinom mit BRCA Mutation im Anschluss an eine platinhaltige Chemotherapie bei Vorliegen einer kompletten oder partiellen Remission.
 
