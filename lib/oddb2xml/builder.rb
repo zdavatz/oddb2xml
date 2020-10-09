@@ -1628,7 +1628,7 @@ module Oddb2xml
               end
              @csv_file << [ ean13, description, '', '', pexf, ppub, '', '', '', '', '', '' ]
               if chap70
-                xml.comment "Chapter70 hack #{ean13.to_s.rjust(13, '0')} #{description}"
+                xml.comment "Chapter70 hack #{ean13.to_s.rjust(13, '0')} #{description.encode(:xml => :text).gsub('--','-')}"
                 xml.SL_ENTRY 'true'
                 xml.PRODNO obj[:pharmacode]
               end
@@ -1732,7 +1732,7 @@ module Oddb2xml
                   used_limitations << lim_code unless used_limitations.index(lim_code)
                   xml.LIMNAMEBAG lim_code
                 elsif obj[:chapter70]
-                  xml.comment "Chapter70 hack prodno #{prodno} #{obj[:description]}"
+                  xml.comment "Chapter70 hack prodno #{prodno} #{obj[:description].encode(:xml => :text).gsub('--','-')}"
                   xml.SALECD('A') # these products are always active!
                   xml.DSCR obj[:description]
                   xml.DSCRF ''
@@ -1765,7 +1765,7 @@ module Oddb2xml
               end
               emitted_lim_code << lim[:code]
               xml.LIMITATION do
-                xml.comment "Chapter70 hack" if lim[:chap70]
+                xml.comment "Chapter70 2 hack" if lim[:chap70]
                 xml.LIMNAMEBAG lim[:code] # original LIMCD
                 xml.DSCR       Oddb2xml.html_decode(lim[:desc_de])
                 xml.DSCRF      Oddb2xml.html_decode(lim[:desc_fr])

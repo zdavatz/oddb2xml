@@ -88,6 +88,7 @@ module Oddb2xml
             puts "Validatied #{@_files[:artikelstamm]}"
          else
             puts "Validating failed using #{cmd}"
+            raise  "Validating failed using #{cmd}"
             exit(2)
          end
       end
