@@ -1,4 +1,4 @@
-=== 2.7.0 / 09.10.2020
+=== 2.7.0 / 05.11.2020
 * Chapter70 hack nur als Kommentar
 * Avoid double hyphen in comment
 
