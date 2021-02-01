@@ -60,17 +60,15 @@ describe Oddb2xml::RefdataExtractor do
       @pharma_items = Oddb2xml::RefdataExtractor.new(xml, 'PHARMA').to_hash
     end
 
-    it "should have correct info for pharmacode 1699947 correctly" do
+    it "should have correct info for no8 62069008 correctly" do
       @pharma_items = subject.to_hash
-      pharma_code_LEVETIRACETAM = '5819012'
-      item_found = @pharma_items.values.find{ |x| x[:pharmacode].eql?(pharma_code_LEVETIRACETAM)}
+      item_found = @pharma_items.values.find{ |x| x[:ean13].eql?(Oddb2xml::LEVETIRACETAM_GTIN)}
       expect(item_found).not_to be nil
       expected = {:data_origin=>"refdata",
         :refdata=>true,
         :_type=>:pharma,
         :ean13=> Oddb2xml::LEVETIRACETAM_GTIN.to_s,
         :no8 => "62069008",
-        :pharmacode=> pharma_code_LEVETIRACETAM,
         :data_origin => "refdata",
         :desc_de=>"LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
         :desc_fr=>"LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce",
@@ -90,14 +88,12 @@ describe Oddb2xml::RefdataExtractor do
 
     it "should have correct info for nonpharma with pharmacode 0058502 correctly" do
       @non_pharma_items = subject.to_hash
-      pharma_code_TUBEGAZE = '0058519'
-      item_found = @non_pharma_items.values.find{ |x| x[:pharmacode].eql?(pharma_code_TUBEGAZE)}
+      item_found = @non_pharma_items.values.find{ |x| x[:ean13].eql?('7611600441020')}
       expect(item_found).not_to be nil
       expected = {:refdata=>true,
       :_type=>:nonpharma,
       :ean13=>'7611600441020',
       :no8 => nil,
-      :pharmacode=>pharma_code_TUBEGAZE,
       :last_change => @@last_change,
       :data_origin => "refdata",
       :desc_de=>"TUBEGAZE Verband weiss Nr 12 20m Finger gross",

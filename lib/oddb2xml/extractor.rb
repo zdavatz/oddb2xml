@@ -218,7 +218,6 @@ module Oddb2xml
         item = {}
         item[:ean13]           = ean13
         item[:no8]             = pac.SWMC_AUTHNR
-        item[:pharmacode]      = (phar = pac.PHAR.to_s)   ? phar: '0'
         item[:data_origin]     = 'refdata'
         item[:refdata]         = true
         item[:_type]           = (typ  = pac.ATYPE.downcase.to_sym)  ? typ: ''
@@ -228,12 +227,6 @@ module Oddb2xml
         item[:atc_code]        = (code = pac.ATC)    ? code.to_s : ''
         item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam: ''
         item[:company_ean]  = (gln = pac.AUTH_HOLDER_GLN)  ? gln: ''
-        unless item[:pharmacode]
-          item[:pharmacode] = phar
-          unless data[item[:pharmacode]] # pharmacode => GTINs
-            data[item[:ean13]] = []
-          end
-        end
         data[item[:ean13]] = item
       end
       data

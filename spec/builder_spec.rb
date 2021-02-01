@@ -39,7 +39,6 @@ ARTICLE_ZURROSE_ELEMENTS =    [
 ]
 
 ARTICLE_NAROPIN = %(<REF_DATA>1</REF_DATA>
-    <PHAR>1882189</PHAR>
     <SMCAT>B</SMCAT>
     <SMNO>54015011</SMNO>
     <PRODNO>5401501</PRODNO>
@@ -259,16 +258,6 @@ def check_result(inhalt, nbr_record)
   expect(m[1].to_i).to eq  nbr_record
 end
 
-def checkItemForRefdata(doc, pharmacode, isRefdata)
-  article = XPath.match( doc, "//ART[PHAR=#{pharmacode.to_s}]").first
-  name =     article.elements['DSCRD'].text
-  refdata =  article.elements['REF_DATA'].text
-  smno    =  article.elements['SMNO'] ? article.elements['SMNO'].text : 'nil'
-  puts "checking doc for gtin #{gtin} isRefdata #{isRefdata} == #{refdata}. SMNO: #{smno} #{name}" if $VERBOSE
-  expect(article.elements['REF_DATA'].text).to eq(isRefdata.to_s)
-  article
-end
-
 ['article', 'betrieb', 'code', 'interaction', 'limitation', 'medizinalperson', 'product', 'substance'].each do |cat|
   eval "
     def oddb_#{cat}_xml
@@ -408,7 +397,7 @@ def checkArticleXml(checkERYTHROCIN = true)
   expect(desitin.elements['DSCRD'].text).to eq("LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk")
   expect(desitin.elements['DSCRF'].text).to eq('LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce')
   expect(desitin.elements['REF_DATA'].text).to eq('1')
-  expect(desitin.elements['PHAR'].text).to eq('5819012')
+  expect(desitin.elements['PHAR']).to be nil
   expect(desitin.elements['SMCAT'].text).to eq('B')
   expect(desitin.elements['SMNO'].text).to eq('62069008')
   expect(desitin.elements['VAT'].text).to eq('2')
@@ -425,7 +414,7 @@ def checkArticleXml(checkERYTHROCIN = true)
   expect(lansoyl.elements['DSCRD'].text).to eq 'LANSOYL Gel 225 g'
   expect(lansoyl.elements['REF_DATA'].text).to eq '1'
   expect(lansoyl.elements['SMNO'].text).to eq '32475019'
-  expect(lansoyl.elements['PHAR'].text).to eq '0023722'
+  expect(lansoyl.elements['PHAR']).to be nil
   expect(lansoyl.elements['ARTCOMP/COMPNO'].text).to eq('7601001002012')
 
   zyvoxid = checkAndGetArticleWithGTIN(doc, Oddb2xml::ZYVOXID_GTIN)
@@ -473,7 +462,7 @@ def checkProductXml(nbr_record = -1)
 end
 
 describe Oddb2xml::Builder do
-  NrExtendedArticles = 78
+  NrExtendedArticles = 80
   NrSubstances = 28
   NrLimitations = 15
 
@@ -482,7 +471,7 @@ describe Oddb2xml::Builder do
   NrProdno = 31
   NrPackages = 46
   NrProducts = 40
-  RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
+  RegExpDesitin = /1120000000LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def common_run_init(options = {})
     @savedDir = Dir.pwd
@@ -821,19 +810,12 @@ describe Oddb2xml::Builder do
 
     it 'should generate the flag non-refdata' do
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName('non-refdata'))
-      expect(XPath.match( doc, "//REF_DATA" ).size).to be > 0
-      checkItemForRefdata(doc, "1699947", 1) # 3TC Filmtabl 150 mg SMNO 53662013 IKSNR 53‘662, 53‘663
-      checkItemForRefdata(doc, "0598003", 0) # SOFRADEX Gtt Auric 8 ml
-      checkItemForRefdata(doc, "5366964", 0) # 1-DAY ACUVUE moist jour
-      unless SkipMigelDownloader
-        novopen = checkItemForRefdata(doc, "3036984", 1) # NovoPen 4 Injektionsgerät blue In NonPharma (a MiGel product)
-        expect(novopen.elements['ARTBAR/BC'].text).to eq '0'
-      end
+      expect(XPath.match( doc, "//REF_DATA" ).size).to eq NrExtendedArticles
     end
 
     it 'should generate SALECD A for migel (NINCD 13)' do
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
-      article = XPath.match( doc, "//ART[PHAR=4236863]").first
+      article = XPath.match( doc, "//ART[DSCRD='ACTICOAT Flex 7 Wundverband 10x12.5cm 5 Stk']").first
       expect(article.elements['SALECD'].text).to eq('A')
       expect(article.elements['ARTINS/NINCD'].text).to eq('13')
     end
@@ -860,12 +842,12 @@ describe Oddb2xml::Builder do
     end
 
     it 'should load correct number of nonpharma' do
+      puts checkAndGetArticleXmlName
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
       dscrds = XPath.match( doc, "//ART" )
       expect(dscrds.size).to eq(NrExtendedArticles)
-      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('1699947') }.size).to eq(1) # swissmedic_packages Cardio-Pulmo-Rénal Sérocytol, suppositoire
-      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('2465312') }.size).to eq(1) # from refdata_pharma.xml"
       expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size).to eq(0) # 0 is not a valid pharmacode
+      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match(/\d+/)}.size).to eq 50
     end
 
     it 'should have a correct NBR_RECORD in oddb_limitation.xml' do
