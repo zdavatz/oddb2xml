@@ -71,17 +71,16 @@ describe Oddb2xml::Builder do
     end
 
     it 'should have a GTIN and a public price with 14 chars (ean14)' do
+      # Till January 2021 it was possible to find a price via transfer.dat
+      # as the pharmacode was given in the refdata_NonPharma.xml
       expected = %(<ITEM PHARMATYPE="N">
             <GTIN>68711428066649</GTIN>
-            <PHAR>5863450</PHAR>
             <SALECD>A</SALECD>
             <DSCR>3M MEDIPORE+PAD Absorbtionsverb 10x15cm 8 x 25 Stk</DSCR>
             <DSCRF>3M MEDIPORE+PAD compr absorb 10x15cm 8 x 25 pce</DSCRF>
             <COMP>
                 <GLN>7610182000007</GLN>
             </COMP>
-            <PEXF>108.01</PEXF>
-            <PPUB>178.20</PPUB>
         </ITEM>)
       expect(@inhalt.index(expected)).not_to be nil
     end
@@ -160,12 +159,6 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index('GTIN>0')).to be > 0
     end
 
-    it 'should contain a PHAR 4236857 from refdata_NonPharma.xml' do
-      expect(@inhalt.index('<PHAR>4236863</PHAR>')).to be > 0
-      # Marco leaves the 14 GTIN digit in previous importes. As of January 2018 force it to the 13 digits
-      expect(@inhalt.index('<GTIN>0040565124346</GTIN>')).to be > 0
-    end
-
     it 'should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
       skip("Where does the DSCR for 4042809018288 come from. It should be TENSOPLAST bande compression 5cmx4.5m")
     end
@@ -215,8 +208,6 @@ describe Oddb2xml::Builder do
     it 'should contain DIBASE with phar' do
       expected = %(<ITEM PHARMATYPE="P">
             <GTIN>7680658560014</GTIN>
-            <!--obsolete override-->
-            <PHAR>7199565</PHAR>
             <SALECD>A</SALECD>
             <DSCR>Dibase 10'000 Tropfen 10000 IE/ml Fl 10 ml</DSCR>
             <DSCRF>Dibase 10'000 gouttes 10000 UI/ml fl 10 ml</DSCRF>
@@ -249,7 +240,6 @@ describe Oddb2xml::Builder do
       tests = { 'item 7680403330459 CARBADERM only in Preparations(SL) with public price' =>
         %(<ITEM PHARMATYPE="P">
             <GTIN>7680403330459</GTIN>
-            <PHAR>3603779</PHAR>
             <SALECD>A</SALECD>
             <DSCR>Carbaderm Creme Tb 300 ml</DSCR>
             <DSCRF>Carbaderm crème tb 300 ml</DSCRF>
@@ -271,7 +261,6 @@ describe Oddb2xml::Builder do
         </ITEM>),
          'product 3247501 LANSOYL' => '<ITEM PHARMATYPE="P">
             <GTIN>7680324750190</GTIN>
-            <PHAR>0023722</PHAR>
             <SALECD>A</SALECD>
             <DSCR>LANSOYL Gel 225 g</DSCR>
             <DSCRF>LANSOYL gel 225 g</DSCRF>
@@ -290,7 +279,6 @@ describe Oddb2xml::Builder do
         'product 5366201 3TC' =>
       %(<ITEM PHARMATYPE="P">
             <GTIN>7680536620137</GTIN>
-            <PHAR>1699947</PHAR>
             <SALECD>A</SALECD>
             <DSCR>3TC Filmtabl 150 mg 60 Stk</DSCR>
             <DSCRF>3TC cpr pell 150 mg 60 pce</DSCRF>
@@ -314,7 +302,6 @@ describe Oddb2xml::Builder do
         'item 7680161050583 HIRUDOID 40g' =>
          %(<ITEM PHARMATYPE="P">
             <GTIN>7680161050583</GTIN>
-            <PHAR>2731179</PHAR>
             <SALECD>A</SALECD>
             <DSCR>Hirudoid Creme 3 mg/g 40 g</DSCR>
             <DSCRF>Hirudoid crème 3 mg/g 40 g</DSCRF>
@@ -336,7 +323,6 @@ describe Oddb2xml::Builder do
         'item 7680161050743 Hirudoid Creme 3 mg/g 100 g' =>
               %( <ITEM PHARMATYPE="P">
             <GTIN>7680161050743</GTIN>
-            <PHAR>2731179</PHAR>
             <SALECD>A</SALECD>
             <DSCR>Hirudoid Creme 3 mg/g 100 g</DSCR>
             <DSCRF>Hirudoid crème 3 mg/g 100 g</DSCRF>
@@ -352,7 +338,6 @@ describe Oddb2xml::Builder do
         </ITEM>),
         'item 7680284860144 ANCOPIR' =>'<ITEM PHARMATYPE="P">
             <GTIN>7680284860144</GTIN>
-            <PHAR>0177804</PHAR>
             <SALECD>A</SALECD>
             <DSCR>ANCOPIR Inj Lös 5 Amp 2 ml</DSCR>
             <DSCRF>Ancopir, sol inj</DSCRF>
@@ -374,7 +359,6 @@ describe Oddb2xml::Builder do
         </ITEM>',
                 'FERRO-GRADUMET price from ZurRose  ' => %(<ITEM PHARMATYPE="P">
             <GTIN>7680316440115</GTIN>
-            <PHAR>0020244</PHAR>
             <SALECD>A</SALECD>
             <DSCR>FERRO-GRADUMET Depottabl 30 Stk</DSCR>
             <DSCRF>FERRO-GRADUMET cpr dépôt 30 pce</DSCRF>
@@ -402,7 +386,6 @@ describe Oddb2xml::Builder do
         </PRODUCT>),
         'nur aus Packungen Coeur-Vaisseaux Sérocytol,' => %(<ITEM PHARMATYPE="P">
             <GTIN>7680002770014</GTIN>
-            <PHAR>0361815</PHAR>
             <SALECD>A</SALECD>
             <DSCR>SEROCYTOL Herz-Gefässe Supp 3 Stk</DSCR>
             <DSCRF>SEROCYTOL Coeur-Vaisseaux supp 3 pce</DSCRF>
@@ -419,7 +402,6 @@ describe Oddb2xml::Builder do
         </ITEM>),
         'HUMALOG (Richter)' => %(<ITEM PHARMATYPE="P">
             <GTIN>7680532900196</GTIN>
-            <PHAR>1699999</PHAR>
             <SALECD>A</SALECD>
             <DSCR>Humalog Inj Lös Durchstf 10 ml</DSCR>
             <DSCRF>Humalog sol inj flac 10 ml</DSCRF>
@@ -450,7 +432,6 @@ describe Oddb2xml::Builder do
         </PRODUCT>),
         'Varilrix item' => %(<ITEM PHARMATYPE="P">
             <GTIN>7680005850010</GTIN>
-            <PHAR>1770177</PHAR>
             <SALECD>A</SALECD>
             <DSCR>Varilrix Trockensub c solv Fertspr 0.500 ml</DSCR>
             <DSCRF>Varilrix subst sèche c solv ser prê 0.500 ml</DSCRF>
@@ -467,9 +448,9 @@ describe Oddb2xml::Builder do
         </ITEM),
         'Chapter 70 product' => %(<PRODUCT>
             <PRODNO>2069639</PRODNO>
-            <!--Chapter70 hack prodno 2069639 Ceres Urtinkturen gemäss L2 mit - im Kommentar-->
+            <!--Chapter70 hack prodno 2069639 Ceres Urtinkturen gem&amp;auml;ss L2 mit - im Kommentar-->
             <SALECD>A</SALECD>
-            <DSCR>Ceres Urtinkturen gemäss L2 mit -- im Kommentar</DSCR>
+            <DSCR>Ceres Urtinkturen gem&amp;auml;ss L2 mit -- im Kommentar</DSCR>
             <DSCRF/>
         </PRODUCT>),
         'Chapter 70 item' => %(<ITEM PHARMATYPE="P">

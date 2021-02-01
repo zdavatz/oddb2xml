@@ -886,8 +886,7 @@ module Oddb2xml
             xml.ART('DT' => obj[:last_change] ? obj[:last_change] : '') do
               nbr_records += 1
               xml.REF_DATA (obj[:refdata] || @migel[pharma_code]) ? '1' : '0'
-              # xml.PHAR  sprintf('%07d', obj[:pharmacode]) if obj[:pharmacode]
-              xml.PHAR  obj[:pharmacode] if obj[:pharmacode]
+              xml.PHAR  obj[:pharmacode] if obj[:pharmacode] && obj[:pharmacode].length > 0
               #xml.GRPCD
               #xml.CDS01
               #xml.CDS02
@@ -988,14 +987,7 @@ module Oddb2xml
                 xml.CDTYP  'E13'
                 xml.BC     ean #  /^9999|^0000|^0$/.match(ean.to_s) ? 0 : sprintf('%013d', ean)
                 xml.BCSTAT 'A' # P is alternative
-                #xml.PHAR2
               } if ean
-              #xml.ARTCH {
-                #xml.PHAR2
-                #xml.CHTYPE
-                #xml.LINENO
-                #xml.NOUNITS
-              #}
               if pac and pac[:prices]
                 pac[:prices].each_pair do |key, price|
                   xml.ARTPRI {
@@ -1499,7 +1491,6 @@ module Oddb2xml
                 name ||= (item[:desc_de] + item[:name_de]) if item
                 name ||= obj[:sequence_name]
                 xml.GTIN pkg_gtin.to_s.rjust(13, '0')
-                override(xml, pkg_gtin, :PHAR, pharma_code)
                 xml.SALECD('A')
                 # maxLength for DSCR is 50 for Artikelstamm v3
                 xml.DSCR(name) # for description for zur_rose
@@ -1598,7 +1589,7 @@ module Oddb2xml
             next if /^#{Oddb2xml::FAKE_GTIN_START}/.match(ean13.to_s)
             xml.ITEM({'PHARMATYPE' => patched_pharma_type }) do
               xml.GTIN ean13.to_s.rjust(13, '0')
-              xml.PHAR obj[:pharmacode]
+              xml.PHAR obj[:pharmacode] if obj[:pharmacode] && obj[:pharmacode].length > 0
               emit_salecd(xml, ean13, obj)
               description = obj[:desc_de] || obj[:description] # for description for zur_rose
               xml.DSCR(description)

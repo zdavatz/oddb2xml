@@ -5,7 +5,6 @@
       <ITEM DT="2018-12-05T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680005850010</GTIN>
-        <PHAR>1770177</PHAR>
         <SWMC_AUTHNR>00585001</SWMC_AUTHNR>
         <NAME_DE>VARILRIX Trockensub c Solv Fertspr 0.5 ml</NAME_DE>
         <NAME_FR>VARILRIX subst sèche c solv ser pré 0.5 ml</NAME_FR>
@@ -16,7 +15,6 @@
       <ITEM DT="2017-12-14T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680545340019</GTIN>
-        <PHAR>6749124</PHAR>
         <SWMC_AUTHNR>54534001</SWMC_AUTHNR>
         <NAME_DE>TEBOKAN Filmtabl 240 mg 30 Stk</NAME_DE>
         <NAME_FR>TEBOKAN cpr pell 240 mg 30 pce</NAME_FR>
@@ -27,7 +25,6 @@
       <ITEM DT="2017-12-14T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680540150118</GTIN>
-        <PHAR>1882189</PHAR>
         <SWMC_AUTHNR>54015011</SWMC_AUTHNR>
         <NAME_DE>NAROPIN Inj Lös 0.2 % 10ml Duofit Amp 5 Stk</NAME_DE>
         <NAME_FR>NAROPIN sol inj 0.2 % 10ml amp duofit 5 pce</NAME_FR>
@@ -38,7 +35,6 @@
       <ITEM DT="2017-12-08T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680563520172</GTIN>
-        <PHAR>6477223</PHAR>
         <SWMC_AUTHNR>56352017</SWMC_AUTHNR>
         <NAME_DE>ADVATE Trockensub 250 IE c Solv 2 ml Durchstf</NAME_DE>
         <NAME_FR>ADVATE subst sèche 250 UI c solv 2 ml flac</NAME_FR>
@@ -49,7 +45,6 @@
       <ITEM DT="2018-09-20T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680658560014</GTIN>
-        <PHAR>7199565</PHAR>
         <SWMC_AUTHNR>65856001</SWMC_AUTHNR>
         <NAME_DE>DIBASE Tropfen 10000 IE/ml Fl 10 ml</NAME_DE>
         <NAME_FR>DIBASE gouttes 10000 UI/ml fl 10 ml</NAME_FR>
@@ -60,7 +55,6 @@
       <ITEM DT="2017-12-08T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680555580054</GTIN>
-        <PHAR>2465312</PHAR>
         <SWMC_AUTHNR>55558005</SWMC_AUTHNR>
         <NAME_DE>ZYVOXID Filmtabl 600 mg 10 Stk</NAME_DE>
         <NAME_FR>ZYVOXID cpr pell 600 mg 10 pce</NAME_FR>
@@ -71,7 +65,6 @@
       <ITEM DT="2017-12-08T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680620690084</GTIN>
-        <PHAR>5819012</PHAR>
         <SWMC_AUTHNR>62069008</SWMC_AUTHNR>
         <NAME_DE>LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk</NAME_DE>
         <NAME_FR>LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce</NAME_FR>
@@ -82,7 +75,6 @@
       <ITEM DT="2017-12-08T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680353660163</GTIN>
-        <PHAR>0020273</PHAR>
         <SWMC_AUTHNR>35366016</SWMC_AUTHNR>
         <NAME_DE>KENDURAL Depottabl 30 Stk</NAME_DE>
         <NAME_FR>KENDURAL cpr dépôt 30 pce</NAME_FR>
@@ -93,7 +85,6 @@
       <ITEM DT="2017-12-08T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680536620137</GTIN>
-        <PHAR>1699947</PHAR>
         <SWMC_AUTHNR>53662013</SWMC_AUTHNR>
         <NAME_DE>3TC Filmtabl 150 mg 60 Stk</NAME_DE>
         <NAME_FR>3TC cpr pell 150 mg 60 pce</NAME_FR>
@@ -104,7 +95,6 @@
       <ITEM DT="2017-12-08T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680161050583</GTIN>
-        <PHAR>2731179</PHAR>
         <SWMC_AUTHNR>16105058</SWMC_AUTHNR>
         <NAME_DE>HIRUDOID Creme 3 mg/g 40 g</NAME_DE>
         <NAME_FR>HIRUDOID crème 3 mg/g 40 g</NAME_FR>
@@ -115,7 +105,6 @@
       <ITEM DT="2017-12-08T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680324750190</GTIN>
-        <PHAR>0023722</PHAR>
         <SWMC_AUTHNR>32475019</SWMC_AUTHNR>
         <NAME_DE>LANSOYL Gel 225 g</NAME_DE>
         <NAME_FR>LANSOYL gel 225 g</NAME_FR>
@@ -126,7 +115,6 @@
       <ITEM DT="2017-12-08T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680573230016</GTIN>
-        <PHAR>6824802</PHAR>
         <SWMC_AUTHNR>57323001</SWMC_AUTHNR>
         <NAME_DE>LANSOPRAZOL Mepha Kaps 15 mg Fl 60 Stk</NAME_DE>
         <NAME_FR>LANSOPRAZOL Mepha caps 15 mg fl 60 pce</NAME_FR>
@@ -137,7 +125,6 @@
       <ITEM DT="2017-12-08T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680532900196</GTIN>
-        <PHAR>1699999</PHAR>
         <SWMC_AUTHNR>53290019</SWMC_AUTHNR>
         <NAME_DE>HUMALOG Inj Lös 100 IE/ml Durchstf 10 ml</NAME_DE>
         <NAME_FR>HUMALOG sol inj 100 UI/ml flac 10 ml</NAME_FR>
@@ -148,7 +135,6 @@
       <ITEM DT="2017-12-01T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680002770014</GTIN>
-        <PHAR>0361815</PHAR>
         <SWMC_AUTHNR>00277001</SWMC_AUTHNR>
         <NAME_DE>SEROCYTOL Herz-Gefässe Supp 3 Stk</NAME_DE>
         <NAME_FR>SEROCYTOL Coeur-Vaisseaux supp 3 pce</NAME_FR>
@@ -159,7 +145,6 @@
       <ITEM DT="2017-12-01T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680002780013</GTIN>
-        <PHAR>0361821</PHAR>
         <SWMC_AUTHNR>00278001</SWMC_AUTHNR>
         <NAME_DE>SEROCYTOL Kolon Supp 3 Stk</NAME_DE>
         <NAME_FR>SEROCYTOL Côlon supp 3 pce</NAME_FR>
@@ -170,7 +155,6 @@
       <ITEM DT="2017-12-01T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680406620144</GTIN>
-        <PHAR>0769841</PHAR>
         <SWMC_AUTHNR>40662014</SWMC_AUTHNR>
         <NAME_DE>PEVISONE Creme 15 g</NAME_DE>
         <NAME_FR>PEVISONE crème 15 g</NAME_FR>
@@ -181,7 +165,6 @@
       <ITEM DT="2017-12-01T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680406620229</GTIN>
-        <PHAR>0863244</PHAR>
         <SWMC_AUTHNR>40662022</SWMC_AUTHNR>
         <NAME_DE>PEVISONE Creme 30 g</NAME_DE>
         <NAME_FR>PEVISONE crème 30 g</NAME_FR>
@@ -192,7 +175,6 @@
       <ITEM DT="2017-11-03T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680587340015</GTIN>
-        <PHAR>4153628</PHAR>
         <SWMC_AUTHNR>58734001</SWMC_AUTHNR>
         <NAME_DE>YONDELIS Trockensub 0.25 mg Durchstf</NAME_DE>
         <NAME_FR>YONDELIS subst sèche 0.25 mg flac</NAME_FR>
@@ -203,7 +185,6 @@
       <ITEM DT="2017-11-03T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680627160016</GTIN>
-        <PHAR>5301924</PHAR>
         <SWMC_AUTHNR>62716001</SWMC_AUTHNR>
         <NAME_DE>COOP VITALITY Bronchialpastillen 40 Stk</NAME_DE>
         <NAME_FR>COOP VITALITY pastilles bronchiques 40 pce</NAME_FR>
@@ -214,7 +195,6 @@
       <ITEM DT="2018-01-30T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680651600014</GTIN>
-        <PHAR>6571270</PHAR>
         <SWMC_AUTHNR>65160001</SWMC_AUTHNR>
         <NAME_DE>LYNPARZA Kaps 50 mg 448 Stk</NAME_DE>
         <NAME_FR>LYNPARZA caps 50 mg 448 pce</NAME_FR>
@@ -225,7 +205,6 @@
       <ITEM DT="2018-02-09T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680316440115</GTIN>
-        <PHAR>0020244</PHAR>
         <SWMC_AUTHNR>31644011</SWMC_AUTHNR>
         <NAME_DE>FERRO-GRADUMET Depottabl 30 Stk</NAME_DE>
         <NAME_FR>FERRO-GRADUMET cpr dépôt 30 pce</NAME_FR>
@@ -236,7 +215,6 @@
       <ITEM DT="2018-03-16T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680581580011</GTIN>
-        <PHAR>3656617</PHAR>
         <SWMC_AUTHNR>58158001</SWMC_AUTHNR>
         <NAME_DE>PRIORIX TETRA Trockensub c Solv Fertspr</NAME_DE>
         <NAME_FR>PRIORIX TETRA subst sèche c solv ser pré</NAME_FR>
@@ -247,7 +225,6 @@
       <ITEM DT="2018-03-23T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680444470107</GTIN>
-        <PHAR>0919766</PHAR>
         <SWMC_AUTHNR>44447010</SWMC_AUTHNR>
         <NAME_DE>LOPRESOR Retard Divitabs 200 mg 14 Stk</NAME_DE>
         <NAME_FR>LOPRESOR Retard Divitabs 200 mg 14 pce</NAME_FR>
@@ -258,7 +235,6 @@
       <ITEM DT="2018-03-23T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680444470299</GTIN>
-        <PHAR>0919772</PHAR>
         <SWMC_AUTHNR>44447029</SWMC_AUTHNR>
         <NAME_DE>LOPRESOR Retard Divitabs 200 mg 56 Stk</NAME_DE>
         <NAME_FR>LOPRESOR Retard Divitabs 200 mg 56 pce</NAME_FR>
@@ -269,7 +245,6 @@
       <ITEM DT="2018-03-23T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680152190687</GTIN>
-        <PHAR>0544042</PHAR>
         <SWMC_AUTHNR>15219068</SWMC_AUTHNR>
         <NAME_DE>ZYMAFLUOR Tabl 0.25 mg Ds 400 Stk</NAME_DE>
         <NAME_FR>ZYMAFLUOR cpr 0.25 mg bte 400 pce</NAME_FR>
@@ -280,7 +255,6 @@
       <ITEM DT="2018-03-23T00:00:00">
         <ATYPE>PHARMA</ATYPE>
         <GTIN>7680434540995</GTIN>
-        <PHAR>2381532</PHAR>
         <SWMC_AUTHNR>43454099</SWMC_AUTHNR>
         <NAME_DE>KAMILLIN Medipharm Bad liq 10 Btl 40 ml</NAME_DE>
         <NAME_FR>KAMILLIN Medipharm bain liq 10 sach 40 ml</NAME_FR>
