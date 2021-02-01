@@ -51,7 +51,7 @@ end unless SkipMigelDownloader
 describe Oddb2xml::RefdataExtractor do
   before(:all) { common_before }
   after(:all) { common_after }
-  @@last_change = '2015-11-24 00:00:00 +0000'
+  Last_change = '2015-11-24 00:00:00 +0000'
 
   context 'should handle pharma articles' do
     subject do
@@ -94,7 +94,7 @@ describe Oddb2xml::RefdataExtractor do
       :_type=>:nonpharma,
       :ean13=>'7611600441020',
       :no8 => nil,
-      :last_change => @@last_change,
+      :last_change => Last_change,
       :data_origin => "refdata",
       :desc_de=>"TUBEGAZE Verband weiss Nr 12 20m Finger gross",
       :desc_fr=>"TUBEGAZE pans tubul blanc Nr 12 20m doigts grands",
