@@ -31,5 +31,10 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
 
-    - name: Run spec tests
+    - name: Install dependencies
+      run: |
+        bundle config set path .bundle/gems --local
+        bundle config set without debugger  --local
+        bundle install
+    - name: Test with RSpec
       run: bundle exec rspec

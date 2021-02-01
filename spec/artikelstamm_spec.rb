@@ -24,7 +24,7 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
-    binding.pry unless @inhalt.index(expected_value)
+    binding.pry if defined?(Pry) && !@inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
   def common_run_init(options = {})
@@ -448,9 +448,9 @@ describe Oddb2xml::Builder do
         </ITEM),
         'Chapter 70 product' => %(<PRODUCT>
             <PRODNO>2069639</PRODNO>
-            <!--Chapter70 hack prodno 2069639 Ceres Urtinkturen gem&amp;auml;ss L2 mit - im Kommentar-->
+            <!--Chapter70 hack prodno 2069639 Ceres Urtinkturen gemäss L2 mit - im Kommentar-->
             <SALECD>A</SALECD>
-            <DSCR>Ceres Urtinkturen gem&amp;auml;ss L2 mit -- im Kommentar</DSCR>
+            <DSCR>Ceres Urtinkturen gemäss L2 mit -- im Kommentar</DSCR>
             <DSCRF/>
         </PRODUCT>),
         'Chapter 70 item' => %(<ITEM PHARMATYPE="P">
