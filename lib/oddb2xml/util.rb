@@ -199,7 +199,7 @@ COLUMNS_FEBRUARY_2019= {
       node['SHA256'] = Digest::SHA256.hexdigest node.text
     end
     unless doc.root.elements.last.name.eql?('RESULT')
-      unless /interaction/i.match(doc.root.name)
+      unless /interaction|articles/i.match(doc.root.name)
         puts "Nokogiri did not find the RESULT item for #{doc.root.name}"
         require 'rexml/document'
         doc2 = REXML::Document.new(string)

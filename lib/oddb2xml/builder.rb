@@ -520,7 +520,7 @@ module Oddb2xml
           return false
         end
         return false if !name || name.empty? || name.length < 3
-        name
+        name[0..119] # limit to maximal 120 chars as specified in the XSD
       end
       prepare_substances
       prepare_products
@@ -886,7 +886,12 @@ module Oddb2xml
             xml.ART('DT' => obj[:last_change] ? obj[:last_change] : '') do
               nbr_records += 1
               xml.REF_DATA (obj[:refdata] || @migel[pharma_code]) ? '1' : '0'
-              xml.PHAR  obj[:pharmacode] if obj[:pharmacode] && obj[:pharmacode].length > 0
+              if obj[:pharmacode] && obj[:pharmacode].length > 0
+                xml.PHAR  obj[:pharmacode]
+              elsif zur_rose
+                puts "Adding #{zur_rose[:pharmacode]} to article GTIN #{ean}"
+                xml.PHAR  zur_rose[:pharmacode]
+              end
               #xml.GRPCD
               #xml.CDS01
               #xml.CDS02
@@ -1405,7 +1410,7 @@ module Oddb2xml
           return '--missing--'
         end
         return '--missing--' if !name || name.empty? || name.length < 3
-        name
+        name[0..119] # limit to maximal 120 chars as specified in the XSD
       end
       def override(xml, id, field, default_value)
         has_overrides =  /\d{13}/.match(id.to_s) ? @@article_overrides[id.to_i] : @@product_overrides[id.to_i]

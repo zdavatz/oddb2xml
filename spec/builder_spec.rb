@@ -397,7 +397,7 @@ def checkArticleXml(checkERYTHROCIN = true)
   expect(desitin.elements['DSCRD'].text).to eq("LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk")
   expect(desitin.elements['DSCRF'].text).to eq('LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce')
   expect(desitin.elements['REF_DATA'].text).to eq('1')
-  expect(desitin.elements['PHAR']).to be nil
+  expect(desitin.elements['PHAR'].text).to eq('5819012') 
   expect(desitin.elements['SMCAT'].text).to eq('B')
   expect(desitin.elements['SMNO'].text).to eq('62069008')
   expect(desitin.elements['VAT'].text).to eq('2')
@@ -414,7 +414,7 @@ def checkArticleXml(checkERYTHROCIN = true)
   expect(lansoyl.elements['DSCRD'].text).to eq 'LANSOYL Gel 225 g'
   expect(lansoyl.elements['REF_DATA'].text).to eq '1'
   expect(lansoyl.elements['SMNO'].text).to eq '32475019'
-  expect(lansoyl.elements['PHAR']).to be nil
+  expect(lansoyl.elements['PHAR'].text).to eq '0023722'
   expect(lansoyl.elements['ARTCOMP/COMPNO'].text).to eq('7601001002012')
 
   zyvoxid = checkAndGetArticleWithGTIN(doc, Oddb2xml::ZYVOXID_GTIN)
@@ -503,6 +503,11 @@ describe Oddb2xml::Builder do
 
     it 'should have a correct NBR_RECORD in oddb_article.xml' do
       check_result(@inhalt, NrProducts)
+    end
+
+    it 'should have a correct NBR_RECORD in oddb_products.xml' do
+      oddb_product_xml = oddb_article_xml.sub('oddb_article.xml', 'oddb_product.xml')
+      check_result(File.read(oddb_product_xml), 46)
     end
 
     it 'oddb_article.xml should contain a SHA256' do
@@ -847,7 +852,7 @@ describe Oddb2xml::Builder do
       dscrds = XPath.match( doc, "//ART" )
       expect(dscrds.size).to eq(NrExtendedArticles)
       expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size).to eq(0) # 0 is not a valid pharmacode
-      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match(/\d+/)}.size).to eq 50
+      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match(/\d+/)}.size).to eq 65
     end
 
     it 'should have a correct NBR_RECORD in oddb_limitation.xml' do
