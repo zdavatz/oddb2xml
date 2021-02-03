@@ -1,3 +1,10 @@
+=== 2.7.1 / 03.02.2021
+* travis-ci -> Github Actions
+* limit DSCRD/DSCRF to 120 chars as specified in the XSD
+* Workaround for https://github.com/sparklemotion/nokogiri/issues/2187
+* Adapt artikelstamm to refdata without pharmacode
+* oddb_article get pharmacode where possible from transfer.dat
+
 === 2.7.0 / 05.11.2020
 * Chapter70 hack nur als Kommentar
 * Avoid double hyphen in comment
