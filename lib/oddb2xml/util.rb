@@ -191,21 +191,14 @@ COLUMNS_FEBRUARY_2019= {
         :drug_index       => /Verz. bei betäubun.*smittel-haltigen Präparaten/i,
     }
   def Oddb2xml.add_hash(string)
-    doc = Nokogiri::XML.parse(string)
+    doc = Nokogiri::XML.parse(string) do |config|
+      config.huge
+    end
     nr = 0
     doc.root.elements.each do |node|
       nr += 1
       next if node.name.eql?('RESULT')
       node['SHA256'] = Digest::SHA256.hexdigest node.text
-    end
-    unless doc.root.elements.last.name.eql?('RESULT')
-      unless /interaction|articles/i.match(doc.root.name)
-        puts "Nokogiri did not find the RESULT item for #{doc.root.name}"
-        require 'rexml/document'
-        doc2 = REXML::Document.new(string)
-        result = REXML::XPath.first(doc2, "/#{doc.root.name}/RESULT").to_s
-        doc.root << Nokogiri::XML.parse(result).root
-      end
     end
     doc.to_xml
   end

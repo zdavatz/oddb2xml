@@ -1,7 +1,7 @@
 === 2.7.1 / 03.02.2021
 * travis-ci -> Github Actions
 * limit DSCRD/DSCRF to 120 chars as specified in the XSD
-* Workaround for https://github.com/sparklemotion/nokogiri/issues/2187
+* Use huge option for nokogiri as suggested by  https://github.com/sparklemotion/nokogiri/issues/2187
 * Adapt artikelstamm to refdata without pharmacode
 * oddb_article get pharmacode where possible from transfer.dat
 
