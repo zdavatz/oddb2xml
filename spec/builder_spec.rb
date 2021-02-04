@@ -852,7 +852,7 @@ describe Oddb2xml::Builder do
       dscrds = XPath.match( doc, "//ART" )
       expect(dscrds.size).to eq(NrExtendedArticles)
       expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match('0000000') }.size).to eq(0) # 0 is not a valid pharmacode
-      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match(/\d+/)}.size).to eq 65
+      expect(XPath.match( doc, "//PHAR" ).find_all{|x| x.text.match(/\d+/)}.size).to eq 66
     end
 
     it 'should have a correct NBR_RECORD in oddb_limitation.xml' do

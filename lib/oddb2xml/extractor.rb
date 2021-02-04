@@ -542,7 +542,6 @@ module Oddb2xml
 
         pexf = sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f)
         ppub =  sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f)
-        next if  @artikelstamm && /^113/.match(line) && /^7680/.match(ean13)
         next if  @artikelstamm && /^113/.match(line) && ppub.eql?('0.0') && pexf.eql?('0.0')
         next unless ean13
         key = ean13

@@ -268,6 +268,8 @@ describe Oddb2xml::Builder do
                 <NAME>Actipharm SA</NAME>
                 <GLN>7601001002012</GLN>
             </COMP>
+            <PEXF>10.54</PEXF>
+            <PPUB>16.25</PPUB>
             <PKG_SIZE>225</PKG_SIZE>
             <MEASURE>g</MEASURE>
             <MEASUREF>g</MEASUREF>
@@ -421,7 +423,19 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>5329001</PRODNO>
         </ITEM>),
-        'Varilrix product' => %(<PRODUCT>
+        'Kolon with Pharmacode for EAN 7680002780013' => %(<ITEM PHARMATYPE="P">
+            <GTIN>7680002780013</GTIN>
+            <PHAR>0361821</PHAR>
+            <SALECD>I</SALECD>
+            <DSCR>SEROCYTOL Kolon Supp 3 Stk</DSCR>
+            <DSCRF>SEROCYTOL Côlon supp 3 pce</DSCRF>
+            <COMP>
+                <GLN>7640128710004</GLN>
+            </COMP>
+            <PEXF>22.75</PEXF>
+            <PPUB>39.60</PPUB>
+        </ITEM>),
+       'Varilrix product' => %(<PRODUCT>
             <PRODNO>0058501</PRODNO>
             <SALECD>A</SALECD>
             <DSCR>Varilrix Trockensub c solv</DSCR>

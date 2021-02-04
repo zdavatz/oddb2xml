@@ -1592,9 +1592,17 @@ module Oddb2xml
             end
             patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, '0')) || chap70 ? 'P': 'N' )
             next if /^#{Oddb2xml::FAKE_GTIN_START}/.match(ean13.to_s)
+            next if obj[:data_origin].eql?('zur_rose') && /^7680/.match(ean13) # must skip inactiv items
             xml.ITEM({'PHARMATYPE' => patched_pharma_type }) do
               xml.GTIN ean13.to_s.rjust(13, '0')
-              xml.PHAR obj[:pharmacode] if obj[:pharmacode] && obj[:pharmacode].length > 0
+              if obj[:pharmacode] && obj[:pharmacode].length > 0
+                xml.PHAR  obj[:pharmacode]
+              elsif (zur_rose = @infos_zur_rose[ean13])
+                puts "Artikelstamm: Adding #{zur_rose[:pharmacode]} to article GTIN #{ean13}"
+                xml.PHAR  zur_rose[:pharmacode]
+              else
+                puts "Artikelstamm: No pharmacode for article GTIN #{ean13} via ZurRose" if /^7680/.match(ean13)
+              end
               emit_salecd(xml, ean13, obj)
               description = obj[:desc_de] || obj[:description] # for description for zur_rose
               xml.DSCR(description)
