@@ -1524,6 +1524,13 @@ module Oddb2xml
                 end
                 ppub = nil if ppub && ppub.size == 0
                 pexf = nil if pexf && pexf.size == 0
+                if !(obj[:price] && !obj[:price].empty?) || !(obj[:pub_price] && !obj[:pub_price].empty?)
+                  zur_rose_detail = @infos_zur_rose.values.find{|x| x[:ean13].to_i == ean13.to_i}
+                  if zur_rose_detail
+                    pexf ||= zur_rose_detail[:price]
+                    ppub ||= zur_rose_detail[:pub_price]
+                  end
+                end
                 xml.PEXF pexf if pexf
                 xml.PPUB ppub if ppub
                 measure = ''
@@ -1553,8 +1560,12 @@ module Oddb2xml
                   when 'N'; xml.DEDUCTIBLE 10; # 10%
                 end if item && item[:deductible]
                 prodno = Oddb2xml.getProdnoForEan13(pkg_gtin)
-                atc = package[:atc_code]
-                atc ||= @refdata[pkg_gtin][:seq][:atc_code] if @refdata[pkg_gtin]
+                atc = obj[:atc_code]
+                atc ||= package[:atc_code]
+                if atc && package[:atc_code] && !atc.eql?(package[:atc_code])
+                  puts "WARNING: #{pkg_gtin} ATC-code from refdata #{atc} overrides the one from swissmedic #{package[:atc_code]}"
+                end
+                atc ||= @refdata[pkg_gtin][:atc_code] if @refdata && @refdata[pkg_gtin] && @refdata[pkg_gtin]
                 unless prodno # find a prodno from packages for vaccinations
                   if atc && /^J07/.match(atc) && !/^J07AX/.match(atc)
                     pack = @packs.values.find{ |v| v && v[:atc_code].eql?(atc)}
@@ -1618,7 +1629,7 @@ module Oddb2xml
                 xml.PEXF (pexf = obj[:price])
               elsif zur_rose_detail
                 if zur_rose_detail[:price] && !zur_rose_detail[:price].empty? && !zur_rose_detail[:price].eql?('0.00')
-                  Oddb2xml.log "NonPharma: #{ean13} adding PEXF #{zur_rose_detail[:price]} #{description}"
+                  # Oddb2xml.log "NonPharma: #{ean13} adding PEXF #{zur_rose_detail[:price]} #{description}"
                   xml.PEXF (pexf = zur_rose_detail[:price])
                 end
               end
@@ -1626,7 +1637,7 @@ module Oddb2xml
                 xml.PPUB  (ppub = obj[:pub_price])
               elsif zur_rose_detail
                 if zur_rose_detail[:pub_price] && !zur_rose_detail[:pub_price].empty? && !zur_rose_detail[:pub_price].eql?('0.00')
-                  Oddb2xml.log "NonPharma: #{ean13} adding PPUB #{zur_rose_detail[:pub_price]} #{description}"
+                  # Oddb2xml.log "NonPharma: #{ean13} adding PPUB #{zur_rose_detail[:pub_price]} #{description}"
                   xml.PPUB (ppub = zur_rose_detail[:pub_price])
                 end
               end
