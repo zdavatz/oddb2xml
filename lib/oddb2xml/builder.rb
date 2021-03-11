@@ -3,6 +3,7 @@ require 'nokogiri'
 require 'oddb2xml/util'
 require 'oddb2xml/calc'
 require 'csv'
+
 class Numeric
   # round a given number to the nearest step
   def round_by(increment)
@@ -248,23 +249,34 @@ module Oddb2xml
         @refdata.each_pair do |ean13, item|
           next if item and item.is_a?(Hash) and item[:atc_code] and /^Q/i.match(item[:atc_code])
           next if item[:prodno] and @products[item[:prodno]]
+          refdata_atc = item[:atc_code]
           obj = {
             :seq => @items[ean13] ? @items[ean13] : @items[item[:ean13]],
             :pac => nil,
             :no8 => nil,
             :ean13 => item[:ean13],
-            :atc => item[:atc_code],
+            :atc => refdata_atc,
             :ith => '',
             :siz => '',
             :eht => '',
             :sub => '',
             :comp => '',
+            :data_origin => 'refdata-product',
           }
           # obj[:pexf_refdata] = item[:price]
           # obj[:ppub_refdata] = item[:pub_price=]
           # obj[:pharmacode=]  = item[:pharmacode=]
           if obj[:ean13] # via EAN-Code
             obj[:no8] = obj[:ean13].to_s[4..11]
+          end
+          swissmedic_pack = @packs[item[:no8]]
+          if swissmedic_pack
+            swissmedic_atc = swissmedic_pack[:atc_code]
+            if swissmedic_atc && swissmedic_atc.length >=3 && (refdata_atc == nil || !refdata_atc.eql?(swissmedic_atc))
+              puts "WARNING: #{ean13} ATC-code #{swissmedic_atc} from swissmedic overrides #{refdata_atc} one from refdata #{item[:desc_de]}"
+              item[:data_origin] += '-swissmedic-ATC'
+              item[:atc] = swissmedic_atc
+            end
           end
           if obj[:no8] && (ppac = @packs[obj[:no8]]) && # Packungen.xls
               !ppac[:is_tier]
@@ -1508,7 +1520,7 @@ module Oddb2xml
                 name_fr ||= name
                 xml.DSCRF(name_fr)
                 xml.COMP  do # Manufacturer
-                  xml.NAME  obj[:company_name]
+                  xml.NAME  obj[:company_name][0..99] # limit to 100 chars as in XSD
                   xml.GLN   obj[:company_ean]
                 end if obj[:company_name] || obj[:company_ean]
                 pexf = ppub = nil
@@ -1560,12 +1572,12 @@ module Oddb2xml
                   when 'N'; xml.DEDUCTIBLE 10; # 10%
                 end if item && item[:deductible]
                 prodno = Oddb2xml.getProdnoForEan13(pkg_gtin)
-                atc = obj[:atc_code]
-                atc ||= package[:atc_code]
-                if atc && package[:atc_code] && !atc.eql?(package[:atc_code])
-                  puts "WARNING: #{pkg_gtin} ATC-code from refdata #{atc} overrides the one from swissmedic #{package[:atc_code]}"
+                atc = package[:atc_code]
+                refdata_atc = @refdata[pkg_gtin][:atc_code] if @refdata && @refdata[pkg_gtin] && @refdata[pkg_gtin]
+                if refdata_atc && atc.nil?
+                  puts "WARNING: #{pkg_gtin} ATC-code from refdata #{refdata_atc} as Swissmedic ATC is nil #{name}"
+                  atc = refdata_atc
                 end
-                atc ||= @refdata[pkg_gtin][:atc_code] if @refdata && @refdata[pkg_gtin] && @refdata[pkg_gtin]
                 unless prodno # find a prodno from packages for vaccinations
                   if atc && /^J07/.match(atc) && !/^J07AX/.match(atc)
                     pack = @packs.values.find{ |v| v && v[:atc_code].eql?(atc)}
@@ -1739,8 +1751,10 @@ module Oddb2xml
                   name_fr ||= (ppac && ppac[:sequence_name])
                   override(xml, prodno, :DSCR,  name_de.strip)
                   override(xml, prodno, :DSCRF, name_fr.strip)
+                  # use overriden ATC if possibel
+                  atc = sequence[:atc] || sequence[:atc_code]
+                  xml.ATC atc if atc && !atc.empty?
                 end
-                xml.ATC sequence[:atc_code] if sequence && sequence[:atc_code] && !sequence[:atc_code].empty?
                 if sequence && sequence[:packages] && (first_package = sequence[:packages].values.first) &&
                    (first_limitation = first_package[:limitations].first)
                   lim_code = first_limitation[:code]
