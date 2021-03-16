@@ -4,7 +4,7 @@ module Oddb2xml
   def self.log_timestamp(msg)
     full_msg = "#{Time.now.strftime("%H:%M:%S")}: #{msg}"
     puts full_msg
-    STDOUT.flush
+    $stdout.flush
     full_msg
   end
 
@@ -72,11 +72,11 @@ module Oddb2xml
     def everyPharmaArticleHasAProductItem
       result = true
       puts "#{Time.now.strftime("%H:%M:%S")}: everyPharmaArticleHasAProductItem"
-      allProductNumbers = products.collect { |product| product[:PRODNO] }
+      all_product_numbers = products.collect { |product| product[:PRODNO] }
       items.each do |item|
         next unless item[:PRODNO]
         unless item[:Chapter70_HACK]
-          unless allProductNumbers.index(item[:PRODNO])
+          unless all_product_numbers.index(item[:PRODNO])
             puts "Item #{item[:GTIN]}  has no Product #{item[:PRODNO]}  #{item[:DSCR]}"
             result = false
           end
@@ -88,9 +88,9 @@ module Oddb2xml
     def everyProductHasAtLeastOneArticle
       result = true
       puts "#{Time.now.strftime("%H:%M:%S")}: veryProductHasAtLeastOneArticle"
-      allProductNumbers = items.collect { |item| item[:PRODNO] }
+      all_product_numbers = items.collect { |item| item[:PRODNO] }
       products.each do |product|
-        unless allProductNumbers.index(product[:PRODNO])
+        unless all_product_numbers.index(product[:PRODNO])
           puts "product #{product[:PRODNO]}: has no Item #{product[:DSCR]}"
           result = false
         end
@@ -101,10 +101,10 @@ module Oddb2xml
     def everyReferencedLimitationIsIncluded
       result = true
       puts "#{Time.now.strftime("%H:%M:%S")}: everyReferencedLimitationIsIncluded"
-      allLimitations = limitations.collect { |lim| lim[:LIMNAMEBAG] }
+      all_limitations = limitations.collect { |lim| lim[:LIMNAMEBAG] }
       products.each do |product|
         next unless product[:LIMNAMEBAG]
-        unless allLimitations.index(product[:LIMNAMEBAG])
+        unless all_limitations.index(product[:LIMNAMEBAG])
           puts "product #{product[:PRODNO]}  has no limitation #{product[:LIMNAMEBAG]} #{product[:DSCR]}"
           result = false
         end

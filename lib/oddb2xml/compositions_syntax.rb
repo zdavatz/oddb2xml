@@ -6,9 +6,9 @@
 
 require "parslet"
 require "parslet/convenience"
-include Parslet
 
 class CompositionParser < Parslet::Parser
+  include Parslet
   # Single character rules
   rule(:lparen) { str("(") }
   rule(:rparen) { str(")") }
@@ -330,7 +330,7 @@ class CompositionParser < Parslet::Parser
   # Perhaps we could have some syntax sugar to make this more easy?
   #
   def tag(opts = {})
-    close = opts[:close] || false
+    opts[:close] || false
   end
 
   # TODO: what does ut alia: impl?

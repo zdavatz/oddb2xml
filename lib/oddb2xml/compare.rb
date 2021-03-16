@@ -4,7 +4,7 @@ module Oddb2xml
   def self.log_timestamp(msg)
     full_msg = "#{Time.now.strftime("%H:%M:%S")}: #{msg}"
     puts full_msg
-    STDOUT.flush
+    $stdout.flush
     full_msg
   end
 

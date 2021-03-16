@@ -28,7 +28,7 @@ describe Oddb2xml::LppvExtractor do
   end
 end
 
-unless SkipMigelDownloader
+unless SKIP_MIGEL_DOWNLOADER
   describe Oddb2xml::MigelExtractor do
     before(:all) {
       common_before
@@ -329,7 +329,7 @@ describe Oddb2xml::ZurroseExtractor do
   context "when parsing examples" do
     subject do
       filename = File.expand_path(File.join(__FILE__, "..", "data", "transfer.dat"))
-      Oddb2xml::ZurroseExtractor.new(filename, true)
+      res = Oddb2xml::ZurroseExtractor.new(filename, true)
     end
 
     it "should extract EPIMINERAL" do

@@ -44,8 +44,8 @@ module Oddb2xml
       idx = 0
       @@items = {}
       res.values.last.each do |item|
-        item.values.first.each do |subElem|
-          what = Chapter70xtractor.parse_td(subElem)
+        item.values.first.each do |sub_elem|
+          what = Chapter70xtractor.parse_td(sub_elem)
           idx += 1
           puts "#{idx}: xx #{what}" if $VERBOSE
           result << what

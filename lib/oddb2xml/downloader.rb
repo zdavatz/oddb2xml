@@ -5,14 +5,14 @@ require "zip"
 require "savon"
 require "open-uri"
 
-SkipMigelDownloader = true # https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls
+SKIP_MIGEL_DOWNLOADER = true # https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls
 
 module Oddb2xml
   module DownloadMethod
     private
 
     def download_as(file, option = "w+")
-      tempFile = File.join(WorkDir, File.basename(file))
+      temp_file = File.join(WorkDir, File.basename(file))
       @file2save = File.join(Downloads, File.basename(file))
       report_download(@url, @file2save)
       data = nil
@@ -28,7 +28,7 @@ module Oddb2xml
           puts "error #{error} while fetching #{@url}"
         ensure
           io.close if io && !io.closed? # win
-          Oddb2xml.download_finished(tempFile)
+          Oddb2xml.download_finished(temp_file)
         end
       end
       data
@@ -36,7 +36,7 @@ module Oddb2xml
   end
 
   class Downloader
-    attr_reader :type, :agent, :url; :file2save
+    attr_reader :type, :agent, :url, :file2save
     def initialize(options = {}, url = nil)
       @options = options
       @url = url
@@ -84,7 +84,12 @@ module Oddb2xml
       Oddb2xml.log "read_xml_from_zip target is #{target} zip: #{zipfile} #{File.exist?(zipfile)}"
       if Oddb2xml.skip_download?
         entry = nil
-        Dir.glob(File.join(Downloads, "*")).each { |name| if target.match(name) then entry = name; break end }
+        Dir.glob(File.join(Downloads, "*")).each do |name|
+          if target.match(name)
+            entry = name
+            break
+          end
+        end
         if entry
           dest = "#{Downloads}/#{File.basename(entry)}"
           @file2save = dest
@@ -100,8 +105,8 @@ module Oddb2xml
       end
       xml = ""
       if RUBY_PLATFORM.match?(/mswin|mingw|bccwin|cygwin/i)
-        Zip::File.open(zipfile) do |zipFile|
-          zipFile.each do |entry|
+        Zip::File.open(zipfile) do |a_zip_file|
+          a_zip_file.each do |entry|
             if entry.name&.match?(target)
               Oddb2xml.log "read_xml_from_zip reading #{__LINE__}: #{entry.name}"
               io = entry.get_input_stream
@@ -131,7 +136,7 @@ module Oddb2xml
       xml
     end
   end
-  unless SkipMigelDownloader
+  unless SKIP_MIGEL_DOWNLOADER
     class MigelDownloader < Downloader
       include DownloadMethod
       def download
@@ -252,7 +257,6 @@ module Oddb2xml
 
     def download
       begin
-        filename = "refdata_#{@type}.xml"
         @file2save = File.join(Downloads, "refdata_#{@type}.xml")
         soap = %(<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://refdatabase.refdata.ch/Article_in" xmlns:ns2="http://refdatabase.refdata.ch/">
@@ -269,7 +273,7 @@ module Oddb2xml
         FileUtils.rm_f(@file2save, verbose: false)
         response = @client.call(:download, xml: soap)
         if response.success?
-          if xml = response.to_xml
+          if (xml = response.to_xml)
             xml = File.read(File.join(Oddb2xml::SpecData, File.basename(@file2save))) if defined?(RSpec)
             response = nil # win
             FileUtils.makedirs(Downloads)
@@ -351,10 +355,10 @@ module Oddb2xml
       unless File.exist?(file)
         begin
           response = nil
-          if home = @agent.get(@url)
+          if (home = @agent.get(@url))
             form = home.form_with(id: "Form1")
             bttn = form.button_with(name: "ctl00$MainContent$btnOK")
-            if page = form.submit(bttn)
+            if (page = form.submit(bttn))
               form = page.form_with(id: "Form1")
               bttn = form.button_with(name: "ctl00$MainContent$BtnYes")
               response = form.submit(bttn)

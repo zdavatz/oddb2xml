@@ -448,7 +448,7 @@ describe Oddb2xml::MigelDownloader do
     expect(File.exist?("oddb2xml_files_nonpharma.txt")).to eq(false)
   end
   end
-end unless SkipMigelDownloader
+end unless SKIP_MIGEL_DOWNLOADER
 
 describe Oddb2xml::ZurroseDownloader do
   include ServerMockHelper

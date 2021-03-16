@@ -42,8 +42,9 @@ module Oddb2xml
             FileUtils.rm(file) if file && File.exist?(file)
           end
         end
-      rescue Errno::ENOENT, StandardError => e
-        return false
+      rescue Errno::ENOENT
+        puts "Unable to compress #{@compress_file}"
+        raise RuntimeError
       end
       true
     end

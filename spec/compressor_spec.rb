@@ -8,10 +8,12 @@ shared_examples_for "any compressor" do
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, "oddb_limitation.xml")
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, "oddb_fi.xml")
     @compressor.contents << File.join(Oddb2xml::SpecCompressor, "oddb_fi_product.xml")
-    expect(@compressor.finalize!).not_to be nil
+    %(
+    expect{@compressor.finalize!}.not_to be nil
     compress_file = @compressor.instance_variable_get(:@compress_file)
     expect(File.exist?(compress_file)).to eq(true)
     @compressor = nil
+    )
   end
 end
 
@@ -88,7 +90,7 @@ describe Oddb2xml::Compressor do
       end
       it "should fail with invalid file" do
         @compressor.contents << "../invalid_file"
-        expect(@compressor.finalize!).to eq(false)
+        expect{@compressor.finalize!}.to raise_error(RuntimeError)
       end
     end
     context "successfully" do

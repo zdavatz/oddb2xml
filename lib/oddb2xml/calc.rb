@@ -21,7 +21,7 @@ module Oddb2xml
   end
 
   class Calc
-    FluidForms = [
+    FLUIDFORMS = [
       "Ampulle(n)",
       "Beutel",
       "Bolus/Boli",
@@ -58,7 +58,7 @@ module Oddb2xml
       "sacchetto",
       "vorgefüllter Injektor"
     ]
-    FesteFormen = [
+    FESTE_FORMEN = [
       "Depotabs",
       "Dragée(s)",
       "Generator mit folgenden Aktivitäten:",
@@ -90,13 +90,13 @@ module Oddb2xml
       "ovale Körper",
       "tube(s)"
     ]
-    Measurements = ["g", "kg", "l", "mg", "ml", "cm", "GBq"]
-    Others = ["Kombipackung", "emballage combiné"]
-    UnknownGalenicForm = 140
-    UnknownGalenicGroup = 1
-    Data_dir = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "data"))
-    @@galenic_groups = YAML.load_file(File.join(Data_dir, "gal_groups.yaml"))
-    @@galenic_forms = YAML.load_file(File.join(Data_dir, "gal_forms.yaml"))
+    MEASUREMENTS = ["g", "kg", "l", "mg", "ml", "cm", "GBq"]
+    OTHERS = ["Kombipackung", "emballage combiné"]
+    UNKNOWN_GALENIC_FORM = 140
+    UNKNOWN_GALENIC_GROUP = 1
+    DATA_DIR = File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "data"))
+    @@galenic_groups = YAML.load_file(File.join(DATA_DIR, "gal_groups.yaml"))
+    @@galenic_forms = YAML.load_file(File.join(DATA_DIR, "gal_forms.yaml"))
     @@new_galenic_forms = []
     @@names_without_galenic_forms = []
     @@rules_counter = {}
@@ -130,7 +130,7 @@ module Oddb2xml
           return galenic_form
         end
       }
-      @@galenic_forms[UnknownGalenicForm]
+      @@galenic_forms[UNKNOWN_GALENIC_FORM]
     end
 
     def self.dump_new_galenic_forms
@@ -164,14 +164,14 @@ module Oddb2xml
       @galenic_form = search_galenic_info(gal_form)
       @pkg_size = remove_duplicated_spaces(size)
       @unit = unit
-      @selling_units = get_selling_units(@name, @pkg_size, @unit)
+      @selling_units = getSellingUnits(@name, @pkg_size, @unit)
       @composition = composition
       @measure = unit if unit && !@measure
       if column_c
         unless @galenic_form
           parts = column_c.split(/\s+|,|-/)
           parts.each { |part|
-            if idx = search_exact_galform(part)
+            if (idx = searchExactGalform(part))
               @galenic_form = idx
               break
             end
@@ -179,10 +179,10 @@ module Oddb2xml
         end
       end
       if @measure && !@galenic_form
-        @galenic_form ||= search_exact_galform(@measure)
-        @galenic_form ||= search_exact_galform(@measure.sub("(n)", "n"))
+        @galenic_form ||= searchExactGalform(@measure)
+        @galenic_form ||= searchExactGalform(@measure.sub("(n)", "n"))
       end
-      handle_unknown_galform(gal_form)
+      handleUnknownGalform(gal_form)
       @measure = @galenic_form.description if @galenic_form && !@measure
 
       @compositions = if composition
@@ -218,77 +218,77 @@ module Oddb2xml
       @@rules_counter[rulename] += 1
     end
 
-    def get_selling_units(part_from_name_C, pkg_size_L, einheit_M)
-      break_condition = (defined?(Pry) && false) # /5 x 2500 ml/.match(pkg_size_L))
-      return pkg_size_to_int(pkg_size_L) unless part_from_name_C
-      part_from_name_C = part_from_name_C.gsub(/[()]/, "_")
-      Measurements.each { |x|
-        if einheit_M && /^#{x}$/i.match(einheit_M)
-          puts "measurement in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
-          update_rule("measurement einheit_M")
+    def getSellingUnits(part_from_name_c, pkg_size_l, einheit_m)
+      # break_condition = (defined?(Pry) && false) # /5 x 2500 ml/.match(pkg_size_l))
+      return pkgSizeToInt(pkg_size_l) unless part_from_name_c
+      part_from_name_c = part_from_name_c.gsub(/[()]/, "_")
+      MEASUREMENTS.each { |x|
+        if einheit_m && /^#{x}$/i.match(einheit_m)
+          puts "measurement in einheit_m #{einheit_m} matched: #{x}" if $VERBOSE
+          update_rule("measurement einheit_m")
           @measure = x
-          binding.pry if break_condition
-          return pkg_size_to_int(pkg_size_L, true)
+          # binding.pry if break_condition
+          return pkgSizeToInt(pkg_size_l, true)
         end
       }
-      FesteFormen.each { |x|
-        if part_from_name_C && (x.gsub(/[()]/, "_")).match(part_from_name_C)
-          puts "feste_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
+      FESTE_FORMEN.each { |x|
+        if part_from_name_c && (x.gsub(/[()]/, "_")).match(part_from_name_c)
+          puts "feste_form in #{part_from_name_c} matched: #{x}" if $VERBOSE
           update_rule("feste_form name_C")
           @measure = x
-          binding.pry if break_condition
-          return pkg_size_to_int(pkg_size_L)
+          # binding.pry if break_condition
+          return pkgSizeToInt(pkg_size_l)
         end
-        if einheit_M && x.eql?(einheit_M)
-          puts "feste_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
-          update_rule("feste_form einheit_M")
+        if einheit_m && x.eql?(einheit_m)
+          puts "feste_form in einheit_m #{einheit_m} matched: #{x}" if $VERBOSE
+          update_rule("feste_form einheit_m")
           @measure = x
-          binding.pry if break_condition
-          return pkg_size_to_int(pkg_size_L)
+          # binding.pry if break_condition
+          return pkgSizeToInt(pkg_size_l)
         end
       }
-      FluidForms.each { |x|
-        if part_from_name_C && x.match(part_from_name_C)
-          puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
+      FLUIDFORMS.each { |x|
+        if part_from_name_c && x.match(part_from_name_c)
+          puts "liquid_form in #{part_from_name_c} matched: #{x}" if $VERBOSE
           update_rule("liquid_form name_C")
           @measure = x
-          binding.pry if break_condition
-          return pkg_size_to_int(pkg_size_L, true)
+          # binding.pry if break_condition
+          return pkgSizeToInt(pkg_size_l, true)
         end
-        if part_from_name_C && x.match(part_from_name_C.split(" ")[0])
-          puts "liquid_form in #{part_from_name_C} matched: #{x}" if $VERBOSE
+        if part_from_name_c && x.match(part_from_name_c.split(" ")[0])
+          puts "liquid_form in #{part_from_name_c} matched: #{x}" if $VERBOSE
           update_rule("liquid_form first_part")
-          binding.pry if break_condition
-          return pkg_size_to_int(pkg_size_L, true)
+          # binding.pry if break_condition
+          return pkgSizeToInt(pkg_size_l, true)
         end
-        if einheit_M && x.eql?(einheit_M)
-          puts "liquid_form in einheit_M #{einheit_M} matched: #{x}" if $VERBOSE
-          update_rule("liquid_form einheit_M")
+        if einheit_m && x.eql?(einheit_m)
+          puts "liquid_form in einheit_m #{einheit_m} matched: #{x}" if $VERBOSE
+          update_rule("liquid_form einheit_m")
           @measure = x
-          binding.pry if break_condition
-          return pkg_size_to_int(pkg_size_L, Measurements.find { |x| pkg_size_L.index(" #{x}") })
+          # binding.pry if break_condition
+          return pkgSizeToInt(pkg_size_l, MEASUREMENTS.find { |x| pkg_size_l.index(" #{x}") })
         end
       }
-      Measurements.each { |x|
-        if pkg_size_L && pkg_size_L.split(" ").index(x)
-          puts "measurement in pkg_size_L #{pkg_size_L} matched: #{x}" if $VERBOSE
-          update_rule("measurement pkg_size_L")
+      MEASUREMENTS.each { |x|
+        if pkg_size_l&.split(" ")&.index(x)
+          puts "measurement in pkg_size_l #{pkg_size_l} matched: #{x}" if $VERBOSE
+          update_rule("measurement pkg_size_l")
           @measure = x
-          binding.pry if break_condition
-          return pkg_size_to_int(pkg_size_L, true)
+          # binding.pry if break_condition
+          return pkgSizeToInt(pkg_size_l, true)
         end
       }
-      binding.pry if break_condition
-      puts "Could not find anything for name_C #{part_from_name_C} pkg_size_L: #{pkg_size_L} einheit_M #{einheit_M}" if $VERBOSE
+      # binding.pry if break_condition
+      puts "Could not find anything for name_C #{part_from_name_c} pkg_size_l: #{pkg_size_l} einheit_m #{einheit_m}" if $VERBOSE
       update_rule("unbekannt")
       "unbekannt"
-    rescue RegexpError => e
-      puts "RegexpError for M: #{einheit_M} pkg_size_L #{pkg_size_L} C: #{part_from_name_C}"
+    rescue RegexpError
+      puts "RegexpError for M: #{einheit_m} pkg_size_l #{pkg_size_l} C: #{part_from_name_c}"
       update_rule("RegexpError")
       "error"
     end
 
-    def pkg_size_to_int(pkg_size, skip_last_part = false)
+    def pkgSizeToInt(pkg_size, skip_last_part = false)
       return pkg_size if pkg_size.is_a?(Integer)
       return 1 unless pkg_size
       parts = pkg_size.split(/\s*x\s*/i)
@@ -305,7 +305,7 @@ module Oddb2xml
       end
     end
 
-    def search_exact_galform(name)
+    def searchExactGalform(name)
       return nil unless name
       if (idx = @@galenic_forms.values.find { |x| x.descriptions["de"] && x.descriptions["de"].downcase.eql?(name.downcase) }) ||
           (idx = @@galenic_forms.values.find { |x| x.descriptions["fr"] && x.descriptions["fr"].downcase.eql?(name.downcase) }) ||
@@ -315,33 +315,33 @@ module Oddb2xml
       nil
     end
 
-    def handle_unknown_galform(gal_form)
+    def handleUnknownGalform(gal_form)
       return if @galenic_form
       if gal_form
-        @galenic_form = GalenicForm.new(0, {"de" => remove_duplicated_spaces(gal_form.gsub(" +", " "))}, @@galenic_forms[UnknownGalenicForm])
+        @galenic_form = GalenicForm.new(0, {"de" => remove_duplicated_spaces(gal_form.gsub(" +", " "))}, @@galenic_forms[UNKNOWN_GALENIC_FORM])
         @@new_galenic_forms << gal_form
       else
-        @galenic_form = @@galenic_forms[UnknownGalenicForm]
+        @galenic_form = @@galenic_forms[UNKNOWN_GALENIC_FORM]
       end
     end
 
     def search_galenic_info(gal_form)
-      if idx = search_exact_galform(gal_form)
+      if (idx = searchExactGalform(gal_form))
         return idx
       end
-      if gal_form && gal_form.index(",")
+      if gal_form&.index(",")
         parts = gal_form.split(/\s+|,/)
         parts.each { |part|
-          if idx = search_exact_galform(part)
+          if (idx = searchExactGalform(part))
             return idx
           end
         }
       elsif gal_form
         if gal_form.eql?("capsule")
-          idx = search_exact_galform("capsules")
+          idx = searchExactGalform("capsules")
           return idx
         end
-        if idx = search_exact_galform(gal_form)
+        if (idx = searchExactGalform(gal_form))
           return idx
         end
       end

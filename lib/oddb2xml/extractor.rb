@@ -39,7 +39,7 @@ module Oddb2xml
   class BagXmlExtractor < Extractor
     def to_hash
       data = {}
-      result = PreparationsEntry.parse(@xml.sub(Strip_For_Sax_Machine, ""), lazy: true)
+      result = PreparationsEntry.parse(@xml.sub(STRIP_FOR_SAX_MACHINE, ""), lazy: true)
       result.Preparations.Preparation.each do |seq|
         if seq.SwissmedicNo5.eql?("0")
           puts "BagXmlExtractor Skipping SwissmedicNo5 0 for #{seq.NameDe} #{seq.DescriptionDe} #{seq.CommentDe}"
@@ -203,7 +203,7 @@ module Oddb2xml
 
     def to_hash
       data = {}
-      result = SwissRegArticleEntry.parse(@xml.sub(Strip_For_Sax_Machine, ""), lazy: true)
+      result = SwissRegArticleEntry.parse(@xml.sub(STRIP_FOR_SAX_MACHINE, ""), lazy: true)
       items = result.ARTICLE.ITEM
       items.each do |pac|
         ean13 = (gtin = pac.GTIN.to_s) ? gtin : "0"
@@ -393,7 +393,7 @@ module Oddb2xml
     def to_hash
       data = Hash.new { |h, k| h[k] = [] }
       return data unless @xml.size > 0
-      result = MedicalInformationsContent.parse(@xml.sub(Strip_For_Sax_Machine, ""), lazy: true)
+      result = MedicalInformationsContent.parse(@xml.sub(STRIP_FOR_SAX_MACHINE, ""), lazy: true)
       result.medicalInformation.each do |pac|
         lang = pac.lang.to_s
         next unless /de|fr/.match?(lang)
