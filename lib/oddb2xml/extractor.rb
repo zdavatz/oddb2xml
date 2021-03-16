@@ -533,7 +533,7 @@ module Oddb2xml
           # next unless /(7680\d{9})(\d{1})$/.match(line) # Skip non pharma
           next if /(ad us\.* vet)|(\(vet\))/i.match?(line)
           if @@extended
-            next unless /(\d{13})(\d{1})$/.match?(line)
+            next unless line.match(/(\d{13})(\d{1})$/)
           else
             next unless line =~ /(7680\d{9})(\d{1})$/
           end
