@@ -1,6 +1,3 @@
-# encoding: utf-8
-
-require 'thread'
 require 'oddb2xml/builder'
 require 'oddb2xml/downloader'
 require 'oddb2xml/extractor'
@@ -11,15 +8,14 @@ require 'rubyXL'
 require 'date' # for today
 
 module Oddb2xml
-
   class Cli
     attr_reader :options
-    SUBJECTS  = %w[product article]
+    SUBJECTS = %w[product article]
     ADDITIONS = %w[substance limitation interaction code]
     OPTIONALS = %w[fi fi_product]
     def initialize(args)
       @options = args
-      STDOUT.puts "\nStarting cli with from #{caller[1]} using #{@options}" if defined?(RSpec)
+      STDOUT.puts "\nStarting cli with from #{caller(2..2).first} using #{@options}" if defined?(RSpec)
       Oddb2xml.save_options(@options)
       @mutex = Mutex.new
       # product
@@ -28,21 +24,22 @@ module Oddb2xml
       @lppvs = {} # lppv.txt from files repo
       @infos = {} # [option] FI from SwissmedicInfo
       @packs = {} # [option] Packungen from Swissmedic for dat
-      @infos_zur_rose  = {} # [addition] infos_zur_rose and other infos from zurrose transfer.txt
-      @migel   = {} # [addition] additional Non Pharma products from files repo
+      @infos_zur_rose = {} # [addition] infos_zur_rose and other infos from zurrose transfer.txt
+      @migel = {} # [addition] additional Non Pharma products from files repo
       @actions = [] # [addition] interactions from epha
       @orphan = [] # [addition] Orphaned drugs from Swissmedic xls
       # addresses
       @companies = [] # betrieb
-      @people    = [] # medizinalperson
+      @people = [] # medizinalperson
       @_message = false
     end
+
     def run
       threads = []
       startTime = Time.now
       files2rm = Dir.glob(File.join(Downloads, '*'))
-      FileUtils.rm_f(files2rm, :verbose => @options[:log]) if files2rm.size > 0 and not Oddb2xml.skip_download?
-      if @options[:calc] and not @options[:extended]
+      FileUtils.rm_f(files2rm, verbose: @options[:log]) if (files2rm.size > 0) && (!Oddb2xml.skip_download?)
+      if @options[:calc] && (!(@options[:extended]))
         threads << download(:package) # swissmedic
       elsif @options[:address]
         [:company, :person].each do |type|
@@ -83,31 +80,33 @@ module Oddb2xml
       build
       if @options[:artikelstamm] && system("which xmllint")
         elexis_v5_xsd = File.expand_path(File.join(__FILE__, '..', '..', '..', 'Elexis_Artikelstamm_v5.xsd'))
-         cmd = "xmllint --noout --schema #{elexis_v5_xsd} #{@_files[:artikelstamm]}"
-         if system(cmd)
-            puts "Validatied #{@_files[:artikelstamm]}"
-         else
-            puts "Validating failed using #{cmd}"
-            raise  "Validating failed using #{cmd}"
-            exit(2)
-         end
+        cmd = "xmllint --noout --schema #{elexis_v5_xsd} #{@_files[:artikelstamm]}"
+        if system(cmd)
+          puts "Validatied #{@_files[:artikelstamm]}"
+        else
+          puts "Validating failed using #{cmd}"
+           raise "Validating failed using #{cmd}"
+           exit(2)
+        end
       end
       compress if @options[:compress_ext]
       res = report
-      nrSecs =  (Time.now - startTime).to_i
-      if defined?(RSpec) && (nrSecs).to_i > 10 && ENV['TRAVIS'].to_s.empty? then require 'pry'; binding.pry ; end
+      nrSecs = (Time.now - startTime).to_i
+      if defined?(RSpec) && nrSecs.to_i > 10 && ENV['TRAVIS'].to_s.empty? then require 'pry'; binding.pry; end
       res
     end
+
     private
+
     def build
-      begin
-        @_files = {"calc"=>"oddb_calc.xml"} if @options[:calc] and not (@options[:extended] || @options[:artikelstamm])
+      
+        @_files = {"calc" => "oddb_calc.xml"} if @options[:calc] && (!(@options[:extended] || @options[:artikelstamm]))
         builder = Builder.new(@options) do |builder|
-          if @options[:calc] and not  (@options[:extended] || @options[:artikelstamm])
+          if @options[:calc] && (!(@options[:extended] || @options[:artikelstamm]))
             builder.packs = @packs
           elsif @options[:address]
             builder.companies = @companies
-            builder.people    = @people
+            builder.people = @people
           else # product
             if @options[:format] != :dat
               refdata = {}
@@ -125,7 +124,7 @@ module Oddb2xml
             builder.packs = @packs
             # additional sources
             %w[actions orphan migel infos_zur_rose].each do |addition|
-              builder.send("#{addition}=".intern, self.instance_variable_get("@#{addition}"))
+              builder.send("#{addition}=".intern, instance_variable_get("@#{addition}"))
             end
           end
           builder.tag_suffix = @options[:tag_suffix]
@@ -133,13 +132,13 @@ module Oddb2xml
         files.each_pair do |sbj, file|
           builder.subject = sbj
           output = ''
-          if !@options[:address] and (@options[:format] == :dat)
+          if !@options[:address] && (@options[:format] == :dat)
             types.each do |type|
               refdata1 = {}
               _sbj = (type == :pharma ? :dat : :with_migel_dat)
               builder.refdata = @refdata_types[type]
               builder.subject = _sbj
-              builder.ean14   = @options[:ean14]
+              builder.ean14 = @options[:ean14]
               if type == :nonpharma
                 output << "\n"
               end
@@ -150,7 +149,7 @@ module Oddb2xml
           end
           File.open(File.join(WorkDir, file), 'w:utf-8') do |fh|
             output.split("\n").each do |line|
-              if /.xml$/i.match(file)
+              if /.xml$/i.match?(file)
                 fh.puts(line)
               else
                 fh.puts(Oddb2xml.convert_to_8859_1(line))
@@ -159,8 +158,8 @@ module Oddb2xml
           end
           if @options[:calc]
             ext = File.extname(file)
-            dest = File.join(WorkDir, file.sub(ext, '_'+Time.now.strftime("%d.%m.%Y_%H.%M")+ext))
-            FileUtils.cp(File.join(WorkDir, file), dest, :verbose => false)
+            dest = File.join(WorkDir, file.sub(ext, '_' + Time.now.strftime("%d.%m.%Y_%H.%M") + ext))
+            FileUtils.cp(File.join(WorkDir, file), dest, verbose: false)
           end
         end
       rescue Interrupt
@@ -170,25 +169,28 @@ module Oddb2xml
           end
         end
         raise Interrupt
-      end
+      
     end
-    def download(what, type=nil)
+
+    def download(what, type = nil)
       case what
       when :company, :person
         var = (what == :company ? 'companies' : 'people')
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = MedregbmDownloader.new(what)
           str = downloader.download
           Oddb2xml.log("SwissmedicInfoDownloader #{what} str #{str.size} bytes")
-          self.instance_variable_set(
+          instance_variable_set(
             "@#{var}".intern,
             items = MedregbmExtractor.new(str, what).to_arry
           )
           Oddb2xml.log("MedregbmExtractor #{what} added #{items.size} fachinfo")
           items
-        end
+        
       when :fachinfo
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = SwissmedicInfoDownloader.new
           xml = downloader.download
           Oddb2xml.log("SwissmedicInfoDownloader #{var} xml #{xml.size} bytes")
@@ -198,22 +200,24 @@ module Oddb2xml
             Oddb2xml.log("SwissmedicInfoExtractor added #{@infos.size} fachinfo")
             @infos
           end
-        end
+        
       when :orphan
         var = what.to_s
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = SwissmedicDownloader.new(what, @options)
           bin = downloader.download
           Oddb2xml.log("SwissmedicDownloader #{var} #{bin} #{File.size(bin)} bytes")
-          self.instance_variable_set(
+          instance_variable_set(
             "@#{var}",
             items = SwissmedicExtractor.new(bin, what).to_arry
           )
           Oddb2xml.log("SwissmedicExtractor added #{items.size}")
           items
-        end
+        
       when :interaction
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = EphaDownloader.new
           str = downloader.download
           Oddb2xml.log("EphaDownloader str #{str.size} bytes")
@@ -222,9 +226,10 @@ module Oddb2xml
             Oddb2xml.log("EphaExtractor added #{@actions.size} interactions")
             @actions
           end
-        end
+        
       when :migel
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = MigelDownloader.new
           bin = downloader.download
           Oddb2xml.log("MigelDownloader bin #{bin.size} bytes")
@@ -233,9 +238,10 @@ module Oddb2xml
             Oddb2xml.log("MigelExtractor added #{@migel.size} migel items")
             @migel
           end
-        end unless SkipMigelDownloader
+         unless SkipMigelDownloader
       when :package
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = SwissmedicDownloader.new(:package, @options)
           bin = downloader.download
           Oddb2xml.log("SwissmedicDownloader package #{bin} #{File.size(bin)} bytes")
@@ -244,9 +250,10 @@ module Oddb2xml
             Oddb2xml.log("SwissmedicExtractor added #{@packs.size} packs from #{bin}")
             @packs
           end
-        end
+        
       when :lppv
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = LppvDownloader.new
           str = downloader.download
           Oddb2xml.log("LppvDownloader str #{str.size} bytes")
@@ -255,9 +262,10 @@ module Oddb2xml
             Oddb2xml.log("LppvExtractor added #{@lppvs.size} lppvs")
             @lppvs
           end
-        end
+        
       when :bag
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = BagXmlDownloader.new(@options)
           xml = downloader.download
           Oddb2xml.log("BagXmlDownloader xml #{xml.size} bytes")
@@ -267,9 +275,10 @@ module Oddb2xml
             Oddb2xml.log("BagXmlExtractor added #{@items.size} items.")
             @items
           end
-        end
+        
       when :zurrose
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = ZurroseDownloader.new(@options, @options[:transfer_dat])
           xml = downloader.download
           Oddb2xml.log("ZurroseDownloader xml #{xml.size} bytes")
@@ -278,9 +287,10 @@ module Oddb2xml
             Oddb2xml.log("ZurroseExtractor added #{hsh.size} items from xml with #{xml.size} bytes")
             @infos_zur_rose = hsh
           end
-        end
+        
       when :refdata
-        begin # instead of Thread.new do
+# instead of Thread.new do
+        
           downloader = RefdataDownloader.new(@options, type)
           begin
             xml = downloader.download
@@ -300,28 +310,30 @@ module Oddb2xml
             Oddb2xml.log("RefdataExtractor #{type} added #{hsh.size} keys now #{@refdata_types.keys} items from xml with #{xml.size} bytes")
             @refdata_types[type]
           end
-        end
+        
       end
     end
+
     def compress
       compressor = Compressor.new(prefix, @options)
       files.values.each do |file|
         work_file = File.join(WorkDir, file)
-        if File.exists?(work_file)
+        if File.exist?(work_file)
           compressor.contents << work_file
         end
       end
       compressor.finalize!
     end
+
     def files
       unless @_files
         @_files = {}
         @_files[:calc] = "oddb_calc.xml" if @options[:calc]
         if @options[:artikelstamm]
-          @_files[:artikelstamm]           = "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml"
+          @_files[:artikelstamm] = "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml"
         elsif @options[:address]
           @_files[:company] = "#{prefix}_betrieb.xml"
-          @_files[:person]  = "#{prefix}_medizinalperson.xml"
+          @_files[:person] = "#{prefix}_medizinalperson.xml"
         elsif @options[:format] == :dat
           @_files[:dat] = "#{prefix}.dat"
           if @options[:nonpharma] # into one file
@@ -335,16 +347,18 @@ module Oddb2xml
           #   3. optional SUBJECTS
           _files = (ADDITIONS + SUBJECTS)
           _files += OPTIONALS if @options[:fi]
-          _files.each do|sbj|
-            @_files[sbj] = "#{prefix}_#{sbj.to_s}.xml"
+          _files.each do |sbj|
+            @_files[sbj] = "#{prefix}_#{sbj}.xml"
           end
         end
       end
       @_files
     end
+
     def prefix
       @_prefix ||= (@options[:tag_suffix] || 'oddb').gsub(/^_|_$/, '').downcase
     end
+
     def report
       lines = []
       if @options[:calc]
@@ -353,7 +367,7 @@ module Oddb2xml
         lines << Calc.report_conversion
         lines << ParseComposition.report
       end
-      if  @options[:artikelstamm]
+      if @options[:artikelstamm]
         lines << "Generated artikelstamm.xml for Elexis"
         lines += Builder.articlestamm_v5_info_lines
       else
@@ -367,7 +381,7 @@ module Oddb2xml
                 if SkipMigelDownloader
                   indices + nonpharmas.length
                 else
-                  migel_xls  = @migel.values.compact.select{|m| !m[:pharmacode]}.map{|m| m[:pharmacode] }
+                  migel_xls = @migel.values.compact.select {|m| !m[:pharmacode]}.map {|m| m[:pharmacode] }
                   indices += (migel_xls - nonpharmas).length # ignore duplicates, null
                 end
                 lines << sprintf("\tNonPharma products: %i", indices)
@@ -376,22 +390,25 @@ module Oddb2xml
               end
             end
           end
-          if  (@options[:extended] || @options[:artikelstamm])
+          if @options[:extended] || @options[:artikelstamm]
             lines << sprintf("\tInformation items zur Rose: %i", @infos_zur_rose.length)
           end
         else
           {
             'Betrieb' => :@companies,
-            'Person'  => :@people
+            'Person' => :@people
           }.each do |type, var|
             lines << sprintf(
-              "#{type} addresses: %i", self.instance_variable_get(var).length)
+              "#{type} addresses: %i", instance_variable_get(var).length
+)
           end
         end
       end
       puts lines.join("\n")
     end
-    def types # RefData
+
+# RefData
+    def types
       @_types ||=
         if @options[:nonpharma] || @options[:artikelstamm]
           [:pharma, :nonpharma]

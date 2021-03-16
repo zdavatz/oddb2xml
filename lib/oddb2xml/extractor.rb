@@ -1,11 +1,10 @@
-# encoding: utf-8
-require 'nokogiri'
-require 'spreadsheet'
-require 'stringio'
-require 'rubyXL'
-require 'rubyXL/convenience_methods/workbook'
-require 'csv'
-require 'oddb2xml/xml_definitions'
+require "nokogiri"
+require "spreadsheet"
+require "stringio"
+require "rubyXL"
+require "rubyXL/convenience_methods/workbook"
+require "csv"
+require "oddb2xml/xml_definitions"
 
 module Oddb2xml
   module TxtExtractorMethods
@@ -13,23 +12,26 @@ module Oddb2xml
       Oddb2xml.log("TxtExtractorMethods #{str} #{str.to_s.size} bytes")
       @io = StringIO.new(str)
     end
+
     def to_hash
       data = {}
       while line = @io.gets
-        next unless line =~ /\d{13}/
-        ean13 = line.chomp.gsub("\"", '')
+        next unless /\d{13}/.match?(line)
+        ean13 = line.chomp.delete("\"")
         data[ean13] = true
       end
       data
     end
   end
+
   class Extractor
     attr_accessor :xml
     def initialize(xml)
-      Oddb2xml.log("Extractor #{xml } xml #{xml.size} bytes")
+      Oddb2xml.log("Extractor #{xml} xml #{xml.size} bytes")
       @xml = xml
     end
   end
+
   class LppvExtractor < Extractor
     include TxtExtractorMethods
   end
@@ -37,156 +39,154 @@ module Oddb2xml
   class BagXmlExtractor < Extractor
     def to_hash
       data = {}
-      result = PreparationsEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
+      result = PreparationsEntry.parse(@xml.sub(Strip_For_Sax_Machine, ""), lazy: true)
       result.Preparations.Preparation.each do |seq|
-        if seq.SwissmedicNo5.eql?('0')
+        if seq.SwissmedicNo5.eql?("0")
           puts "BagXmlExtractor Skipping SwissmedicNo5 0 for #{seq.NameDe} #{seq.DescriptionDe} #{seq.CommentDe}"
           next
         end
         item = {}
-        item[:data_origin]  = 'bag_xml'
-        item[:refdata]      = true
-        item[:product_key]  = seq.ProductCommercial
-        item[:desc_de]      = (desc = seq.DescriptionDe) ? desc : ''
-        item[:desc_fr]      = (desc = seq.DescriptionFr) ? desc : ''
-        item[:name_de]      = (name = seq.NameDe)        ? name : ''
-        item[:name_fr]      = (name = seq.NameFr)        ? name : ''
-        item[:swissmedic_number5] = (num5 = seq.SwissmedicNo5) ? (num5.rjust(5,'0')) : ''
-        item[:org_gen_code] = (orgc = seq.OrgGenCode)    ? orgc : ''
-        item[:deductible]   = (ddbl = seq.FlagSB20)      ? ddbl : ''
-        item[:atc_code]     = (atcc = seq.AtcCode)       ? atcc : ''
-        item[:comment_de]   = (info = seq.CommentDe)     ? info : ''
-        item[:comment_fr]   = (info = seq.CommentFr)     ? info : ''
-        item[:it_code]      = ''
+        item[:data_origin] = "bag_xml"
+        item[:refdata] = true
+        item[:product_key] = seq.ProductCommercial
+        item[:desc_de] = (desc = seq.DescriptionDe) ? desc : ""
+        item[:desc_fr] = (desc = seq.DescriptionFr) ? desc : ""
+        item[:name_de] = (name = seq.NameDe) ? name : ""
+        item[:name_fr] = (name = seq.NameFr) ? name : ""
+        item[:swissmedic_number5] = (num5 = seq.SwissmedicNo5) ? num5.rjust(5, "0") : ""
+        item[:org_gen_code] = (orgc = seq.OrgGenCode) ? orgc : ""
+        item[:deductible] = (ddbl = seq.FlagSB20) ? ddbl : ""
+        item[:atc_code] = (atcc = seq.AtcCode) ? atcc : ""
+        item[:comment_de] = (info = seq.CommentDe) ? info : ""
+        item[:comment_fr] = (info = seq.CommentFr) ? info : ""
+        item[:it_code] = ""
         seq.ItCodes.ItCode.each do |itc|
           if item[:it_code].to_s.empty?
             it_code = itc.Code.to_s
-            item[:it_code] = (it_code =~ /(\d+)\.(\d+)\.(\d+)./) ? it_code : ''
+            item[:it_code] = /(\d+)\.(\d+)\.(\d+)./.match?(it_code) ? it_code : ""
           end
         end
         item[:substances] = []
         seq.Substances.Substance.each_with_index do |sub, i|
           item[:substances] << {
-            :index    => i.to_s,
-            :name     => (name = sub.DescriptionLa) ? name : '',
-            :quantity => (qtty = sub.Quantity)      ? qtty : '',
-            :unit     => (unit = sub.QuantityUnit)  ? unit : '',
+            index: i.to_s,
+            name: (name = sub.DescriptionLa) ? name : "",
+            quantity: (qtty = sub.Quantity) ? qtty : "",
+            unit: (unit = sub.QuantityUnit) ? unit : ""
           }
         end
         item[:pharmacodes] = []
-        item[:packages]    = {} # pharmacode => package
+        item[:packages] = {} # pharmacode => package
         seq.Packs.Pack.each do |pac|
           if pac.SwissmedicNo8 && pac.SwissmedicNo8.length < 8
             puts "BagXmlExtractor: Adding leading zeros for SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}" if $VERBOSE
-            pac.SwissmedicNo8  = pac.SwissmedicNo8.rjust(8, '0')
+            pac.SwissmedicNo8 = pac.SwissmedicNo8.rjust(8, "0")
           end
           unless pac.GTIN
-            unless pac.SwissmedicNo8
+            if pac.SwissmedicNo8
+              ean12 = "7680" + pac.SwissmedicNo8
+              pac.GTIN = (ean12 + Oddb2xml.calc_checksum(ean12)) unless @artikelstamm
+              # puts "BagXmlExtractor: Missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}."
+            else
               puts "BagXmlExtractor: Missing GTIN and SwissmedicNo8 in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}"
               next
-            else
-              ean12 = '7680' + pac.SwissmedicNo8
-              pac.GTIN  = (ean12 + Oddb2xml.calc_checksum(ean12)) unless @artikelstamm
-              # puts "BagXmlExtractor: Missing GTIN in SwissmedicNo8 #{pac.SwissmedicNo8}  BagDossierNo #{pac.BagDossierNo} PackId #{pac.PackId} #{item[:name_de]}."
             end
           end
           ean13 = pac.GTIN.to_s
           Oddb2xml.setEan13forNo8(pac.SwissmedicNo8, ean13) if pac.SwissmedicNo8
           # packages
-          exf = {:price => '', :valid_date => '', :price_code => ''}
-          if pac.Prices and pac.Prices.ExFactoryPrice
-            exf[:price]      =  pac.Prices.ExFactoryPrice.Price         if pac.Prices.ExFactoryPrice.Price
-            exf[:valid_date] =  pac.Prices.ExFactoryPrice.ValidFromDate if pac.Prices.ExFactoryPrice.ValidFromDate
-            exf[:price_code] =  pac.Prices.ExFactoryPrice.PriceTypeCode if pac.Prices.ExFactoryPrice.PriceTypeCode
+          exf = {price: "", valid_date: "", price_code: ""}
+          if pac.Prices && pac.Prices.ExFactoryPrice
+            exf[:price] = pac.Prices.ExFactoryPrice.Price if pac.Prices.ExFactoryPrice.Price
+            exf[:valid_date] = pac.Prices.ExFactoryPrice.ValidFromDate if pac.Prices.ExFactoryPrice.ValidFromDate
+            exf[:price_code] = pac.Prices.ExFactoryPrice.PriceTypeCode if pac.Prices.ExFactoryPrice.PriceTypeCode
           end
-          pub = {:price => '', :valid_date => '', :price_code => ''}
-          if pac.Prices and pac.Prices.PublicPrice
-            pub[:price]      =  pac.Prices.PublicPrice.Price         if pac.Prices.PublicPrice.Price
-            pub[:valid_date] =  pac.Prices.PublicPrice.ValidFromDate if pac.Prices.PublicPrice.ValidFromDate
-            pub[:price_code] =  pac.Prices.PublicPrice.PriceTypeCode if pac.Prices.PublicPrice.PriceTypeCode
+          pub = {price: "", valid_date: "", price_code: ""}
+          if pac.Prices && pac.Prices.PublicPrice
+            pub[:price] = pac.Prices.PublicPrice.Price if pac.Prices.PublicPrice.Price
+            pub[:valid_date] = pac.Prices.PublicPrice.ValidFromDate if pac.Prices.PublicPrice.ValidFromDate
+            pub[:price_code] = pac.Prices.PublicPrice.PriceTypeCode if pac.Prices.PublicPrice.PriceTypeCode
           end
           item[:packages][ean13] = {
-            :ean13               => ean13,
-            :name_de             => (desc = seq.NameDe) ? desc : '',
-            :name_fr             => (desc = seq.NameFr) ? desc : '',
-            :desc_de             => (desc = pac.DescriptionDe) ? desc : '',
-            :desc_fr             => (desc = pac.DescriptionFr) ? desc : '',
-            :sl_entry            => true,
-            :swissmedic_category => (cat = pac.SwissmedicCategory) ? cat : '',
-            :swissmedic_number8  => (num = pac.SwissmedicNo8)      ? num : '',
-            :prices              => { :exf_price => exf, :pub_price => pub },
+            ean13: ean13,
+            name_de: (desc = seq.NameDe) ? desc : "",
+            name_fr: (desc = seq.NameFr) ? desc : "",
+            desc_de: (desc = pac.DescriptionDe) ? desc : "",
+            desc_fr: (desc = pac.DescriptionFr) ? desc : "",
+            sl_entry: true,
+            swissmedic_category: (cat = pac.SwissmedicCategory) ? cat : "",
+            swissmedic_number8: (num = pac.SwissmedicNo8) ? num : "",
+            prices: {exf_price: exf, pub_price: pub}
           }
           # related all limitations
           item[:packages][ean13][:limitations] = []
-          limitations = Hash.new{|h,k| h[k] = [] }
-          if seq.Limitations
-            limitations[:seq] = seq.Limitations.Limitation.collect { |x| x }
-          else
-            limitations[:seq] = nil
+          limitations = Hash.new { |h, k| h[k] = [] }
+          limitations[:seq] = if seq.Limitations
+            seq.Limitations.Limitation.collect { |x| x }
           end
           # in it-codes
-          if seq and seq.ItCodes and seq.ItCodes.ItCode
+          if seq && seq.ItCodes && seq.ItCodes.ItCode
             limitations[:itc] = []
-            seq.ItCodes.ItCode.each { |x|  limitations[:itc] += x.Limitations.Limitation if x.Limitations.Limitation}
+            seq.ItCodes.ItCode.each { |x| limitations[:itc] += x.Limitations.Limitation if x.Limitations.Limitation }
           else
-            limitations[:itc] =nil
+            limitations[:itc] = nil
           end
           # in pac
-          if pac and pac.Limitations
-            limitations[:pac] = (lims = pac.Limitations.Limitation) ? lims.to_a : nil
-          else
-            limitations[:pac] = nil
+          limitations[:pac] = if pac && pac.Limitations
+            (lims = pac.Limitations.Limitation) ? lims.to_a : nil
           end
           limitations.each_pair do |lim_key, lims|
-            key = ''
-            id  = ''
+            key = ""
+            id = ""
             case lim_key
             when :seq, :itc
               key = :swissmedic_number5
-              id  = item[key].to_s
+              id = item[key].to_s
             when :pac
               key = :swissmedic_number8
-              id  = item[:packages][ean13][key].to_s
+              id = item[:packages][ean13][key].to_s
             end
-            if id.empty? && item[:packages][ean13][ :swissmedic_number8]
+            if id.empty? && item[:packages][ean13][:swissmedic_number8]
               key = :swissmedic_number8
-              id  = item[:packages][ean13][key].to_s
+              id = item[:packages][ean13][key].to_s
             end
-            lims.each do |lim|
-              limitation = {
-                :it      => item[:it_code],
-                :key     => key,
-                :id      => id,
-                :code    => (lic = lim.LimitationCode)   ? lic : '',
-                :type    => (lit = lim.LimitationType)   ? lit : '',
-                :value   => (liv = lim.LimitationValue)  ? liv : '',
-                :niv     => (niv = lim.LimitationNiveau) ? niv : '',
-                :desc_de => (dsc = lim.DescriptionDe)    ? dsc : '',
-                :desc_fr => (dsc = lim.DescriptionFr)    ? dsc : '',
-                :vdate   => (dat = lim.ValidFromDate)    ? dat : '',
-              }
-              deleted = false
-              if upto = ((thr = lim.ValidThruDate) ? thr : nil) and
-                  upto =~ /\d{2}\.\d{2}\.\d{2}/
-                begin
-                  deleted = true if Date.strptime(upto, '%d.%m.%y') >= Date.today
-                rescue ArgumentError
+            if lims
+              lims.each do |lim|
+                limitation = {
+                  it: item[:it_code],
+                  key: key,
+                  id: id,
+                  code: (lic = lim.LimitationCode) ? lic : "",
+                  type: (lit = lim.LimitationType) ? lit : "",
+                  value: (liv = lim.LimitationValue) ? liv : "",
+                  niv: (niv = lim.LimitationNiveau) ? niv : "",
+                  desc_de: (dsc = lim.DescriptionDe) ? dsc : "",
+                  desc_fr: (dsc = lim.DescriptionFr) ? dsc : "",
+                  vdate: (dat = lim.ValidFromDate) ? dat : ""
+                }
+                deleted = false
+                if (upto = ((thr = lim.ValidThruDate) ? thr : nil)) &&
+                    upto =~ (/\d{2}\.\d{2}\.\d{2}/)
+                  begin
+                    deleted = true if Date.strptime(upto, "%d.%m.%y") >= Date.today
+                  rescue ArgumentError
+                  end
                 end
+                limitation[:del] = deleted
+                item[:packages][ean13][:limitations] << limitation
               end
-              limitation[:del] = deleted
-              item[:packages][ean13][:limitations] << limitation
-            end if lims
+            end
           end
           # limitation points
           pts = pac.PointLimitations.PointLimitation.first # only first points
-          item[:packages][ean13][:limitation_points] = pts ? pts.Points : ''
+          item[:packages][ean13][:limitation_points] = pts ? pts.Points : ""
           if pac.SwissmedicNo8
-              ean12 = '7680' + pac.SwissmedicNo8
-              correct_ean13 = ean12+ Oddb2xml.calc_checksum(ean12)
-              unless pac.GTIN.eql?(correct_ean13)
-                puts "pac.GTIN #{pac.GTIN} should be #{correct_ean13}"
-                item[:packages][ean13][:CORRECT_EAN13] = correct_ean13
-              end
+            ean12 = "7680" + pac.SwissmedicNo8
+            correct_ean13 = ean12 + Oddb2xml.calc_checksum(ean12)
+            unless pac.GTIN.eql?(correct_ean13)
+              puts "pac.GTIN #{pac.GTIN} should be #{correct_ean13}"
+              item[:packages][ean13][:CORRECT_EAN13] = correct_ean13
+            end
           end
           data[ean13] = item
         end
@@ -197,50 +197,53 @@ module Oddb2xml
 
   class RefdataExtractor < Extractor
     def initialize(xml, type)
-      @type = (type == :pharma ? 'PHARMA' : 'NONPHARMA')
+      @type = (type == :pharma ? "PHARMA" : "NONPHARMA")
       super(xml)
     end
+
     def to_hash
       data = {}
-      result = SwissRegArticleEntry.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
+      result = SwissRegArticleEntry.parse(@xml.sub(Strip_For_Sax_Machine, ""), lazy: true)
       items = result.ARTICLE.ITEM
       items.each do |pac|
-        ean13 = (gtin = pac.GTIN.to_s) ? gtin: '0'
+        ean13 = (gtin = pac.GTIN.to_s) ? gtin : "0"
         if ean13.size < 13
           puts "Refdata #{@type} use 13 chars not #{ean13.size} for #{ean13}" if $VERBOSE
-          ean13 = ean13.rjust(13, '0')
+          ean13 = ean13.rjust(13, "0")
         end
-        if ean13.size == 14 && ean13[0] == '0'
+        if ean13.size == 14 && ean13[0] == "0"
           puts "Refdata #{@type} remove leading '0' for #{ean13}" if $VERBOSE
           ean13 = ean13[1..-1]
         end
         # but in refdata_nonPharma we have a about 700 GTINs which are 14 characters and longer
         item = {}
-        item[:ean13]           = ean13
-        item[:no8]             = pac.SWMC_AUTHNR
-        item[:data_origin]     = 'refdata'
-        item[:refdata]         = true
-        item[:_type]           = (typ  = pac.ATYPE.downcase.to_sym)  ? typ: ''
-        item[:last_change]     = (date = Time.parse(pac.DT).to_s)  ? date: ''  # Date and time of last data change
-        item[:desc_de]         = (dscr = pac.NAME_DE)   ? dscr: ''
-        item[:desc_fr]         = (dscr = pac.NAME_FR)   ? dscr: ''
-        item[:atc_code]        = (code = pac.ATC)    ? code.to_s : ''
-        item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam: ''
-        item[:company_ean]  = (gln = pac.AUTH_HOLDER_GLN)  ? gln: ''
+        item[:ean13] = ean13
+        item[:no8] = pac.SWMC_AUTHNR
+        item[:data_origin] = "refdata"
+        item[:refdata] = true
+        item[:_type] = (typ = pac.ATYPE.downcase.to_sym) ? typ : ""
+        item[:last_change] = (date = Time.parse(pac.DT).to_s) ? date : "" # Date and time of last data change
+        item[:desc_de] = (dscr = pac.NAME_DE) ? dscr : ""
+        item[:desc_fr] = (dscr = pac.NAME_FR) ? dscr : ""
+        item[:atc_code] = (code = pac.ATC) ? code.to_s : ""
+        item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam : ""
+        item[:company_ean] = (gln = pac.AUTH_HOLDER_GLN) ? gln : ""
         data[item[:ean13]] = item
       end
       data
     end
   end
+
   class SwissmedicExtractor < Extractor
     def initialize(filename, type)
       @filename = File.join(Downloads, File.basename(filename))
-      @filename = File.join(SpecData, File.basename(filename)) if defined?(RSpec) and not File.exists?(@filename)
-      @type  = type
+      @filename = File.join(SpecData, File.basename(filename)) if defined?(RSpec) && !File.exist?(@filename)
+      @type = type
       Oddb2xml.log("SwissmedicExtractor #{@filename} #{File.size(@filename)} bytes")
-      return unless File.exists?(@filename)
+      return unless File.exist?(@filename)
       @sheet = RubyXL::Parser.parse(File.expand_path(@filename)).worksheets[0]
     end
+
     def to_arry
       data = []
       return data unless @sheet
@@ -248,7 +251,7 @@ module Oddb2xml
       when :orphan
         i = 1
         col_zulassung = 6
-        raise "Could not find Zulassungsnummer in column #{col_zulassung} of #{@filename}" unless /Zulassungs.*nummer/.match(@sheet[3][col_zulassung].value)
+        raise "Could not find Zulassungsnummer in column #{col_zulassung} of #{@filename}" unless /Zulassungs.*nummer/.match?(@sheet[3][col_zulassung].value)
         @sheet.each do |row|
           next unless row[col_zulassung]
           number = row[col_zulassung].value.to_i
@@ -262,24 +265,25 @@ module Oddb2xml
       data.uniq
     end
 
-    def to_hash # Packungen.xlsx COLUMNS_FEBRUARY_2019
+    # Packungen.xlsx COLUMNS_FEBRUARY_2019
+    def to_hash
       data = {}
       return data unless @sheet
       case @type
       when :package
         Oddb2xml.check_column_indices(@sheet)
-        ith       = COLUMNS_FEBRUARY_2019.keys.index(:index_therapeuticus)
-        iksnr     = COLUMNS_FEBRUARY_2019.keys.index(:iksnr)
-        seq_name  = COLUMNS_FEBRUARY_2019.keys.index(:name_base)
-        i_3       = COLUMNS_FEBRUARY_2019.keys.index(:ikscd)
-        seqnr     = COLUMNS_FEBRUARY_2019.keys.index(:seqnr)
-        cat       = COLUMNS_FEBRUARY_2019.keys.index(:ikscat)
-        siz       = COLUMNS_FEBRUARY_2019.keys.index(:size)
-        atc       = COLUMNS_FEBRUARY_2019.keys.index(:atc_class)
+        ith = COLUMNS_FEBRUARY_2019.keys.index(:index_therapeuticus)
+        iksnr = COLUMNS_FEBRUARY_2019.keys.index(:iksnr)
+        seq_name = COLUMNS_FEBRUARY_2019.keys.index(:name_base)
+        i_3 = COLUMNS_FEBRUARY_2019.keys.index(:ikscd)
+        seqnr = COLUMNS_FEBRUARY_2019.keys.index(:seqnr)
+        cat = COLUMNS_FEBRUARY_2019.keys.index(:ikscat)
+        siz = COLUMNS_FEBRUARY_2019.keys.index(:size)
+        atc = COLUMNS_FEBRUARY_2019.keys.index(:atc_class)
         list_code = COLUMNS_FEBRUARY_2019.keys.index(:production_science)
-        eht       = COLUMNS_FEBRUARY_2019.keys.index(:unit)
-        sub       = COLUMNS_FEBRUARY_2019.keys.index(:substances)
-        comp      = COLUMNS_FEBRUARY_2019.keys.index(:composition)
+        eht = COLUMNS_FEBRUARY_2019.keys.index(:unit)
+        sub = COLUMNS_FEBRUARY_2019.keys.index(:substances)
+        comp = COLUMNS_FEBRUARY_2019.keys.index(:composition)
 
         # production_science Heilmittelcode, possible values are
         # Allergene
@@ -299,42 +303,41 @@ module Oddb2xml
         # Tierarzneimittel
         # Transplantat: Gewebeprodukt
         @sheet.each_with_index do |row, i|
-
-          next if (i <= 1)
-          next unless row and row[iksnr] and row[i_3]
-          next unless row[iksnr].value.to_i > 0 and row[i_3].value.to_i > 0
-          no8 = sprintf('%05d',row[iksnr].value.to_i) + sprintf('%03d',row[i_3].value.to_i)
+          next if i <= 1
+          next unless row && row[iksnr] && row[i_3]
+          next unless (row[iksnr].value.to_i > 0) && (row[i_3].value.to_i > 0)
+          no8 = sprintf("%05d", row[iksnr].value.to_i) + sprintf("%03d", row[i_3].value.to_i)
           unless no8.empty?
             next if no8.to_i == 0
             ean_base12 = "7680#{no8}"
-            prodno =  Oddb2xml.gen_prodno(row[iksnr].value.to_i, row[seqnr].value.to_i)
-            ean13 = (ean_base12.ljust(12, '0') + Oddb2xml.calc_checksum(ean_base12))
+            prodno = Oddb2xml.gen_prodno(row[iksnr].value.to_i, row[seqnr].value.to_i)
+            ean13 = (ean_base12.ljust(12, "0") + Oddb2xml.calc_checksum(ean_base12))
             Oddb2xml.setEan13forProdno(prodno, ean13)
             Oddb2xml.setEan13forNo8(no8, ean13)
             data[no8] = {
-              :iksnr                => row[iksnr].value.to_i,
-              :no8                  => no8,
-              :ean13                => ean13,
-              :prodno               => prodno,
-              :seqnr                => row[seqnr].value,
-              :ith_swissmedic       => row[ith] ? row[ith].value.to_s : '',
-              :swissmedic_category  => row[cat].value.to_s,
-              :atc_code             => row[atc] ? Oddb2xml.add_epha_changes_for_ATC(row[iksnr].value.to_s, row[atc].value.to_s) : '',
-              :list_code            => row[list_code] ? row[list_code].value.to_s : '',
-              :package_size         => row[siz] ? row[siz].value.to_s : '',
-              :einheit_swissmedic   => row[eht] ? row[eht].value.to_s : '',
-              :substance_swissmedic => row[sub] ? row[sub].value.to_s : '',
-              :composition_swissmedic => row[comp] ? row[comp].value.to_s : '',
-              :sequence_name        => row[seq_name] ? row[seq_name].value.to_s : '',
-              :is_tier              => (row[list_code] == 'Tierarzneimittel' ? true : false),
-              :gen_production       => row[COLUMNS_FEBRUARY_2019.keys.index(:gen_production)].value.to_s,
-              :insulin_category     => row[COLUMNS_FEBRUARY_2019.keys.index(:insulin_category)].value.to_s,
-              :drug_index           => row[COLUMNS_FEBRUARY_2019.keys.index(:drug_index)].value.to_s,
-              :data_origin          => 'swissmedic_package',
-              :expiry_date          => row[COLUMNS_FEBRUARY_2019.keys.index(:expiry_date)].value.to_s,
-              :company_name         => row[COLUMNS_FEBRUARY_2019.keys.index(:company)].value.to_s,
-              :size                 => row[COLUMNS_FEBRUARY_2019.keys.index(:size)].value.to_s,
-              :unit                 => row[COLUMNS_FEBRUARY_2019.keys.index(:unit)].value.to_s,
+              iksnr: row[iksnr].value.to_i,
+              no8: no8,
+              ean13: ean13,
+              prodno: prodno,
+              seqnr: row[seqnr].value,
+              ith_swissmedic: row[ith] ? row[ith].value.to_s : "",
+              swissmedic_category: row[cat].value.to_s,
+              atc_code: row[atc] ? Oddb2xml.add_epha_changes_for_ATC(row[iksnr].value.to_s, row[atc].value.to_s) : "",
+              list_code: row[list_code] ? row[list_code].value.to_s : "",
+              package_size: row[siz] ? row[siz].value.to_s : "",
+              einheit_swissmedic: row[eht] ? row[eht].value.to_s : "",
+              substance_swissmedic: row[sub] ? row[sub].value.to_s : "",
+              composition_swissmedic: row[comp] ? row[comp].value.to_s : "",
+              sequence_name: row[seq_name] ? row[seq_name].value.to_s : "",
+              is_tier: (row[list_code] == "Tierarzneimittel"),
+              gen_production: row[COLUMNS_FEBRUARY_2019.keys.index(:gen_production)].value.to_s,
+              insulin_category: row[COLUMNS_FEBRUARY_2019.keys.index(:insulin_category)].value.to_s,
+              drug_index: row[COLUMNS_FEBRUARY_2019.keys.index(:drug_index)].value.to_s,
+              data_origin: "swissmedic_package",
+              expiry_date: row[COLUMNS_FEBRUARY_2019.keys.index(:expiry_date)].value.to_s,
+              company_name: row[COLUMNS_FEBRUARY_2019.keys.index(:company)].value.to_s,
+              size: row[COLUMNS_FEBRUARY_2019.keys.index(:size)].value.to_s,
+              unit: row[COLUMNS_FEBRUARY_2019.keys.index(:unit)].value.to_s
             }
           end
         end
@@ -342,21 +345,26 @@ module Oddb2xml
       cleanup_file
       data
     end
-    private
-    def cleanup_file
-      begin
-        File.unlink(@filename) if File.exists?(@filename)
-        rescue Errno::EACCES # Permission Denied on Windows
-      end unless defined?(RSpec)
-    end
 
+    private
+
+    def cleanup_file
+      unless defined?(RSpec)
+        begin
+          File.unlink(@filename) if File.exist?(@filename)
+        rescue Errno::EACCES # Permission Denied on Windows
+        end
+      end
+    end
   end
+
   class MigelExtractor < Extractor
     def initialize(bin)
       Oddb2xml.log("MigelExtractor #{io} #{File.size(io)} bytes")
-      book = Spreadsheet.open(io, 'rb')
+      book = Spreadsheet.open(io, "rb")
       @sheet = book.worksheet(0)
     end
+
     def to_hash
       data = {}
       @sheet.each_with_index do |row, i|
@@ -366,15 +374,15 @@ module Oddb2xml
         ean13 = row[0]
         ean13 = phar unless ean13.to_s.length == 13
         data[ean] = {
-          :refdata         => true,
-          :ean13           => ean13,
-          :pharmacode      => phar,
-          :desc_de         => row[3],
-          :desc_fr         => row[4],
-          :quantity        => row[5], # quantity
-          :company_name    => row[6],
-          :company_ean     => row[7],
-          :data_origin     => 'migel'
+          refdata: true,
+          ean13: ean13,
+          pharmacode: phar,
+          desc_de: row[3],
+          desc_fr: row[4],
+          quantity: row[5], # quantity
+          company_name: row[6],
+          company_ean: row[7],
+          data_origin: "migel"
         }
       end
       data
@@ -383,26 +391,26 @@ module Oddb2xml
 
   class SwissmedicInfoExtractor < Extractor
     def to_hash
-      data = Hash.new{|h,k| h[k] = [] }
+      data = Hash.new { |h, k| h[k] = [] }
       return data unless @xml.size > 0
-      result = MedicalInformationsContent.parse(@xml.sub(Strip_For_Sax_Machine, ''), :lazy => true)
+      result = MedicalInformationsContent.parse(@xml.sub(Strip_For_Sax_Machine, ""), lazy: true)
       result.medicalInformation.each do |pac|
         lang = pac.lang.to_s
-        next unless lang =~ /de|fr/
+        next unless /de|fr/.match?(lang)
         item = {}
         item[:refdata] = true
-        item[:data_origin] = 'swissmedic_info'
-        item[:name]  = (name = pac.title) ? name : ''
-        item[:owner] = (ownr = pac.authHolder) ? ownr : ''
-        item[:style] =  Nokogiri::HTML.fragment(pac.style).to_html(:encoding => 'UTF-8')
-        html = Nokogiri::HTML.fragment(pac.content.force_encoding('UTF-8'))
+        item[:data_origin] = "swissmedic_info"
+        item[:name] = (name = pac.title) ? name : ""
+        item[:owner] = (ownr = pac.authHolder) ? ownr : ""
+        item[:style] = Nokogiri::HTML.fragment(pac.style).to_html(encoding: "UTF-8")
+        html = Nokogiri::HTML.fragment(pac.content.force_encoding("UTF-8"))
         item[:paragraph] = html
-        numbers =  /(\d{5})[,\s]*(\d{5})?|(\d{5})[,\s]*(\d{5})?[,\s]*(\d{5})?/.match(html)
+        numbers = /(\d{5})[,\s]*(\d{5})?|(\d{5})[,\s]*(\d{5})?[,\s]*(\d{5})?/.match(html)
         if numbers
-              [$1, $2, $3].compact.each do |n| # plural
-                item[:monid] = n
-                data[lang] << item
-              end
+          [$1, $2, $3].compact.each do |n| # plural
+            item[:monid] = n
+            data[lang] << item
+          end
         end
       end
       data
@@ -414,27 +422,28 @@ module Oddb2xml
       Oddb2xml.log("EphaExtractor #{str.size} bytes")
       @io = StringIO.new(str)
     end
+
     def to_arry
       data = []
       ixno = 0
       inhalt = @io.read
       inhalt.split("\n").each do |line|
         ixno += 1
-        next if /ATC1.*Name1.*ATC2.*Name2/.match(line)
-        #line = '"'+line unless /^"/.match(line)
+        next if /ATC1.*Name1.*ATC2.*Name2/.match?(line)
+        # line = '"'+line unless /^"/.match(line)
         begin
-          row = CSV.parse_line(line.gsub('""','"'))
+          row = CSV.parse_line(line.gsub('""', '"'))
           action = {}
           next unless row.size > 8
-          action[:data_origin] = 'epha'
-          action[:ixno]      = ixno
-          action[:title]     = row[4]
-          action[:atc1]      = row[0]
-          action[:atc2]      = row[2]
+          action[:data_origin] = "epha"
+          action[:ixno] = ixno
+          action[:title] = row[4]
+          action[:atc1] = row[0]
+          action[:atc2] = row[2]
           action[:mechanism] = row[5]
-          action[:effect]    = row[6]
-          action[:measures]  = row[7]
-          action[:grad]      = row[8]
+          action[:effect] = row[6]
+          action[:measures] = row[7]
+          action[:grad] = row[8]
           data << action
         rescue CSV::MalformedCSVError
           puts "CSV::MalformedCSVError in line #{ixno}: #{line}"
@@ -443,138 +452,146 @@ module Oddb2xml
       data
     end
   end
+
   class MedregbmExtractor < Extractor
     def initialize(str, type)
-      @io   = StringIO.new(str)
+      @io = StringIO.new(str)
       @type = type
     end
+
     def to_arry
       data = []
       case @type
       when :company
         while line = @io.gets
           row = line.chomp.split("\t")
-          next if row[0] =~ /^GLN/
+          next if /^GLN/.match?(row[0])
           data << {
-            :data_origin   => 'medreg',
-            :gln           => row[0].to_s.gsub(/[^0-9]/, ''), #=> GLN Betrieb
-            :name_1        => row[1].to_s,                    #=> Betriebsname 1
-            :name_2        => row[2].to_s,                    #=> Betriebsname 2
-            :address       => row[3].to_s,                    #=> Strasse
-            :number        => row[4].to_s,                    #=> Nummer
-            :post          => row[5].to_s,                    #=> PLZ
-            :place         => row[6].to_s,                    #=> Ort
-            :region        => row[7].to_s,                    #=> Bewilligungskanton
-            :country       => row[8].to_s,                    #=> Land
-            :type          => row[9].to_s,                    #=> Betriebstyp
-            :authorization => row[10].to_s,                   #=> BTM Berechtigung
+            data_origin: "medreg",
+            gln: row[0].to_s.gsub(/[^0-9]/, ""), #=> GLN Betrieb
+            name_1: row[1].to_s, #=> Betriebsname 1
+            name_2: row[2].to_s, #=> Betriebsname 2
+            address: row[3].to_s, #=> Strasse
+            number: row[4].to_s, #=> Nummer
+            post: row[5].to_s, #=> PLZ
+            place: row[6].to_s, #=> Ort
+            region: row[7].to_s, #=> Bewilligungskanton
+            country: row[8].to_s, #=> Land
+            type: row[9].to_s, #=> Betriebstyp
+            authorization: row[10].to_s #=> BTM Berechtigung
           }
         end
       when :person
         while line = @io.gets
           row = line.chomp.split("\t")
-          next if row[0] =~ /^GLN/
+          next if /^GLN/.match?(row[0])
           data << {
-            :data_origin   => 'medreg',
-            :gln           => row[0].to_s.gsub(/[^0-9]/, ''), #=> GLN Person
-            :last_name     => row[1].to_s,                    #=> Name
-            :first_name    => row[2].to_s,                    #=> Vorname
-            :post          => row[3].to_s,                    #=> PLZ
-            :place         => row[4].to_s,                    #=> Ort
-            :region        => row[5].to_s,                    #=> Bewilligungskanton
-            :country       => row[6].to_s,                    #=> Land
-            :license       => row[7].to_s,                    #=> Bewilligung Selbstdispensation
-            :certificate   => row[8].to_s,                    #=> Diplom
-            :authorization => row[9].to_s,                    #=> BTM Berechtigung
+            data_origin: "medreg",
+            gln: row[0].to_s.gsub(/[^0-9]/, ""), #=> GLN Person
+            last_name: row[1].to_s, #=> Name
+            first_name: row[2].to_s, #=> Vorname
+            post: row[3].to_s, #=> PLZ
+            place: row[4].to_s, #=> Ort
+            region: row[5].to_s, #=> Bewilligungskanton
+            country: row[6].to_s, #=> Land
+            license: row[7].to_s, #=> Bewilligung Selbstdispensation
+            certificate: row[8].to_s, #=> Diplom
+            authorization: row[9].to_s #=> BTM Berechtigung
           }
         end
       end
       data
     end
   end
+
   class ZurroseExtractor < Extractor
     # see http://dev.ywesee.com/Bbmb/TransferDat
     def initialize(dat, extended = false, artikelstamm = false)
       @@extended = extended
       @artikelstamm = artikelstamm
       FileUtils.makedirs(WorkDir)
-      @@error_file ||= File.open(File.join(WorkDir, "duplicate_ean13_from_zur_rose.txt"), 'wb+:ISO-8859-14')
+      @@error_file ||= File.open(File.join(WorkDir, "duplicate_ean13_from_zur_rose.txt"), "wb+:ISO-8859-14")
       @@items_without_ean13s ||= 0
       @@duplicated_ean13s ||= 0
       @@zur_rose_items ||= 0
       if dat
-        if File.exists?(dat)
-          @io = File.open(dat, 'rb:ISO-8859-14')
+        @io = if File.exist?(dat)
+          File.open(dat, "rb:ISO-8859-14")
         else
-          @io = StringIO.new(dat)
+          StringIO.new(dat)
         end
         @io
-      else
-         nil
       end
     end
+
     def to_hash
       data = {}
-      while line = @io.gets
-        ean13 = "-1"
-        line = Oddb2xml.patch_some_utf8(line).chomp
-        # next unless /(7680\d{9})(\d{1})$/.match(line) # Skip non pharma
-        next if line =~ /(ad us\.* vet)|(\(vet\))/i
-        if @@extended
-          next unless line =~ /(\d{13})(\d{1})$/
-        else
-          next unless line =~ /(7680\d{9})(\d{1})$/
-        end
-        pharma_code = line[3..9]
-        if $1.to_s == '0000000000000'
-          @@items_without_ean13s += 1
-          next if @artikelstamm && pharma_code.to_i == 0
-          ean13 = Oddb2xml::FAKE_GTIN_START + pharma_code.to_s unless @artikelstamm
-        else
-          ean13 = $1
-        end
-        if data[ean13]
-          @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"
-          @@items_without_ean13s -= 1
-          @@duplicated_ean13s += 1
-          next
-        end
+      if @io
+        while line = @io.gets
+          ean13 = "-1"
+          line = Oddb2xml.patch_some_utf8(line).chomp
+          # next unless /(7680\d{9})(\d{1})$/.match(line) # Skip non pharma
+          next if /(ad us\.* vet)|(\(vet\))/i.match?(line)
+          if @@extended
+            next unless /(\d{13})(\d{1})$/.match?(line)
+          else
+            next unless line =~ /(7680\d{9})(\d{1})$/
+          end
+          pharma_code = line[3..9]
+          if $1.to_s == "0000000000000"
+            @@items_without_ean13s += 1
+            next if @artikelstamm && pharma_code.to_i == 0
+            ean13 = Oddb2xml::FAKE_GTIN_START + pharma_code.to_s unless @artikelstamm
+          else
+            ean13 = $1
+          end
+          if data[ean13]
+            @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"
+            @@items_without_ean13s -= 1
+            @@duplicated_ean13s += 1
+            next
+          end
 
-        pexf = sprintf("%.2f", line[60,6].gsub(/(\d{2})$/, '.\1').to_f)
-        ppub =  sprintf("%.2f", line[66,6].gsub(/(\d{2})$/, '.\1').to_f)
-        next if  @artikelstamm && /^113/.match(line) && ppub.eql?('0.0') && pexf.eql?('0.0')
-        next unless ean13
-        key = ean13
-        key =  (Oddb2xml::FAKE_GTIN_START + pharma_code.to_s) if ean13.to_i <= 0 # dummy ean13
-        data[key] = {
-          :data_origin   => 'zur_rose',
-          :line   => line.chomp,
-          :ean13 => ean13,
-          :clag  => line[73],
-          :vat   => line[96],
-          :description => line[10..59].sub(/\s+$/, ''),
-          :quantity => '',
-          :pharmacode => pharma_code,
-          :price => pexf,
-          :pub_price => ppub,
-          :type => :nonpharma,
-          :cmut => line[2],
-        }
-        @@zur_rose_items += 1
-      end if @io
-      if defined?(@@extended) and @@extended
+          pexf = sprintf("%.2f", line[60, 6].gsub(/(\d{2})$/, '.\1').to_f)
+          ppub = sprintf("%.2f", line[66, 6].gsub(/(\d{2})$/, '.\1').to_f)
+          next if @artikelstamm && /^113/.match(line) && ppub.eql?("0.0") && pexf.eql?("0.0")
+          next unless ean13
+          key = ean13
+          key = (Oddb2xml::FAKE_GTIN_START + pharma_code.to_s) if ean13.to_i <= 0 # dummy ean13
+          data[key] = {
+            data_origin: "zur_rose",
+            line: line.chomp,
+            ean13: ean13,
+            clag: line[73],
+            vat: line[96],
+            description: line[10..59].sub(/\s+$/, ""),
+            quantity: "",
+            pharmacode: pharma_code,
+            price: pexf,
+            pub_price: ppub,
+            type: :nonpharma,
+            cmut: line[2]
+          }
+          @@zur_rose_items += 1
+        end
+      end
+      if defined?(@@extended) && @@extended
         @@error_file.puts get_error_msg
       end
       @@error_file.close
       @@error_file = nil
       data
     end
-    at_exit do
-      puts get_error_msg
-    end if defined?(@@extended) and @@extended
-private
+    if defined?(@@extended) && @@extended
+      at_exit do
+        puts get_error_msg
+      end
+    end
+
+    private
+
     def get_error_msg
-      if defined?(@@extended) and @@extended
+      if defined?(@@extended) && @@extended
         msg = "Added #{@@items_without_ean13s} via pharmacodes of #{@@zur_rose_items} items when extracting the transfer.dat from \"Zur Rose\""
         msg += "\n  found #{@@duplicated_ean13s} lines with duplicated ean13" if @@duplicated_ean13s > 0
         return msg

@@ -1,13 +1,11 @@
-# encoding: utf-8
-
-require 'spec_helper'
+require "spec_helper"
 require "rexml/document"
-require 'webmock/rspec'
+require "webmock/rspec"
 include REXML
 RUN_ALL = true
 
 describe Oddb2xml::Builder do
-  raise "Cannot rspec in directroy containing a spac" if / /.match(Oddb2xml::SpecData)
+  raise "Cannot rspec in directroy containing a spac" if / /.match?(Oddb2xml::SpecData)
   NrExtendedArticles = 34
   NrSubstances = 14
   NrLimitations = 5
@@ -27,12 +25,13 @@ describe Oddb2xml::Builder do
     binding.pry if defined?(Pry) && !@inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
+
   def common_run_init(options = {})
     @savedDir = Dir.pwd
-    @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb2xml.xsd'))
-    @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), '..', 'oddb_calc.xsd'))
-    @elexis_v5_xsd = File.expand_path(File.join(__FILE__, '..', '..', 'Elexis_Artikelstamm_v5.xsd'))
-    @elexis_v5_csv = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.csv")
+    @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), "..", "oddb2xml.xsd"))
+    @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), "..", "oddb_calc.xsd"))
+    @elexis_v5_xsd = File.expand_path(File.join(__FILE__, "..", "..", "Elexis_Artikelstamm_v5.xsd"))
+    @elexis_v5_csv = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.csv")
 
     expect(File.exist?(@oddb2xml_xsd)).to eq true
     expect(File.exist?(@oddb_calc_xsd)).to eq true
@@ -44,33 +43,33 @@ describe Oddb2xml::Builder do
   end
 
   after(:all) do
-    Dir.chdir @savedDir if @savedDir and File.directory?(@savedDir)
+    Dir.chdir @savedDir if @savedDir && File.directory?(@savedDir)
   end
-  context 'when artikelstamm option is given' do
+  context "when artikelstamm option is given" do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.parse(['--artikelstamm']) # , '--log'])
+      options = Oddb2xml::Options.parse(["--artikelstamm"]) # , '--log'])
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
       Oddb2xml::Cli.new(options).run # to debug
-      @artikelstamm_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.xml")
+      @artikelstamm_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml")
       @doc = Nokogiri::XML(File.open(@artikelstamm_name))
       # @rexml = REXML::Document.new File.read(@artikelstamm_name)
       @inhalt = IO.read(@artikelstamm_name)
     end
 
-    it 'should exist' do
-      expect(File.exists?(@artikelstamm_name)).to eq true
+    it "should exist" do
+      expect(File.exist?(@artikelstamm_name)).to eq true
     end
 
-    it 'should create transfer.ut8' do
-      expect(File.exists?(File.join(Oddb2xml::Downloads, 'transfer.utf8'))).to eq true
+    it "should create transfer.ut8" do
+      expect(File.exist?(File.join(Oddb2xml::Downloads, "transfer.utf8"))).to eq true
     end
 
-    it 'should have a comment' do
-      expect(@inhalt).to match /<!--Produced by/
+    it "should have a comment" do
+      expect(@inhalt).to match(/<!--Produced by/)
     end
 
-    it 'should have a GTIN and a public price with 14 chars (ean14)' do
+    it "should have a GTIN and a public price with 14 chars (ean14)" do
       # Till January 2021 it was possible to find a price via transfer.dat
       # as the pharmacode was given in the refdata_NonPharma.xml
       expected = %(<ITEM PHARMATYPE="N">
@@ -85,7 +84,7 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
-    it 'should have a ATC for product PRIORIX TETRA' do
+    it "should have a ATC for product PRIORIX TETRA" do
       expected = %(<PRODUCT>
             <PRODNO>5815801</PRODNO>
             <SALECD>A</SALECD>
@@ -96,35 +95,35 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
-    it 'should produce a Elexis_Artikelstamm_v5.csv' do
-      expect(File.exists?(@elexis_v5_csv)).to eq true
-      inhalt = File.open(@elexis_v5_csv, 'r+').read
+    it "should produce a Elexis_Artikelstamm_v5.csv" do
+      expect(File.exist?(@elexis_v5_csv)).to eq true
+      inhalt = File.open(@elexis_v5_csv, "r+").read
       expect(inhalt.size).to be > 0
-      expect(inhalt).to match /7680284860144/
+      expect(inhalt).to match(/7680284860144/)
     end
 
-    it 'should NOT generate a v3 nonpharma xml' do
-      v3_name = @artikelstamm_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_N_')
+    it "should NOT generate a v3 nonpharma xml" do
+      v3_name = @artikelstamm_name.sub("_v5.xml", "_v3.xml").sub("artikelstamm_", "artikelstamm_N_")
       expect(File.exist?(v3_name)).to eq false
     end
 
-    it 'should NOT generate a vx pharma xml' do
-      v3_name = @artikelstamm_name.sub('_v5.xml', '_v3.xml').sub('artikelstamm_', 'artikelstamm_P_')
+    it "should NOT generate a vx pharma xml" do
+      v3_name = @artikelstamm_name.sub("_v5.xml", "_v3.xml").sub("artikelstamm_", "artikelstamm_P_")
       expect(File.exist?(v3_name)).to eq false
     end
 
-    it 'should contain a LIMITATION_PTS' do
-      expect(@inhalt.index('<LIMITATION_PTS>40</LIMITATION_PTS>')).not_to be nil
+    it "should contain a LIMITATION_PTS" do
+      expect(@inhalt.index("<LIMITATION_PTS>40</LIMITATION_PTS>")).not_to be nil
     end
 
-    it 'should find price from Preparations.xml by setting' do
-      expect(File.exists?(@elexis_v5_csv)).to eq true
-      inhalt = File.open(@elexis_v5_csv, 'r+').read
+    it "should find price from Preparations.xml by setting" do
+      expect(File.exist?(@elexis_v5_csv)).to eq true
+      inhalt = File.open(@elexis_v5_csv, "r+").read
       expected = %(7680658560014,Dibase 10'000 Tropfen 10000 IE/ml Fl 10 ml,,Flasche(n),5,9.25,6585601,A11CC05,,"",,SL)
       expect(inhalt.index(expected)).to be > 0
     end
 
-    it 'should contain a PRODUCT which was not in refdata' do
+    it "should contain a PRODUCT which was not in refdata" do
       expected = %(<PRODUCT>
             <PRODNO>5559401</PRODNO>
             <SALECD>A</SALECD>
@@ -135,12 +134,12 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
-    it 'should have a price for Lynparza' do
-      expect(File.exists?(@elexis_v5_csv)).to eq true
-      inhalt = File.open(@elexis_v5_csv, 'r+').read
+    it "should have a price for Lynparza" do
+      expect(File.exist?(@elexis_v5_csv)).to eq true
+      inhalt = File.open(@elexis_v5_csv, "r+").read
       expect(inhalt.index('7680651600014,Lynparza Kaps 50 mg 448 Stk,,Kapsel(n),5562.48,5947.55,6516001,L01XX46,,"",,S')).not_to be nil
     end
-    it 'should trim the ean13 to 13 length' do
+    it "should trim the ean13 to 13 length" do
       gtin14 = "00040565124346"
       expect(gtin14.length).to eq 14
       expected14 = %(<GTIN>#{gtin14}</GTIN>)
@@ -151,35 +150,35 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected13)).not_to be nil
     end
 
-    it 'should not contain a GTIN=0' do
-      expect(@inhalt.index('GTIN>0</GTIN')).to be nil
+    it "should not contain a GTIN=0" do
+      expect(@inhalt.index("GTIN>0</GTIN")).to be nil
     end
 
-    it 'should contain a GTIN starting 0' do
-      expect(@inhalt.index('GTIN>0')).to be > 0
+    it "should contain a GTIN starting 0" do
+      expect(@inhalt.index("GTIN>0")).to be > 0
     end
 
-    it 'should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
+    it "should a DSCRF for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m" do
       skip("Where does the DSCR for 4042809018288 come from. It should be TENSOPLAST bande compression 5cmx4.5m")
     end
 
-    it 'should NOT add GTIN 7680172330414 SELSUN and ean13 start with 7680 (Swissmedic) which is marked as inactive in transfer.dat' do
+    it "should NOT add GTIN 7680172330414 SELSUN and ean13 start with 7680 (Swissmedic) which is marked as inactive in transfer.dat" do
       @inhalt = IO.read(@artikelstamm_name)
-      expect(@inhalt.index('7680172330414')).to be nil
+      expect(@inhalt.index("7680172330414")).to be nil
     end
 
-    it 'should add GTIN 3605520301605 Armani Attitude which is marked as inactive in transfer.dat' do
+    it "should add GTIN 3605520301605 Armani Attitude which is marked as inactive in transfer.dat" do
       @inhalt = IO.read(@artikelstamm_name)
-      expect(@inhalt.index('3605520301605')).not_to be nil
+      expect(@inhalt.index("3605520301605")).not_to be nil
     end
 
-    it 'should add BIOMARIS Voll Meersalz which is marked as inactive in transfer.dat but has PPUB and PEXF' do
+    it "should add BIOMARIS Voll Meersalz which is marked as inactive in transfer.dat but has PPUB and PEXF" do
       @inhalt = IO.read(@artikelstamm_name)
-      expect(@inhalt.index('BIOMARIS Voll Meersalz 500 g')).not_to be nil
+      expect(@inhalt.index("BIOMARIS Voll Meersalz 500 g")).not_to be nil
     end
 
-    it 'Should not contain PHAR 8809544 Sildenavil with pexf and ppub 0.0' do
-#1128809544Sildenafil Suspension 7mg/ml 100ml                0030850045801000000000000000000000002
+    it "Should not contain PHAR 8809544 Sildenavil with pexf and ppub 0.0" do
+      # 1128809544Sildenafil Suspension 7mg/ml 100ml                0030850045801000000000000000000000002
       @inhalt = IO.read(@artikelstamm_name)
       expected = %(<ITEM PHARMATYPE="N">
             <GTIN>9999998809544</GTIN>
@@ -193,19 +192,19 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).to be nil
     end
 
-    it 'should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m' do
+    it "should a company EAN for 4042809018288 TENSOPLAST Kompressionsbinde 5cmx4.5m" do
       skip("Where does the COMP GLN for 4042809018288 come from. It should be 7601003468441")
     end
 
-    it 'shoud contain Lamivudinum as 3TC substance' do
-      expect(@inhalt.index('<SUBSTANCE>Lamivudinum</SUBSTANCE>')).not_to be nil
+    it "shoud contain Lamivudinum as 3TC substance" do
+      expect(@inhalt.index("<SUBSTANCE>Lamivudinum</SUBSTANCE>")).not_to be nil
     end
 
-    it 'shoud contain GENERIC_TYPE' do
-      expect(@inhalt.index('<GENERIC_TYPE')).not_to be nil
+    it "shoud contain GENERIC_TYPE" do
+      expect(@inhalt.index("<GENERIC_TYPE")).not_to be nil
     end
 
-    it 'should contain DIBASE with phar' do
+    it "should contain DIBASE with phar" do
       expected = %(<ITEM PHARMATYPE="P">
             <GTIN>7680658560014</GTIN>
             <SALECD>A</SALECD>
@@ -229,16 +228,16 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
-    it 'should contain PEVISONE Creme 30 g' do
-      expect(@inhalt.index('Pevisone Creme 15 g')).not_to be nil # 7680406620144
-      expect(@inhalt.index('Pevisone Creme 30 g')).not_to be nil # 7680406620229
+    it "should contain PEVISONE Creme 30 g" do
+      expect(@inhalt.index("Pevisone Creme 15 g")).not_to be nil # 7680406620144
+      expect(@inhalt.index("Pevisone Creme 30 g")).not_to be nil # 7680406620229
       # Should also check for price!
     end
-    it 'should validate against artikelstamm.xsd' do
+    it "should validate against artikelstamm.xsd" do
       validate_via_xsd(@elexis_v5_xsd, @artikelstamm_name)
     end
-      tests = { 'item 7680403330459 CARBADERM only in Preparations(SL) with public price' =>
-        %(<ITEM PHARMATYPE="P">
+    tests = {"item 7680403330459 CARBADERM only in Preparations(SL) with public price" =>
+      %(<ITEM PHARMATYPE="P">
             <GTIN>7680403330459</GTIN>
             <SALECD>A</SALECD>
             <DSCR>Carbaderm Creme Tb 300 ml</DSCR>
@@ -249,8 +248,8 @@ describe Oddb2xml::Builder do
             <IKSCAT>D</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
         </ITEM>),
-        'item 4042809018288 TENSOPLAST' =>
-      %(<ITEM PHARMATYPE="N">
+             "item 4042809018288 TENSOPLAST" =>
+    %(<ITEM PHARMATYPE="N">
             <GTIN>4042809018288</GTIN>
             <PHAR>0055805</PHAR>
             <SALECD>A</SALECD>
@@ -259,7 +258,7 @@ describe Oddb2xml::Builder do
             <PEXF>0.00</PEXF>
             <PPUB>22.95</PPUB>
         </ITEM>),
-         'product 3247501 LANSOYL' => '<ITEM PHARMATYPE="P">
+             "product 3247501 LANSOYL" => '<ITEM PHARMATYPE="P">
             <GTIN>7680324750190</GTIN>
             <SALECD>A</SALECD>
             <DSCR>LANSOYL Gel 225 g</DSCR>
@@ -278,8 +277,8 @@ describe Oddb2xml::Builder do
             <LPPV>true</LPPV>
             <PRODNO>3247501</PRODNO>
         </ITEM>',
-        'product 5366201 3TC' =>
-      %(<ITEM PHARMATYPE="P">
+             "product 5366201 3TC" =>
+    %(<ITEM PHARMATYPE="P">
             <GTIN>7680536620137</GTIN>
             <SALECD>A</SALECD>
             <DSCR>3TC Filmtabl 150 mg 60 Stk</DSCR>
@@ -301,8 +300,8 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>5366201</PRODNO>
         </ITEM>),
-        'item 7680161050583 HIRUDOID 40g' =>
-         %(<ITEM PHARMATYPE="P">
+             "item 7680161050583 HIRUDOID 40g" =>
+       %(<ITEM PHARMATYPE="P">
             <GTIN>7680161050583</GTIN>
             <SALECD>A</SALECD>
             <DSCR>Hirudoid Creme 3 mg/g 40 g</DSCR>
@@ -322,8 +321,8 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>1610501</PRODNO>
         </ITEM>),
-        'item 7680161050743 Hirudoid Creme 3 mg/g 100 g' =>
-              %( <ITEM PHARMATYPE="P">
+             "item 7680161050743 Hirudoid Creme 3 mg/g 100 g" =>
+            %( <ITEM PHARMATYPE="P">
             <GTIN>7680161050743</GTIN>
             <SALECD>A</SALECD>
             <DSCR>Hirudoid Creme 3 mg/g 100 g</DSCR>
@@ -338,7 +337,7 @@ describe Oddb2xml::Builder do
             <IKSCAT>D</IKSCAT>
             <DEDUCTIBLE>10</DEDUCTIBLE>
         </ITEM>),
-        'item 7680284860144 ANCOPIR' =>'<ITEM PHARMATYPE="P">
+             "item 7680284860144 ANCOPIR" => '<ITEM PHARMATYPE="P">
             <GTIN>7680284860144</GTIN>
             <SALECD>A</SALECD>
             <DSCR>ANCOPIR Inj Lös 5 Amp 2 ml</DSCR>
@@ -359,7 +358,7 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>2848601</PRODNO>
         </ITEM>',
-                'FERRO-GRADUMET price from ZurRose  ' => %(<ITEM PHARMATYPE="P">
+             "FERRO-GRADUMET price from ZurRose  " => %(<ITEM PHARMATYPE="P">
             <GTIN>7680316440115</GTIN>
             <SALECD>A</SALECD>
             <DSCR>FERRO-GRADUMET Depottabl 30 Stk</DSCR>
@@ -378,7 +377,7 @@ describe Oddb2xml::Builder do
             <IKSCAT>C</IKSCAT>
             <PRODNO>3164402</PRODNO>
         </ITEM>),
-      'product 3TC Filmtabl' => %(<PRODUCT>
+             "product 3TC Filmtabl" => %(<PRODUCT>
             <PRODNO>5366201</PRODNO>
             <SALECD>A</SALECD>
             <DSCR>3TC Filmtabl 150 mg</DSCR>
@@ -386,7 +385,7 @@ describe Oddb2xml::Builder do
             <ATC>J05AF05</ATC>
             <SUBSTANCE>Lamivudinum</SUBSTANCE>
         </PRODUCT>),
-        'nur aus Packungen Coeur-Vaisseaux Sérocytol,' => %(<ITEM PHARMATYPE="P">
+             "nur aus Packungen Coeur-Vaisseaux Sérocytol," => %(<ITEM PHARMATYPE="P">
             <GTIN>7680002770014</GTIN>
             <SALECD>A</SALECD>
             <DSCR>SEROCYTOL Herz-Gefässe Supp 3 Stk</DSCR>
@@ -402,7 +401,7 @@ describe Oddb2xml::Builder do
             <IKSCAT>B</IKSCAT>
             <PRODNO>0027701</PRODNO>
         </ITEM>),
-        'HUMALOG (Richter)' => %(<ITEM PHARMATYPE="P">
+             "HUMALOG (Richter)" => %(<ITEM PHARMATYPE="P">
             <GTIN>7680532900196</GTIN>
             <SALECD>A</SALECD>
             <DSCR>Humalog Inj Lös Durchstf 10 ml</DSCR>
@@ -423,7 +422,7 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>20</DEDUCTIBLE>
             <PRODNO>5329001</PRODNO>
         </ITEM>),
-        'Kolon with Pharmacode for EAN 7680002780013' => %(<ITEM PHARMATYPE="P">
+             "Kolon with Pharmacode for EAN 7680002780013" => %(<ITEM PHARMATYPE="P">
             <GTIN>7680002780013</GTIN>
             <PHAR>0361821</PHAR>
             <SALECD>I</SALECD>
@@ -435,7 +434,7 @@ describe Oddb2xml::Builder do
             <PEXF>22.75</PEXF>
             <PPUB>39.60</PPUB>
         </ITEM>),
-       'Varilrix product' => %(<PRODUCT>
+             "Varilrix product" => %(<PRODUCT>
             <PRODNO>0058501</PRODNO>
             <SALECD>A</SALECD>
             <DSCR>Varilrix Trockensub c solv</DSCR>
@@ -444,7 +443,7 @@ describe Oddb2xml::Builder do
             <LIMNAMEBAG>0808</LIMNAMEBAG>
             <SUBSTANCE>Vaccinum virus varicellae vivus attenuat. (Stamm OKA)</SUBSTANCE>
         </PRODUCT>),
-        'Varilrix item' => %(<ITEM PHARMATYPE="P">
+             "Varilrix item" => %(<ITEM PHARMATYPE="P">
             <GTIN>7680005850010</GTIN>
             <SALECD>A</SALECD>
             <DSCR>Varilrix Trockensub c solv Fertspr 0.500 ml</DSCR>
@@ -460,14 +459,14 @@ describe Oddb2xml::Builder do
             <DEDUCTIBLE>10</DEDUCTIBLE>
             <PRODNO>0058501</PRODNO>
         </ITEM),
-        'Chapter 70 product' => %(<PRODUCT>
+             "Chapter 70 product" => %(<PRODUCT>
             <PRODNO>2069639</PRODNO>
             <!--Chapter70 hack prodno 2069639 Ceres Urtinkturen gemäss L2 mit - im Kommentar-->
             <SALECD>A</SALECD>
             <DSCR>Ceres Urtinkturen gemäss L2 mit -- im Kommentar</DSCR>
             <DSCRF/>
         </PRODUCT>),
-        'Chapter 70 item' => %(<ITEM PHARMATYPE="P">
+             "Chapter 70 item" => %(<ITEM PHARMATYPE="P">
             <GTIN>2500000588532</GTIN>
             <PHAR>2069639</PHAR>
             <SALECD>A</SALECD>
@@ -479,33 +478,31 @@ describe Oddb2xml::Builder do
             <SL_ENTRY>true</SL_ENTRY>
             <PRODNO>2069639</PRODNO>
         </ITEM>),
-        'HTML-encoded limitation' => %(<DSCR>Zur Erhaltungstherapie (Monotherapie) bei erwachsenen Patientinnen mit rezidiviertem, fortgeschrittenem Ovarialkarzinom mit BRCA Mutation im Anschluss an eine platinhaltige Chemotherapie bei Vorliegen einer kompletten oder partiellen Remission.
+             "HTML-encoded limitation" => %(<DSCR>Zur Erhaltungstherapie (Monotherapie) bei erwachsenen Patientinnen mit rezidiviertem, fortgeschrittenem Ovarialkarzinom mit BRCA Mutation im Anschluss an eine platinhaltige Chemotherapie bei Vorliegen einer kompletten oder partiellen Remission.
 
 Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorgegebenen Internettool des Registers, abrufbar auf http://www.olaparib-registry.ch, zu erfassen. Eine schriftliche Einwilligung der Patientin muss vorliegen. Es sind folgende Daten zu erfassen:
 
 1\)	Geburtsjahr, sowie Vortherapien für das OC
 
 2\)	Datum Therapiestart, Dosierung, Dosisanpassungen, Datum Therapieende.
-</DSCR>),
-              }
+</DSCR>)}
 
-      tests.each do |key, expected|
-        it "should a valid entry for #{key}" do
-          check_artikelstamm_xml(key, expected)
-        end
+    tests.each do |key, expected|
+      it "should a valid entry for #{key}" do
+        check_artikelstamm_xml(key, expected)
       end
+    end
   end
-  context 'chapter 70 hack' do
+  context "chapter 70 hack" do
     before(:all) do
       mock_downloads
     end
-    it 'parsing' do
-      require 'oddb2xml/chapter_70_hack'
-      result = Oddb2xml::Chapter70xtractor.parse()
+    it "parsing" do
+      require "oddb2xml/chapter_70_hack"
+      result = Oddb2xml::Chapter70xtractor.parse
       expect(result.class).to eq Array
       expect(result.first).to eq ["2069562", "70.01.10", "Urtinktur", "1--10 g/ml", "13.40", ""]
-      expect(result.last).to eq  ["6516727", "70.02", "Allergenorum extractum varium / Inj. Susp. \tFortsetzungsbehandlung", "1 Durchstfl 1.5 ml", "311.85", "L"]
+      expect(result.last).to eq ["6516727", "70.02", "Allergenorum extractum varium / Inj. Susp. \tFortsetzungsbehandlung", "1 Durchstfl 1.5 ml", "311.85", "L"]
     end
-
   end
 end
