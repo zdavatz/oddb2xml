@@ -229,7 +229,7 @@ module Oddb2xml
         
       when :migel
 # instead of Thread.new do
-        
+        begin
           downloader = MigelDownloader.new
           bin = downloader.download
           Oddb2xml.log("MigelDownloader bin #{bin.size} bytes")
@@ -238,7 +238,7 @@ module Oddb2xml
             Oddb2xml.log("MigelExtractor added #{@migel.size} migel items")
             @migel
           end
-         unless SkipMigelDownloader
+         end unless SkipMigelDownloader
       when :package
 # instead of Thread.new do
         

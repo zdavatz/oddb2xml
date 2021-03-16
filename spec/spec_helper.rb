@@ -254,8 +254,8 @@ def mock_downloads
       "https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt" => "atc.csv",
       "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt" => "oddb2xml_files_lppv.txt",
       "http://www.xn--spezialittenliste-yqb.ch/File.axd?file=XMLPublications.zip" => "XMLPublications.zip",
-      "http://www.spezialitaetenliste.ch/varia_De.htm" => "varia_De.htm"}
-        #      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml',.each do |url, file|
+      #      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml
+      "http://www.spezialitaetenliste.ch/varia_De.htm" => "varia_De.htm"}.each do |url, file|
       inhalt = File.read(File.join(Oddb2xml::SpecData, file))
       m = flexmock("open-uri")
       m.should_receive(:open).with(url).and_return(inhalt)

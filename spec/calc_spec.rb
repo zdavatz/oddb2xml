@@ -42,8 +42,7 @@ describe Oddb2xml::Calc do
     "globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins)",
     "globulina equina (immunisé avec coeur, tissu pulmonaire, reins de porcins) 8 mg, propylenglycolum, conserv.: E 216, E 218, excipiens pro suppositorio.",
     {selling_units: 3,
-      measure: "Suppositorien"}
-        # :count => 10, :multi => 1,  :dose => '')
+      measure: "Suppositorien"})
 
   tst_fluorglukose = TestExample.new("Fluorglukose",
     51908, 2, 16, "2-Fluorglukose (18-F), Injektionslösung",
@@ -51,40 +50,35 @@ describe Oddb2xml::Calc do
     "fludeoxyglucosum(18-F) zum Kalibrierungszeitpunkt",
     "fludeoxyglucosum(18-F) zum Kalibrierungszeitpunkt 0.1-8 GBq, dinatrii phosphas dihydricus, natrii dihydrogenophosphas dihydricus, natrii chloridum, antiox.: natrii thiosulfas 1.3-1.9 mg, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.",
     {selling_units: 1,
-      measure: "GBq"}
-        # :count => 10, :multi => 1,  :dose => '')
+      measure: "GBq"})
   tst_bicaNova = TestExample.new("bicaNova",
     58277, 1, 1, "bicaNova 1,5 % Glucose, Peritonealdialyselösung",
     "1500 ml", "",
     "natrii chloridum, natrii hydrogenocarbonas, calcii chloridum dihydricum, magnesii chloridum hexahydricum, glucosum anhydricum, natrium, calcium, magnesium, chloridum, hydrogenocarbonas, glucosum",
     "I) et II) corresp.: natrii chloridum 5.5 g, natrii hydrogenocarbonas 3.36 g, calcii chloridum dihydricum 184 mg, magnesii chloridum hexahydricum 102 mg, glucosum anhydricum 15 g ut glucosum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 1000 ml.",
     {selling_units: 1500,
-      measure: "ml"}
-        # :count => 10, :multi => 1,  :dose => '')
+      measure: "ml"})
   tst_kamillin = TestExample.new("Kamillin Medipharm, Bad",
     43454, 1, 101, "Kamillin Medipharm, Bad",
     "25 x 40", "ml",
     "matricariae extractum isopropanolicum liquidum",
     "haemagglutininum influenzae A (H1N1) (Virus-Stamm A/California/7/2009 (H1N1)-like: reassortant virus NYMC X-179A) 15 µg, haemagglutininum influenzae A (H3N2) (Virus-Stamm A/Texas/50/2012 (H3N2)-like: reassortant virus NYMC X-223A) 15 µg, haemagglutininum influenzae B (Virus-Stamm B/Massachusetts/2/2012-like: B/Massachusetts/2/2012) 15 µg, natrii chloridum, kalii chloridum, dinatrii phosphas dihydricus, kalii dihydrogenophosphas, residui: formaldehydum max. 100 µg, octoxinolum-9 max. 500 µg, ovalbuminum max. 0.05 µg, saccharum nihil, neomycinum nihil, aqua ad iniectabilia q.s. ad suspensionem pro 0.5 ml.",
     {selling_units: 25,
-      measure: "ml"}
-        # :count => 10, :multi => 1,  :dose => '')
+      measure: "ml"})
   tst_infloran = TestExample.new("Test Infloran, capsule",
     679, 2, 12, "Infloran, capsule",
     "2x10", "Kapsel(n)",
     "lactobacillus acidophilus cryodesiccatus, bifidobacterium infantis",
     "lactobacillus acidophilus cryodesiccatus min. 10^9 CFU, bifidobacterium infantis min. 10^9 CFU, color.: E 127, E 132, E 104, excipiens pro capsula.",
     {selling_units: 20,
-      measure: "Kapsel(n)"}
-        # :count => 10, :multi => 1,  :dose => '')
+      measure: "Kapsel(n)"})
   tst_mutagrip = TestExample.new("Test Mutagrip (Fertigspritzen)",
     373, 23, 10, "Mutagrip, Suspension zur Injektion",
     "10 x 0.5 ml", "Fertigspritze(n)",
     "ropivacainum",
     "ropivacaini hydrochloridum 2 mg, natrii chloridum, aqua ad iniectabilia q.s. ad solutionem pro 1 ml.",
     {selling_units: 10,
-      measure: "Fertigspritze(n)"}
-        # :count => 10, :multi => 1,  :dose => '')
+      measure: "Fertigspritze(n)"})
   Tst_nutriflex = TestExample.new("Nutriflex Lipid plus ohne Elektrolyte, Infusionsemulsion 1250ml",
     56089, 1, 1, "Nutriflex Lipid plus, Infusionsemulsion, 1250ml",
     "5 x 1250", "ml",
@@ -105,8 +99,7 @@ Corresp. 5300 kJ.",
     "acetazolamidum",
     "acetazolamidum 250 mg, excipiens pro compresso.",
     {selling_units: 25,
-      measure: "Tablette(n)"}
-        #:count => 25, :multi => 1)
+      measure: "Tablette(n)"})
 
   Tst_naropin = TestExample.new("Das ist eine Injektionslösung von einer Packung mit 5 x 100 ml",
     54015, 0o1, 100, "Naropin 0,2 %, Infusionslösung / Injektionslösung",

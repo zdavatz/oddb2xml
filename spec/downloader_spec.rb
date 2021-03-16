@@ -126,7 +126,7 @@ describe Oddb2xml::RefdataDownloader do
     VCR.eject_cassette
     VCR.configure do |c|
       c.before_record(:Refdata_DE) do |i|
-        if (!/WSDL$/.match(i.request.uri)()) && /refdatabase.refdata.ch\/Service/.match(i.request.uri) && (i.response.body.size > 1024 * 1024)
+        if (!/WSDL$/.match(i.request.uri)) && /refdatabase.refdata.ch\/Service/.match(i.request.uri) && (i.response.body.size > 1024 * 1024)
           puts "#{Time.now}: #{__LINE__}: Parsing response.body (#{i.response.body.size / (1024 * 1024)} MB ) will take some time. URI was #{i.request.uri}"
           doc = REXML::Document.new(i.response.body)
           items = doc.root.children.first.elements.first

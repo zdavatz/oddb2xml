@@ -451,7 +451,7 @@ class ParseComposition
       label_description = ast[:label_description].to_s if ast[:label_description]
     end
     if label
-      if label and !/((A|B|C|D|E|I|II|III|IV|\)+)\s+et\s+(A|B|C|D|E|I|II|III|IV|\))+)/.match(label)()
+      if label and !/((A|B|C|D|E|I|II|III|IV|\)+)\s+et\s+(A|B|C|D|E|I|II|III|IV|\))+)/.match(label)
         result.label = label
       end
       result.label_description = label_description.gsub(/:+$/, '').strip if label_description
