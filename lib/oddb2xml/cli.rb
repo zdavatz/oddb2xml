@@ -37,7 +37,7 @@ module Oddb2xml
     def run
       threads = []
       start_time = Time.now
-      files2rm = Dir.glob(File.join(Downloads, "*"))
+      files2rm = Dir.glob(File.join(DOWNLOADS, "*"))
       FileUtils.rm_f(files2rm, verbose: @options[:log]) if (files2rm.size > 0) && !Oddb2xml.skip_download?
       if @options[:calc] && !(@options[:extended])
         threads << download(:package) # swissmedic
@@ -147,7 +147,7 @@ module Oddb2xml
         else
           output = builder.to_xml
         end
-        File.open(File.join(WorkDir, file), "w:utf-8") do |fh|
+        File.open(File.join(WORK_DIR, file), "w:utf-8") do |fh|
           output.split("\n").each do |line|
             if /.xml$/i.match?(file)
               fh.puts(line)
@@ -158,8 +158,8 @@ module Oddb2xml
         end
         if @options[:calc]
           ext = File.extname(file)
-          dest = File.join(WorkDir, file.sub(ext, "_" + Time.now.strftime("%d.%m.%Y_%H.%M") + ext))
-          FileUtils.cp(File.join(WorkDir, file), dest, verbose: false)
+          dest = File.join(WORK_DIR, file.sub(ext, "_" + Time.now.strftime("%d.%m.%Y_%H.%M") + ext))
+          FileUtils.cp(File.join(WORK_DIR, file), dest, verbose: false)
         end
       end
     rescue Interrupt
@@ -318,7 +318,7 @@ module Oddb2xml
     def compress
       compressor = Compressor.new(prefix, @options)
       files.values.each do |file|
-        work_file = File.join(WorkDir, file)
+        work_file = File.join(WORK_DIR, file)
         if File.exist?(work_file)
           compressor.contents << work_file
         end
@@ -370,7 +370,7 @@ module Oddb2xml
       end
       if @options[:artikelstamm]
         lines << "Generated artikelstamm.xml for Elexis"
-        lines += Builder.articlestamm_v5_info_lines
+        lines += Builder::articlestamm_v5_info_lines
       elsif @options[:address]
         {
           "Betrieb" => :@companies,

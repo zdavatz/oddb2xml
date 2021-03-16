@@ -24,7 +24,7 @@ if args.size != 1
   exit 2
 end
 
-startTime = Time.now
-result = Oddb2xml::SemanticCheck.new(ARGV.first).allSemanticChecks
-diff = (Time.now - startTime).to_i
+start_time = Time.now
+Oddb2xml::SemanticCheck.new(ARGV.first).allSemanticChecks
+diff = (Time.now - start_time).to_i
 puts "#{Time.now.strftime("%H:%M:%S")}: #{__FILE__} done. Took #{diff} seconds"

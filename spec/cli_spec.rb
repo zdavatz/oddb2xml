@@ -33,20 +33,20 @@ describe Oddb2xml::Cli do
   before(:all) do
     VCR.eject_cassette
     VCR.insert_cassette("oddb2xml")
-    @savedDir = Dir.pwd
+    @saved_dir = Dir.pwd
     cleanup_directories_before_run
-    FileUtils.makedirs(Oddb2xml::WorkDir)
-    Dir.chdir(Oddb2xml::WorkDir)
+    FileUtils.makedirs(Oddb2xml::WORK_DIR)
+    Dir.chdir(Oddb2xml::WORK_DIR)
   end
   after(:all) do
-    Dir.chdir(@savedDir) if @savedDir && File.directory?(@savedDir)
+    Dir.chdir(@saved_dir) if @saved_dir && File.directory?(@saved_dir)
     cleanup_compressor
   end
 
   context "when -x address option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse("-e")
+      Oddb2xml::Options.parse("-e")
       # @cli = Oddb2xml::Cli.new(options);  @cli.run
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
@@ -76,8 +76,8 @@ describe Oddb2xml::Cli do
       expect(@cli).to have_option(tag_suffix: "md")
     end
     it "should not create a compressed file" do
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.tar.gz")).first).to be_nil
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.zip")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
     end
     it "should create xml files with prefix swiss_" do
       expected = [
@@ -89,7 +89,7 @@ describe Oddb2xml::Cli do
         "md_code.xml"
       ]
       expected.each { |name|
-        tst_file = File.join(Oddb2xml::WorkDir, name)
+        tst_file = File.join(Oddb2xml::WORK_DIR, name)
         expect(Dir.glob(tst_file).size).to eq 1
         tst_size = File.size(tst_file)
         if tst_size < 1024
@@ -115,7 +115,7 @@ describe Oddb2xml::Cli do
     it_behaves_like "any interface for product"
     it "should not create any xml file" do
       expect(@cli_output).to match(/Pharma/)
-      Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.xml")).each do |file|
+      Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
         expect(File.exist?(file)).to be_falsey
       end
     end
@@ -127,7 +127,7 @@ describe Oddb2xml::Cli do
       expect(File.exist?(file)).to eq true
     end
     it "should not create any xml file" do
-      Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.xml")).each do |file|
+      Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
         expect(File.exist?(file)).to be_falsey
       end
     end
@@ -150,9 +150,9 @@ describe Oddb2xml::Cli do
       expect(File.exist?(file)).to eq true
     end
     it "should not create any xml file" do
-      Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.xml")).each { |file| FileUtil.rm_f(file) }
+      Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each { |file| FileUtil.rm_f(file) }
       expect(@cli_output).to match(/Pharma/)
-      Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.xml")).each do |file|
+      Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
         expect(File.exist?(file)).to be_falsey
       end
     end
@@ -171,13 +171,13 @@ describe Oddb2xml::Cli do
     end
     it "should create the needed files" do
       expect(@cli_output).to match(/\sPharma\s/)
-      expect(File.exist?(File.join(Oddb2xml::Downloads, "transfer.zip"))).to eq true
-      expect(File.exist?(File.join(Oddb2xml::WorkDir, "transfer.zip"))).to eq false
-      expected = [
+      expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "transfer.zip"))).to eq true
+      expect(File.exist?(File.join(Oddb2xml::WORK_DIR, "transfer.zip"))).to eq false
+      [
         "duplicate_ean13_from_zur_rose.txt",
         "oddb.dat"
       ].each { |file|
-        expect(File.exist?(File.join(Oddb2xml::WorkDir, file))).to eq true
+        expect(File.exist?(File.join(Oddb2xml::WORK_DIR, file))).to eq true
       }
     end
   end
@@ -197,14 +197,14 @@ describe Oddb2xml::Cli do
     it "should create xml files" do
       expect(@cli_output).to match(/NonPharma/)
       file_today = "oddb_calc_#{Time.now.strftime("%d.%m.%Y_%H.%M")}.xml"
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_calc.xml")).size).to eq 1
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, file_today)).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_calc.xml")).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, file_today)).size).to eq 1
     end
     it "should create migel files" do
       expect(@cli_output).to match(/NonPharma/)
       file_today = "oddb_with_migel_#{Time.now.strftime("%d.%m.%Y_%H.%M")}.dat"
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_with_migel.dat")).size).to eq 1
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, file_today)).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_with_migel.dat")).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, file_today)).size).to eq 1
     end
   end
 
@@ -221,8 +221,8 @@ describe Oddb2xml::Cli do
     end
     it "should not create any compressed file" do
       expect(@cli_output).to match(/NonPharma/)
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.tar.gz")).first).to be_nil
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.zip")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
     end
     it "should create xml files" do
       expect(@cli_output).to match(/NonPharma/)
@@ -234,7 +234,7 @@ describe Oddb2xml::Cli do
         "oddb_interaction.xml",
         "oddb_code.xml"
       ].length
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.xml")).each do |file|
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
         expect(File.exist?(file)).to eq true
       end.to_a.length).to equal expected
     end
@@ -252,8 +252,8 @@ describe Oddb2xml::Cli do
     end
     it "should not create any compressed file" do
       expect(@cli_output).to match(/Pharma/)
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.tar.gz")).first).to be_nil
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.zip")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
     end
     it "should create xml files with prefix swiss_" do
       expect(@cli_output).to match(/Pharma/)
@@ -265,7 +265,7 @@ describe Oddb2xml::Cli do
         "swiss_interaction.xml",
         "swiss_code.xml"
       ].length
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "swiss_*.xml")).each do |file|
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "swiss_*.xml")).each do |file|
         expect(File.exist?(file)).to eq true
       end.to_a.length).to equal expected
     end
@@ -283,8 +283,8 @@ describe Oddb2xml::Cli do
     end
     it "should not create any compressed file" do
       expect(@cli_output).to match(/Pharma/)
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.tar.gz")).first).to be_nil
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.zip")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
     end
     it "should create xml files" do
       expect(@cli_output).to match(/Pharma/)
@@ -298,7 +298,7 @@ describe Oddb2xml::Cli do
         "oddb_interaction.xml",
         "oddb_code.xml"
       ].length
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.xml")).each do |file|
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
         expect(File.exist?(file)).to eq true
       end.to_a.length).to equal expected
     end
@@ -318,8 +318,8 @@ describe Oddb2xml::Cli do
       it "should not create any compressed file" do
         pending "Cannot download medreg at the moment"
         expect(@cli_output).to match(/addresses/)
-        expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.tar.gz")).first).to be_nil
-        expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.zip")).first).to be_nil
+        expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+        expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
       end
       it "should create xml files" do
         pending "Cannot download medreg at the moment"
@@ -328,7 +328,7 @@ describe Oddb2xml::Cli do
           "oddb_betrieb.xml",
           "oddb_medizinalperson.xml"
         ].length
-        expect(Dir.glob(File.join(Oddb2xml::WorkDir, "oddb_*.xml")).each do |file|
+        expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
           expect(File.exist?(file)).to eq true
         end.to_a.length).to equal expected
       end

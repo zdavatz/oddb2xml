@@ -7,7 +7,7 @@ $:.unshift root.join("lib") if $0 == __FILE__
 require "oddb2xml/version"
 require "oddb2xml/compare"
 require "optimist"
-DEFAULTSx = {
+DEFAULTS_X = {
   components: ["PRODUCTS", "LIMITATIONS", "ITEMS"],
   fields_to_ignore: ["COMP", "DOSAGE_FORMF", "MEASUREF"],
   fields_as_floats: ["PEXT", "PEXF", "PPUB"],
@@ -35,7 +35,7 @@ if args.size != 2
   exit 2
 end
 
-startTime = Time.now
-result = Oddb2xml::CompareV5.new(ARGV.first, ARGV.last, @opts).compare
-diff = (Time.now - startTime).to_i
+start_time = Time.now
+Oddb2xml::CompareV5.new(ARGV.first, ARGV.last, @opts).compare
+diff = (Time.now - start_time).to_i
 puts "#{Time.now.strftime("%H:%M:%S")}: #{__FILE__} done. Took #{diff} seconds"

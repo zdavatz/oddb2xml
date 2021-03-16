@@ -3,11 +3,9 @@ require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require "parslet/rig/rspec"
 require "parslet/convenience"
 
-RunAllParsingExamples = false # Takes over 3 minutes to run, all the other ones just a few seconds
-GoIntoPry = true
-NoGoIntoPry = false
-
-if NoGoIntoPry
+RUN_ALL_PARSING_EXAMPLES = false # Takes over 3 minutes to run, all the other ones just a few seconds
+NO_GO_INTO_PRY = false
+if NO_GO_INTO_PRY
 
   describe CompositionParser do
     let(:parser) { CompositionParser.new }
@@ -26,7 +24,8 @@ if NoGoIntoPry
       it "parses identifier" do
         text = "Solvens: conserv.: alcohol benzylicus 18 mg, aqua ad iniectabilia q.s. ad solutionem pro 2 ml."
         res1 = composition_parser.parse_with_debug(text)
-        pp res1; binding.pry
+        puts res1
+        # pp res1; binding.pry
       end
     end
   end
@@ -168,7 +167,7 @@ else
   ]
 
   nr_parsing_tests = excipiens_tests.size + substance_tests.size + composition_tests.size
-  if RunAllParsingExamples
+  if RUN_ALL_PARSING_EXAMPLES
     puts "Testing includes #{nr_parsing_tests} lines to be parsed"
   else
     puts "Skip testing includes #{nr_parsing_tests} lines to be parsed"
@@ -181,7 +180,7 @@ else
     context "should return correct dose for 2*10^9 CFU.'" do
       let(:dose_parse) { parser.dose }
 
-      should_pass = [
+      [
         "40 U.",
         "50'000 U.I.",
         "1 Mio. U.I.",
@@ -206,7 +205,7 @@ else
           expect(dose_parse).to parse(id)
         end
       }
-      should_not_pass = [
+      [
         "10 2*10^9 CFU",
         "20 20 mg",
         "50%" # This can be part of a name like ferrum-quarz 50%
@@ -263,7 +262,7 @@ else
     context "label parsing" do
       let(:label_parser) { parser.label }
 
-      should_pass = [
+      [
         "A):",
         "II)",
         "V)",
@@ -273,7 +272,7 @@ else
           expect(label_parser).to parse(id)
         end
       }
-      should_not_pass = [
+      [
         "I): albuminum humanum colloidale 0.5 mg,"
       ].each { |id|
         it "parses label #{id}" do
@@ -285,7 +284,7 @@ else
     context "substance parsing" do
       let(:substance_parser) { parser.substance }
 
-      should_pass = [
+      [
         "calcium",
         "calcium 10 mg",
         "ferrum-quarz 50% 20 mg",
@@ -298,12 +297,14 @@ else
         "DER: 6-8:1",
         "DER: 4.0-9.0:1",
         "retinoli palmitas 7900 U.I."
-      ].each { |id|
+      ].each do |id|
         it "parses substance #{id}" do
           expect(substance_parser).to parse(id)
         end
-      }
-      it "parses substance calcium, zwei" do expect(substance_parser).to_not parse("calcium, zwei") end
+      end
+      it "parses substance calcium, zwei" do
+        expect(substance_parser).to_not parse("calcium, zwei")
+      end
     end
 
     context "excipiens parsing" do
@@ -311,15 +312,17 @@ else
 
       puts "Testing whether #{excipiens_tests.size} excipiens can be parsed"
       let(:excipiens_parser) { parser.excipiens }
-      excipiens_tests.each { |value, name|
-        it "parses excipiens #{value}" do expect(excipiens_parser).to parse(value) end
-      }
+      excipiens_tests.each do |value, name|
+        it "parses excipiens #{value}" do
+          expect(excipiens_parser).to parse(value)
+        end
+      end
     end
 
     context "substance_name parsing" do
       let(:substance_name_parser) { parser.substance_name }
 
-      should_pass = [
+      [
         "calcium",
         "calendula officinalis D2",
         "pollinis allergeni extractum (Phleum pratense)",
@@ -330,7 +333,7 @@ else
         end
       }
 
-      should_not_pass = [
+      [
         "calcium 10 mg",
         "ferrum-quarz 50% 20 mg",
         "calendula officinalis D2 2.2 mg",
@@ -347,7 +350,7 @@ else
 
     context "simple_substance parsing" do
       let(:simple_substance_parser) { parser.simple_substance }
-      should_pass = [
+      [
         "2,2'-methylen-bis(6-tert.-butyl-4-methyl-phenolum)",
         "calcium part_b",
         "calcium 10",
@@ -359,7 +362,7 @@ else
           expect(simple_substance_parser).to parse(id)
         end
       }
-      should_not_pass = [
+      [
         "calcium corresp. 10 ml",
         "excipiens",
         "calcium ut magnesium",
@@ -372,7 +375,7 @@ else
     end
 
     context "substance_name parsing" do
-      should_pass = [
+      [
         "calcium",
         "calcium par_2 Part_C",
         "semecarpus anacardium D12",
@@ -390,7 +393,7 @@ else
           expect(substance_name_parser).to parse(id)
         end
       }
-      should_not_pass = [
+      [
         "calendula officinalis D2 2,2 mg",
         "calcium corresp. xx",
         "calcium residui: xx",
@@ -410,7 +413,7 @@ else
 
     context "composition parsing" do
       let(:composition_parser) { parser.composition }
-      should_pass = [
+      [
         "calcium",
         "calcium par_2 Part_C",
         "virus poliomyelitis typus inactivatum",
@@ -437,14 +440,16 @@ else
         end
       }
 
-      if RunAllParsingExamples
+      if RUN_ALL_PARSING_EXAMPLES
         specify { expect(File.exist?(AllCompositionLines)).to eq true }
         composition_lines = IO.readlines(AllCompositionLines)
         puts "Testing whether all #{composition_lines.size} lines in #{File.basename(AllCompositionLines)} can be parsed"
-        composition_lines.each { |value, name|
+        composition_lines.each do |value, name|
           let(:composition_parser) { parser.composition }
-          it "parses composition #{value}" do expect(composition_parser).to parse(value) end
-        }
+          it "parses composition #{value}" do
+            expect(composition_parser).to parse(value)
+          end
+        end
       else
         puts "Skip testing whether #{composition_tests.size} compositions and #{substance_tests.size} substances can be parsed"
       end

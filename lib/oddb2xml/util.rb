@@ -10,9 +10,9 @@ module Oddb2xml
   def self.uri_open(url)
     version = RUBY_VERSION.split(".").map { |x| x.to_i }
     if (version <=> [2, 5, 0]) >= 0
-      URI.open(url)
+      URI.parse(url).open
     else
-      open(url)
+      IO.popen(url)
     end
   end
 
@@ -28,8 +28,8 @@ module Oddb2xml
   end
 
   unless defined?(RSpec)
-    WorkDir = Dir.pwd
-    Downloads = "#{Dir.pwd}/downloads"
+    WORK_DIR = Dir.pwd
+    DOWNLOADS = "#{Dir.pwd}/DOWNLOADS"
   end
   @options = {}
   @atc_csv_origin = "https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt"
@@ -47,7 +47,7 @@ module Oddb2xml
   def self.patch_some_utf8(line)
     begin
       line = line.encode("utf-8")
-    rescue => error
+    rescue
     end
     begin
       line.tr("\u0089", "‰").tr("\u0092", "’").tr("\u0096", "-").tr("\u2013", "-").tr("\u201D", '"').chomp
@@ -95,7 +95,7 @@ module Oddb2xml
 
   def self.skip_download(file)
     return false if defined?(VCR)
-    dest = "#{Downloads}/#{File.basename(file)}"
+    dest = "#{DOWNLOADS}/#{File.basename(file)}"
     if File.exist?(dest)
       FileUtils.cp(dest, file, verbose: false, preserve: true) unless File.expand_path(file).eql?(dest)
       return true
@@ -104,9 +104,9 @@ module Oddb2xml
   end
 
   def self.download_finished(file, remove_file = true)
-    src = "#{WorkDir}/#{File.basename(file)}"
-    dest = "#{Downloads}/#{File.basename(file)}"
-    FileUtils.makedirs(Downloads)
+    src = "#{WORK_DIR}/#{File.basename(file)}"
+    dest = "#{DOWNLOADS}/#{File.basename(file)}"
+    FileUtils.makedirs(DOWNLOADS)
     # return unless File.exists?(file)
     return unless file && File.exist?(file)
     return if File.expand_path(file).eql?(dest)
@@ -217,7 +217,7 @@ module Oddb2xml
   end
 
   def self.validate_via_xsd(xsd_file, xml_file)
-    xsd = open(xsd_file).read
+    xsd = IO.open(xsd_file).read
     xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
     doc = Nokogiri::XML(File.read(xml_file))
     xsd_rtikelstamm_xml.validate(doc).each do |error|

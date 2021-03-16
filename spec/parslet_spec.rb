@@ -5,28 +5,16 @@ require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
 require "parslet/rig/rspec"
 
 hostname = Socket.gethostbyname(Socket.gethostname).first
-RunAllCompositionsTests = false # /travis|localhost/i.match(hostname) != nil # takes about five minutes to run!
-puts "hostname is #{hostname} RunAllCompositionsTests #{RunAllCompositionsTests}"
+RUN_ALL_COMPOSITION_TESTS = false # /travis|localhost/i.match(hostname) != nil # takes about five minutes to run!
+puts "hostname is #{hostname} RUN_ALL_COMPOSITION_TESTS #{RUN_ALL_COMPOSITION_TESTS}"
 # Testing whether 8937 composition lines can be parsed. Found 380 errors in 293 seconds
 # 520 examples, 20 failures, 1 pending
-
-RunFailingSpec = true
-
-describe ParseComposition do
-  to_add = %(
-  VERBOSE_MESSAGES = true
-      pp composition; binding.pry
-)
-end
-
-if RunFailingSpec
-end
 
 describe ParseComposition do
   context "should handle 66540 Tektrotyd, Markierungsbesteck" do
     string = "conserv.: E 216, E 218, excipiens pro suppositorio."
     composition = ParseComposition.from_string(string)
-    active_agent = ["hynic-[d-phe(1)", "tyr(3)-octeotridum]trifluoroacetum", "acidum ethylendiamini-n,n'-diaceticum"]
+    # active_agent = ["hynic-[d-phe(1)", "tyr(3)-octeotridum]trifluoroacetum", "acidum ethylendiamini-n,n'-diaceticum"]
 
     active_substance = "HYNIC-[D-Phe(1)"
     composition_text = "II) Durchstechflasche 2: acidum ethylendiamini-N,N'-diaceticum 10 mg, dinatrii phosphas dodecahydricus, natrii hydroxidum, pro vitro."
@@ -545,8 +533,8 @@ describe ParseComposition do
     line_1 = "I) DTPa-IPV-Komponente (Suspension): toxoidum diphtheriae 30 U.I., toxoidum tetani 40 U.I., toxoidum pertussis 25 µg et haemagglutininum filamentosum 25 µg, virus poliomyelitis typus 1 inactivatum (D-Antigen) 40 U., virus poliomyelitis typus 2 inactivatum (D-Antigen) 8 U., virus poliomyelitis typus 3 inactivatum (D-Antigen) 32 U., aluminium ut aluminii hydroxidum hydricum ad adsorptionem, formaldehydum 10 µg, conserv.: phenoxyethanolum 2.5 µl, residui: neomycinum, streptomycinum, polymyxini B sulfas, medium199, aqua q.s. ad suspensionem pro 0.5 ml."
     line_2 = "II) Hib-Komponente (Lyophilisat): haemophilus influenzae Typ B polysaccharida T-conjugatum 10 µg, trometamolum, saccharum, pro praeparatione."
     txt = "#{line_1}\n#{line_2}"
-    composition = ParseComposition.from_string(line_1)
-    composition = ParseComposition.from_string(line_2)
+    # composition = ParseComposition.from_string(line_1)
+    # composition = ParseComposition.from_string(line_2)
     info = ParseUtil.parse_compositions(txt)
 
     specify { expect(info.first.label).to eq "I" }
@@ -818,7 +806,7 @@ describe ParseComposition do
   context "should handle aqua ad iniectabilia" do
     string = "any_substance, aqua ad iniectabilia q.s. ad solutionem pro 5 ml"
     composition = ParseComposition.from_string(string)
-    substance = composition.substances.last
+    # substance = composition.substances.last
     specify { expect(composition.excipiens.name).to eq "aqua ad iniectabilia q.s. ad solutionem" }
     specify { expect(composition.excipiens.chemical_substance).to eq nil }
     specify { expect(composition.excipiens.qty).to eq 5.0 }
@@ -828,7 +816,7 @@ describe ParseComposition do
   context "should return correct substance for 'excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V'" do
     string = "any_substance, excipiens ad solutionem pro 1 ml corresp. ethanolum 59.5 % V/V"
     composition = ParseComposition.from_string(string)
-    substance = composition.substances.first
+    # substance = composition.substances.first
     # TODO: what should we report here? dose = pro 1 ml or 59.5 % V/V, chemical_substance = ethanolum?
     # or does it only make sense as part of a composition?
     skip { expect(composition.excipiens.name).to eq "Ethanolum" }
@@ -840,7 +828,7 @@ describe ParseComposition do
   context "should return correct composition for 'excipiens ad emulsionem'" do
     string = 'something, excipiens ad emulsionem pro 1 g"'
     composition = ParseComposition.from_string(string)
-    substance = composition.substances.first
+    # substance = composition.substances.first
     specify { expect(composition.source).to eq string }
     specify { expect(composition.substances.size).to eq 1 }
   end
@@ -960,7 +948,7 @@ describe ParseComposition do
   context "should parse a Praeparatio with a label/galenic form?" do
     string = "Praeparatio cryodesiccata: pollinis allergeni extractum 25'000 U.: urtica dioica"
     composition = ParseComposition.from_string(string)
-    substance = composition.substances.first
+    # substance = composition.substances.first
     #      specify { expect(substance.name).to eq 'Urtica Dioica' } # TODO: is this okay?
     specify { expect(composition.label).to eq "Praeparatio cryodesiccata:" }
   end
@@ -994,7 +982,7 @@ describe ParseComposition do
 
     composition = ParseComposition.from_string(string)
     specify { expect(composition.substances.size).to eq 2 }
-    calcii = composition.substances.find { |x| /calcii/i.match(x.name) }
+    # calcii = composition.substances.find { |x| /calcii/i.match(x.name) }
     pentahydricus = composition.substances.find { |x| /pentahydricus/i.match(x.name) }
     anhydricus = composition.substances.find { |x| /anhydricus/i.match(x.name) }
     specify { expect(pentahydricus.name).to eq "Calcii Lactas Pentahydricus" }
@@ -1009,24 +997,17 @@ describe ParseComposition do
   end
 
   context "should return correct substances for Nutriflex IKSNR 42847" do
-    string = "I) Glucoselösung: glucosum anhydricum 240 g ut glucosum monohydricum, calcii chloridum dihydricum 600 mg, acidum citricum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.
-.
-II) Aminosäurelösung: aminoacida: isoleucinum 4.11 g, leucinum 5.48 g, lysinum anhydricum 3.98 g ut lysinum monohydricum, methioninum 3.42 g, phenylalaninum 6.15 g, threoninum 3.18 g, tryptophanum 1 g, valinum 4.54 g, argininum 4.73 g, histidinum 2.19 g ut histidini hydrochloridum monohydricum, alaninum 8.49 g, acidum asparticum 2.63 g, acidum glutamicum 6.14 g, glycinum 2.89 g, prolinum 5.95 g, serinum 5.25 g, mineralia: magnesii acetas tetrahydricus 1.08 g, natrii acetas trihydricus 1.63 g, kalii dihydrogenophosphas 2 g, kalii hydroxidum 620 mg, natrii hydroxidum 1.14 g, acidum citricum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 500 ml.
-.
-I) et II) corresp.: aminoacida 70 g, nitrogenia 10 g, natrium 40.5 mmol, kalium 25.7 mmol, calcium 4.1 mmol, magnesium 5 mmol, chloridum 49.5 mmol, phosphas 14.7 mmol, acetas 22 mmol, in solutione recenter reconstituta 1000 ml.
-Corresp. 5190 kJ pro 1 l."
     line_1 = "I) Glucoselösung: glucosum anhydricum 240 g ut glucosum monohydricum, calcii chloridum dihydricum 600 mg, acidum citricum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 500 ml."
     line_2 = "."
-    line_3 = "II) Aminosäurelösung: aminoacida: isoleucinum 4.11 g, leucinum 5.48 g, lysinum anhydricum 3.98 g ut lysinum monohydricum, methioninum 3.42 g, phenylalaninum 6.15 g, threoninum 3.18 g, tryptophanum 1 g, valinum 4.54 g, argininum 4.73 g, histidinum 2.19 g ut histidini hydrochloridum monohydricum, alaninum 8.49 g, acidum asparticum 2.63 g, acidum glutamicum 6.14 g, glycinum 2.89 g, prolinum 5.95 g, serinum 5.25 g, mineralia: magnesii acetas tetrahydricus 1.08 g, natrii acetas trihydricus 1.63 g, kalii dihydrogenophosphas 2 g, kalii hydroxidum 620 mg, natrii hydroxidum 1.14 g, acidum citricum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 500 ml."
-    line_4 = "."
-    line_5 = "I) et II) corresp.: aminoacida 70 g, nitrogenia 10 g, natrium 40.5 mmol, kalium 25.7 mmol, calcium 4.1 mmol, magnesium 5 mmol, chloridum 49.5 mmol, phosphas 14.7 mmol, acetas 22 mmol, in solutione recenter reconstituta 1000 ml."
-    line_6 = "Corresp. 5190 kJ pro 1 l."
-    tst = "glucosum anhydricum 240 g ut glucosum monohydricum, calcii chloridum dihydricum 600 mg, acidum citricum monohydricum"
-    tst2 = "glucosum anhydricum 240 g ut glucosum monohydricum, calcii chloridum dihydricum 600 mg"
-    tst_ut = "glucosum anhydricum 240 g ut glucosum monohydricum"
+    # line_4 = "."
+    # line_5 = "I) et II) corresp.: aminoacida 70 g, nitrogenia 10 g, natrium 40.5 mmol, kalium 25.7 mmol, calcium 4.1 mmol, magnesium 5 mmol, chloridum 49.5 mmol, phosphas 14.7 mmol, acetas 22 mmol, in solutione recenter reconstituta 1000 ml."
+    # line_6 = "Corresp. 5190 kJ pro 1 l."
+    # tst = "glucosum anhydricum 240 g ut glucosum monohydricum, calcii chloridum dihydricum 600 mg, acidum citricum monohydricum"
+    # tst2 = "glucosum anhydricum 240 g ut glucosum monohydricum, calcii chloridum dihydricum 600 mg"
+    # tst_ut = "glucosum anhydricum 240 g ut glucosum monohydricum"
     composition = ParseComposition.from_string(line_2)
-    line_3 = "II) Aminosäurelösung: aminoacida: isoleucinum 4.11 g, leucinum 5.48 g, lysinum anhydricum 3.98 g ut lysinum monohydricum, methioninum 3.42 g, phenylalaninum 6.15 g, threoninum 3.18 g, tryptophanum 1 g, valinum 4.54 g, argininum 4.73 g, histidinum 2.19 g ut histidini hydrochloridum monohydricum, alaninum 8.49 g, acidum asparticum 2.63 g, acidum glutamicum 6.14 g, glycinum 2.89 g, prolinum 5.95 g, serinum 5.25 g, mineralia: magnesii acetas tetrahydricus 1.08 g, natrii acetas trihydricus 1.63 g, kalii dihydrogenophosphas 2 g, kalii hydroxidum 620 mg, natrii hydroxidum 1.14 g, acidum citricum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 500 ml."
-    line_3 = "II) Aminosäurelösung: aminoacida: isoleucinum 4.11 g, leucinum 5.48 g"
+    # line_3 = "II) Aminosäurelösung: aminoacida: isoleucinum 4.11 g, leucinum 5.48 g, lysinum anhydricum 3.98 g ut lysinum monohydricum, methioninum 3.42 g, phenylalaninum 6.15 g, threoninum 3.18 g, tryptophanum 1 g, valinum 4.54 g, argininum 4.73 g, histidinum 2.19 g ut histidini hydrochloridum monohydricum, alaninum 8.49 g, acidum asparticum 2.63 g, acidum glutamicum 6.14 g, glycinum 2.89 g, prolinum 5.95 g, serinum 5.25 g, mineralia: magnesii acetas tetrahydricus 1.08 g, natrii acetas trihydricus 1.63 g, kalii dihydrogenophosphas 2 g, kalii hydroxidum 620 mg, natrii hydroxidum 1.14 g, acidum citricum monohydricum, aqua ad iniectabilia q.s. ad solutionem pro 500 ml."
+    # line_3 = "II) Aminosäurelösung: aminoacida: isoleucinum 4.11 g, leucinum 5.48 g"
     line_3 = "aminoacida: isoleucinum 4.11 g, leucinum 5.48 g"
     composition = ParseComposition.from_string(line_3)
     composition = ParseComposition.from_string(line_1)
@@ -1051,7 +1032,8 @@ Corresp. 5190 kJ pro 1 l."
   end
 
   context "should return correct substance for 9,11-linolicum " do
-    substance = nil; composition = nil
+    substance = nil
+    composition = nil
     ["9,11-linolicum",
       "9,11-linolicum 3.25 mg"].each { |string|
       composition = ParseComposition.from_string(string)
@@ -1141,7 +1123,7 @@ Corresp. 5190 kJ pro 1 l."
   end
 
   context "should return correct substance Rote Filmtablett 54819 Beriplast" do
-    string = "A) Rote Filmtablette: estradiolum 1 mg ut estradiolum hemihydricum, excipiens pro compresso obducto"
+    # string = "A) Rote Filmtablette: estradiolum 1 mg ut estradiolum hemihydricum, excipiens pro compresso obducto"
     string = "estradiolum 1 mg ut estradiolum hemihydricum, excipiens pro compresso obducto"
     composition = ParseComposition.from_string(string)
     substance = composition.substances.first
@@ -1375,10 +1357,10 @@ Corresp. 5190 kJ pro 1 l."
         specify { expect(leucinum.qty.to_f).to eq 3.13 }
         specify { expect(leucinum.unit).to eq "g/400 ml" }
       end
-      leucinum_I = compositions[0].substances.find { |x| x.name.eql?("Leucinum") }
-      specify { expect(leucinum_I).to eq nil }
-      leucinum_II = compositions[1].substances.find { |x| x.name.eql?("Leucinum") }
-      specify { expect(leucinum_II).to eq nil }
+      leucinum_i = compositions[0].substances.find { |x| x.name.eql?("Leucinum") }
+      specify { expect(leucinum_i).to eq nil }
+      leucinum_ii = compositions[1].substances.find { |x| x.name.eql?("Leucinum") }
+      specify { expect(leucinum_ii).to eq nil }
       #    aqua =  compositions[2].substances.find{ |x| /aqua ad/i.match(x.name) }
       #   specify { expect(aqua.name).to eq "Aqua Ad Iniectabilia Q.s. Ad Solutionem Pro"}
     end
@@ -1400,26 +1382,26 @@ Corresp. 5190 kJ pro 1 l."
   end
 end
 
-if RunAllCompositionsTests
+if RUN_ALL_COMPOSITION_TESTS
   describe ParseComposition do
     context "should parse a complex composition" do
       start_time = Time.now
       specify { expect(File.exist?(AllCompositionLines)).to eq true }
       inhalt = IO.readlines(AllCompositionLines)
       nr = 0
-      @nrErrors = 0
+      @nr_errors = 0
       inhalt.each { |line|
         nr += 1
         next if line.length < 5
-        puts "#{File.basename(AllCompositionLines)}:#{nr} #{@nrErrors} errors: #{line}" if VERBOSE_MESSAGES
+        puts "#{File.basename(AllCompositionLines)}:#{nr} #{@nr_errors} errors: #{line}" if VERBOSE_MESSAGES
         begin
-          composition = ParseComposition.from_string line
+          ParseComposition.from_string line
         rescue Parslet::ParseFailed
-          @nrErrors += 1
-          puts "#{File.basename(AllCompositionLines)}:#{nr} parse_error #{@nrErrors} in: #{line}"
+          @nr_errors += 1
+          puts "#{File.basename(AllCompositionLines)}:#{nr} parse_error #{@nr_errors} in: #{line}"
         end
       }
-      at_exit { puts "Testing whether #{nr} composition lines can be parsed. Found #{@nrErrors} errors in #{(Time.now - start_time).to_i} seconds" }
+      at_exit { puts "Testing whether #{nr} composition lines can be parsed. Found #{@nr_errors} errors in #{(Time.now - start_time).to_i} seconds" }
     end
   end
 end

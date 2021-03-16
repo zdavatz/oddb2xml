@@ -236,7 +236,7 @@ module Oddb2xml
 
   class SwissmedicExtractor < Extractor
     def initialize(filename, type)
-      @filename = File.join(Downloads, File.basename(filename))
+      @filename = File.join(DOWNLOADS, File.basename(filename))
       @filename = File.join(SpecData, File.basename(filename)) if defined?(RSpec) && !File.exist?(@filename)
       @type = type
       Oddb2xml.log("SwissmedicExtractor #{@filename} #{File.size(@filename)} bytes")
@@ -509,8 +509,8 @@ module Oddb2xml
     def initialize(dat, extended = false, artikelstamm = false)
       @@extended = extended
       @artikelstamm = artikelstamm
-      FileUtils.makedirs(WorkDir)
-      @@error_file ||= File.open(File.join(WorkDir, "duplicate_ean13_from_zur_rose.txt"), "wb+:ISO-8859-14")
+      FileUtils.makedirs(WORK_DIR)
+      @@error_file ||= File.open(File.join(WORK_DIR, "duplicate_ean13_from_zur_rose.txt"), "wb+:ISO-8859-14")
       @@items_without_ean13s ||= 0
       @@duplicated_ean13s ||= 0
       @@zur_rose_items ||= 0

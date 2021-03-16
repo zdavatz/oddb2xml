@@ -17,11 +17,11 @@ if args.size > 0
   exit 2
 end
 # TEMP
-if path = args.first
+if (path = args.first)
   opts[:transfer_dat] = path
 end
 
-startTime = Time.now
+start_time = Time.now
 ui = Oddb2xml::Cli.new(opts)
 begin
   if opts[:format] == :xml
@@ -39,5 +39,6 @@ begin
 rescue Interrupt
   exit
 end
-diff = (Time.now - startTime).to_i
-puts "#{Time.now}: #{__LINE__} done. Took #{diff} seconds"; $stdout.sync
+diff = (Time.now - start_time).to_i
+puts "#{Time.now}: #{__LINE__} done. Took #{diff} seconds"
+$stdout.sync

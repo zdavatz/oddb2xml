@@ -4,10 +4,9 @@ require "parslet/rig/rspec"
 require "parslet/convenience"
 require "csv"
 
-RunAllParsingExamples = false #  RunAllParsingExamples /travis|localhost/i.match(hostname) != nil # takes about one minute to run
+RUN_ALL_PARSING_EXAMPLES = false #  RUN_ALL_PARSING_EXAMPLES /travis|localhost/i.match(hostname) != nil # takes about one minute to run
 
 galenic_tests = {
-
   "1001 Blattgrün Dragées" => {prepation_name: "1001 Blattgrün ", galenic_form: "Dragées"},
   "3TC 150 mg, Filmtabletten" => {prepation_name: "3TC 150 mg", galenic_form: "Filmtabletten"},
   "Acetocaustin, Lösung" => {prepation_name: "Acetocaustin", galenic_form: "Lösung"},
@@ -33,86 +32,85 @@ galenic_tests = {
   "Tramal 100, Injektionslösung (i.m., i.v.)" => {prepation_name: "Tramal 100", galenic_form: "Injektionslösung (i.m., i.v.)"},
   "Uman Albumin Kedrion 20%" => {prepation_name: "Uman Albumin Kedrion 20%", galenic_form: nil}
 }
-
-todo = %(
-Testlösung zur Allergiediagnose Teomed Kaninchen  (Fell) Lösung
-Testlösung zur Allergiediagnose Teomed Hund   (Haare) Lösung
-Pandemrix   (Pandemic Influenza Vaccine H1N1)
-Phytopharma dragées pour la détente et le sommeil   / Entspannungs- und Schlafdragées
-Phytopharma dragées pour le coeur   / Herz Dragées
-Best Friend Katzenhalsband  / Katzenhalsband Reflex ad us.vet.
-Amlodipin Helvepharm  10 Tabletten
-Salbu Orion Easyhaler 100 ug Inhalationspulver
-TISSEEL 10 ml 2 Fertigspritzen
-TISSEEL 2 ml  2 Fertigspritzen
-TISSEEL 4 ml  2 Fertigspritzen
-Norprolac Starter-pack  25 ug + 50 ug, Tabletten
-Phostal 5-Gräser  4-Getreidemischung 10IR, Injektionssuspension
-Alustal 5-Gräser  4-Getreidemischung Kombipackung, Injektionssuspension
-Staloral Beifuss  5-Gräser 100IR, Injektionssuspension
-Phostal Beifuss 5-Gräser 10IR, Injektionssuspension
-Alustal Beifuss 5-Gräser 10IR, Injektionssuspension
-Seebri Breezhaler 50 Mikrogramm, Pulver zur Inhalation, Hartkapseln
-Nplate  500 mcg Pulver und Lösungsmittel zur Herstellung einer Injektionslösung
-Bayvantage ad us.vet. 80 für Katzen, Lösung
-Ondansetron-Teva  8mg, Filmtabletten
-Soluprick SQ 3-Bäumemischung (Alnus glutinosa Betula verrucosa, Corylus avellana), Lösung
-BicaVera 2,3% Glucose Calcium, Peritonealdialyselösung
-Telfastin Allergo 120 comprimés pelliculés 120 mg
-Multaq  comprimés pelliculés de 400 mg de dronédarone
-KCL 7,45% Sintetica concentrato per soluzione per infusione (fiala di 20 ml)
-Alk7 Frühblühermischung Depotsuspension zur s.c. Injektion "1 Flasche B"
-Alk7 Gräsermischung und Roggen  Depotsuspension zur s.c. Injektion "1 Flasche B"
-Relenza 5 mg  Disk (Pulverinhalation)
-Ventolin  Dosier-Aerosol (FCKW-frei)
-Axotide 0,125 mg  Dosier-Aerosol (FCKW-frei)
-Axotide 0,250 mg  Dosier-Aerosol (FCKW-frei)
-Axotide 0,050 mg  Dosier-Aerosol (FCKW-frei)
-Serevent  Dosier-Aerosol FCKW-frei
-Bronchialpastillen  Dr. Welti
-Conoxia Druckgasflasche 300 bar
-Staloral Pollen 3-Bäume Esche 100IR, Lösung zur sublingualen Anwendung
-Staloral Pollen Birke Esche 100IR, Lösung zur sublingualen Anwendung
-Phostal Birke Esche 10IR, Injektionssuspension
-Alustal Birke Esche 10IR, Injektionssuspension
-Alustal 3-Bäume Esche Kombipackung , Injektionssuspension
-Phostal 3-Bäume Esche Kombipackung, Injektionssuspension
-Fisherman's Friend  Eucalyptus-Menthol, sans sucre, avec sorbitol, nouvelle formule, pastilles
-Victoza 6 mg/ml Fertigpen (Triple-Dose)
-Fluimucil Erkältungshusten  Fertigsirup mit Himbeergeschmack
-Rebif Neue Formulierung 22  Fertigspritzen, Injektionslösung
-Rebif Neue Formulierung 44  Fertigspritzen, Injektionslösung
-Rebif Neue Formulierung 8.8 Fertigspritzen, Injektionslösung
-Bonherba rocks Kräuterzucker, Kräuterbonbon 2,7   g
-Ricola Kräuter, Kräuterbonbons ohne Zucker, 2,5   g
-Testlösung zur Allergiediagnose Teomed Ei ganz,  Lösung
-Helena's Fenchelfruchttee ganze Droge
-Intron A 10 Mio. I.E./1 mL  gebrauchsfertige, HSA-freie Injektionslösung
-Picato  Gel 500 mcg/g
-Duodopa Gel zur intestinalen Anwendung
-Weleda Arnica-Gel Gel, anthroposophisches Arzneimittel
-Burgerstein Vitamin E-Kapseln 400   I.E.
-Solmucol 10 % local i.v., i.m., soluzione iniettabile
-Synacthen (i.m. i.v.), Injektionslösung
-Nutriflex Lipid plus ohne Elektrolyte Infusionsemulsion 1250ml
-Nutriflex Omega plus  Infusionsemulsion 1875 ml
-SmofKabiven Infusionsemulsion 1970 ml
-SmofKabiven EF  Infusionsemulsion 1970 ml
-Nutriflex Omega special Infusionsemulsion 2500 ml
-Nutriflex Lipid special ohne Elektrolyte  Infusionsemulsion 2500ml
-Nutriflex Lipid peri  Infusionsemulsion, 1250ml
-Nutriflex Lipid plus  Infusionsemulsion, 1250ml
-Nutriflex Lipid special Infusionsemulsion, 1250ml
-Dexdor  Infusionskonzentrat 1000ug/10ml
-Peditrace Infusionskonzentrat, Zusatzampulle
-M Classic Eucalyptus Gummipastillen zuckerfrei
-M Classic Halsbonbons   zuckerfrei
-Salbisan Halspastillen  zuckerfrei
-Madopar LIQ 125 Tabletten zur Herstellung einer Suspension zum Einnehmen
-Anginazol forte tablettes à sucer
-Tisane provençale No 1  tisane laxative, plantes coupées
-)
-
+x = %(
+    Testlösung zur Allergiediagnose Teomed Kaninchen  (Fell) Lösung
+    Testlösung zur Allergiediagnose Teomed Hund   (Haare) Lösung
+    Pandemrix   (Pandemic Influenza Vaccine H1N1)
+    Phytopharma dragées pour la détente et le sommeil   / Entspannungs- und Schlafdragées
+    Phytopharma dragées pour le coeur   / Herz Dragées
+    Best Friend Katzenhalsband  / Katzenhalsband Reflex ad us.vet.
+    Amlodipin Helvepharm  10 Tabletten
+    Salbu Orion Easyhaler 100 ug Inhalationspulver
+    TISSEEL 10 ml 2 Fertigspritzen
+    TISSEEL 2 ml  2 Fertigspritzen
+    TISSEEL 4 ml  2 Fertigspritzen
+    Norprolac Starter-pack  25 ug + 50 ug, Tabletten
+    Phostal 5-Gräser  4-Getreidemischung 10IR, Injektionssuspension
+    Alustal 5-Gräser  4-Getreidemischung Kombipackung, Injektionssuspension
+    Staloral Beifuss  5-Gräser 100IR, Injektionssuspension
+    Phostal Beifuss 5-Gräser 10IR, Injektionssuspension
+    Alustal Beifuss 5-Gräser 10IR, Injektionssuspension
+    Seebri Breezhaler 50 Mikrogramm, Pulver zur Inhalation, Hartkapseln
+    Nplate  500 mcg Pulver und Lösungsmittel zur Herstellung einer Injektionslösung
+    Bayvantage ad us.vet. 80 für Katzen, Lösung
+    Ondansetron-Teva  8mg, Filmtabletten
+    Soluprick SQ 3-Bäumemischung (Alnus glutinosa Betula verrucosa, Corylus avellana), Lösung
+    BicaVera 2,3% Glucose Calcium, Peritonealdialyselösung
+    Telfastin Allergo 120 comprimés pelliculés 120 mg
+    Multaq  comprimés pelliculés de 400 mg de dronédarone
+    KCL 7,45% Sintetica concentrato per soluzione per infusione (fiala di 20 ml)
+    Alk7 Frühblühermischung Depotsuspension zur s.c. Injektion "1 Flasche B"
+    Alk7 Gräsermischung und Roggen  Depotsuspension zur s.c. Injektion "1 Flasche B"
+    Relenza 5 mg  Disk (Pulverinhalation)
+    Ventolin  Dosier-Aerosol (FCKW-frei)
+    Axotide 0,125 mg  Dosier-Aerosol (FCKW-frei)
+    Axotide 0,250 mg  Dosier-Aerosol (FCKW-frei)
+    Axotide 0,050 mg  Dosier-Aerosol (FCKW-frei)
+    Serevent  Dosier-Aerosol FCKW-frei
+    Bronchialpastillen  Dr. Welti
+    Conoxia Druckgasflasche 300 bar
+    Staloral Pollen 3-Bäume Esche 100IR, Lösung zur sublingualen Anwendung
+    Staloral Pollen Birke Esche 100IR, Lösung zur sublingualen Anwendung
+    Phostal Birke Esche 10IR, Injektionssuspension
+    Alustal Birke Esche 10IR, Injektionssuspension
+    Alustal 3-Bäume Esche Kombipackung , Injektionssuspension
+    Phostal 3-Bäume Esche Kombipackung, Injektionssuspension
+    Fisherman's Friend  Eucalyptus-Menthol, sans sucre, avec sorbitol, nouvelle formule, pastilles
+    Victoza 6 mg/ml Fertigpen (Triple-Dose)
+    Fluimucil Erkältungshusten  Fertigsirup mit Himbeergeschmack
+    Rebif Neue Formulierung 22  Fertigspritzen, Injektionslösung
+    Rebif Neue Formulierung 44  Fertigspritzen, Injektionslösung
+    Rebif Neue Formulierung 8.8 Fertigspritzen, Injektionslösung
+    Bonherba rocks Kräuterzucker, Kräuterbonbon 2,7   g
+    Ricola Kräuter, Kräuterbonbons ohne Zucker, 2,5   g
+    Testlösung zur Allergiediagnose Teomed Ei ganz,  Lösung
+    Helena's Fenchelfruchttee ganze Droge
+    Intron A 10 Mio. I.E./1 mL  gebrauchsfertige, HSA-freie Injektionslösung
+    Picato  Gel 500 mcg/g
+    Duodopa Gel zur intestinalen Anwendung
+    Weleda Arnica-Gel Gel, anthroposophisches Arzneimittel
+    Burgerstein Vitamin E-Kapseln 400   I.E.
+    Solmucol 10 % local i.v., i.m., soluzione iniettabile
+    Synacthen (i.m. i.v.), Injektionslösung
+    Nutriflex Lipid plus ohne Elektrolyte Infusionsemulsion 1250ml
+    Nutriflex Omega plus  Infusionsemulsion 1875 ml
+    SmofKabiven Infusionsemulsion 1970 ml
+    SmofKabiven EF  Infusionsemulsion 1970 ml
+    Nutriflex Omega special Infusionsemulsion 2500 ml
+    Nutriflex Lipid special ohne Elektrolyte  Infusionsemulsion 2500ml
+    Nutriflex Lipid peri  Infusionsemulsion, 1250ml
+    Nutriflex Lipid plus  Infusionsemulsion, 1250ml
+    Nutriflex Lipid special Infusionsemulsion, 1250ml
+    Dexdor  Infusionskonzentrat 1000ug/10ml
+    Peditrace Infusionskonzentrat, Zusatzampulle
+    M Classic Eucalyptus Gummipastillen zuckerfrei
+    M Classic Halsbonbons   zuckerfrei
+    Salbisan Halspastillen  zuckerfrei
+    Madopar LIQ 125 Tabletten zur Herstellung einer Suspension zum Einnehmen
+    Anginazol forte tablettes à sucer
+    Tisane provençale No 1  tisane laxative, plantes coupées
+  )
+puts "Have #{x.split("\n").size} more examples toDO"
 describe ParseGalenicForm do
   context "parse_column_c should work" do
     name, gal_form = ParseGalenicForm.from_string(galenic_tests.first.first)
@@ -140,16 +138,16 @@ end
 
 def test_one_string(parser, string, expected)
   res1 = parser.parse_with_debug(string)
-  res1.delete(:qty) if res1
-  res1.delete(:unit) if res1
+  res1&.delete(:qty)
+  res1&.delete(:unit)
   stringified = res1 ? res1.to_s.gsub(/@\d+/, "") : nil
   if res1.nil? || !stringified.eql?(expected.to_s)
-    puts "Failed testing: #{string}"; binding.pry
+    puts "Failed testing: #{string}"
   end
   expect(stringified).to eq expected.to_s if expected
 end
 
-if true then describe GalenicFormParser do
+describe GalenicFormParser do
   let(:parser) { GalenicFormParser.new }
   context "identifier parsing" do
     let(:galenic_parser) { parser.galenic }
@@ -162,9 +160,9 @@ if true then describe GalenicFormParser do
       end
     }
   end
-end end
+end
 
-if RunAllParsingExamples then describe GalenicFormParser do
+if RUN_ALL_PARSING_EXAMPLES then describe GalenicFormParser do
   context "should parse all lines in #{File.basename(AllColumn_C_Lines)}" do
     let(:galenic_parser) { GalenicFormParser.new.galenic }
     ausgabe = {}
@@ -185,7 +183,7 @@ if RunAllParsingExamples then describe GalenicFormParser do
         end
       end
     }
-    csv_name = File.join(Oddb2xml::WorkDir, "galenic.csv")
+    csv_name = File.join(Oddb2xml::WORK_DIR, "galenic.csv")
     at_exit do
       CSV.open(csv_name, "w+", col_sep: ";") do |csv|
         ausgabe.each do |key, value|
@@ -194,14 +192,15 @@ if RunAllParsingExamples then describe GalenicFormParser do
       end
     end
   end
-end end
+end
+end
 
 describe GalenicFormParser do
   let(:parser) { GalenicFormParser.new }
   context "gal_form parsing" do
     let(:gal_form_parser) { parser.gal_form }
 
-    should_pass = [
+    [
       ", Lösung",
       ", 100mg Lösung",
       "Lösung",
@@ -212,7 +211,7 @@ describe GalenicFormParser do
         expect(gal_form_parser).to parse(id)
       end
     }
-    should_not_pass = [].each { |id|
+    [].each { |id|
       it "parses gal_form #{id}" do
         expect(gal_form_parser).to_not parse(id)
       end
@@ -221,7 +220,7 @@ describe GalenicFormParser do
   context "name_gal_form parsing" do
     let(:name_gal_form_parser) { parser.name_gal_form }
 
-    should_pass = [
+    [
       "Dicloabak 0,1% Augentropfen",
       "35 Clear-Flex 3,86 % Peritonealdialyselösung",
       "Esmeron 100mg/10ml Injektionslösung"
@@ -230,7 +229,7 @@ describe GalenicFormParser do
         expect(name_gal_form_parser).to parse(id)
       end
     }
-    should_not_pass = [].each { |id|
+    [].each { |id|
       it "parses name_gal_form #{id}" do
         expect(name_gal_form_parser).to_not parse(id)
       end
@@ -240,7 +239,7 @@ describe GalenicFormParser do
   context "prepation_name parsing" do
     let(:prepation_name_parser) { parser.prepation_name }
 
-    should_pass = [
+    [
       "name",
       "name more",
       "name more and more",
@@ -250,7 +249,7 @@ describe GalenicFormParser do
         expect(prepation_name_parser).to parse(id)
       end
     }
-    should_not_pass = [].each { |id|
+    [].each { |id|
       it "parses prepation_name #{id}" do
         expect(prepation_name_parser).to_not parse(id)
       end
@@ -259,7 +258,7 @@ describe GalenicFormParser do
   context "standard_galenic parsing" do
     let(:standard_galenic_parser) { parser.standard_galenic }
 
-    should_pass = [
+    [
       "Antithrombin III 500 I.E., Injektionspräparat",
       "Ondansetron Labatec, 8mg/4ml, concentré pour perfusion"
     ].each { |id|
@@ -267,7 +266,7 @@ describe GalenicFormParser do
         expect(standard_galenic_parser).to parse(id)
       end
     }
-    should_not_pass = [
+    [
       "Dicloabak 0,1% Augentropfen",
       "35 Clear-Flex 3,86 % Peritonealdialyselösung",
       "Esmeron 100mg/10ml Injektionslösung"
@@ -280,7 +279,7 @@ describe GalenicFormParser do
   context "dose_with_pro parsing" do
     let(:dose_with_pro_parser) { parser.dose_with_pro }
 
-    should_pass = [
+    [
       "100mg/10ml",
       "8mg/4ml"
     ].each { |id|
@@ -288,7 +287,7 @@ describe GalenicFormParser do
         expect(dose_with_pro_parser).to parse(id)
       end
     }
-    should_not_pass = [
+    [
       "100mgx10ml",
       "8mgX4ml"
     ].each { |id|

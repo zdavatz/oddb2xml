@@ -1,4 +1,3 @@
-
 require "spec_helper"
 require "rexml/document"
 
@@ -7,7 +6,8 @@ VCR.eject_cassette # we use insert/eject around each example
 # not used but, as I still don't know how to generate
 def filter_aips_xml(filename = "AipsDownload_ng.xml", ids_to_keep = [55558, 61848])
   puts "File #{filename} exists? #{File.exist?(filename)}"
-  tst = %(<?xml version="1.0" encoding="utf-8"?>
+  if $VERBOSE
+    puts %(<?xml version="1.0" encoding="utf-8"?>
 <medicalInformations>
   <medicalInformation type="fi" version="5" lang="de" safetyRelevant="false" informationUpdate="07.2008">
     <title>Zyvoxid®</title>
@@ -16,35 +16,36 @@ def filter_aips_xml(filename = "AipsDownload_ng.xml", ids_to_keep = [55558, 6184
     <substances>Linezolid</substances>
     <authNrs>55558, 55559, 55560</authNrs>
 )
+  end
   @xml = IO.read(filename)
   ausgabe = File.open("tst.out", "w+")
   data = {}
-  result = MedicalInformationsContent.parse(@xml.sub(Strip_For_Sax_Machine, ""), lazy: true)
+  result = MedicalInformationsContent.parse(@xml.sub(STRIP_FOR_SAX_MACHINE, ""), lazy: true)
   result.medicalInformation.each do |pac|
     lang = pac.lang.to_s
     next unless /de|fr/.match?(lang)
     item = {}
-    keepIt = false
+    keep_it = false
     pac.authNrs.split(/[, ]+/).each { |id|
       if ids_to_keep.index(id.to_i)
         data[[lang, id.to_i]] = pac
-        keepIt = true
+        keep_it = true
         ausgabe.puts
         break
-        end
+      end
     }
     html = Nokogiri::HTML.fragment(pac.content.force_encoding("UTF-8"))
     item[:paragraph] = html
     numbers = /(\d{5})[,\s]*(\d{5})?|(\d{5})[,\s]*(\d{5})?[,\s]*(\d{5})?/.match(html)
     if numbers
       [$1, $2, $3].compact.each { |id|
-          if ids_to_keep.index(id.to_i)
-            data[[lang, id.to_i]] = pac
-            keepIt = true
-            break
-              end
+        if ids_to_keep.index(id.to_i)
+          data[[lang, id.to_i]] = pac
+          keep_it = true
+          break
+        end
       }
-          puts "Must keep #{keepIt} #{pac.authNrs}"
+      puts "Must keep #{keep_it} #{pac.authNrs}"
     end
   end
   puts data.size
@@ -53,26 +54,16 @@ end
 
 XML_VERSION_1_0 = /xml\sversion=["']1.0["']/
 PREP_XML = "Preparations.xml"
+
 shared_examples_for "any downloader" do
-  # this takes 5 sec. by call for sleep
-  it "should count retry times as retrievable or not", slow: true do
-    expect {
-      Array.new(3).map do
-        Thread.new do
-          expect(@downloader.send(:retrievable?)).to be(true)
-        end
-      end.map(&:join)
-    }.to change {
-      @downloader.instance_variable_get(:@retry_times)
-    }.from(3).to(0)
-  end if false
+  # nothing at the moment
 end
 
 def common_before
-  @savedDir = Dir.pwd
+  @saved_dir = Dir.pwd
   cleanup_directories_before_run
-  FileUtils.makedirs(Oddb2xml::WorkDir)
-  Dir.chdir(Oddb2xml::WorkDir)
+  FileUtils.makedirs(Oddb2xml::WORK_DIR)
+  Dir.chdir(Oddb2xml::WORK_DIR)
   WebMock.enable!
   {"https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/interactions_de_utf8.csv" => "epha_interactions.csv"}.each do |url, file|
     inhalt = File.read(File.join(Oddb2xml::SpecData, file))
@@ -81,13 +72,13 @@ def common_before
 end
 
 def common_after
-  Dir.chdir(@savedDir) if @savedDir && File.directory?(@savedDir)
+  Dir.chdir(@saved_dir) if @saved_dir && File.directory?(@saved_dir)
   VCR.eject_cassette
   vcr_file = File.expand_path(File.join(Oddb2xml::SpecData, "..", "fixtures", "vcr_cassettes", "oddb2xml.json"))
   puts "Pretty-printing #{vcr_file} exists? #{File.exist?(vcr_file)}" if $VERBOSE
   vcr_file_new = vcr_file.sub(".json", ".new")
   cmd = "cat #{vcr_file} | python -mjson.tool > #{vcr_file_new}"
-  res = system(cmd)
+  system(cmd)
   FileUtils.mv(vcr_file_new, vcr_file)
 end
 
@@ -104,7 +95,7 @@ end
 
 # Unzips into a specific directory
 def unzip_files(zipfile_name, directory = Dir.pwd)
-  savedDir = Dir.pwd
+  saved_dir = Dir.pwd
   FileUtils.makedirs(directory)
   Dir.chdir(directory)
   Zip::File.open(zipfile_name) do |zip_file|
@@ -117,7 +108,7 @@ def unzip_files(zipfile_name, directory = Dir.pwd)
     end
   end
 ensure
-  Dir.chdir(savedDir)
+  Dir.chdir(saved_dir)
 end
 
 describe Oddb2xml::RefdataDownloader do
@@ -126,16 +117,16 @@ describe Oddb2xml::RefdataDownloader do
     VCR.eject_cassette
     VCR.configure do |c|
       c.before_record(:Refdata_DE) do |i|
-        if (!/WSDL$/.match(i.request.uri)) && /refdatabase.refdata.ch\/Service/.match(i.request.uri) && (i.response.body.size > 1024 * 1024)
+        if !/WSDL$/.match(i.request.uri) && /refdatabase.refdata.ch\/Service/.match(i.request.uri) && (i.response.body.size > 1024 * 1024)
           puts "#{Time.now}: #{__LINE__}: Parsing response.body (#{i.response.body.size / (1024 * 1024)} MB ) will take some time. URI was #{i.request.uri}"
           doc = REXML::Document.new(i.response.body)
           items = doc.root.children.first.elements.first
-          nrItems = doc.root.children.first.elements.first.elements.size
-          puts "#{Time.now}: #{__LINE__}: Removing most of the #{nrItems} items will take some time"
-          nrSearched = 0
+          nr_items = doc.root.children.first.elements.first.elements.size
+          puts "#{Time.now}: #{__LINE__}: Removing most of the #{nr_items} items will take some time"
+          nr_searched = 0
           items.elements.each { |x|
-            nrSearched += 1
-            puts "#{Time.now}: #{__LINE__}: nrSearched #{nrSearched}/#{nrItems}" if nrSearched % 1000 == 0
+            nr_searched += 1
+            puts "#{Time.now}: #{__LINE__}: nr_searched #{nr_searched}/#{nr_items}" if nr_searched % 1000 == 0
             items.delete x unless x.elements["GTIN"] && Oddb2xml::GTINS_DRUGS.index(x.elements["GTIN"].text)
           }
           i.response.body = doc.to_s
@@ -196,7 +187,7 @@ def cleanPackungenXlsx(info)
   name = nil
   name = "packungen" if /zugelasseneverpackungen/.match?(info.request.uri)
   name = "orphan" if /zugelasseneverpackungen/.match?(info.request.uri)
-  swissmedic_dir = File.join(Oddb2xml::WorkDir, "swissmedic")
+  swissmedic_dir = File.join(Oddb2xml::WORK_DIR, "swissmedic")
   FileUtils.makedirs(swissmedic_dir)
   xlsx_name = File.join(swissmedic_dir, name + ".xlsx")
   if /Packungen/i.match?(xlsx_name)
@@ -207,16 +198,20 @@ def cleanPackungenXlsx(info)
     workbook = RubyXL::Parser.parse(xlsx_name)
     worksheet = workbook[0]
     drugs = []
-    Oddb2xml::GTINS_DRUGS.each { |x| next unless x.to_s.size == 13; drugs << [x.to_s[4..8].to_i, x.to_s[9..11].to_i] }
-    idx = 6; to_delete = []
+    Oddb2xml::GTINS_DRUGS.each do |x|
+      next unless x.to_s.size == 13
+      drugs << [x.to_s[4..8].to_i, x.to_s[9..11].to_i]
+    end
+    idx = 6
+    to_delete = []
     puts "#{Time.now}: Finding items to delete will take some time"
     while worksheet.sheet_data[idx]
       idx += 1
-    next unless worksheet.sheet_data[idx - 1][Oddb2xml::COLUMNS_FEBRUARY_2019.keys.index(:iksnr)]
-    to_delete << (idx - 1) unless drugs.find { |x| 
-                                  (x[0] == worksheet.sheet_data[idx - 1][Oddb2xml::COLUMNS_FEBRUARY_2019.keys.index(:iksnr)].value.to_i) &&
-      (x[1] == worksheet.sheet_data[idx - 1][Oddb2xml::COLUMNS_FEBRUARY_2019.keys.index(:ikscd)].value.to_i)
-                                }
+      next unless worksheet.sheet_data[idx - 1][Oddb2xml::COLUMNS_FEBRUARY_2019.keys.index(:iksnr)]
+      to_delete << (idx - 1) unless drugs.find { |x|
+                                      (x[0] == worksheet.sheet_data[idx - 1][Oddb2xml::COLUMNS_FEBRUARY_2019.keys.index(:iksnr)].value.to_i) &&
+                                        (x[1] == worksheet.sheet_data[idx - 1][Oddb2xml::COLUMNS_FEBRUARY_2019.keys.index(:ikscd)].value.to_i)
+                                    }
     end
     if to_delete.size > 0
       puts "#{Time.now}: Deleting #{to_delete.size} of the #{idx} items will take some time"
@@ -233,18 +228,15 @@ end
 describe Oddb2xml::SwissmedicDownloader do
   include ServerMockHelper
   before(:each) do
-    mock_downloads
+    mock_DOWNLOADS
     VCR.configure do |c|
       c.before_record(:swissmedic) do |i|
-        config = c
-          info = i
-          begin
-              if i.response.headers["Content-Disposition"] && /www.swissmedic.ch/.match(i.request.uri) && (i.response.body.size > 1024 * 1024)
-                cleanPackungenXlsx(i)
-              end
-            rescue => error
-                  require "pry"; binding.pry
-          end
+        if i.response.headers["Content-Disposition"] && /www.swissmedic.ch/.match(i.request.uri) && (i.response.body.size > 1024 * 1024)
+          cleanPackungenXlsx(i)
+        end
+      rescue => error
+        puts error if $VERBOSE
+        # require "pry"; binding.pry
       end
     end
   end
@@ -254,15 +246,12 @@ describe Oddb2xml::SwissmedicDownloader do
     before(:each) do
       VCR.configure do |c|
         c.before_record(:swissmedic) do |i|
-          config = c
-            info = i
-            begin
-                if i.response.headers["Content-Disposition"] && /www.swissmedic.ch/.match(i.request.uri) && (i.response.body.size > 1024 * 1024)
-                  cleanPackungenXlsx(i)
-                end
-              rescue => error
-                    require "pry"; binding.pry
-            end
+          if i.response.headers["Content-Disposition"] && /www.swissmedic.ch/.match(i.request.uri) && (i.response.body.size > 1024 * 1024)
+            cleanPackungenXlsx(i)
+          end
+        rescue => error
+          puts error if $VERBOSE
+          # require "pry"; binding.pry
         end
       end
       VCR.eject_cassette
@@ -277,9 +266,9 @@ describe Oddb2xml::SwissmedicDownloader do
         @downloader.download
       }
       it "should return valid Binary-String" do
-          # unless [:orphan, :package].index(@downloader.type)
+        # unless [:orphan, :package].index(@downloader.type)
         expect(bin).to be_a String
-          expect(bin.bytes).not_to be nil
+        expect(bin.bytes).not_to be nil
         # end
       end
       it "should clean up current directory" do
@@ -289,7 +278,7 @@ describe Oddb2xml::SwissmedicDownloader do
         end
       end
       it "should not save into the download directory" do
-        expect(File.exist?(File.join(Oddb2xml::Downloads, "oddb_orphan.xls"))).to eq(false)
+        expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "oddb_orphan.xls"))).to eq(false)
       end
     end
   end
@@ -308,7 +297,7 @@ describe Oddb2xml::SwissmedicDownloader do
         expect(@bin.bytes).not_to be nil
       end
       it "should save into the download directory" do
-        expect(File.exist?(File.join(Oddb2xml::Downloads, "swissmedic_package.xlsx"))).to eq(true)
+        expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "swissmedic_package.xlsx"))).to eq(true)
       end
     end
   end
@@ -323,7 +312,7 @@ describe Oddb2xml::EphaDownloader do
       Oddb2xml.add_epha_changes_for_ATC(1, 3, force_run: true)
       @csv = @downloader.download
     }
-    expect(File.exist?(File.join(Oddb2xml::Downloads, "epha_interactions.csv"))).to eq(true)
+    expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "epha_interactions.csv"))).to eq(true)
   end
   after(:all) do
     common_after
@@ -341,7 +330,7 @@ describe Oddb2xml::EphaDownloader do
       expect(File.exist?("epha_interactions.csv")).to eq(false)
     end
     it "should save under download" do
-      expect(File.exist?(File.join(Oddb2xml::Downloads, "epha_interactions.csv"))).to eq(true)
+      expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "epha_interactions.csv"))).to eq(true)
     end
   end
 end
@@ -353,9 +342,9 @@ describe Oddb2xml::BagXmlDownloader do
     VCR.configure do |c|
       c.before_record(:bag_xml) do |i|
         if i.response.headers["Content-Disposition"] && /XMLPublications.zip/.match(i.request.uri)
-          bag_dir = File.join(Oddb2xml::WorkDir, "bag")
-          FileUtils.makedirs(Oddb2xml::WorkDir)
-          tmp_zip = File.join(Oddb2xml::WorkDir, "XMLPublications.zip")
+          bag_dir = File.join(Oddb2xml::WORK_DIR, "bag")
+          FileUtils.makedirs(Oddb2xml::WORK_DIR)
+          tmp_zip = File.join(Oddb2xml::WORK_DIR, "XMLPublications.zip")
           File.open(tmp_zip, "wb+") { |f| f.write(i.response.body) }
           unzip_files(tmp_zip, bag_dir)
           bag_tmp = File.join(bag_dir, PREP_XML)
@@ -376,7 +365,7 @@ describe Oddb2xml::BagXmlDownloader do
     end
     VCR.eject_cassette
     VCR.use_cassette("oddb2xml", tag: :bag_xml) do
-    @downloader = Oddb2xml::BagXmlDownloader.new
+      @downloader = Oddb2xml::BagXmlDownloader.new
     end
     common_before
   }
@@ -425,30 +414,32 @@ describe Oddb2xml::LppvDownloader do
   end
 end
 
-describe Oddb2xml::MigelDownloader do
-  include ServerMockHelper
-  before(:all) { VCR.eject_cassette }
-  before(:each) do
-    @downloader = Oddb2xml::MigelDownloader.new
-    VCR.insert_cassette("oddb2xml", tag: :migel)
-    common_before
-    @downloader.download
-  end
-  after(:each) { common_after }
+unless SKIP_MIGEL_DOWNLOADER
+  describe Oddb2xml::MigelDownloader do
+    include ServerMockHelper
+    before(:all) { VCR.eject_cassette }
+    before(:each) do
+      @downloader = Oddb2xml::MigelDownloader.new
+      VCR.insert_cassette("oddb2xml", tag: :migel)
+      common_before
+      @downloader.download
+    end
+    after(:each) { common_after }
 
-  it_behaves_like "any downloader"
-  context "when download is called" do
-  let(:bin) { @downloader.download }
-  it "should read xls as Binary-String" do
-    expect(bin).to be_a String
-    expect(bin.bytes).not_to be nil
+    it_behaves_like "any downloader"
+    context "when download is called" do
+      let(:bin) { @downloader.download }
+      it "should read xls as Binary-String" do
+        expect(bin).to be_a String
+        expect(bin.bytes).not_to be nil
+      end
+      it "should clean up current directory" do
+        expect { bin }.not_to raise_error
+        expect(File.exist?("oddb2xml_files_nonpharma.txt")).to eq(false)
+      end
+    end
   end
-  it "should clean up current directory" do
-    expect { bin }.not_to raise_error
-    expect(File.exist?("oddb2xml_files_nonpharma.txt")).to eq(false)
-  end
-  end
-end unless SKIP_MIGEL_DOWNLOADER
+end
 
 describe Oddb2xml::ZurroseDownloader do
   include ServerMockHelper
@@ -485,8 +476,8 @@ describe Oddb2xml::ZurroseDownloader do
       expect(File.exist?("transfer.zip")).to eq(false)
     end
     it "should save into the download directory" do
-      expect(File.exist?(File.join(Oddb2xml::Downloads, "transfer.zip"))).to eq(true)
-      expect(File.exist?(File.join(Oddb2xml::Downloads, "transfer.dat"))).to eq(true)
+      expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "transfer.zip"))).to eq(true)
+      expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "transfer.dat"))).to eq(true)
     end
   end
 end
@@ -500,14 +491,15 @@ describe Oddb2xml::MedregbmDownloader do
         if /medregbm.admin.ch/i.match?(i.request.uri)
           puts "#{Time.now}: #{__LINE__}: URI was #{i.request.uri} containing #{i.response.body.size / (1024 * 1024)} MB "
           begin
-            medreg_dir = File.join(Oddb2xml::WorkDir, "medreg")
+            medreg_dir = File.join(Oddb2xml::WORK_DIR, "medreg")
             FileUtils.makedirs(medreg_dir)
             xlsx_name = File.join(medreg_dir, /ListBetrieb/.match?(i.request.uri) ? "Betriebe.xlsx" : "Personen.xlsx")
             File.open(xlsx_name, "wb+") { |f| f.write(i.response.body) }
             puts "#{Time.now}: Openening saved #{xlsx_name} (#{File.size(xlsx_name)} bytes) will take some time. URI was #{i.request.uri}"
             workbook = RubyXL::Parser.parse(xlsx_name)
             worksheet = workbook[0]
-            idx = 1; to_delete = []
+            idx = 1
+            to_delete = []
             while worksheet.sheet_data[idx]
               idx += 1
               next unless worksheet.sheet_data[idx - 1][0]
@@ -564,7 +556,7 @@ describe Oddb2xml::MedregbmDownloader do
     after(:each) { common_after }
     context "download person txt" do
       let(:txt) {
-        # this downloads a xlsx file (2.5MB), where we should keep only the first few lines
+        # this DOWNLOADS a xlsx file (2.5MB), where we should keep only the first few lines
         @downloader.download
       }
       it "should return valid String" do
@@ -584,21 +576,21 @@ describe Oddb2xml::SwissmedicInfoDownloader do
   before(:all) do
     VCR.configure do |c|
       c.before_record(:swissmedicInfo) do |i|
-      puts "#{Time.now}: #{__LINE__}: URI was #{i.request.uri} returning #{i.response.body.size / (1024 * 1024)} MB "
-      if i.response.headers["Content-Disposition"]
-        m = /filename=([^\d]+)/.match(i.response.headers["Content-Disposition"][0])
-        if m
-          name = m[1].chomp("_")
-          if /AipsDownload/i.match?(name)
-            # we replace this by manually reduced xml file from spec/data
-            # As we only use to create the fachinfo, we don't need many elements
-            tmp_zip = File.join(Oddb2xml::SpecData, "AipsDownload.zip")
-            i.response.body = IO.binread(tmp_zip)
-            i.response.headers["Content-Length"] = i.response.body.size
-            puts "#{Time.now}: #{__LINE__}: response.body is now #{i.response.body.size / (1024 * 1024)} MB long. #{tmp_zip} was #{File.size(tmp_zip)}"
+        puts "#{Time.now}: #{__LINE__}: URI was #{i.request.uri} returning #{i.response.body.size / (1024 * 1024)} MB"
+        if i.response.headers["Content-Disposition"]
+          m = /filename=([^\d]+)/.match(i.response.headers["Content-Disposition"][0])
+          if m
+            name = m[1].chomp("_")
+            if /AipsDownload/i.match?(name)
+              # we replace this by manually reduced xml file from spec/data
+              # As we only use to create the fachinfo, we don't need many elements
+              tmp_zip = File.join(Oddb2xml::SpecData, "AipsDownload.zip")
+              i.response.body = IO.binread(tmp_zip)
+              i.response.headers["Content-Length"] = i.response.body.size
+              puts "#{Time.now}: #{__LINE__}: response.body is now #{i.response.body.size / (1024 * 1024)} MB long. #{tmp_zip} was #{File.size(tmp_zip)}"
+            end
           end
         end
-      end
       end
     end
     VCR.eject_cassette
@@ -625,7 +617,7 @@ describe Oddb2xml::SwissmedicInfoDownloader do
       expect(File.exist?("swissmedic_info.zip")).to eq(false)
     end
     it "should save into the download directory" do
-      expect(File.exist?(File.join(Oddb2xml::Downloads, "swissmedic_info.zip"))).to eq(true)
+      expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "swissmedic_info.zip"))).to eq(true)
     end
   end
 end

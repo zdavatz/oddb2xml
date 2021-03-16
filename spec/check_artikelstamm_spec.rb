@@ -1,15 +1,14 @@
 require "spec_helper"
 require "oddb2xml/semantic_check"
+CHECK_DIR = File.expand_path(File.join(File.dirname(__FILE__), "data", "check_artikelstamm"))
 
 describe Oddb2xml::SemanticCheck do
-  CheckDir = File.expand_path(File.join(File.dirname(__FILE__), "data", "check_artikelstamm"))
-
   def common_run_init(options = {})
     @savedDir = Dir.pwd
     cleanup_directories_before_run
-    FileUtils.makedirs(Oddb2xml::WorkDir)
-    Dir.chdir(Oddb2xml::WorkDir)
-    mock_downloads
+    FileUtils.makedirs(Oddb2xml::WORK_DIR)
+    Dir.chdir(Oddb2xml::WORK_DIR)
+    mock_DOWNLOADS
   end
 
   after(:all) do
@@ -20,7 +19,7 @@ describe Oddb2xml::SemanticCheck do
       common_run_init
     end
 
-    files2check = Dir.glob(CheckDir + "/*.xml")
+    files2check = Dir.glob(CHECK_DIR + "/*.xml")
 
     files2check.each do |file2check|
       it "should exist" do

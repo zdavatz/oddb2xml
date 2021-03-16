@@ -11,7 +11,7 @@ module Oddb2xml
       @options[:compress_ext] ||= "tar.gz"
       @options[:format] ||= :xml
       @compress_file = "#{prefix}_#{@options[:format]}_" + Time.now.strftime("%d.%m.%Y_%H.%M.#{@options[:compress_ext]}")
-      #      @compress_file = File.join(WorkDir, "#{prefix}_#{@options[:format].to_s}_" +
+      #      @compress_file = File.join(WORK_DIR, "#{prefix}_#{@options[:format].to_s}_" +
       # Time.now.strftime("%d.%m.%Y_%H.%M.#{@options[:compress_ext]}"))
       @contents = []
       super()

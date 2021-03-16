@@ -16,8 +16,8 @@ require "pp"
 # load pry if is available
 begin
   require "pry"
-  Pry.config.output = STDOUT
-  rescue LoadError
+  Pry.config.output = $stdout
+rescue LoadError
 end
 
 require "vcr"
@@ -27,8 +27,8 @@ module Oddb2xml
   # we override here a few directories to make input/output when running specs to
   # be in different places compared when running
   SpecData = File.join(File.dirname(__FILE__), "data")
-  WorkDir = File.join(File.dirname(__FILE__), "run")
-  Downloads = File.join(WorkDir, "downloads")
+  WORK_DIR = File.join(File.dirname(__FILE__), "run")
+  DOWNLOADS = File.join(WORK_DIR, "DOWNLOADS")
   SpecCompressor = File.join(Oddb2xml::SpecData, "compressor")
   DATE_REGEXP = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[-+]\d{4}/
 
@@ -70,8 +70,9 @@ module Oddb2xml
     "7680403330459",
     "7680536620137", # 3TC Filmtabl 150 mg
     "7680555580054", # ZYVOXID
-    "7680620690084" # LEVETIRACETAM DESITIN Mini Filmtab 250 mg needed for extractor_spec.rb
-] + GTINS_CALC
+    # 7680620690084 is LEVETIRACETAM DESITIN Mini Filmtab 250 mg needed for extractor_spec.rb
+    "7680620690084"] +
+    GTINS_CALC
   FERRO_GRADUMET_GTIN = "7680316440115"
   HIRUDOID_GTIN = "7680161050583"
   LANSOYL_GTIN = "7680324750190"
@@ -103,7 +104,7 @@ module Oddb2xml
 end
 
 RSpec.configure do |config|
-    config.mock_with :flexmock
+  config.mock_with :flexmock
 end
 
 VCR.configure do |config|
@@ -111,12 +112,12 @@ VCR.configure do |config|
   config.hook_into :webmock
   config.debug_logger = File.open(File.join(File.dirname(File.dirname(__FILE__)), "vcr.log"), "w+")
   config.debug_logger.sync = true
-  config.default_cassette_options = {:record =>  :once, # ARGV.join(' ').index('downloader_spec') ? :new_episodes : :once ,
-                                      :preserve_exact_body_bytes => true,
-                                      :allow_playback_repeats => true,
-                                      :serialize_with => :json,
-                                      :decode_compressed_response => true,
-                                      :match_requests_on => [:method, :uri, :body]}
+  config.default_cassette_options = {record: :once, # ARGV.join(' ').index('downloader_spec') ? :new_episodes : :once ,
+                                     preserve_exact_body_bytes: true,
+                                     allow_playback_repeats: true,
+                                     serialize_with: :json,
+                                     decode_compressed_response: true,
+                                     match_requests_on: [:method, :uri, :body]}
   #	 :match_requests_on (Array<Symbol, #call>) —
   #
   # List of request matchers to use to determine what recorded HTTP interaction to replay. Defaults to [:method, :uri]. The built-in matchers are :method, :uri, :host, :path, :headers and :body. You can also pass the name of a registered custom request matcher or any object that responds to #call.
@@ -135,12 +136,15 @@ require "oddb2xml"
 module Kernel
   def buildr_capture(stream)
     begin
+      # We know that standardrb complains here. But there is no time to fix it
       stream = stream.to_s
       eval "$#{stream} = StringIO.new"
       yield
       result = eval("$#{stream}").string
     ensure
-      eval "$#{stream} = #{stream.upcase}"
+      eval <<-RUBY, binding, __FILE__, __LINE__ + 1
+        "$#{stream} = #{stream.upcase}"
+      RUBY
     end
     result
   end
@@ -154,15 +158,15 @@ module ServerMockHelper
       File.join(Oddb2xml::SpecCompressor, "medregbm_company.txt*"),
       File.join(Oddb2xml::SpecCompressor, "medregbm_person.txt*"),
       File.join(Oddb2xml::SpecCompressor, "transfer.dat.*"),
-      File.join(Oddb2xml::SpecCompressor, "oddb2xml_files_nonpharma.xls.*")].each { |file| FileUtils.rm_f(Dir.glob(file), :verbose => false) if Dir.glob(file).size > 0 }
+      File.join(Oddb2xml::SpecCompressor, "oddb2xml_files_nonpharma.xls.*")].each { |file| FileUtils.rm_f(Dir.glob(file), verbose: false) if Dir.glob(file).size > 0 }
   end
 
   def cleanup_directories_before_run
-    dirs = [Oddb2xml::Downloads, Oddb2xml::WorkDir]
-    dirs.each { |dir| FileUtils.rm_rf(Dir.glob(File.join(dir, "*")), :verbose => false) }
-    dirs.each { |dir| FileUtils.makedirs(dir, :verbose => false) }
+    dirs = [Oddb2xml::DOWNLOADS, Oddb2xml::WORK_DIR]
+    dirs.each { |dir| FileUtils.rm_rf(Dir.glob(File.join(dir, "*")), verbose: false) }
+    dirs.each { |dir| FileUtils.makedirs(dir, verbose: false) }
     cleanup_compressor
-    mock_downloads
+    mock_DOWNLOADS
   end
 
   def setup_server_mocks
@@ -177,10 +181,10 @@ def check_elements(xml_name, tests)
     it "should have correct entries #{value} for path #{path}" do
       found = false
       Nokogiri::XML(File.read(xml_name)).search(path, nil, nil).each do |x|
-      if value.match(x.text)
-        found = true
-        break
-      end
+        if value.match(x.text)
+          found = true
+          break
+        end
       end
       expect(found).to be true
     end
@@ -222,7 +226,7 @@ RSpec.configure do |config|
 end
 
 def validate_via_xsd(xsd_file, xml_file)
-  xsd = open(xsd_file).read
+  xsd = File.open(xsd_file).read
   xsd_rtikelstamm_xml = Nokogiri::XML::Schema(xsd)
   doc = Nokogiri::XML(File.read(xml_file))
   xsd_rtikelstamm_xml.validate(doc).each do |error|
@@ -230,38 +234,39 @@ def validate_via_xsd(xsd_file, xml_file)
       puts "Failed validating #{xml_file} with #{File.size(xml_file)} bytes using XSD from #{xsd_file}"
       puts "CMD: xmllint --noout --schema #{xsd_file} #{xml_file}"
     end
-      msg = "expected #{error.message} to be nil\nfor #{xml_file}"
-      puts msg
-      expect(error.message).to be_nil, msg
+    msg = "expected #{error.message} to be nil\nfor #{xml_file}"
+    puts msg
+    expect(error.message).to be_nil, msg
   end
 end
 
-def mock_downloads
+def mock_DOWNLOADS
   WebMock.enable!
-    {"transfer.zip" => ["transfer.dat"],
-      "XMLPublications.zip" => ["Preparations.xml", "ItCodes.xml", "GL_Diff_SB.xml"]}.each do |zip, entries|
-      zip_file = File.join(Oddb2xml::SpecData, zip)
-        files = entries.collect {|entry| File.join(Oddb2xml::SpecData, entry)}
-        FileUtils.rm(zip_file, :verbose => false) if File.exist?(zip_file)
-        cmd = "zip --quiet --junk-paths #{zip_file} #{files.join(" ")}"
-        system(cmd)
-    end
-    {"https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/interactions_de_utf8.csv" => "epha_interactions.csv",
-      "https://www.swissmedic.ch/swissmedic/de/home/services/listen_neu.html" => "listen_neu.html",
-      "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/internetlisten/status_ophan%20Drug.xlsx.download.xlsx/Liste_OrphanDrug_Internet_2019_01_31.xlsx" => "swissmedic_orphan.xlsx",
-      "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/internetlisten/zugelassene_packungen_ham.xlsx.download.xlsx/Zugelassene_Packungen%20HAM_31012019.xlsx" => "swissmedic_package.xlsx",
-      "http://pillbox.oddb.org/TRANSFER.ZIP" => "transfer.zip",
-      "https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt" => "atc.csv",
-      "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt" => "oddb2xml_files_lppv.txt",
-      "http://www.xn--spezialittenliste-yqb.ch/File.axd?file=XMLPublications.zip" => "XMLPublications.zip",
-      #      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml
-      "http://www.spezialitaetenliste.ch/varia_De.htm" => "varia_De.htm"}.each do |url, file|
-      inhalt = File.read(File.join(Oddb2xml::SpecData, file))
-      m = flexmock("open-uri")
-      m.should_receive(:open).with(url).and_return(inhalt)
-      stub_request(:any, url).to_return(body: inhalt)
-      stub_request(:get, url).to_return(body: inhalt)
-      stub_request(:open, url).to_return(body: inhalt)
-    end
-    VCR.eject_cassette; VCR.insert_cassette("oddb2xml")
+  {"transfer.zip" => ["transfer.dat"],
+   "XMLPublications.zip" => ["Preparations.xml", "ItCodes.xml", "GL_Diff_SB.xml"]}.each do |zip, entries|
+    zip_file = File.join(Oddb2xml::SpecData, zip)
+    files = entries.collect { |entry| File.join(Oddb2xml::SpecData, entry) }
+    FileUtils.rm(zip_file, verbose: false) if File.exist?(zip_file)
+    cmd = "zip --quiet --junk-paths #{zip_file} #{files.join(" ")}"
+    system(cmd)
+  end
+  {"https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/interactions_de_utf8.csv" => "epha_interactions.csv",
+   "https://www.swissmedic.ch/swissmedic/de/home/services/listen_neu.html" => "listen_neu.html",
+   "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/internetlisten/status_ophan%20Drug.xlsx.download.xlsx/Liste_OrphanDrug_Internet_2019_01_31.xlsx" => "swissmedic_orphan.xlsx",
+   "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/internetlisten/zugelassene_packungen_ham.xlsx.download.xlsx/Zugelassene_Packungen%20HAM_31012019.xlsx" => "swissmedic_package.xlsx",
+   "http://pillbox.oddb.org/TRANSFER.ZIP" => "transfer.zip",
+   "https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt" => "atc.csv",
+   "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt" => "oddb2xml_files_lppv.txt",
+   "http://www.xn--spezialittenliste-yqb.ch/File.axd?file=XMLPublications.zip" => "XMLPublications.zip",
+   #      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml
+   "http://www.spezialitaetenliste.ch/varia_De.htm" => "varia_De.htm"}.each do |url, file|
+    inhalt = File.read(File.join(Oddb2xml::SpecData, file))
+    m = flexmock("open-uri")
+    m.should_receive(:open).with(url).and_return(inhalt)
+    stub_request(:any, url).to_return(body: inhalt)
+    stub_request(:get, url).to_return(body: inhalt)
+    stub_request(:open, url).to_return(body: inhalt)
+  end
+  VCR.eject_cassette
+  VCR.insert_cassette("oddb2xml")
 end

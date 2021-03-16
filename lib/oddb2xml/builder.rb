@@ -482,7 +482,7 @@ module Oddb2xml
               ean13_to_product[ean13] = obj
               obj[:pharmacode] ||= @refdata[ean13][:pharmacode] if @refdata[ean13]
       }
-      ausgabe = File.open(File.join(WorkDir, 'missing_in_refdata.txt'), 'w+')
+      ausgabe = File.open(File.join(WORK_DIR, 'missing_in_refdata.txt'), 'w+')
       size_old = ean13_to_product.size
       @missing = []
       Oddb2xml.log "build_product add_missing_products_from_swissmedic. Imported #{size_old} ean13_to_product from @products. Checking #{@packs.size} @packs"
@@ -704,7 +704,7 @@ module Oddb2xml
 
     def prepare_calc_items(suppress_composition_parsing: false)
       @calc_items = {}
-      packungen_xlsx = File.join(Oddb2xml::WorkDir, "swissmedic_package.xlsx")
+      packungen_xlsx = File.join(Oddb2xml::WORK_DIR, "swissmedic_package.xlsx")
       idx = 0
       return unless File.exists?(packungen_xlsx)
       workbook = RubyXL::Parser.parse(packungen_xlsx)
@@ -825,7 +825,7 @@ module Oddb2xml
         end
       end
 
-      csv_name = File.join(WorkDir, 'oddb_calc.csv')
+      csv_name = File.join(WORK_DIR, 'oddb_calc.csv')
       CSV.open(csv_name, "w+", :col_sep => ';') do |csv|
         csv << ['gtin'] + @calc_items.values.first.headers
         @calc_items.each do |key, value|
@@ -1405,7 +1405,7 @@ module Oddb2xml
 
     def build_artikelstamm
       @@emitted_v5_gtins = []
-      @csv_file = CSV.open(File.join(WorkDir,  "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.csv"), "w+")
+      @csv_file = CSV.open(File.join(WORK_DIR,  "artikelstamm_#{Date.today.strftime('%d%m%Y')}_v5.csv"), "w+")
       @csv_file << ['gtin', 'name', 'pkg_size', 'galenic_form', 'price_ex_factory', 'price_public', 'prodno', 'atc_code', 'active_substance', 'original', 'it-code', 'sl-liste']
       @csv_file.sync = true
       variant = "build_artikelstamm"

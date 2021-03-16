@@ -78,19 +78,19 @@ describe Oddb2xml::Compressor do
     context "unexpectedly" do
       before(:each) do
         cleanup_directories_before_run
-        @savedDir = Dir.pwd
+        @saved_dir = Dir.pwd
         Dir.chdir Oddb2xml::SpecCompressor
         @compressor = Oddb2xml::Compressor.new
       end
       after(:each) do
-        Dir.chdir @savedDir if @savedDir && File.directory?(@savedDir)
+        Dir.chdir @saved_dir if @saved_dir && File.directory?(@saved_dir)
       end
       it "should fail with no contents" do
         expect(@compressor.finalize!).to eq(false)
       end
       it "should fail with invalid file" do
         @compressor.contents << "../invalid_file"
-        expect{@compressor.finalize!}.to raise_error(RuntimeError)
+        expect { @compressor.finalize! }.to raise_error(RuntimeError)
       end
     end
     context "successfully" do
@@ -104,14 +104,14 @@ describe Oddb2xml::Compressor do
       context "with zip" do
         before(:each) do
           cleanup_directories_before_run
-          @savedDir = Dir.pwd
+          @saved_dir = Dir.pwd
           Dir.chdir Oddb2xml::SpecCompressor
           @compressor = Oddb2xml::Compressor.new("oddb", {compress_ext: "zip"})
         end
         after(:each) do
-          Dir.chdir @savedDir if @savedDir && File.directory?(@savedDir)
+          Dir.chdir @saved_dir if @saved_dir && File.directory?(@saved_dir)
         end
-        it_behaves_like "any compressor" if true
+        it_behaves_like "any compressor"
       end
     end
   end

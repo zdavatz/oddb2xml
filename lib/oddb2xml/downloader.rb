@@ -12,8 +12,8 @@ module Oddb2xml
     private
 
     def download_as(file, option = "w+")
-      temp_file = File.join(WorkDir, File.basename(file))
-      @file2save = File.join(Downloads, File.basename(file))
+      temp_file = File.join(WORK_DIR, File.basename(file))
+      @file2save = File.join(DOWNLOADS, File.basename(file))
       report_download(@url, @file2save)
       data = nil
       if Oddb2xml.skip_download(file)
@@ -84,14 +84,14 @@ module Oddb2xml
       Oddb2xml.log "read_xml_from_zip target is #{target} zip: #{zipfile} #{File.exist?(zipfile)}"
       if Oddb2xml.skip_download?
         entry = nil
-        Dir.glob(File.join(Downloads, "*")).each do |name|
+        Dir.glob(File.join(DOWNLOADS, "*")).each do |name|
           if target.match(name)
             entry = name
             break
           end
         end
         if entry
-          dest = "#{Downloads}/#{File.basename(entry)}"
+          dest = "#{DOWNLOADS}/#{File.basename(entry)}"
           @file2save = dest
           if File.exist?(dest)
             Oddb2xml.log "read_xml_from_zip return content of #{dest} #{File.size(dest)} bytes "
@@ -116,7 +116,7 @@ module Oddb2xml
                 bytes = nil
               end
               io.close if io.respond_to?(:close)
-              dest = "#{Downloads}/#{File.basename(entry.name)}"
+              dest = "#{DOWNLOADS}/#{File.basename(entry.name)}"
               File.open(dest, "w+") { |f| f.write xml }
               Oddb2xml.log "read_xml_from_zip saved as #{dest}"
             end
@@ -126,7 +126,7 @@ module Oddb2xml
         Zip::File.foreach(zipfile) do |entry|
           if entry.name&.match?(target)
             Oddb2xml.log "read_xml_from_zip #{__LINE__}: reading #{entry.name}"
-            dest = "#{Downloads}/#{File.basename(entry.name)}"
+            dest = "#{DOWNLOADS}/#{File.basename(entry.name)}"
             entry.get_input_stream { |io| xml = io.read }
             File.open(dest, "w+") { |f| f.write xml }
             Oddb2xml.log "read_xml_from_zip saved as #{dest}"
@@ -168,10 +168,10 @@ module Oddb2xml
     include DownloadMethod
     def download
       @url ||= "http://pillbox.oddb.org/TRANSFER.ZIP"
-      zipfile = File.join(WorkDir, "transfer.zip")
+      zipfile = File.join(WORK_DIR, "transfer.zip")
       download_as(zipfile)
-      dest = File.join(Downloads, "transfer.dat")
-      cmd = "unzip -o '#{zipfile}' -d '#{Downloads}'"
+      dest = File.join(DOWNLOADS, "transfer.dat")
+      cmd = "unzip -o '#{zipfile}' -d '#{DOWNLOADS}'"
       system(cmd)
       if @options[:artikelstamm]
         cmd = "iconv -f ISO8859-1 -t utf-8 -o #{dest.sub(".dat", ".utf8")} #{dest}"
@@ -218,15 +218,15 @@ module Oddb2xml
     end
 
     def download
-      file = File.join(WorkDir, "XMLPublications.zip")
+      file = File.join(WORK_DIR, "XMLPublications.zip")
       download_as(file)
       report_download(@url, file)
       if defined?(RSpec)
         src = File.join(Oddb2xml::SpecData, "Preparations.xml")
         content = File.read(src)
-        FileUtils.cp(src, File.join(Downloads, File.basename(file)))
+        FileUtils.cp(src, File.join(DOWNLOADS, File.basename(file)))
       else
-        content = read_xml_from_zip(/Preparations.xml/, File.join(Downloads, File.basename(file)))
+        content = read_xml_from_zip(/Preparations.xml/, File.join(DOWNLOADS, File.basename(file)))
       end
       if @options[:artikelstamm]
         cmd = "xmllint --format --output Preparations.xml Preparations.xml"
@@ -257,7 +257,7 @@ module Oddb2xml
 
     def download
       begin
-        @file2save = File.join(Downloads, "refdata_#{@type}.xml")
+        @file2save = File.join(DOWNLOADS, "refdata_#{@type}.xml")
         soap = %(<?xml version="1.0" encoding="UTF-8"?>
 <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://refdatabase.refdata.ch/Article_in" xmlns:ns2="http://refdatabase.refdata.ch/">
   <SOAP-ENV:Body>
@@ -276,7 +276,7 @@ module Oddb2xml
           if (xml = response.to_xml)
             xml = File.read(File.join(Oddb2xml::SpecData, File.basename(@file2save))) if defined?(RSpec)
             response = nil # win
-            FileUtils.makedirs(Downloads)
+            FileUtils.makedirs(DOWNLOADS)
             File.open(@file2save, "w+") { |file| file.write xml }
             if @options[:artikelstamm]
               cmd = "xmllint --format --output #{@file2save} #{@file2save}"
@@ -316,7 +316,7 @@ module Oddb2xml
     end
 
     def download
-      @file2save = File.join(Oddb2xml::WorkDir, "swissmedic_#{@type}.xlsx")
+      @file2save = File.join(Oddb2xml::WORK_DIR, "swissmedic_#{@type}.xlsx")
       report_download(@url, @file2save)
       if @options[:calc] && @options[:skip_download] && File.exist?(@file2save) && ((Time.now - File.ctime(@file2save)).to_i < 24 * 60 * 60)
         Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{@file2save} #{File.size(@file2save)} bytes"
@@ -327,7 +327,7 @@ module Oddb2xml
         @url = @direct_url_link
         download_as(@file2save, "w+")
         if @options[:artikelstamm]
-          cmd = "ssconvert '#{@file2save}' '#{File.join(Downloads, File.basename(@file2save).sub(/\.xls.*/, ".csv"))}' 2> /dev/null"
+          cmd = "ssconvert '#{@file2save}' '#{File.join(DOWNLOADS, File.basename(@file2save).sub(/\.xls.*/, ".csv"))}' 2> /dev/null"
           Oddb2xml.log(cmd)
           system(cmd)
         end
@@ -349,7 +349,7 @@ module Oddb2xml
     end
 
     def download
-      file = File.join(Downloads, "swissmedic_info.zip")
+      file = File.join(DOWNLOADS, "swissmedic_info.zip")
       report_download(@url, file)
       FileUtils.rm_f(file, verbose: false) unless Oddb2xml.skip_download?
       unless File.exist?(file)

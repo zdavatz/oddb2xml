@@ -43,12 +43,12 @@ module Oddb2xml
     outfile = "spec/data/transfer.dat"
     FileUtils.rm_f(outfile, verbose: true)
     start_keys.each do |key|
-      cmd = "egrep '^#{key}' downloads/transfer.dat >> #{outfile}"
+      cmd = "egrep '^#{key}' DOWNLOADS/transfer.dat >> #{outfile}"
       system(cmd)
     end
     iksnrs = []
     gtins.each do |key|
-      cmd = "grep #{key} downloads/transfer.dat >> #{outfile}"
+      cmd = "grep #{key} DOWNLOADS/transfer.dat >> #{outfile}"
       system(cmd)
       iksnrs << key.to_s[4..8] if /^7680/i.match?(key.to_s)
     end
@@ -57,12 +57,12 @@ module Oddb2xml
   end
 
   def self.check_gtin(gtin)
-    files = `grep -l #{gtin} downloads/*.xml`.split("\n")
+    files = `grep -l #{gtin} DOWNLOADS/*.xml`.split("\n")
     files.each do |file|
       short = File.join(SpecData, File.basename(file))
-      nrMatches = 0
-      nrMatches = `grep -c #{gtin} #{short}`.to_i if File.exist?(short)
-      puts "Could not find #{gtin} in #{short}" unless nrMatches > 0
+      nr_matches = 0
+      nr_matches = `grep -c #{gtin} #{short}`.to_i if File.exist?(short)
+      puts "Could not find #{gtin} in #{short}" unless nr_matches > 0
     end
   end
 end

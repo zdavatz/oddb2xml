@@ -1,20 +1,10 @@
 require "spec_helper"
 require "rexml/document"
 require "webmock/rspec"
-include REXML
-RUN_ALL = true
 
 describe Oddb2xml::Builder do
+  include REXML
   raise "Cannot rspec in directroy containing a spac" if / /.match?(Oddb2xml::SpecData)
-  NrExtendedArticles = 34
-  NrSubstances = 14
-  NrLimitations = 5
-  NrInteractions = 5
-  NrCodes = 5
-  NrProdno = 23
-  NrPackages = 24
-  NrProducts = 19
-  RegExpDesitin = /1125819012LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
   include ServerMockHelper
   def check_artikelstamm_xml(key, expected_value)
     expect(@artikelstamm_name).not_to be nil
@@ -22,28 +12,28 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
-    binding.pry if defined?(Pry) && !@inhalt.index(expected_value)
+    # binding.pry if defined?(Pry) && !@inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
 
   def common_run_init(options = {})
-    @savedDir = Dir.pwd
+    @saved_dir = Dir.pwd
     @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), "..", "oddb2xml.xsd"))
     @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), "..", "oddb_calc.xsd"))
     @elexis_v5_xsd = File.expand_path(File.join(__FILE__, "..", "..", "Elexis_Artikelstamm_v5.xsd"))
-    @elexis_v5_csv = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.csv")
+    @elexis_v5_csv = File.join(Oddb2xml::WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.csv")
 
     expect(File.exist?(@oddb2xml_xsd)).to eq true
     expect(File.exist?(@oddb_calc_xsd)).to eq true
     expect(File.exist?(@elexis_v5_xsd)).to eq true
     cleanup_directories_before_run
-    FileUtils.makedirs(Oddb2xml::WorkDir)
-    Dir.chdir(Oddb2xml::WorkDir)
-    mock_downloads
+    FileUtils.makedirs(Oddb2xml::WORK_DIR)
+    Dir.chdir(Oddb2xml::WORK_DIR)
+    mock_DOWNLOADS
   end
 
   after(:all) do
-    Dir.chdir @savedDir if @savedDir && File.directory?(@savedDir)
+    Dir.chdir @saved_dir if @saved_dir && File.directory?(@saved_dir)
   end
   context "when artikelstamm option is given" do
     before(:all) do
@@ -51,7 +41,7 @@ describe Oddb2xml::Builder do
       options = Oddb2xml::Options.parse(["--artikelstamm"]) # , '--log'])
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
       Oddb2xml::Cli.new(options).run # to debug
-      @artikelstamm_name = File.join(Oddb2xml::WorkDir, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml")
+      @artikelstamm_name = File.join(Oddb2xml::WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml")
       @doc = Nokogiri::XML(File.open(@artikelstamm_name))
       # @rexml = REXML::Document.new File.read(@artikelstamm_name)
       @inhalt = IO.read(@artikelstamm_name)
@@ -62,7 +52,7 @@ describe Oddb2xml::Builder do
     end
 
     it "should create transfer.ut8" do
-      expect(File.exist?(File.join(Oddb2xml::Downloads, "transfer.utf8"))).to eq true
+      expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "transfer.utf8"))).to eq true
     end
 
     it "should have a comment" do
@@ -495,7 +485,7 @@ Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorge
   end
   context "chapter 70 hack" do
     before(:all) do
-      mock_downloads
+      mock_DOWNLOADS
     end
     it "parsing" do
       require "oddb2xml/chapter_70_hack"

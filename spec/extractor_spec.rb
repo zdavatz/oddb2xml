@@ -2,17 +2,19 @@ require "spec_helper"
 require "#{Dir.pwd}/lib/oddb2xml/downloader"
 ENV["TZ"] = "UTC" # needed for last_change
 LAST_CHANGE = "2015-07-03 00:00:00 +0000"
+LAST_CHANGE_2 = "2015-11-24 00:00:00 +0000"
 
 def common_before
-  @savedDir = Dir.pwd
-  FileUtils.makedirs(Oddb2xml::WorkDir)
-  Dir.chdir(Oddb2xml::WorkDir)
-  VCR.eject_cassette; VCR.insert_cassette("oddb2xml")
+  @saved_dir = Dir.pwd
+  FileUtils.makedirs(Oddb2xml::WORK_DIR)
+  Dir.chdir(Oddb2xml::WORK_DIR)
+  VCR.eject_cassette
+  VCR.insert_cassette("oddb2xml")
 end
 
 def common_after
   VCR.eject_cassette
-  Dir.chdir(@savedDir) if @savedDir && File.directory?(@savedDir)
+  Dir.chdir(@saved_dir) if @saved_dir && File.directory?(@saved_dir)
 end
 
 describe Oddb2xml::LppvExtractor do
@@ -39,9 +41,9 @@ unless SKIP_MIGEL_DOWNLOADER
     after(:all) { common_after }
     it "should have at some items" do
       expect(@items.size).not_to eq 0
-      expect(@items.find { |k, v| 3248410 == v[:pharmacode] }).not_to be_nil
+      expect(@items.find { |k, v| v[:pharmacode] == 3248410 }).not_to be_nil
       expect(@items.find { |k, v| /Novopen/i.match(v[:desc_de]) }).not_to be_nil
-      expect(@items.find { |k, v| 3036984 == v[:pharmacode] }).not_to be_nil
+      expect(@items.find { |k, v| v[:pharmacode] == 3036984 }).not_to be_nil
       # Epimineral without pharmacode nor GTIN should not appear
       expect(@items.find { |k, v| /Epimineral/i.match(v[:desc_de]) }).to be_nil
     end
@@ -51,7 +53,6 @@ end
 describe Oddb2xml::RefdataExtractor do
   before(:all) { common_before }
   after(:all) { common_after }
-  Last_change = "2015-11-24 00:00:00 +0000"
 
   context "should handle pharma articles" do
     subject do
@@ -69,7 +70,6 @@ describe Oddb2xml::RefdataExtractor do
                   _type: :pharma,
                   ean13: Oddb2xml::LEVETIRACETAM_GTIN.to_s,
                   no8: "62069008",
-                  data_origin: "refdata",
                   desc_de: "LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
                   desc_fr: "LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce",
                   atc_code: "N03AX14",
@@ -94,7 +94,7 @@ describe Oddb2xml::RefdataExtractor do
                   _type: :nonpharma,
                   ean13: "7611600441020",
                   no8: nil,
-                  last_change: Last_change,
+                  last_change: LAST_CHANGE_2,
                   data_origin: "refdata",
                   desc_de: "TUBEGAZE Verband weiss Nr 12 20m Finger gross",
                   desc_fr: "TUBEGAZE pans tubul blanc Nr 12 20m doigts grands",
@@ -162,7 +162,10 @@ describe Oddb2xml::SwissmedicInfoExtractor do
 end
 
 describe Oddb2xml::SwissmedicExtractor do
-  before(:all) { common_before; cleanup_directories_before_run }
+  before(:all) do
+    common_before
+    cleanup_directories_before_run
+  end
   after(:all) { common_after }
   context "when transfer.dat is empty" do
     subject { Oddb2xml::SwissmedicInfoExtractor.new("") }
@@ -302,7 +305,9 @@ describe Oddb2xml::ZurroseExtractor do
     it { expect(subject.to_hash.values.first[:price]).to eq("15.76") }
     it { expect(subject.to_hash.values.first[:pub_price]).to eq("24.30") }
     it { expect(subject.to_hash.values.first[:pharmacode]).to eq("0020652") }
-    it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("2") end
+    it "should set the correct SALECD cmut code" do
+      expect(subject.to_hash.values.first[:cmut]).to eq("2")
+    end
   end
   context "when SOFRADEX is given" do
     subject do
@@ -312,8 +317,12 @@ describe Oddb2xml::ZurroseExtractor do
       Oddb2xml::ZurroseExtractor.new(dat)
     end
     # it { expect(subject.to_hash.keys.first).to eq("7680316950157") }
-    it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("3") end
-    it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to eq("SOFRADEX Gtt Auric 8 ml") end
+    it "should set the correct SALECD cmut code" do
+      expect(subject.to_hash.values.first[:cmut]).to eq("3")
+    end
+    it "should set the correct SALECD description" do
+      expect(subject.to_hash.values.first[:description]).to eq("SOFRADEX Gtt Auric 8 ml")
+    end
   end
   context "when Ethacridin is given" do
     subject do
@@ -323,13 +332,17 @@ describe Oddb2xml::ZurroseExtractor do
       Oddb2xml::ZurroseExtractor.new(dat, true)
     end
     it { expect(subject.to_hash.keys.first).to eq("9999998807890") }
-    it "should set the correct SALECD cmut code" do expect(subject.to_hash.values.first[:cmut]).to eq("2") end
-    it "should set the correct SALECD description" do expect(subject.to_hash.values.first[:description]).to match(/Ethacridin lactat 1.+ 100ml/) end
+    it "should set the correct SALECD cmut code" do
+      expect(subject.to_hash.values.first[:cmut]).to eq("2")
+    end
+    it "should set the correct SALECD description" do
+      expect(subject.to_hash.values.first[:description]).to match(/Ethacridin lactat 1.+ 100ml/)
+    end
   end
   context "when parsing examples" do
     subject do
       filename = File.expand_path(File.join(__FILE__, "..", "data", "transfer.dat"))
-      res = Oddb2xml::ZurroseExtractor.new(filename, true)
+      Oddb2xml::ZurroseExtractor.new(filename, true)
     end
 
     it "should extract EPIMINERAL" do
@@ -337,10 +350,10 @@ describe Oddb2xml::ZurroseExtractor do
       expect(ethacridin[:description]).to eq("EPIMINERAL Paste 20 g")
     end
 
-    specials = {"SEMPER Cookie" => "SEMPER Cookie-O's Biskuit glutenfrei 150 g",
-                "DermaSilk" => "DermaSilk Set Body + Strumpfhöschen 24-36 Mon (98)",
-                "after sting Roll-on" => "CER'8 after sting Roll-on 20 ml",
-                "Inkosport" => "Inkosport Activ Pro 80 Himbeer - Joghurt Ds 750g"}
+    {"SEMPER Cookie" => "SEMPER Cookie-O's Biskuit glutenfrei 150 g",
+     "DermaSilk" => "DermaSilk Set Body + Strumpfhöschen 24-36 Mon (98)",
+     "after sting Roll-on" => "CER'8 after sting Roll-on 20 ml",
+     "Inkosport" => "Inkosport Activ Pro 80 Himbeer - Joghurt Ds 750g"}
       .each { |key, value|
       it "should set the correct #{key} description" do
         item = subject.to_hash.values.find { |x| /#{key}/i.match(x[:description]) }

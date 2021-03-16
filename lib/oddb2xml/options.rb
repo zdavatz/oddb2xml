@@ -38,8 +38,8 @@ module Oddb2xml
         opt :context, "{product|address}. product is default.", default: "product", type: :string, short: "x"
         opt :calc, "create only oddb_calc.xml with GTIN, name and galenic information"
 
-        opt :skip_download, "skips downloading files it the file is already under downloads.
-                            Downloaded files are saved under downloads"
+        opt :skip_download, "skips downloading files it the file is already under DOWNLOADS.
+                            Downloaded files are saved under DOWNLOADS"
         opt :log, "log important actions", short: :none
         opt :use_ra11zip, "Use the ra11.zip (a zipped transfer.dat from Galexis)",
           default: File.exist?("ra11.zip") ? "ra11.zip" : nil, type: :string
