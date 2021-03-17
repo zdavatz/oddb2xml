@@ -3,6 +3,8 @@
 * Added standard to rake tasks
 * Use ATC-code from refdata if available and show differences
 * Get pharmacode from tranfer.dat for artikelstamm if possible
+* We do not longer test Ruby 2.4 with github/actions
+* Update build status to use github/actions instead of travis
 
 === 2.7.1 / 03.02.2021
 * travis-ci -> Github Actions
