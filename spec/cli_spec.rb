@@ -1,6 +1,4 @@
-# encoding: utf-8
-
-require 'spec_helper'
+require "spec_helper"
 
 RSpec::Matchers.define :have_option do |option|
   match do |interface|
@@ -14,16 +12,16 @@ RSpec::Matchers.define :have_option do |option|
   end
 end
 
-shared_examples_for 'any interface for product' do
+shared_examples_for "any interface for product" do
   it { expect(@cli).to respond_to(:run) }
-  it 'should run successfully' do
+  it "should run successfully" do
     expect(@cli_output).to match(/products/)
   end
 end
 
-shared_examples_for 'any interface for address' do
+shared_examples_for "any interface for address" do
   it { buildr_capture(:stdout) { expect(@cli).to respond_to(:run) } }
-  it 'should run successfully' do
+  it "should run successfully" do
     expect(@cli_output).to match(/addresses/)
   end
 end
@@ -34,65 +32,64 @@ describe Oddb2xml::Cli do
   include ServerMockHelper
   before(:all) do
     VCR.eject_cassette
-    VCR.insert_cassette('oddb2xml')
-    @savedDir = Dir.pwd
+    VCR.insert_cassette("oddb2xml")
+    @saved_dir = Dir.pwd
     cleanup_directories_before_run
-    FileUtils.makedirs(Oddb2xml::WorkDir)
-    Dir.chdir(Oddb2xml::WorkDir)
+    FileUtils.makedirs(Oddb2xml::WORK_DIR)
+    Dir.chdir(Oddb2xml::WORK_DIR)
   end
   after(:all) do
-    Dir.chdir(@savedDir) if @savedDir and File.directory?(@savedDir)
+    Dir.chdir(@saved_dir) if @saved_dir && File.directory?(@saved_dir)
     cleanup_compressor
   end
 
-  context 'when -x address option is given' do
+  context "when -x address option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-e')
+      Oddb2xml::Options.parse("-e")
       # @cli = Oddb2xml::Cli.new(options);  @cli.run
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
   end
-  context 'when -o fi option is given' do
+  context "when -o fi option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-o fi')
-      @cli = Oddb2xml::Cli.new(options);
-      @cli_output = buildr_capture(:stdout) { @cli.run }
-    end
-#    it_behaves_like 'any interface for product'
-    it 'should have nonpharma option' do
-      expect(@cli).to have_option(:fi => true)
-    end
-  end
-
-  context 'when -t md option is given' do
-    before(:all) do
-      cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-t md')
+      options = Oddb2xml::Options.parse("-o fi")
       @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
-    it_behaves_like 'any interface for product'
-    it 'should have tag_suffix option' do
-      expect(@cli).to have_option(:tag_suffix=> 'md')
+    #    it_behaves_like 'any interface for product'
+    it "should have nonpharma option" do
+      expect(@cli).to have_option(fi: true)
     end
-    it 'should not create a compressed file' do
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.tar.gz')).first).to be_nil
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.zip')).first).to be_nil
+  end
+
+  context "when -t md option is given" do
+    before(:all) do
+      cleanup_directories_before_run
+      options = Oddb2xml::Options.parse("-t md")
+      @cli = Oddb2xml::Cli.new(options)
+      @cli_output = buildr_capture(:stdout) { @cli.run }
     end
-    it 'should create xml files with prefix swiss_' do
+    it_behaves_like "any interface for product"
+    it "should have tag_suffix option" do
+      expect(@cli).to have_option(tag_suffix: "md")
+    end
+    it "should not create a compressed file" do
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
+    end
+    it "should create xml files with prefix swiss_" do
       expected = [
-        'md_product.xml',
-        'md_article.xml',
-        'md_limitation.xml',
-        'md_substance.xml',
-        'md_interaction.xml',
-        'md_code.xml'
+        "md_product.xml",
+        "md_article.xml",
+        "md_limitation.xml",
+        "md_substance.xml",
+        "md_interaction.xml",
+        "md_code.xml"
       ]
-      expected.each{
-          |name|
-        tst_file = File.join(Oddb2xml::WorkDir, name)
+      expected.each { |name|
+        tst_file = File.join(Oddb2xml::WORK_DIR, name)
         expect(Dir.glob(tst_file).size).to eq 1
         tst_size = File.size(tst_file)
         if tst_size < 1024
@@ -101,238 +98,240 @@ describe Oddb2xml::Cli do
         expect(tst_size).to be >= 400
       }
     end
-    it 'should produce a correct report' do
+    it "should produce a correct report" do
       expect(@cli_output).to match(/Pharma products:/)
     end
   end
 
-  context 'when -c tar.gz option is given' do
+  context "when -c tar.gz option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-c tar.gz')
+      options = Oddb2xml::Options.parse("-c tar.gz")
       @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
       # @cli_output = @cli.run # to debug
     end
 
-    it_behaves_like 'any interface for product'
-    it 'should not create any xml file' do
-        expect(@cli_output).to match(/Pharma/)
-        Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
-        expect(File.exists?(file)).to be_falsey
+    it_behaves_like "any interface for product"
+    it "should not create any xml file" do
+      expect(@cli_output).to match(/Pharma/)
+      Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
+        expect(File.exist?(file)).to be_falsey
       end
     end
-    it 'should have compress option' do
-      expect(@cli).to have_option(:compress_ext => 'tar.gz')
+    it "should have compress option" do
+      expect(@cli).to have_option(compress_ext: "tar.gz")
     end
-    it 'should create tar.gz file' do
-      file = Dir.glob(File.join(Dir.pwd, 'oddb_*.tar.gz')).first
-      expect(File.exists?(file)).to eq true
+    it "should create tar.gz file" do
+      file = Dir.glob(File.join(Dir.pwd, "oddb_*.tar.gz")).first
+      expect(File.exist?(file)).to eq true
     end
-    it 'should not create any xml file' do
-      Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
-        expect(File.exists?(file)).to be_falsey
+    it "should not create any xml file" do
+      Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
+        expect(File.exist?(file)).to be_falsey
       end
     end
   end
 
-  context 'when -c zip option is given' do
+  context "when -c zip option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-c zip')
+      options = Oddb2xml::Options.parse("-c zip")
       @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
-    it_behaves_like 'any interface for product'
-    it 'should have compress option' do
-      expect(@cli).to have_option(:compress_ext => 'zip')
+    it_behaves_like "any interface for product"
+    it "should have compress option" do
+      expect(@cli).to have_option(compress_ext: "zip")
     end
-    it 'should create zip file' do
+    it "should create zip file" do
       expect(@cli_output).to match(/Pharma/)
-      file = Dir.glob(File.join(Dir.pwd, 'oddb_*.zip')).first
-      expect(File.exists?(file)).to eq true
+      file = Dir.glob(File.join(Dir.pwd, "oddb_*.zip")).first
+      expect(File.exist?(file)).to eq true
     end
-    it 'should not create any xml file' do
-      Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file| FileUtil.rm_f(file) end
+    it "should not create any xml file" do
+      Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each { |file| FileUtil.rm_f(file) }
       expect(@cli_output).to match(/Pharma/)
-      Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
-        expect(File.exists?(file)).to be_falsey
+      Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
+        expect(File.exist?(file)).to be_falsey
       end
     end
   end
 
-  context 'when -f dat option is given' do
+  context "when -f dat option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-f dat')
+      options = Oddb2xml::Options.parse("-f dat")
       @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
-    it_behaves_like 'any interface for product'
-    it 'should have nonpharma option' do
-      expect(@cli).to have_option(:format => :dat, :extended => false)
+    it_behaves_like "any interface for product"
+    it "should have nonpharma option" do
+      expect(@cli).to have_option(format: :dat, extended: false)
     end
-    it 'should create the needed files' do
+    it "should create the needed files" do
       expect(@cli_output).to match(/\sPharma\s/)
-      expect(File.exists?(File.join(Oddb2xml::Downloads, 'transfer.zip'))).to eq true
-      expect(File.exists?(File.join(Oddb2xml::WorkDir, 'transfer.zip'))).to eq false
-      expected = [
-        'duplicate_ean13_from_zur_rose.txt',
-        'oddb.dat',
-      ].each{ |file|
-        expect(File.exists?(File.join(Oddb2xml::WorkDir, file))).to eq true
-            }
+      expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "transfer.zip"))).to eq true
+      expect(File.exist?(File.join(Oddb2xml::WORK_DIR, "transfer.zip"))).to eq false
+      [
+        "duplicate_ean13_from_zur_rose.txt",
+        "oddb.dat"
+      ].each { |file|
+        expect(File.exist?(File.join(Oddb2xml::WORK_DIR, file))).to eq true
+      }
     end
   end
-  context 'when  -e and -f dat option is given' do
+  context "when  -e and -f dat option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-e -f dat')
+      options = Oddb2xml::Options.parse("-e -f dat")
       @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
-    it_behaves_like 'any interface for product'
-    it 'should have calc option' do
-      expect(@cli).to have_option(:format => :dat)
-      expect(@cli).to have_option(:calc => true)
-      expect(@cli).to have_option(:extended => true)
+    it_behaves_like "any interface for product"
+    it "should have calc option" do
+      expect(@cli).to have_option(format: :dat)
+      expect(@cli).to have_option(calc: true)
+      expect(@cli).to have_option(extended: true)
     end
-    it 'should create xml files' do
+    it "should create xml files" do
       expect(@cli_output).to match(/NonPharma/)
       file_today = "oddb_calc_#{Time.now.strftime("%d.%m.%Y_%H.%M")}.xml"
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_calc.xml')).size).to eq 1
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, file_today)).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_calc.xml")).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, file_today)).size).to eq 1
     end
-    it 'should create migel files' do
+    it "should create migel files" do
       expect(@cli_output).to match(/NonPharma/)
       file_today = "oddb_with_migel_#{Time.now.strftime("%d.%m.%Y_%H.%M")}.dat"
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_with_migel.dat')).size).to eq 1
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, file_today)).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_with_migel.dat")).size).to eq 1
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, file_today)).size).to eq 1
     end
   end
 
-  context 'when -a nonpharma option is given' do
+  context "when -a nonpharma option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-a nonpharma')
+      options = Oddb2xml::Options.parse("-a nonpharma")
       @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
-    it_behaves_like 'any interface for product'
-    it 'should have nonpharma option' do
-      expect(@cli).to have_option(:nonpharma => true)
+    it_behaves_like "any interface for product"
+    it "should have nonpharma option" do
+      expect(@cli).to have_option(nonpharma: true)
     end
-    it 'should not create any compressed file' do
+    it "should not create any compressed file" do
       expect(@cli_output).to match(/NonPharma/)
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.tar.gz')).first).to be_nil
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.zip')).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
     end
-    it 'should create xml files' do
+    it "should create xml files" do
       expect(@cli_output).to match(/NonPharma/)
       expected = [
-        'oddb_product.xml',
-        'oddb_article.xml',
-        'oddb_limitation.xml',
-        'oddb_substance.xml',
-        'oddb_interaction.xml',
-        'oddb_code.xml'
+        "oddb_product.xml",
+        "oddb_article.xml",
+        "oddb_limitation.xml",
+        "oddb_substance.xml",
+        "oddb_interaction.xml",
+        "oddb_code.xml"
       ].length
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
-        expect(File.exists?(file)).to eq true
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
+        expect(File.exist?(file)).to eq true
       end.to_a.length).to equal expected
     end
   end
-  context 'when -t _swiss option is given' do
+  context "when -t _swiss option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-t _swiss')
+      options = Oddb2xml::Options.parse("-t _swiss")
       @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
-    it_behaves_like 'any interface for product'
-    it 'should have tag_suffix option' do
-      expect(@cli).to have_option(:tag_suffix=> '_swiss')
+    it_behaves_like "any interface for product"
+    it "should have tag_suffix option" do
+      expect(@cli).to have_option(tag_suffix: "_swiss")
     end
-    it 'should not create any compressed file' do
+    it "should not create any compressed file" do
       expect(@cli_output).to match(/Pharma/)
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.tar.gz')).first).to be_nil
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.zip')).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
     end
-    it 'should create xml files with prefix swiss_' do
+    it "should create xml files with prefix swiss_" do
       expect(@cli_output).to match(/Pharma/)
       expected = [
-        'swiss_product.xml',
-        'swiss_article.xml',
-        'swiss_limitation.xml',
-        'swiss_substance.xml',
-        'swiss_interaction.xml',
-        'swiss_code.xml'
+        "swiss_product.xml",
+        "swiss_article.xml",
+        "swiss_limitation.xml",
+        "swiss_substance.xml",
+        "swiss_interaction.xml",
+        "swiss_code.xml"
       ].length
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'swiss_*.xml')).each do |file|
-        expect(File.exists?(file)).to eq true
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "swiss_*.xml")).each do |file|
+        expect(File.exist?(file)).to eq true
       end.to_a.length).to equal expected
     end
   end
-  context 'when -o fi option is given' do
+  context "when -o fi option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-o fi')
+      options = Oddb2xml::Options.parse("-o fi")
       @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end
-    it_behaves_like 'any interface for product'
-    it 'should have nonpharma option' do
-      expect(@cli).to have_option(:fi => true)
+    it_behaves_like "any interface for product"
+    it "should have nonpharma option" do
+      expect(@cli).to have_option(fi: true)
     end
-    it 'should not create any compressed file' do
+    it "should not create any compressed file" do
       expect(@cli_output).to match(/Pharma/)
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.tar.gz')).first).to be_nil
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.zip')).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
     end
-    it 'should create xml files' do
+    it "should create xml files" do
       expect(@cli_output).to match(/Pharma/)
       expected = [
-        'oddb_fi.xml',
-        'oddb_fi_product.xml',
-        'oddb_product.xml',
-        'oddb_article.xml',
-        'oddb_limitation.xml',
-        'oddb_substance.xml',
-        'oddb_interaction.xml',
-        'oddb_code.xml'
+        "oddb_fi.xml",
+        "oddb_fi_product.xml",
+        "oddb_product.xml",
+        "oddb_article.xml",
+        "oddb_limitation.xml",
+        "oddb_substance.xml",
+        "oddb_interaction.xml",
+        "oddb_code.xml"
       ].length
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
-        expect(File.exists?(file)).to eq true
+      expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
+        expect(File.exist?(file)).to eq true
       end.to_a.length).to equal expected
     end
   end
-  context 'when -x address option is given' do
-    before(:all) do
-      cleanup_directories_before_run
-      options = Oddb2xml::Options.parse('-x address')
-      @cli = Oddb2xml::Cli.new(options)
-      @cli_output = buildr_capture(:stdout) { @cli.run }
+  if false
+    context "when -x address option is given" do
+      before(:all) do
+        cleanup_directories_before_run
+        options = Oddb2xml::Options.parse("-x address")
+        @cli = Oddb2xml::Cli.new(options)
+        @cli_output = buildr_capture(:stdout) { @cli.run }
+      end
+      it_behaves_like "any interface for address"
+      it "should have address option" do
+        expect(@cli).to have_option(address: true)
+      end
+      it "should not create any compressed file" do
+        pending "Cannot download medreg at the moment"
+        expect(@cli_output).to match(/addresses/)
+        expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.tar.gz")).first).to be_nil
+        expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.zip")).first).to be_nil
+      end
+      it "should create xml files" do
+        pending "Cannot download medreg at the moment"
+        expect(@cli_output).to match(/addresses/)
+        expected = [
+          "oddb_betrieb.xml",
+          "oddb_medizinalperson.xml"
+        ].length
+        expect(Dir.glob(File.join(Oddb2xml::WORK_DIR, "oddb_*.xml")).each do |file|
+          expect(File.exist?(file)).to eq true
+        end.to_a.length).to equal expected
+      end
     end
-    it_behaves_like 'any interface for address'
-    it 'should have address option' do
-      expect(@cli).to have_option(:address=> true)
-    end
-    it 'should not create any compressed file' do
-      pending 'Cannot download medreg at the moment'
-      expect(@cli_output).to match(/addresses/)
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.tar.gz')).first).to be_nil
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.zip')).first).to be_nil
-    end
-    it 'should create xml files' do
-      pending 'Cannot download medreg at the moment'
-      expect(@cli_output).to match(/addresses/)
-      expected = [
-        'oddb_betrieb.xml',
-        'oddb_medizinalperson.xml',
-      ].length
-      expect(Dir.glob(File.join(Oddb2xml::WorkDir, 'oddb_*.xml')).each do |file|
-        expect(File.exists?(file)).to eq true
-      end.to_a.length).to equal expected
-    end
-  end if false # TODO: pending medreg
+  end
 end

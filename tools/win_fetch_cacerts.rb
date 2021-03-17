@@ -1,13 +1,12 @@
-require 'net/http'
+require "net/http"
 
 # create a path to the file "C:\%HOME%\cacert.pem"
 cacert_file = File.join(Dir.home, "cacert.pem")
 
 Net::HTTP.start("curl.haxx.se") do |http|
-
   resp = http.get("/ca/cacert.pem")
   if resp.code == "200"
-    open(cacert_file, "wb") { |file| file.write(resp.body) }
+    File.open(cacert_file, "wb") { |file| file.write(resp.body) }
     puts "\n\nA bundle of certificate authorities has been installed to"
     puts "C:\\%HOME%\\cacert.pem\n"
     puts "* Please set SSL_CERT_FILE in your current command prompt session with:"

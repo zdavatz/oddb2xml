@@ -1,20 +1,20 @@
 #!/usr/bin/env ruby
-require 'pathname'
+require "pathname"
 
 root = Pathname.new(__FILE__).realpath.parent.parent
-$:.unshift root.join('lib') if $0 == __FILE__
+$:.unshift root.join("lib") if $0 == __FILE__
 
-require 'oddb2xml/version'
-require 'oddb2xml/semantic_check'
-require 'optimist'
+require "oddb2xml/version"
+require "oddb2xml/semantic_check"
+require "optimist"
 
-@opts = Optimist::options(ARGV) do
-  version "#$0 ver.#{Oddb2xml::VERSION}"
+@opts = Optimist.options(ARGV) do
+  version "#{$0} ver.#{Oddb2xml::VERSION}"
   banner <<-EOS
     Runs various semanti_check for the Elexis artikelstamm
   Usage:
   #{File.basename(__FILE__)} xml_file_to_check
-EOS
+  EOS
 end
 $stdout.sync = true
 
@@ -24,7 +24,7 @@ if args.size != 1
   exit 2
 end
 
-startTime = Time.now
-result = Oddb2xml::SemanticCheck.new(ARGV.first).allSemanticChecks
-diff = (Time.now-startTime).to_i
+start_time = Time.now
+Oddb2xml::SemanticCheck.new(ARGV.first).allSemanticChecks
+diff = (Time.now - start_time).to_i
 puts "#{Time.now.strftime("%H:%M:%S")}: #{__FILE__} done. Took #{diff} seconds"

@@ -1,8 +1,8 @@
-source 'https://rubygems.org'
+source "https://rubygems.org"
 
 gemspec
 
 group :debugger do
-  gem 'pry-byebug'
-  gem 'pry-doc'
+  gem "pry-byebug"
+  gem "pry-doc"
 end
