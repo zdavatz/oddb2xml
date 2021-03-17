@@ -35,7 +35,7 @@ describe Oddb2xml::Calc do
 
   after(:each) do
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WORK_DIR, "*.*")))
-    FileUtils.rm(Dir.glob(File.join(Oddb2xml::WORK_DIR, "DOWNLOADS", "*")))
+    FileUtils.rm(Dir.glob(File.join(Oddb2xml::WORK_DIR, "downloads", "*")))
   end
   before(:each) do
     FileUtils.rm(Dir.glob(File.join(Oddb2xml::WORK_DIR, "*.xml")))

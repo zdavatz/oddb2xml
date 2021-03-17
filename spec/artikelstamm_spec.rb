@@ -29,7 +29,7 @@ describe Oddb2xml::Builder do
     cleanup_directories_before_run
     FileUtils.makedirs(Oddb2xml::WORK_DIR)
     Dir.chdir(Oddb2xml::WORK_DIR)
-    mock_DOWNLOADS
+    mock_downloads
   end
 
   after(:all) do
@@ -485,7 +485,7 @@ Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorge
   end
   context "chapter 70 hack" do
     before(:all) do
-      mock_DOWNLOADS
+      mock_downloads
     end
     it "parsing" do
       require "oddb2xml/chapter_70_hack"

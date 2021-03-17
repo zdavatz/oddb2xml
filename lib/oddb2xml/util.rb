@@ -29,7 +29,7 @@ module Oddb2xml
 
   unless defined?(RSpec)
     WORK_DIR = Dir.pwd
-    DOWNLOADS = "#{Dir.pwd}/DOWNLOADS"
+    DOWNLOADS = "#{Dir.pwd}/downloads"
   end
   @options = {}
   @atc_csv_origin = "https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt"

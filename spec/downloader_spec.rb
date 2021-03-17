@@ -228,7 +228,7 @@ end
 describe Oddb2xml::SwissmedicDownloader do
   include ServerMockHelper
   before(:each) do
-    mock_DOWNLOADS
+    mock_downloads
     VCR.configure do |c|
       c.before_record(:swissmedic) do |i|
         if i.response.headers["Content-Disposition"] && /www.swissmedic.ch/.match(i.request.uri) && (i.response.body.size > 1024 * 1024)
@@ -556,7 +556,7 @@ describe Oddb2xml::MedregbmDownloader do
     after(:each) { common_after }
     context "download person txt" do
       let(:txt) {
-        # this DOWNLOADS a xlsx file (2.5MB), where we should keep only the first few lines
+        # this downloads a xlsx file (2.5MB), where we should keep only the first few lines
         @downloader.download
       }
       it "should return valid String" do

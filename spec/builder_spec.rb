@@ -472,7 +472,7 @@ describe Oddb2xml::Builder do
     cleanup_directories_before_run
     FileUtils.makedirs(Oddb2xml::WORK_DIR)
     Dir.chdir(Oddb2xml::WORK_DIR)
-    mock_DOWNLOADS
+    mock_downloads
   end
 
   after(:all) do

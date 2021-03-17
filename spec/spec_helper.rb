@@ -28,7 +28,7 @@ module Oddb2xml
   # be in different places compared when running
   SpecData = File.join(File.dirname(__FILE__), "data")
   WORK_DIR = File.join(File.dirname(__FILE__), "run")
-  DOWNLOADS = File.join(WORK_DIR, "DOWNLOADS")
+  DOWNLOADS = File.join(WORK_DIR, "downloads")
   SpecCompressor = File.join(Oddb2xml::SpecData, "compressor")
   DATE_REGEXP = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[-+]\d{4}/
 
@@ -166,7 +166,7 @@ module ServerMockHelper
     dirs.each { |dir| FileUtils.rm_rf(Dir.glob(File.join(dir, "*")), verbose: false) }
     dirs.each { |dir| FileUtils.makedirs(dir, verbose: false) }
     cleanup_compressor
-    mock_DOWNLOADS
+    mock_downloads
   end
 
   def setup_server_mocks
@@ -240,7 +240,7 @@ def validate_via_xsd(xsd_file, xml_file)
   end
 end
 
-def mock_DOWNLOADS
+def mock_downloads
   WebMock.enable!
   {"transfer.zip" => ["transfer.dat"],
    "XMLPublications.zip" => ["Preparations.xml", "ItCodes.xml", "GL_Diff_SB.xml"]}.each do |zip, entries|
