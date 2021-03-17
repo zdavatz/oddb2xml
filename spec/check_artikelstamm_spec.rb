@@ -4,7 +4,7 @@ CHECK_DIR = File.expand_path(File.join(File.dirname(__FILE__), "data", "check_ar
 
 describe Oddb2xml::SemanticCheck do
   def common_run_init(options = {})
-    @savedDir = Dir.pwd
+    @saved_dir = Dir.pwd
     cleanup_directories_before_run
     FileUtils.makedirs(Oddb2xml::WORK_DIR)
     Dir.chdir(Oddb2xml::WORK_DIR)
@@ -12,7 +12,7 @@ describe Oddb2xml::SemanticCheck do
   end
 
   after(:all) do
-    Dir.chdir @savedDir if @savedDir && File.directory?(@savedDir)
+    Dir.chdir @saved_dir if @saved_dir && File.directory?(@saved_dir)
   end
   context "checking" do
     before(:each) do
