@@ -15,7 +15,7 @@ module Oddb2xml
 
     def to_hash
       data = {}
-      while line = @io.gets
+      while (line = @io.gets)
         next unless /\d{13}/.match?(line)
         ean13 = line.chomp.delete("\"")
         data[ean13] = true
@@ -96,13 +96,13 @@ module Oddb2xml
           Oddb2xml.setEan13forNo8(pac.SwissmedicNo8, ean13) if pac.SwissmedicNo8
           # packages
           exf = {price: "", valid_date: "", price_code: ""}
-          if pac.Prices && pac.Prices.ExFactoryPrice
+          if pac&.Prices&.ExFactoryPrice
             exf[:price] = pac.Prices.ExFactoryPrice.Price if pac.Prices.ExFactoryPrice.Price
             exf[:valid_date] = pac.Prices.ExFactoryPrice.ValidFromDate if pac.Prices.ExFactoryPrice.ValidFromDate
             exf[:price_code] = pac.Prices.ExFactoryPrice.PriceTypeCode if pac.Prices.ExFactoryPrice.PriceTypeCode
           end
           pub = {price: "", valid_date: "", price_code: ""}
-          if pac.Prices && pac.Prices.PublicPrice
+          if pac&.Prices&.PublicPrice
             pub[:price] = pac.Prices.PublicPrice.Price if pac.Prices.PublicPrice.Price
             pub[:valid_date] = pac.Prices.PublicPrice.ValidFromDate if pac.Prices.PublicPrice.ValidFromDate
             pub[:price_code] = pac.Prices.PublicPrice.PriceTypeCode if pac.Prices.PublicPrice.PriceTypeCode
@@ -125,7 +125,7 @@ module Oddb2xml
             seq.Limitations.Limitation.collect { |x| x }
           end
           # in it-codes
-          if seq && seq.ItCodes && seq.ItCodes.ItCode
+          if seq&.ItCodes && seq&.ItCodes&.ItCode
             limitations[:itc] = []
             seq.ItCodes.ItCode.each { |x| limitations[:itc] += x.Limitations.Limitation if x.Limitations.Limitation }
           else
@@ -150,31 +150,29 @@ module Oddb2xml
               key = :swissmedic_number8
               id = item[:packages][ean13][key].to_s
             end
-            if lims
-              lims.each do |lim|
-                limitation = {
-                  it: item[:it_code],
-                  key: key,
-                  id: id,
-                  code: (lic = lim.LimitationCode) ? lic : "",
-                  type: (lit = lim.LimitationType) ? lit : "",
-                  value: (liv = lim.LimitationValue) ? liv : "",
-                  niv: (niv = lim.LimitationNiveau) ? niv : "",
-                  desc_de: (dsc = lim.DescriptionDe) ? dsc : "",
-                  desc_fr: (dsc = lim.DescriptionFr) ? dsc : "",
-                  vdate: (dat = lim.ValidFromDate) ? dat : ""
-                }
-                deleted = false
-                if (upto = ((thr = lim.ValidThruDate) ? thr : nil)) &&
-                    upto =~ (/\d{2}\.\d{2}\.\d{2}/)
-                  begin
-                    deleted = true if Date.strptime(upto, "%d.%m.%y") >= Date.today
-                  rescue ArgumentError
-                  end
+            lims&.each do |lim|
+              limitation = {
+                it: item[:it_code],
+                key: key,
+                id: id,
+                code: (lic = lim.LimitationCode) ? lic : "",
+                type: (lit = lim.LimitationType) ? lit : "",
+                value: (liv = lim.LimitationValue) ? liv : "",
+                niv: (niv = lim.LimitationNiveau) ? niv : "",
+                desc_de: (dsc = lim.DescriptionDe) ? dsc : "",
+                desc_fr: (dsc = lim.DescriptionFr) ? dsc : "",
+                vdate: (dat = lim.ValidFromDate) ? dat : ""
+              }
+              deleted = false
+              if (upto = ((thr = lim.ValidThruDate) ? thr : nil)) &&
+                  upto =~ (/\d{2}\.\d{2}\.\d{2}/)
+                begin
+                  deleted = true if Date.strptime(upto, "%d.%m.%y") >= Date.today
+                rescue ArgumentError
                 end
-                limitation[:del] = deleted
-                item[:packages][ean13][:limitations] << limitation
               end
+              limitation[:del] = deleted
+              item[:packages][ean13][:limitations] << limitation
             end
           end
           # limitation points
@@ -249,7 +247,6 @@ module Oddb2xml
       return data unless @sheet
       case @type
       when :orphan
-        i = 1
         col_zulassung = 6
         raise "Could not find Zulassungsnummer in column #{col_zulassung} of #{@filename}" unless /Zulassungs.*nummer/.match?(@sheet[3][col_zulassung].value)
         @sheet.each do |row|
@@ -463,7 +460,7 @@ module Oddb2xml
       data = []
       case @type
       when :company
-        while line = @io.gets
+        while (line = @io.gets)
           row = line.chomp.split("\t")
           next if /^GLN/.match?(row[0])
           data << {
@@ -482,7 +479,7 @@ module Oddb2xml
           }
         end
       when :person
-        while line = @io.gets
+        while (line = @io.gets)
           row = line.chomp.split("\t")
           next if /^GLN/.match?(row[0])
           data << {
@@ -527,23 +524,23 @@ module Oddb2xml
     def to_hash
       data = {}
       if @io
-        while line = @io.gets
+        while (line = @io.gets)
           ean13 = "-1"
           line = Oddb2xml.patch_some_utf8(line).chomp
           # next unless /(7680\d{9})(\d{1})$/.match(line) # Skip non pharma
           next if /(ad us\.* vet)|(\(vet\))/i.match?(line)
           if @@extended
-            next unless line.match(/(\d{13})(\d{1})$/)
+            next unless (match_data = line.match(/(\d{13})(\d{1})$/))
           else
-            next unless line =~ /(7680\d{9})(\d{1})$/
+            next unless (match_data = line.match(/(7680\d{9})(\d{1})$/))
           end
           pharma_code = line[3..9]
-          if $1.to_s == "0000000000000"
+          if match_data[1].to_s == "0000000000000"
             @@items_without_ean13s += 1
             next if @artikelstamm && pharma_code.to_i == 0
             ean13 = Oddb2xml::FAKE_GTIN_START + pharma_code.to_s unless @artikelstamm
           else
-            ean13 = $1
+            ean13 = match_data[1]
           end
           if data[ean13]
             @@error_file.puts "Duplicate ean13 #{ean13} in line \nact: #{line.chomp}\norg: #{data[ean13][:line]}"

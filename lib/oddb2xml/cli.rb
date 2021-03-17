@@ -370,7 +370,7 @@ module Oddb2xml
       end
       if @options[:artikelstamm]
         lines << "Generated artikelstamm.xml for Elexis"
-        lines += Builder::articlestamm_v5_info_lines
+        lines += Builder.articlestamm_v5_info_lines
       elsif @options[:address]
         {
           "Betrieb" => :@companies,
