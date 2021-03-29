@@ -106,8 +106,8 @@ FR
 
 ## Supported ruby version
 
-We run tests on travis-ci.org for the Ruby versions mentioned in the .travis.yml file. You will need ruby > 2.4 to work correctly.
-Ruby 2.2/2.3 have problems with i18n encoding and fail a spec test for Naropin
+We run tests on travis-ci.org for the Ruby versions mentioned in the .travis.yml file. You will need ruby > 2.5 to work correctly.
+Look at the github actions to see the spec test results. We ignore errors against ruby head, as it is sometimes unstable.
 
 
 ## XSD files
