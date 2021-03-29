@@ -257,7 +257,6 @@ module Oddb2xml
           end
         end
       end
-      cleanup_file
       # puts "found #{data.uniq.size} entities for type #{@type}"
       data.uniq
     end
@@ -339,19 +338,7 @@ module Oddb2xml
           end
         end
       end
-      cleanup_file
       data
-    end
-
-    private
-
-    def cleanup_file
-      unless defined?(RSpec)
-        begin
-          File.unlink(@filename) if File.exist?(@filename)
-        rescue Errno::EACCES # Permission Denied on Windows
-        end
-      end
     end
   end
 

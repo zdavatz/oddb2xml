@@ -709,7 +709,7 @@ module Oddb2xml
 
     def prepare_calc_items(suppress_composition_parsing: false)
       @calc_items = {}
-      packungen_xlsx = File.join(Oddb2xml::WORK_DIR, "swissmedic_package.xlsx")
+      packungen_xlsx = File.join(Oddb2xml::DOWNLOADS, "swissmedic_package.xlsx")
       return unless File.exist?(packungen_xlsx)
       workbook = RubyXL::Parser.parse(packungen_xlsx)
       row_nr = 0

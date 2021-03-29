@@ -151,7 +151,7 @@ module Oddb2xml
       @url ||= "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/interactions_de_utf8.csv"
       file = "epha_interactions.csv"
       content = download_as(file, "w+")
-      FileUtils.rm_f(file, verbose: false)
+      FileUtils.rm_f(file, verbose: true)
       content
     end
   end
@@ -181,7 +181,7 @@ module Oddb2xml
       # read file and convert it to utf-8
       File.open(dest, "r:iso-8859-1:utf-8").read
     ensure
-      FileUtils.rm(zipfile) if File.exist?(dest) && File.exist?(zipfile)
+      FileUtils.rm(zipfile, verbose: true) if File.exist?(dest) && File.exist?(zipfile)
     end
   end
 
@@ -205,7 +205,7 @@ module Oddb2xml
       file = "medregbm_#{@type}.txt"
       download_as(file, "w+:iso-8859-1:utf-8")
       report_download(@url, file)
-      FileUtils.rm_f(file, verbose: false) # we need it only in the download
+      FileUtils.rm_f(file, verbose: true) # we need it only in the download
       file
     end
   end
@@ -233,7 +233,7 @@ module Oddb2xml
         Oddb2xml.log(cmd)
         system(cmd)
       end
-      FileUtils.rm_f(file, verbose: false) unless defined?(RSpec)
+      FileUtils.rm_f(file, verbose: true) unless defined?(RSpec)
       content
     end
   end
@@ -270,7 +270,7 @@ module Oddb2xml
 )
         report_download(@url, @file2save)
         return IO.read(@file2save) if Oddb2xml.skip_download? && File.exist?(@file2save)
-        FileUtils.rm_f(@file2save, verbose: false)
+        FileUtils.rm_f(@file2save, verbose: true)
         response = @client.call(:download, xml: soap)
         if response.success?
           if (xml = response.to_xml)
@@ -316,17 +316,17 @@ module Oddb2xml
     end
 
     def download
-      @file2save = File.join(Oddb2xml::WORK_DIR, "swissmedic_#{@type}.xlsx")
+      @file2save = File.join(DOWNLOADS, "swissmedic_#{@type}.xlsx")
       report_download(@url, @file2save)
       if @options[:calc] && @options[:skip_download] && File.exist?(@file2save) && ((Time.now - File.ctime(@file2save)).to_i < 24 * 60 * 60)
         Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{@file2save} #{File.size(@file2save)} bytes"
         return File.expand_path(@file2save)
       end
       begin
-        FileUtils.rm(File.expand_path(@file2save), verbose: !defined?(RSpec)) if File.exist?(File.expand_path(@file2save))
         @url = @direct_url_link
         download_as(@file2save, "w+")
         if @options[:artikelstamm]
+          # ssconvert is in the package gnumeric (Debian)
           cmd = "ssconvert '#{@file2save}' '#{File.join(DOWNLOADS, File.basename(@file2save).sub(/\.xls.*/, ".csv"))}' 2> /dev/null"
           Oddb2xml.log(cmd)
           system(cmd)
@@ -351,7 +351,7 @@ module Oddb2xml
     def download
       file = File.join(DOWNLOADS, "swissmedic_info.zip")
       report_download(@url, file)
-      FileUtils.rm_f(file, verbose: false) unless Oddb2xml.skip_download?
+      FileUtils.rm_f(file, verbose: true) unless Oddb2xml.skip_download?
       unless File.exist?(file)
         begin
           response = nil

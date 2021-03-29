@@ -38,7 +38,7 @@ module Oddb2xml
       threads = []
       start_time = Time.now
       files2rm = Dir.glob(File.join(DOWNLOADS, "*"))
-      FileUtils.rm_f(files2rm, verbose: @options[:log]) if (files2rm.size > 0) && !Oddb2xml.skip_download?
+      FileUtils.rm_f(files2rm, verbose: true) if (files2rm.size > 0) && !Oddb2xml.skip_download?
       if @options[:calc] && !(@options[:extended])
         threads << download(:package) # swissmedic
       elsif @options[:address]
@@ -211,7 +211,7 @@ module Oddb2xml
           "@#{var}",
           items = SwissmedicExtractor.new(bin, what).to_arry
         )
-        Oddb2xml.log("SwissmedicExtractor added #{items.size}")
+        Oddb2xml.log("SwissmedicExtractor added #{items.size} from #{bin}")
         items
 
       when :interaction

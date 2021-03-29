@@ -39,7 +39,7 @@ module Oddb2xml
           @contents.each do |file|
             @tmpfile = file
             puts "#{__LINE__}: @tmpfile"
-            FileUtils.rm(file) if file && File.exist?(file)
+            FileUtils.rm(file, verbose: true) if file && File.exist?(file)
           end
         end
       rescue Errno::ENOENT
