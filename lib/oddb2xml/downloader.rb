@@ -16,6 +16,7 @@ module Oddb2xml
       @file2save = File.join(DOWNLOADS, File.basename(file))
       report_download(@url, @file2save)
       data = nil
+      FileUtils.makedirs(File.dirname(file), verbose: true)
       if Oddb2xml.skip_download(file)
         io = File.open(file, option)
         data = io.read
@@ -23,6 +24,7 @@ module Oddb2xml
         begin
           io = File.open(file, option)
           data = Oddb2xml.uri_open(@url).read
+          io.sync = true
           io.write(data)
         rescue => error
           puts "error #{error} while fetching #{@url}"

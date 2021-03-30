@@ -164,7 +164,6 @@ module ServerMockHelper
   def cleanup_directories_before_run
     dirs = [Oddb2xml::DOWNLOADS, Oddb2xml::WORK_DIR]
     dirs.each { |dir| FileUtils.rm_rf(Dir.glob(File.join(dir, "*")), verbose: false) }
-    dirs.each { |dir| FileUtils.makedirs(dir, verbose: false) }
     cleanup_compressor
     mock_downloads
   end

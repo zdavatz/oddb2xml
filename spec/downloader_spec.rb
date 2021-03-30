@@ -256,6 +256,7 @@ describe Oddb2xml::SwissmedicDownloader do
       end
       VCR.eject_cassette
       VCR.insert_cassette("oddb2xml", tag: :swissmedic, exclusive: false)
+      FileUtils.rm_rf(Oddb2xml::DOWNLOADS, verbose: true)
       common_before
       @downloader = Oddb2xml::SwissmedicDownloader.new(:orphan)
     end
@@ -276,9 +277,12 @@ describe Oddb2xml::SwissmedicDownloader do
           expect { bin }.not_to raise_error
           expect(File.exist?("oddb_orphan.xls")).to eq(false)
         end
+        expect(File.dirname(bin)).to be == (Oddb2xml::DOWNLOADS)
+        expect(File.exist?(bin)).to eq(true)
       end
-      it "should not save into the download directory" do
-        expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "oddb_orphan.xls"))).to eq(false)
+      it "should save into the download directory" do
+        expect(File.exist?(bin)).to eq(true)
+        expect(File.exist?(File.join(Oddb2xml::DOWNLOADS, "swissmedic_orphan.xlsx"))).to eq(true)
       end
     end
   end
