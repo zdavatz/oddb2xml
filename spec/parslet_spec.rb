@@ -1290,6 +1290,23 @@ describe ParseComposition do
     specify { expect(substance.unit).to eq nil }
   end
 
+  context "should handle 66097" do
+    string = "acidum acetylsalicylicum 100 mg, cellulosum microcristallinum, maydis amylum, silica colloidalis anhydrica, acidum stearicum, Überzug: acidi methacrylici et ethylis acrylatis polymerisatum 1:1, polysorbatum 80, natrii laurilsulfas corresp. natrium 2 µg, triethylis citras, talcum pro compresso obducto" # fails
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string }
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.substances.first.name).to eq "Acidum Acetylsalicylicum" }
+    specify { expect(composition.substances.last.name).to eq "Talcum pro compresso Obducto" }
+  end
+  context "should handle 65828" do
+    string = " esomeprazolum 20 mg ut esomeprazolum magnesicum dihydricum, acidi methacrylici et ethylis acrylatis polymerisati 1:1 dispersio 30 per centum, natrii laurilsulfas, talcum, triethylis citras, hypromellosum, sacchari sphaerae corresp. saccharum 4.73 mg et maydis amylum, magnesii stearas, hydroxypropylcellulosum, glyceroli monostearas 40-55, polysorbatum 80, cellulosum microcristallinum, povidonum K 29-32, macrogolum 6000, crospovidonum, natrii stearylis fumaras, Überzug: hypromellosum, E 171, macrogolum 400, E 172 (rubrum), E 172 (flavum), pro compresso obducto corresp. natrium 0.01 mg."
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string }
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.substances.first.name).to eq "Esomeprazolum" }
+    specify { expect(composition.substances.last.name).to eq "pro compresso Obducto" }
+  end
+
   context "should return correct composition for 'minoxidilum excipiens'" do
     string = "minoxidilum 2.5 mg, excipiens pro compresso."
     composition = ParseComposition.from_string(string)

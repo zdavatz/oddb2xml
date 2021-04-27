@@ -546,7 +546,8 @@ describe Oddb2xml::Builder do
     it "should flag fridge drugs correctly" do
       doc = REXML::Document.new IO.read(checkAndGetArticleXmlName)
       checkAndGetArticleWithGTIN(doc, Oddb2xml::FRIDGE_GTIN)
-      expect(REXML::XPath.match(doc, "//COOL='1']").size).to eq 1
+      expect(REXML::XPath.match(doc, "//COOL=").size).to eq 1
+      expect(REXML::XPath.match(doc, "//COOL").first.text).to eq "1"
     end
 
     ean_with_drug_index = 7680555610041

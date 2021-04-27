@@ -6,7 +6,7 @@
 
 require "parslet"
 require "parslet/convenience"
-require "oddb2xml/compositions_syntax"
+require_relative "compositions_syntax"
 VERBOSE_MESSAGES ||= false
 
 module ParseUtil
@@ -101,6 +101,7 @@ module ParseUtil
   rescue => error
     puts "error #{error}"
     # binding.pry
+    raise error
   end
 end
 
@@ -373,6 +374,7 @@ class ParseComposition
   ERRORS_TO_FIX = {
     /(\d+)\s+-\s*(\d+)/ => '\1-\2',
     "o.1" => "0.1",
+    /polymerisat(i|um) \d:\d/ => "polymerisatum",
     /\s+(mg|g) DER:/ => ' \1, DER:',
     " mind. " => " min. ",
     " streptococci pyogen. " => " streptococci pyogen ",
