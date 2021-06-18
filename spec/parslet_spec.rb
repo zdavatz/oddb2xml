@@ -1,8 +1,13 @@
-require "pp"
 VERBOSE_MESSAGES = false
-require "spec_helper"
-require "#{Dir.pwd}/lib/oddb2xml/parslet_compositions"
+if File.exists?("#{Dir.pwd}/lib/oddb2xml/parslet_compositions.rb")
+  require_relative "../lib/oddb2xml/parslet_compositions"
+else
+  puts :ParseFailed
+  require_relative "../src/plugin/parslet_compositions"
+end
+
 require "parslet/rig/rspec"
+require "socket"
 
 hostname = Socket.gethostbyname(Socket.gethostname).first
 RUN_ALL_COMPOSITION_TESTS = false # /travis|localhost/i.match(hostname) != nil # takes about five minutes to run!
@@ -15,7 +20,6 @@ describe ParseComposition do
     string = "conserv.: E 216, E 218, excipiens pro suppositorio."
     composition = ParseComposition.from_string(string)
     # active_agent = ["hynic-[d-phe(1)", "tyr(3)-octeotridum]trifluoroacetum", "acidum ethylendiamini-n,n'-diaceticum"]
-
     active_substance = "HYNIC-[D-Phe(1)"
     composition_text = "II) Durchstechflasche 2: acidum ethylendiamini-N,N'-diaceticum 10 mg, dinatrii phosphas dodecahydricus, natrii hydroxidum, pro vitro."
     composition = ParseUtil.parse_compositions(composition_text, active_substance).first
@@ -1288,6 +1292,46 @@ describe ParseComposition do
     specify { expect(substance.name).to eq "Minoxidilum" }
     specify { expect(substance.qty).to eq nil }
     specify { expect(substance.unit).to eq nil }
+  end
+
+  context "should handle 41174" do
+    string = "triamcinoloni acetonidum 10 mg, carmellosum natricum, natrii chloridum, polysorbatum 80, conserv.: alcohol benzylicus 9.9 mg, aqua ad iniectabile q.s. ad suspensionem pro 1 ml."
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string }
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.substances.size).to be > 1 }
+    specify { expect(composition.substances.first.name).to eq "Triamcinoloni Acetonidum" }
+    specify { expect(composition.substances.last.name).to eq "Alcohol Benzylicus" }
+  end
+
+  context "should handle 67023" do
+    string = "noradrenalinum 0.06 mg ut noradrenalini tartras, natrii chloridum, acidum hydrochloridum, aqua ad iniectabile q.s. ad solutionem pro 1 ml corresp. natrium 3.308 mg."
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string }
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.substances.size).to be > 1 }
+    specify { expect(composition.substances.first.name).to eq "Noradrenalinum" }
+    specify { expect(composition.substances.last.name).to eq "Acidum Hydrochloridum" }
+  end
+
+  context "should handle 67023" do
+    string = "noradrenalinum 0.06 mg ut noradrenalini tartras, natrii chloridum, acidum hydrochloridum, aqua ad iniectabile q.s. ad solutionem pro 1 ml corresp. natrium 3.308 mg."
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string }
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.substances.size).to be > 0 }
+    specify { expect(composition.substances.first.name).to eq "Noradrenalinum" }
+    specify { expect(composition.substances.last.name).to eq "Acidum Hydrochloridum" }
+  end
+
+  context "should handle 67689" do
+    string = "daratumumabum 1800 mg, hyaluronidasum humanum ADNr, histidinum, histidini hydrochloridum monohydricum, sorbitolum 735.1 mg, methioninum, polysorbatum 20, aqua ad iniectabile ad solutionem pro 15 ml"
+    composition = ParseComposition.from_string(string)
+    specify { expect(composition.source).to eq string }
+    specify { expect(composition.label).to eq nil }
+    specify { expect(composition.substances.size).to be > 0 }
+    specify { expect(composition.substances.first.name).to eq "Daratumumabum" }
+    specify { expect(composition.substances.last.name).to eq "Polysorbatum 20" }
   end
 
   context "should handle 66097" do

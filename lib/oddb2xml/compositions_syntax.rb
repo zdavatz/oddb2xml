@@ -213,7 +213,6 @@ class CompositionParser < Parslet::Parser
       str("et ") |
       str("excipiens") |
       str("partes") |
-      str("pro capsula") |
       str("pro dosi") |
       str("pro vitroe") |
       str("q.s. ad ") |
@@ -259,6 +258,9 @@ class CompositionParser < Parslet::Parser
 
   rule(:pro_identifiers) {
     str("ut aqua ad iniectabilia q.s. ad emulsionem pro ") |
+      str("aqua ").maybe >> str("ad iniectabile q.s. ad suspensionem pro ") |
+      str("aqua ").maybe >> str("ad iniectabile q.s. ad solutionem pro ") |
+      str("aqua ").maybe >> str("ad iniectabile ad solutionem pro ") |
       str("aqua ").maybe >> str("ad iniectabilia q.s. ad solutionem pro ") |
       str("aqua ").maybe >> str("ad solutionem pro ") |
       str("aqua ").maybe >> str("q.s. ad emulsionem pro ") |
@@ -270,6 +272,7 @@ class CompositionParser < Parslet::Parser
       str("excipiens ad pulverem pro ") |
       str("excipiens ad solutionem pro ") |
       str("pro vase ") |
+      str("pro capsula ") |
       str("q.s. ad pulverem pro ")
   }
   rule(:excipiens_dose) {

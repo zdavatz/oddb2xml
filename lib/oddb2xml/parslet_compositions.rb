@@ -386,7 +386,7 @@ class ParseComposition
     / U\.: (excipiens) / => ' U. \1 ',
     / U\.: (alnus|betula|betula|betulae) / => ' U., \1 ',
     /^(acari allergeni extractum (\(acarus siro\)|).+\s+U\.:)/ => 'A): \1',
-    "Solvens: alprostadilum" => "alprostadilum"
+    "Solvens: alprostadilum" => "alprostadilum",
   }
   @@error_handler = ParseUtil::HandleSwissmedicErrors.new(ERRORS_TO_FIX)
 
