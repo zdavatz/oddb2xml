@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "minitar" # , '~> 0.5.2'
   spec.add_dependency "mechanize" # , '~> 2.5.1'
   spec.add_dependency "nokogiri", ">= 1.8.2"
-  spec.add_dependency "savon" # , '~> 2.11.0'
+  spec.add_dependency "savon" , '~> 2.12.0'
   spec.add_dependency "spreadsheet" # , '~> 1.0.0'
   spec.add_dependency "rubyXL", "~> 3.4.0"
   spec.add_dependency "sax-machine" # ,  '~> 0.1.0'
@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "webmock"
-  spec.add_development_dependency "rdoc"
+  spec.add_development_dependency "rdoc", "6.3.3" # rdoc 6.4 depends on psych 4.0 which breaks savon!
   spec.add_development_dependency "vcr"
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "flexmock"
