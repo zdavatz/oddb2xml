@@ -1,6 +1,9 @@
 === 2.7.5 / 1.02.2022
 * Specify old versions of savon and rdoc to avoid importing psych
 * Added ruby 3.1 to tested ruby versions
+* Removed ruby 2.5 from supported versions
+* Force psych to < 4.0 to avoid the error Psych::DisallowedClass: Tried to load unspecified class: Struct::GalenicGroup
+*   Therefor rdoc < 6.4
 
 === 2.7.4 / 30.03.2021
 * Update needed Ruby-Version to 2.5.0 in gemspec
