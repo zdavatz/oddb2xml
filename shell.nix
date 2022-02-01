@@ -6,6 +6,7 @@ stdenv.mkDerivation {
   buildInputs = [
     ruby_3_0.devEnv
     git
+    python
     libpcap
     libxml2
     libxslt
