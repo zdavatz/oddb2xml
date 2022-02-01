@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "webmock"
-  spec.add_development_dependency "rdoc", "6.3.0" # rdoc 6.4 depends on psych 4.0 which breaks savon!
+  spec.add_development_dependency "rdoc", ">= 6.3.1" # rdoc 6.4 depends on psych 4.0 which breaks savon!
   spec.add_development_dependency "vcr"
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "flexmock"
