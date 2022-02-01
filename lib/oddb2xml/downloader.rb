@@ -243,7 +243,7 @@ module Oddb2xml
   class RefdataDownloader < Downloader
     def initialize(options = {}, type = :pharma)
       @type = (type == :pharma ? "Pharma" : "NonPharma")
-      url = "http://refdatabase.refdata.ch/Service/Article.asmx?WSDL"
+      url = "https://refdatabase.refdata.ch/Service/Article.asmx?WSDL"
       super(options, url)
     end
 
