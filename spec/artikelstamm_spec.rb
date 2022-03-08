@@ -492,7 +492,7 @@ Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorge
       result = Oddb2xml::Chapter70xtractor.parse
       expect(result.class).to eq Array
       expect(result.first).to eq ["2069562", "70.01.10", "Urtinktur", "1--10 g/ml", "13.40", ""]
-      expect(result.last).to eq ["6516727", "70.02", "Allergenorum extractum varium / Inj. Susp. \tFortsetzungsbehandlung", "1 Durchstfl 1.5 ml", "311.85", "L"]
+      expect(result.last).to eq ["6516727", "70.02", "Allergenorum extractum varium / Inj. Susp. \n\tFortsetzungsbehandlung", "1 Durchstfl 1.5 ml", "311.85", "L"]
     end
   end
 end
