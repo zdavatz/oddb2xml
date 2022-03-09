@@ -1568,7 +1568,7 @@ module Oddb2xml
                     xml.DOSAGE_FORMF info.galenic_form.descriptions["fr"] if info.galenic_form.descriptions["fr"]
                   end
                   xml.SL_ENTRY "true" if sl_gtins.index(pkg_gtin)
-                  xml.IKSCAT package[:swissmedic_category] if package[:swissmedic_category] && package[:swissmedic_category].length > 0
+                  xml.IKSCAT package[:swissmedic_category][0] if package[:swissmedic_category] && package[:swissmedic_category].length > 0
                   xml.GENERIC_TYPE sequence[:org_gen_code] if sequence[:org_gen_code] && !sequence[:org_gen_code].empty?
                   xml.LPPV "true" if @lppvs[pkg_gtin.to_s] # detect_nincd
                   if item && item[:deductible]
