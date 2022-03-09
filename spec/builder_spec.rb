@@ -458,7 +458,7 @@ NR_LIMITATIONS = 15
 NR_INTERACTIONS = 2
 NR_CODES = 5
 NR_PRODNO = 31
-NR_PACKAGES = 46
+NR_PACKAGES = 47
 NR_PRODUCTS = 40
 REG_EXP_DESITIN = /1120000000LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk/
 describe Oddb2xml::Builder do
@@ -497,7 +497,7 @@ describe Oddb2xml::Builder do
 
     it "should have a correct NBR_RECORD in oddb_products.xml" do
       oddb_product_xml = oddb_article_xml.sub("oddb_article.xml", "oddb_product.xml")
-      check_result(File.read(oddb_product_xml), 46)
+      check_result(File.read(oddb_product_xml), NR_PACKAGES)
     end
 
     it "oddb_article.xml should contain a SHA256" do

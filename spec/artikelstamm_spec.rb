@@ -12,7 +12,7 @@ describe Oddb2xml::Builder do
     unless @inhalt.index(expected_value)
       puts expected_value
     end
-    # binding.pry if defined?(Pry) && !@inhalt.index(expected_value)
+    # binding.irb unless @inhalt.index(expected_value)
     expect(@inhalt.index(expected_value)).not_to be nil
   end
 
@@ -475,7 +475,14 @@ Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorge
 1\)	Geburtsjahr, sowie Vortherapien für das OC
 
 2\)	Datum Therapiestart, Dosierung, Dosisanpassungen, Datum Therapieende.
-</DSCR>)}
+</DSCR>),
+             "No A+" => %(<PRODUCT>
+            <PRODNO>1336901</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>Pethidin HCl Amino 100 mg/2 ml, Injektionslösung</DSCR>
+            <DSCRF/>
+            <ATC>N02AB02</ATC>
+        </PRODUCT>)}
 
     tests.each do |key, expected|
       it "should a valid entry for #{key}" do
