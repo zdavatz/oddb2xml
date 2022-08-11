@@ -48,6 +48,7 @@
       FIRST import all data from swissINDEX
       * DSCRD  German name
       * DSCRF  French name (Products/article only from ZurRose do not have a french name)
+      * DSCRI  Italian name (Products/article only from ZurRose do not have a french name)
       * GTIN
         GTIN may be  8, 12, 13 or 14 chars long (https://en.wikipedia.org/wiki/Global_Trade_Item_Number)
         The EAN-8 code is an eight-digit barcode used usually for very small articles, such as a battery for hearing aid, where fitting a larger code onto the item would be difficult
@@ -128,6 +129,15 @@
     </xs:simpleType>
   </xs:element>
 
+  <xs:element name="DSCRI">
+    <xs:simpleType>
+      <xs:restriction base="xs:string">
+        <xs:minLength value="3" />
+        <xs:maxLength value="120" />
+      </xs:restriction>
+    </xs:simpleType>
+  </xs:element>
+
   <xs:element name="ART">
     <xs:complexType>
       <xs:sequence>
@@ -157,12 +167,15 @@
           <xs:element ref="ns1:BG"/>
         </xs:sequence>
         <xs:element ref="ns1:DSCRD"/>
-        <xs:element ref="ns1:DSCRF"/>
+        <xs:element ref="ns1:DSCRF" minOccurs="0" />
+        <xs:element ref="ns1:DSCRI" minOccurs="0"/>
         <xs:element ref="ns1:SORTD"/>
-        <xs:element ref="ns1:SORTF"/>
+        <xs:element ref="ns1:SORTF" minOccurs="0"/>
+        <xs:element ref="ns1:SORTI" minOccurs="0"/>
         <xs:sequence minOccurs="0">
           <xs:element ref="ns1:SYN1D"/>
           <xs:element ref="ns1:SYN1F"/>
+          <xs:element ref="ns1:SYN1I"/>
           <xs:element ref="ns1:SLOPLUS"/>
         </xs:sequence>
         <xs:element ref="ns1:ARTCOMP"/>
@@ -245,8 +258,10 @@
   </xs:element>
   <xs:element name="SORTD" type="xs:string"/>
   <xs:element name="SORTF" type="xs:string"/>
+  <xs:element name="SORTI" type="xs:string"/>
   <xs:element name="SYN1D" type="xs:string"/>
   <xs:element name="SYN1F" type="xs:string"/>
+  <xs:element name="SYN1I" type="xs:string"/>
   <xs:element name="SLOPLUS">
     <xs:simpleType>
       <xs:restriction base="xs:byte">
@@ -346,8 +361,10 @@
         <xs:element ref="ns1:QTYMD"/>
         <xs:element ref="ns1:DSCRDMD"/>
         <xs:element ref="ns1:DSCRFMD"/>
+        <xs:element ref="ns1:DSCRIMD"/>
         <xs:element ref="ns1:SORTDMD"/>
         <xs:element ref="ns1:SORTFMD"/>
+        <xs:element ref="ns1:SORTIMD"/>
         <xs:sequence minOccurs="0">
           <xs:element ref="ns1:SYN1DMD"/>
           <xs:element ref="ns1:SYN1FMD"/>
@@ -399,8 +416,10 @@
   </xs:element>
   <xs:element name="SORTDMD" type="xs:string"/>
   <xs:element name="SORTFMD" type="xs:string"/>
+  <xs:element name="SORTIMD" type="xs:string"/>
   <xs:element name="SYN1DMD" type="xs:string"/>
   <xs:element name="SYN1FMD" type="xs:string"/>
+  <xs:element name="SYN1IMD" type="xs:string"/>
   <xs:element name="SLOPLUSMD">
     <xs:simpleType>
       <xs:restriction base="xs:byte">
@@ -722,6 +741,7 @@
         <xs:element ref="ns1:LIMNIV"/>
         <xs:element name="DSCRD" type="xs:string"/>
         <xs:element name="DSCRF" type="xs:string"/>
+        <xs:element name="DSCRI" type="xs:string"/>
         <xs:element ref="ns1:VDAT"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
@@ -780,6 +800,7 @@
         <xs:element ref="ns1:LIMNIVMD"/>
         <xs:element name="DSCRDMD" type="xs:string"/>
         <xs:element name="DSCRFMD" type="xs:string"/>
+        <xs:element name="DSCRIMD" type="xs:string"/>
         <xs:element ref="ns1:VDATMD"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
@@ -844,7 +865,8 @@
         <xs:element minOccurs="0" ref="ns1:PRODNO"/>
         <xs:sequence minOccurs="0">
           <xs:element ref="ns1:DSCRD"/>
-          <xs:element ref="ns1:DSCRF"/>
+          <xs:element ref="ns1:DSCRF" minOccurs="0"/>
+          <xs:element ref="ns1:DSCRI" minOccurs="0"/>
         </xs:sequence>
         <xs:element minOccurs="0" ref="ns1:ADINFD"/>
         <xs:element minOccurs="0" ref="ns1:ADINFF"/>
@@ -920,6 +942,7 @@
         <xs:sequence minOccurs="0">
           <xs:element ref="ns1:DSCRDMD"/>
           <xs:element ref="ns1:DSCRFMD"/>
+          <xs:element ref="ns1:DSCRIMD"/>
         </xs:sequence>
         <xs:element minOccurs="0" ref="ns1:ADINFDMD"/>
         <xs:element minOccurs="0" ref="ns1:ADINFFMD"/>
@@ -1088,6 +1111,7 @@
   <xs:element name="ITMD" type="xs:string"/>
   <xs:element name="DSCRDMD" type="xs:string"/>
   <xs:element name="DSCRFMD" type="xs:string"/>
+  <xs:element name="DSCRIMD" type="xs:string"/>
   <xs:element name="VDATMD" type="xs:NMTOKEN"/>
   <xs:element name="RESULTMD">
     <xs:complexType>

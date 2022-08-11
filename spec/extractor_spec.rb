@@ -72,6 +72,7 @@ describe Oddb2xml::RefdataExtractor do
                   no8: "62069008",
                   desc_de: "LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
                   desc_fr: "LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce",
+                  desc_it: "LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
                   atc_code: "N03AX14",
                   last_change: "2017-12-08 00:00:00 +0000",
                   company_name: "Desitin Pharma GmbH",
@@ -98,6 +99,7 @@ describe Oddb2xml::RefdataExtractor do
                   data_origin: "refdata",
                   desc_de: "TUBEGAZE Verband weiss Nr 12 20m Finger gross",
                   desc_fr: "TUBEGAZE pans tubul blanc Nr 12 20m doigts grands",
+                  desc_it: "TUBEGAZE Verband weiss Nr 12 20m Finger gross",
                   atc_code: "",
                   company_name: "IVF HARTMANN AG",
                   company_ean: "7601001000896"}
