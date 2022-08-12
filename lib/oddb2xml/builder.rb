@@ -910,7 +910,7 @@ module Oddb2xml
               # xml.CDS01
               # xml.CDS02
               if ppac
-                xml.SMCAT ppac[:swissmedic_category] unless ppac[:swissmedic_category].empty?
+                xml.SMCAT ppac[:swissmedic_category][0] unless ppac[:swissmedic_category].empty?
                 xml.GEN_PRODUCTION ppac[:gen_production] unless ppac[:gen_production].empty?
                 xml.INSULIN_CATEGORY ppac[:insulin_category] unless ppac[:insulin_category].empty?
                 xml.DRUG_INDEX ppac[:drug_index] unless ppac[:drug_index].empty?

@@ -1,3 +1,6 @@
+=== 2.7.7/ 12.08.2022
+* Workaround for artikelstamm V3. Strip IKSCAT from A+ to A to be compatible with XSD
+
 === 2.7.6/ 9.03.2022
 * Workaround for artikelstamm V5. Strip IKSCAT from A+ to A to be compatible with XSD
 * Fix spec tests
