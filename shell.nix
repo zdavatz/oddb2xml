@@ -4,6 +4,8 @@ with import <nixpkgs> {};
 stdenv.mkDerivation {
   name = "env";
   buildInputs = [
+    ruby_3_0
+    rubyPackages_3_0.safe_yaml
     ruby_3_0.devEnv
     git
     python

@@ -51,14 +51,17 @@ module Oddb2xml
         item[:product_key] = seq.ProductCommercial
         item[:desc_de] = (desc = seq.DescriptionDe) ? desc : ""
         item[:desc_fr] = (desc = seq.DescriptionFr) ? desc : ""
+        item[:desc_it] = (desc = seq.DescriptionIt) ? desc : ""
         item[:name_de] = (name = seq.NameDe) ? name : ""
         item[:name_fr] = (name = seq.NameFr) ? name : ""
+        item[:name_it] = (name = seq.NameIt) ? name : ""
         item[:swissmedic_number5] = (num5 = seq.SwissmedicNo5) ? num5.rjust(5, "0") : ""
         item[:org_gen_code] = (orgc = seq.OrgGenCode) ? orgc : ""
         item[:deductible] = (ddbl = seq.FlagSB20) ? ddbl : ""
         item[:atc_code] = (atcc = seq.AtcCode) ? atcc : ""
         item[:comment_de] = (info = seq.CommentDe) ? info : ""
         item[:comment_fr] = (info = seq.CommentFr) ? info : ""
+        item[:comment_it] = (info = seq.CommentIt) ? info : ""
         item[:it_code] = ""
         seq.ItCodes.ItCode.each do |itc|
           if item[:it_code].to_s.empty?
@@ -111,8 +114,10 @@ module Oddb2xml
             ean13: ean13,
             name_de: (desc = seq.NameDe) ? desc : "",
             name_fr: (desc = seq.NameFr) ? desc : "",
+            name_it: (desc = seq.NameIt) ? desc : "",
             desc_de: (desc = pac.DescriptionDe) ? desc : "",
             desc_fr: (desc = pac.DescriptionFr) ? desc : "",
+            desc_it: (desc = pac.DescriptionIt) ? desc : "",
             sl_entry: true,
             swissmedic_category: (cat = pac.SwissmedicCategory) ? cat : "",
             swissmedic_number8: (num = pac.SwissmedicNo8) ? num : "",
@@ -161,6 +166,7 @@ module Oddb2xml
                 niv: (niv = lim.LimitationNiveau) ? niv : "",
                 desc_de: (dsc = lim.DescriptionDe) ? dsc : "",
                 desc_fr: (dsc = lim.DescriptionFr) ? dsc : "",
+                desc_it: (dsc = lim.DescriptionIt) ? dsc : "",
                 vdate: (dat = lim.ValidFromDate) ? dat : ""
               }
               deleted = false
@@ -223,6 +229,7 @@ module Oddb2xml
         item[:last_change] = (date = Time.parse(pac.DT).to_s) ? date : "" # Date and time of last data change
         item[:desc_de] = (dscr = pac.NAME_DE) ? dscr : ""
         item[:desc_fr] = (dscr = pac.NAME_FR) ? dscr : ""
+        item[:desc_it] = item[:desc_de] # refdata has no italian name
         item[:atc_code] = (code = pac.ATC) ? code.to_s : ""
         item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam : ""
         item[:company_ean] = (gln = pac.AUTH_HOLDER_GLN) ? gln : ""
@@ -368,6 +375,7 @@ module Oddb2xml
           company_ean: row[7],
           data_origin: "migel"
         }
+        data
       end
       data
     end
