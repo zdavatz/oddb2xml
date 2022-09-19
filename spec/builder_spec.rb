@@ -35,7 +35,7 @@ ARTICLE_ZURROSE_ELEMENTS = [
   ["ARTICLE/ART/ARTINS/NINCD", "20"]
 ]
 
-ARTICLE_NAROPIN = %(    <REF_DATA>1</REF_DATA>
+ARTICLE_NAROPIN = %(<REF_DATA>1</REF_DATA>
     <SMCAT>B</SMCAT>
     <SMNO>54015011</SMNO>
     <PRODNO>5401501</PRODNO>
@@ -44,10 +44,8 @@ ARTICLE_NAROPIN = %(    <REF_DATA>1</REF_DATA>
     <BG>N</BG>
     <DSCRD>NAROPIN Inj Lös 0.2 % 10ml Duofit Amp 5 Stk</DSCRD>
     <DSCRF>NAROPIN sol inj 0.2 % 10ml amp duofit 5 pce</DSCRF>
-    <DSCRI>NAROPIN Inj Lös 0.2 % 10ml Duofit Amp 5 Stk</DSCRI>
     <SORTD>NAROPIN INJ LÖS 0.2 % 10ML DUOFIT AMP 5 STK</SORTD>
     <SORTF>NAROPIN SOL INJ 0.2 % 10ML AMP DUOFIT 5 PCE</SORTF>
-    <SORTI>NAROPIN INJ LÖS 0.2 % 10ML DUOFIT AMP 5 STK</SORTI>
     <ARTCOMP>
       <COMPNO>7601001402539</COMPNO>
     </ARTCOMP>
@@ -56,8 +54,7 @@ ARTICLE_NAROPIN = %(    <REF_DATA>1</REF_DATA>
       <BC>7680540150118</BC>
       <BCSTAT>A</BCSTAT>
     </ARTBAR>
-  </ART>
-)
+  </ART>)
 
 ARTICLE_COMMON_ELEMENTS = [
   ["ARTICLE/ART/REF_DATA", "1"],
@@ -571,10 +568,11 @@ describe Oddb2xml::Builder do
 
     it "should generate ATC for 7680002770014" do
       oddb_product_xml = IO.read(File.join(Oddb2xml::WORK_DIR, "oddb_product.xml"))
-      text = %(<GTIN>7680002770021</GTIN>
+      text = %(<GTIN>7680002770014</GTIN>
     <PRODNO>0027701</PRODNO>
-    <DSCRD>Coeur-Vaisseaux Sérocytol, suppositoire</DSCRD>
-    <ATC>J06AA</ATC>
+    <DSCRD>SEROCYTOL Herz-Gefässe Supp 3 Stk</DSCRD>
+    <DSCRF>SEROCYTOL Coeur-Vaisseaux supp 3 pce</DSCRF>
+    <ATC>J06AA99</ATC>
     <IT>08.07.</IT>
     <CPT/>)
       expect(oddb_product_xml.index(text)).to be >= 1
@@ -585,6 +583,7 @@ describe Oddb2xml::Builder do
       text2 = %( <GTIN>7680002770021</GTIN>
     <PRODNO>0027701</PRODNO>
     <DSCRD>Coeur-Vaisseaux Sérocytol, suppositoire</DSCRD>
+    <DSCRF>Coeur-Vaisseaux Sérocytol, suppositoire</DSCRF>
     <ATC>J06AA</ATC>
     <IT>08.07.</IT>
     <CPT/>)

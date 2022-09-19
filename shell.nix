@@ -4,9 +4,9 @@ with import <nixpkgs> {};
 stdenv.mkDerivation {
   name = "env";
   buildInputs = [
-    ruby_3_0
+    ruby_3_1
     rubyPackages_3_0.safe_yaml
-    ruby_3_0.devEnv
+    ruby_3_1.devEnv
     git
     python
     libpcap

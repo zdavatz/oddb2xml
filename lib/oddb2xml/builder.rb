@@ -378,7 +378,6 @@ module Oddb2xml
               xml.LIMNIV lim[:niv]
               xml.DSCRD lim[:desc_de]
               xml.DSCRF lim[:desc_fr]
-              xml.DSCRI lim[:desc_it]
               xml.VDAT lim[:vdate]
               nbr_records += 1
             end
@@ -536,7 +535,7 @@ module Oddb2xml
           if lang == :de
             name = refdata && refdata[:desc_de] ? refdata[:desc_de] : obj[:sequence_name]
           elsif lang == :fr
-            name =  refdata[:desc_fr] if refdata && refdata[:desc_fr]
+            name = refdata && refdata[:desc_fr] ? refdata[:desc_fr] : obj[:sequence_name]
           elsif lang == :it
             name =  refdata[:desc_it] if refdata && refdata[:desc_it]
           else
@@ -560,7 +559,7 @@ module Oddb2xml
           @missing.each do |obj|
             ean = obj[:ean13]
             next unless check_name(obj, :de)
-            # next unless check_name(obj, :fr)
+            next unless check_name(obj, :fr)
             next if /^Q/i.match?(obj[:atc])
             if obj[:prodno]
               next if emitted.index(obj[:prodno])
@@ -572,9 +571,6 @@ module Oddb2xml
               xml.PRODNO obj[:prodno] if obj[:prodno]
               xml.DSCRD check_name(obj, :de)
               xml.DSCRF check_name(obj, :fr) if check_name(obj, :fr)
-              binding.pry if  check_name(obj, :de) &&  check_name(obj, :de).eql?('Varilrix Trockensub c solv')
-
-              xml.DSCRI check_name(obj, :it) if check_name(obj, :it)
               xml.ATC obj[:atc_code] unless obj[:atc_code].empty?
               xml.IT obj[:ith_swissmedic] if obj[:ith_swissmedic]
               xml.CPT
@@ -598,7 +594,6 @@ module Oddb2xml
               xml.PRODNO ppac[:prodno] if ppac[:prodno] && !ppac[:prodno].empty?
               xml.DSCRD check_name(obj, :de)
               xml.DSCRF check_name(obj, :fr)
-              xml.DSCRI check_name(obj, :it)
               # xml.BNAMD
               # xml.BNAMF
               # xml.ADNAMD
@@ -952,10 +947,10 @@ module Oddb2xml
               end
               xml.DSCRD obj[:desc_de] if obj[:desc_de] && !obj[:desc_de].empty?
               xml.DSCRF obj[:desc_fr] if obj[:desc_fr] && !obj[:desc_fr].empty?
-              xml.DSCRI obj[:desc_it] if obj[:desc_it] && !obj[:desc_it].empty?
+              xml.DSCRF obj[:desc_de] if !obj[:desc_fr] || obj[:desc_fr].empty?
               xml.SORTD obj[:desc_de].upcase if obj[:desc_de] && !obj[:desc_de].empty?
               xml.SORTF obj[:desc_fr].upcase if obj[:desc_fr] && !obj[:desc_fr].empty?
-              xml.SORTI obj[:desc_it].upcase if obj[:desc_it] && !obj[:desc_it].empty?
+              xml.SORTF obj[:desc_de].upcase if !obj[:desc_fr] || obj[:desc_fr].empty?
               # xml.QTYUD
               # xml.QTYUF
               # xml.IMG
@@ -966,7 +961,6 @@ module Oddb2xml
               if obj[:seq]
                 xml.SYN1D obj[:seq][:name_de] unless obj[:seq][:name_de].empty?
                 xml.SYN1F obj[:seq][:name_fr] unless obj[:seq][:name_fr].empty?
-                xml.SYN1I obj[:seq][:name_it] unless obj[:seq][:name_it].empty?
               end
               if obj[:seq]
                 case obj[:seq][:deductible]

@@ -11,7 +11,7 @@ describe Oddb2xml::Builder do
     expect(@inhalt).not_to be nil
     unless @inhalt.index(expected_value)
       puts expected_value
-      binding.pry # TODO: Must not be active in production!!
+      # binding.pry # TODO: Must not be active in production!!
     end
     expect(@inhalt.index(expected_value)).not_to be nil
   end

@@ -430,6 +430,7 @@ class ParseComposition
         ast = transf.apply(parser.parse(cleaned))
       end
     rescue Parslet::ParseFailed => error
+      @@error_handler.nrParsingErrors ||= 0
       @@error_handler.nrParsingErrors += 1
       puts "#{File.basename(__FILE__)}:#{__LINE__}: failed parsing ==>  #{cleaned} #{error}"
       return nil
@@ -495,6 +496,7 @@ class ParseGalenicForm
         ast = transf.apply(parser.parse(string))
       end
     rescue Parslet::ParseFailed => error
+      @@error_handler.nrParsingErrors ||= 0
       @@error_handler.nrParsingErrors += 1
       puts "#{File.basename(__FILE__)}:#{__LINE__}: failed parsing ==>  #{string} #{error}"
       return nil
