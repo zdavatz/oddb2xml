@@ -75,11 +75,12 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
-    it "should have a ATC for product PRIORIX TETRA" do
+    it "should have a DSCRF and ATC for product PRIORIX TETRA" do
       expected = %(<PRODUCT>
             <PRODNO>5815801</PRODNO>
             <SALECD>A</SALECD>
             <DSCR>PRIORIX TETRA Trockensub c Solv Fertspr</DSCR>
+            <DSCRF>Priorix-Tetra, Pulver und Lösungsmittel zur Herstellung einer Injektionslösung</DSCRF>
             <ATC>J07BD54</ATC>
         </PRODUCT>)
       expect(@inhalt.index(expected)).not_to be nil
@@ -118,6 +119,7 @@ describe Oddb2xml::Builder do
             <PRODNO>5559401</PRODNO>
             <SALECD>A</SALECD>
             <DSCR>Nutriflex Lipid plus, Infusionsemulsion, 1250ml</DSCR>
+            <DSCRF/>
             <ATC>B05BA10</ATC>
         </PRODUCT>)
       expect(@inhalt.index(expected)).not_to be nil
@@ -244,6 +246,7 @@ describe Oddb2xml::Builder do
             <PHAR>0055805</PHAR>
             <SALECD>A</SALECD>
             <DSCR>TENSOPLAST Kompressionsbinde 5cmx4.5m</DSCR>
+            <DSCRF/>
             <PEXF>0.00</PEXF>
             <PPUB>22.95</PPUB>
         </ITEM>),
@@ -458,12 +461,14 @@ describe Oddb2xml::Builder do
             <!--Chapter70 hack prodno 2069639 Ceres Urtinkturen gemäss L2 mit - im Kommentar-->
             <SALECD>A</SALECD>
             <DSCR>Ceres Urtinkturen gemäss L2 mit -- im Kommentar</DSCR>
+            <DSCRF/>
         </PRODUCT>),
              "Chapter 70 item" => %(<ITEM PHARMATYPE="P">
             <GTIN>2500000588532</GTIN>
             <PHAR>2069639</PHAR>
             <SALECD>A</SALECD>
             <DSCR>EINF ARZNEI Ceres Urtinktur spez 20ml</DSCR>
+            <DSCRF/>
             <PEXF>23.44</PEXF>
             <PPUB>31.30</PPUB>
             <!--Chapter70 hack 2500000588532 EINF ARZNEI Ceres Urtinktur spez 20ml-->
@@ -482,6 +487,7 @@ Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorge
             <PRODNO>1336901</PRODNO>
             <SALECD>A</SALECD>
             <DSCR>Pethidin HCl Amino 100 mg/2 ml, Injektionslösung</DSCR>
+            <DSCRF/>
             <ATC>N02AB02</ATC>
         </PRODUCT>)}
 
