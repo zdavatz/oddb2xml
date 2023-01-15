@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (2.6.9)
+    oddb2xml (2.7.9)
       htmlentities
       httpi
       mechanize
@@ -11,42 +11,49 @@ PATH
       optimist
       ox
       parslet
+      rexml
       rubyXL (~> 3.4.0)
       rubyntlm (= 0.5.1)
       rubyzip
-      savon
+      savon (~> 2.12.0)
       sax-machine
       spreadsheet
+      standardrb
+      webrick
       xml-simple
 
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.7.0)
-      public_suffix (>= 2.0.2, < 5.0)
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
     akami (1.3.1)
       gyoku (>= 0.4.0)
       nokogiri
+    ast (2.4.2)
     builder (3.2.4)
     byebug (11.1.3)
     coderay (1.1.3)
-    connection_pool (2.2.3)
-    crack (0.4.3)
-      safe_yaml (~> 1.0.0)
-    diff-lcs (1.4.3)
+    connection_pool (2.3.0)
+    crack (0.4.5)
+      rexml
+    diff-lcs (1.5.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     flexmock (2.3.6)
-    gyoku (1.3.1)
+    gyoku (1.4.0)
       builder (>= 2.1.2)
+      rexml (~> 3.0)
     hashdiff (1.0.1)
     htmlentities (4.3.4)
-    http-cookie (1.0.3)
+    http-cookie (1.0.5)
       domain_name (~> 0.5)
-    httpi (2.4.4)
+    httpi (2.5.0)
       rack
       socksify
-    mechanize (2.7.6)
+    json (2.6.3)
+    language_server-protocol (3.17.0.2)
+    mechanize (2.7.7)
       domain_name (~> 0.5, >= 0.5.1)
       http-cookie (~> 1.0)
       mime-types (>= 1.17.2)
@@ -54,58 +61,83 @@ GEM
       net-http-persistent (>= 2.5.2)
       nokogiri (~> 1.6)
       ntlm-http (~> 0.1, >= 0.1.1)
+      webrick (~> 1.7)
       webrobots (>= 0.0.9, < 0.2)
     method_source (1.0.0)
-    mime-types (3.3.1)
+    mime-types (3.4.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2020.0512)
-    mini_portile2 (2.4.0)
+    mime-types-data (3.2022.0105)
+    mini_portile2 (2.8.1)
     minitar (0.9)
-    multi_json (1.14.1)
+    multi_json (1.15.0)
     net-http-digest_auth (1.4.1)
-    net-http-persistent (4.0.0)
+    net-http-persistent (4.0.1)
       connection_pool (~> 2.2)
-    nokogiri (1.10.9)
-      mini_portile2 (~> 2.4.0)
+    nokogiri (1.13.9)
+      mini_portile2 (~> 2.8.0)
+      racc (~> 1.4)
     nori (2.6.0)
     ntlm-http (0.1.1)
     optimist (3.0.1)
-    ox (2.13.2)
+    ox (2.14.12)
+    parallel (1.22.1)
+    parser (3.2.0.0)
+      ast (~> 2.4.1)
     parslet (2.0.0)
-    pry (0.13.1)
+    pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    pry-byebug (3.9.0)
+    pry-byebug (3.10.1)
       byebug (~> 11.0)
-      pry (~> 0.13.0)
-    pry-doc (1.1.0)
+      pry (>= 0.13, < 0.15)
+    pry-doc (1.4.0)
       pry (~> 0.11)
       yard (~> 0.9.11)
-    public_suffix (4.0.5)
-    rack (2.2.3)
-    rake (13.0.1)
-    rdoc (6.2.1)
-    rspec (3.9.0)
-      rspec-core (~> 3.9.0)
-      rspec-expectations (~> 3.9.0)
-      rspec-mocks (~> 3.9.0)
-    rspec-core (3.9.2)
-      rspec-support (~> 3.9.3)
-    rspec-expectations (3.9.2)
+    psych (3.3.4)
+    public_suffix (5.0.1)
+    racc (1.6.2)
+    rack (3.0.3)
+    rainbow (3.1.1)
+    rake (13.0.6)
+    rdoc (6.3.3)
+    regexp_parser (2.6.1)
+    rexml (3.2.5)
+    rspec (3.12.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
+    rspec-core (3.12.0)
+      rspec-support (~> 3.12.0)
+    rspec-expectations (3.12.2)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.9.0)
-    rspec-mocks (3.9.1)
+      rspec-support (~> 3.12.0)
+    rspec-mocks (3.12.2)
       diff-lcs (>= 1.2.0, < 2.0)
-      rspec-support (~> 3.9.0)
-    rspec-support (3.9.3)
+      rspec-support (~> 3.12.0)
+    rspec-support (3.12.0)
+    rubocop (1.42.0)
+      json (~> 2.3)
+      parallel (~> 1.10)
+      parser (>= 3.1.2.1)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
+      rexml (>= 3.2.5, < 4.0)
+      rubocop-ast (>= 1.24.1, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 3.0)
+    rubocop-ast (1.24.1)
+      parser (>= 3.1.1.0)
+    rubocop-performance (1.15.2)
+      rubocop (>= 1.7.0, < 2.0)
+      rubocop-ast (>= 0.4.0)
     ruby-ole (1.2.12.2)
-    rubyXL (3.4.14)
+    ruby-progressbar (1.11.0)
+    rubyXL (3.4.25)
       nokogiri (>= 1.10.8)
       rubyzip (>= 1.3.0)
     rubyntlm (0.5.1)
-    rubyzip (2.3.0)
-    safe_yaml (1.0.5)
-    savon (2.12.0)
+    rubyzip (2.3.2)
+    savon (2.12.1)
       akami (~> 1.2)
       builder (>= 2.1.2)
       gyoku (~> 1.2)
@@ -115,23 +147,34 @@ GEM
       wasabi (~> 3.4)
     sax-machine (1.3.2)
     socksify (1.7.1)
-    spreadsheet (1.2.6)
-      ruby-ole (>= 1.0)
-    timecop (0.9.1)
+    spreadsheet (1.3.0)
+      ruby-ole
+    standard (1.21.1)
+      language_server-protocol (~> 3.17.0.2)
+      rubocop (= 1.42.0)
+      rubocop-performance (= 1.15.2)
+    standardrb (1.0.1)
+      standard
+    timecop (0.9.6)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.7)
-    vcr (6.0.0)
-    wasabi (3.5.0)
+    unf_ext (0.0.8.2)
+    unicode-display_width (2.4.2)
+    vcr (6.1.0)
+    wasabi (3.7.0)
+      addressable
       httpi (~> 2.0)
       nokogiri (>= 1.4.2)
-    webmock (3.8.3)
-      addressable (>= 2.3.6)
+    webmock (3.18.1)
+      addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
+    webrick (1.7.0)
     webrobots (0.1.2)
-    xml-simple (1.1.5)
-    yard (0.9.25)
+    xml-simple (1.1.9)
+      rexml
+    yard (0.9.28)
+      webrick (~> 1.7.0)
 
 PLATFORMS
   ruby
@@ -139,15 +182,17 @@ PLATFORMS
 DEPENDENCIES
   bundler
   flexmock
+  nokogiri (= 1.13.9)
   oddb2xml!
   pry-byebug
   pry-doc
+  psych (< 4.0.0)
   rake
-  rdoc
+  rdoc (~> 6.3.3)
   rspec
   timecop
   vcr
   webmock
 
 BUNDLED WITH
-   2.1.4
+   2.3.26

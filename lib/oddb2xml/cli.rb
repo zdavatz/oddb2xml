@@ -85,6 +85,7 @@ module Oddb2xml
           puts "Validatied #{@the_files[:artikelstamm]}"
         else
           puts "Validating failed using #{cmd}"
+          require'pry'; binding.pry
           raise "Validating failed using #{cmd}"
         end
       end

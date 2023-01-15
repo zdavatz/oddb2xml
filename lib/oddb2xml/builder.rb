@@ -1514,21 +1514,21 @@ module Oddb2xml
                   xml.GTIN pkg_gtin.to_s.rjust(13, "0")
                   xml.SALECD("A")
                   # maxLength for DSCR is 50 for Artikelstamm v3
-                  xml.DSCR(name) # for g for zur_rose
+                  xml.DSCR(name) # for description for zur_rose
                   name_fr = item[:name_fr] + " " + item[:desc_fr].strip + " " + package[:desc_fr] if package && package[:desc_fr]
                   name_fr ||= @refdata[pkg_gtin] ? @refdata[pkg_gtin][:desc_fr] : nil
                   # Zugelassenen Packungen has only german names
                   name_fr ||= (obj[:name_fr] + ", " + obj[:desc_fr]).strip if obj[:name_fr]
                   # ZuRorse has only german names
                   name_fr ||= (item[:name_fr] + ", " + item[:desc_fr]) if item
-                  xml.DSCRF(name_fr) if name_fr
+                  xml.DSCRF(name_fr)
                   name_it = item[:name_it] + " " + item[:desc_it].strip + " " + package[:desc_it] if package && package[:desc_it]
                   name_it ||= @refdata[pkg_gtin] ? @refdata[pkg_gtin][:desc_it] : nil
                   # Zugelassenen Packungen has only german names
                   name_it ||= (obj[:name_it] + ", " + obj[:desc_it]).strip if obj[:name_it]
                   # ZuRorse has only german names
                   name_it ||= (item[:name_it] + ", " + item[:desc_it]) if item
-                  xml.DSCRI(name_it) if name_it
+                  xml.DSCRI(name_it)
                   if obj[:company_name] || obj[:company_ean]
                     xml.COMP do # Manufacturer
                       xml.NAME obj[:company_name][0..99] # limit to 100 chars as in XSD
@@ -1641,7 +1641,7 @@ module Oddb2xml
                 emit_salecd(xml, ean13, obj)
                 description = obj[:desc_de] || obj[:description] # for description for zur_rose
                 xml.DSCR(description)
-                xml.DSCRF(obj[:desc_fr]) if obj[:desc_fr] && !obj[:desc_fr].empty?
+                xml.DSCRF(obj[:desc_fr])
                 xml.DSCRI(obj[:desc_it]) if obj[:desc_it] && !obj[:desc_it].empty?
                 if obj[:company_ean] && !obj[:company_ean].empty?
                   xml.COMP do
@@ -1746,7 +1746,6 @@ module Oddb2xml
               nr_products += 1
               xml.PRODUCT do
                 xml.PRODNO prodno
-
                 if sequence
                   xml.SALECD("A") # these products are always active!
                   name_de = "#{sequence[:name_de]} #{sequence[:desc_de]}".strip if sequence[:name_de]
@@ -1755,10 +1754,11 @@ module Oddb2xml
                   else
                     sequence[:desc_de]
                   end
+                  name_fr ||= (ppac && ppac[:sequence_name])
                   name_fr = "#{sequence[:name_fr]} #{sequence[:desc_fr]}".strip if sequence[:name_fr]
                   name_it = "#{sequence[:name_it]} #{sequence[:desc_it]}".strip if sequence[:name_it]
                   override(xml, prodno, :DSCR, name_de.strip)
-                  override(xml, prodno, :DSCRF, name_fr.strip) if name_fr && !name_fr.empty?
+                  override(xml, prodno, :DSCRF, name_fr.strip)
                   override(xml, prodno, :DSCRI, name_it.strip) if name_it && !name_it.empty?
                   # use overriden ATC if possibel
                   atc = sequence[:atc] || sequence[:atc_code]
@@ -1773,6 +1773,7 @@ module Oddb2xml
                   xml.comment "Chapter70 hack prodno #{prodno} #{obj[:description].encode(xml: :text).gsub("--", "-")}"
                   xml.SALECD("A") # these products are always active!
                   xml.DSCR obj[:description]
+                  xml.DSCRF ""
                   if @limitations.index(obj[:code])
                     xml.LIMNAMEBAG obj[:code]
                     used_limitations << obj[:code]
