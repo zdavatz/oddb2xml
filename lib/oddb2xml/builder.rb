@@ -594,6 +594,14 @@ module Oddb2xml
               xml.CompositionSwissmedic obj[:composition_swissmedic] if obj[:composition_swissmedic]
             }
           end
+          @firstbase.each do |ean13, obj|
+            xml.PRD("DT" => "") {
+              xml.GTIN obj[:gtin]
+              xml.CPT
+              xml.DSCRD obj[:trade_item_description_de]
+              xml.DSCRF obj[:trade_item_description_fr]
+            }
+          end
           @products.sort.to_h.each do |ean13, obj|
             next if /^Q/i.match?(obj[:atc])
             seq = obj[:seq]
