@@ -591,4 +591,34 @@ module Oddb2xml
       nil
     end
   end
+
+  class FirstbaseExtractor < Extractor
+    def initialize(file)
+      @sheet = RubyXL::Parser.parse(file).worksheets[0]
+    end
+
+    def to_hash
+      data = {}
+      return data unless @sheet
+      @sheet.each_with_index do |row, i|
+        next if i <= 1
+        gtin = row[0].value.to_s.gsub(/^0+/, '')
+        data[gtin] = {
+          gtin: gtin,
+          gln: row[1].value.to_s,
+          target_market: row[2] ? row[2].value.to_s: "",
+          gpc: row[3] ? row[3].value.to_s: "",
+          trade_item_description_de: row[4] ? row[4].value.to_s: "",
+          trade_item_description_en: row[5] ? row[5].value.to_s: "",
+          trade_item_description_fr: row[6] ? row[6].value.to_s: "",
+          trade_item_description_it: row[7] ? row[7].value.to_s: "",
+          manufacturer_name: row[8] ? row[8].value.to_s: "",
+          start_availability_date: row[9] ? row[9].value.to_s: "",
+          gross_weight: row[10] ? row[10].value.to_s: "",
+          net_weight: row[11] ? row[11].value.to_s: "",
+        }
+      end
+      data
+    end
+  end
 end

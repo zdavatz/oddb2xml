@@ -381,4 +381,26 @@ module Oddb2xml
       read_xml_from_zip(/^AipsDownload_/iu, file)
     end
   end
+
+  class FirstbaseDownloader < Downloader
+    BASE_URL = "https://www.firstbase.ch"
+    include DownloadMethod
+    def initialize(type = :orphan, options = {})
+      @url = BASE_URL + "/sites/default/files/2023-09/firstbase_healthcare_public_data-dump%2C%2020230920.xlsx"
+    end
+
+    def download
+      @file2save = File.join(DOWNLOADS, "firstbase.xlsx")
+      report_download(@url, @file2save)
+      begin
+        download_as(@file2save, "w+")
+        return File.expand_path(@file2save)
+      rescue Timeout::Error, Errno::ETIMEDOUT
+        retrievable? ? retry : raise
+      ensure
+        Oddb2xml.download_finished(@file2save, false)
+      end
+      File.expand_path(@file2save)
+    end
+  end
 end
