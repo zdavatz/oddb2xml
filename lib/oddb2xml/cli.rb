@@ -26,6 +26,7 @@ module Oddb2xml
       @packs = {} # [option] Packungen from Swissmedic for dat
       @infos_zur_rose = {} # [addition] infos_zur_rose and other infos from zurrose transfer.txt
       @migel = {} # [addition] additional Non Pharma products from files repo
+      @firstbase = {}
       @actions = [] # [addition] interactions from epha
       @orphan = [] # [addition] Orphaned drugs from Swissmedic xls
       # addresses
@@ -60,6 +61,9 @@ module Oddb2xml
         threads << download(:package) # swissmedic
         threads << download(:lppv) # oddb2xml_files
         threads << download(:bag) # bag.e-mediat
+        if @options[:firstbase]
+          threads << download(:firstbase) # https://github.com/zdavatz/oddb2xml/issues/63
+        end
         types.each do |type|
           threads << download(:refdata, type) # refdata
         end
@@ -313,6 +317,10 @@ module Oddb2xml
           @refdata_types[type]
         end
 
+      when :firstbase
+        downloader = FirstbaseDownloader.new(@options)
+        bin = downloader.download
+        Oddb2xml.log("FirstbaseDownloader bin #{File.size(bin)} bytes")
       end
     end
 
