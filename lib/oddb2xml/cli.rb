@@ -321,6 +321,11 @@ module Oddb2xml
         downloader = FirstbaseDownloader.new(@options)
         bin = downloader.download
         Oddb2xml.log("FirstbaseDownloader bin #{File.size(bin)} bytes")
+        @mutex.synchronize do
+          @firstbase = FirstbaseExtractor.new(bin).to_hash
+          Oddb2xml.log("FirstbaseExtractor added #{@firstbase.size} firstbase items")
+          @firstbase
+        end
       end
     end
 
