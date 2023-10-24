@@ -43,6 +43,7 @@ module Oddb2xml
         opt :log, "log important actions", short: :none
         opt :use_ra11zip, "Use the ra11.zip (a zipped transfer.dat from Galexis)",
           default: File.exist?("ra11.zip") ? "ra11.zip" : nil, type: :string
+        opt :firstbase, "Build all NONPHARMA articles on firstbase", short: "b", default: false
       end
 
       @opts[:percent] = @opts[:increment]
@@ -62,6 +63,9 @@ module Oddb2xml
       if @opts[:artikelstamm]
         @opts[:extended] = true
         @opts[:price] = :zurrose
+      end
+      if @opts[:firstbase]
+        @opts[:nonpharma] = true
       end
       @opts[:price] = :zurrose if @opts[:price].is_a?(TrueClass)
       @opts[:price] = @opts[:price].to_sym if @opts[:price]
