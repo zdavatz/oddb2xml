@@ -129,7 +129,7 @@ module Oddb2xml
           builder.infos = @infos
           builder.packs = @packs
           # additional sources
-          %w[actions orphan migel infos_zur_rose].each do |addition|
+          %w[actions orphan migel infos_zur_rose firstbase].each do |addition|
             builder.send("#{addition}=".intern, instance_variable_get("@#{addition}"))
           end
         end

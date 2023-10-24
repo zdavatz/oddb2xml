@@ -42,7 +42,7 @@ module Oddb2xml
     @@gtin2ignore ||= []
     attr_accessor :subject, :refdata, :items, :flags, :lppvs,
       :actions, :migel, :orphan,
-      :infos, :packs, :infos_zur_rose,
+      :infos, :packs, :infos_zur_rose, :firstbase,
       :ean14, :tag_suffix,
       :companies, :people,
       :xsd
@@ -57,6 +57,7 @@ module Oddb2xml
       @packs = {}
       @migel = {}
       @infos_zur_rose ||= {}
+      @firstbase ||= {}
       @actions = []
       @orphan = []
       @ean14 = false
@@ -168,6 +169,19 @@ module Oddb2xml
               @articles << obj unless @options[:artikelstamm]
               nr_added += 1
             end
+          end
+        end
+        @firstbase.each do |ean13, obj|
+          entry = {
+            ean13: obj[:gtin],
+            desc_de: obj[:trade_item_description_de],
+            desc_fr: obj[:trade_item_description_fr],
+            atc_code: "",
+            company_ean: obj[:gln],
+            firstbase: true
+          }
+          if @refdata[obj[:gtin]].nil?
+            @articles << entry
           end
         end
       end
