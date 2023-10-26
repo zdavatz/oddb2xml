@@ -172,15 +172,19 @@ module Oddb2xml
           end
         end
         @firstbase.each do |ean13, obj|
-          entry = {
-            ean13: obj[:gtin],
-            desc_de: obj[:trade_item_description_de],
-            desc_fr: obj[:trade_item_description_fr],
-            atc_code: "",
-            company_ean: obj[:gln],
-            firstbase: true
-          }
-          if @refdata[obj[:gtin]].nil?
+          description = obj[:trade_item_description_de]
+          if description.empty?
+            description = obj[:trade_item_description_en]
+          end
+          if (!description.empty? || !obj[:trade_item_description_fr].empty?) && @refdata[obj[:gtin]].nil?
+            entry = {
+              ean13: obj[:gtin],
+              desc_de: description,
+              desc_fr: obj[:trade_item_description_fr],
+              atc_code: "",
+              company_ean: obj[:gln],
+              firstbase: true
+            }
             @articles << entry
           end
         end
@@ -595,12 +599,18 @@ module Oddb2xml
             }
           end
           @firstbase.each do |ean13, obj|
-            xml.PRD("DT" => "") {
-              xml.GTIN obj[:gtin]
-              xml.CPT
-              xml.DSCRD obj[:trade_item_description_de]
-              xml.DSCRF obj[:trade_item_description_fr]
-            }
+            description = obj[:trade_item_description_de]
+            if description.empty?
+              description = obj[:trade_item_description_en]
+            end
+            if !description.empty? || !obj[:trade_item_description_fr].empty?
+              xml.PRD("DT" => "") {
+                xml.GTIN obj[:gtin]
+                xml.CPT
+                xml.DSCRD description
+                xml.DSCRF obj[:trade_item_description_fr]
+              }
+            end
           end
           @products.sort.to_h.each do |ean13, obj|
             next if /^Q/i.match?(obj[:atc])
