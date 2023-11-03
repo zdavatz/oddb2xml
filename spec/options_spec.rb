@@ -15,7 +15,8 @@ Oddb2xml::DEFAULT_OPTS = {
   skip_download: false,
   log: false,
   percent: nil,
-  use_ra11zip: nil
+  use_ra11zip: nil,
+  firstbase: false,
 }
 
 describe Oddb2xml::Options do
