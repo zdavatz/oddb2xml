@@ -545,6 +545,41 @@ module Oddb2xml
       Oddb2xml.log "build_product add_missing_products_from_swissmedic. Added #{corrected_size - size_old} corrected_size #{corrected_size} size_old #{size_old} ean13_to_product."
     end
 
+    def add_products_from_bag_preparations(add_to_products = false)
+      Oddb2xml.log "build_product add_products_from_bag_preparations. Starting with #{@products.size} products and #{@items.size} @items"
+      ean13_to_product = {}
+      @products.each { |ean13, obj|
+        ean13_to_product[ean13] = obj
+        obj[:pharmacode] ||= @refdata[ean13][:pharmacode] if @refdata[ean13]
+      }
+      size_old = ean13_to_product.size
+      Oddb2xml.log "build_product add_products_from_bag_preparations. Imported #{size_old} ean13_to_product from @products. Checking #{@items.size} @items"
+      @items.each do |ean13, item|
+        next if @products[ean13]
+        if add_to_products
+          @products[ean13] = {
+            seq: item,
+            pac: nil,
+            sequence_name: "",
+            desc_de: "#{item[:name_de]}, #{item[:desc_de]}, #{item[:packages][ean13][:desc_de]}",
+            desc_fr: "#{item[:name_fr]}, #{item[:desc_fr]}, #{item[:packages][ean13][:desc_fr]}",
+            no8: "",
+            ean13: ean13,
+            atc: item[:atc_code],
+            ith: "",
+            siz: "",
+            eht: "",
+            sub: "",
+            comp: "",
+            drug_index: ""
+          }
+        end
+        ean13_to_product[ean13] = item
+      end
+      corrected_size = ean13_to_product.size
+      Oddb2xml.log "build_product add_products_from_bag_preparations. Added #{corrected_size - size_old} corrected_size #{corrected_size} size_old #{size_old} ean13_to_product."
+    end
+
     def build_product
       self.class.class_eval do
         def check_name(obj, lang = :de)
@@ -568,6 +603,7 @@ module Oddb2xml
       prepare_interactions
       prepare_codes
       add_missing_products_from_swissmedic
+      add_products_from_bag_preparations(true)
       nbr_products = 0
       Oddb2xml.log "build_product #{@products.size + @missing.size} products"
       a_builder = Nokogiri::XML::Builder.new(encoding: "utf-8") do |xml|
@@ -1722,6 +1758,7 @@ module Oddb2xml
         prepare_articles
         prepare_products
         add_missing_products_from_swissmedic(true)
+        add_products_from_bag_preparations(true)
         prepare_calc_items(suppress_composition_parsing: true)
         @prepared = true
         @old_rose_size = @infos_zur_rose.size
