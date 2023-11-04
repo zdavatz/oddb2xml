@@ -586,9 +586,9 @@ module Oddb2xml
           ean = obj[:ean13]
           refdata = @refdata[ean]
           if lang == :de
-            name = refdata && refdata[:desc_de] ? refdata[:desc_de] : obj[:sequence_name]
+            name = refdata && refdata[:desc_de] ? refdata[:desc_de] : (obj[:desc_de] || obj[:sequence_name])
           elsif lang == :fr
-            name = refdata && refdata[:desc_fr] ? refdata[:desc_fr] : obj[:sequence_name]
+            name = refdata && refdata[:desc_fr] ? refdata[:desc_fr] : (obj[:desc_fr] || obj[:sequence_name])
           elsif lang == :it
             name =  refdata[:desc_it] if refdata && refdata[:desc_it]
           else
