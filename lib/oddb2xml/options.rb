@@ -66,6 +66,7 @@ module Oddb2xml
       end
       if @opts[:firstbase]
         @opts[:nonpharma] = true
+        @opts[:calc] = true
       end
       @opts[:price] = :zurrose if @opts[:price].is_a?(TrueClass)
       @opts[:price] = @opts[:price].to_sym if @opts[:price]
