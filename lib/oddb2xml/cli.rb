@@ -40,7 +40,7 @@ module Oddb2xml
       start_time = Time.now
       files2rm = Dir.glob(File.join(DOWNLOADS, "*"))
       FileUtils.rm_f(files2rm, verbose: true) if (files2rm.size > 0) && !Oddb2xml.skip_download?
-      if @options[:calc] && !(@options[:extended])
+      if @options[:calc] && !(@options[:extended] || @options[:firstbase])
         threads << download(:package) # swissmedic
       elsif @options[:address]
         [:company, :person].each do |type|
@@ -106,9 +106,9 @@ module Oddb2xml
     private
 
     def build
-      @the_files = {"calc" => "oddb_calc.xml"} if @options[:calc] && !(@options[:extended] || @options[:artikelstamm])
+      @the_files = {"calc" => "oddb_calc.xml"} if @options[:calc] && !(@options[:extended] || @options[:artikelstamm] || @options[:firstbase])
       builder = Builder.new(@options) do |builder|
-        if @options[:calc] && !(@options[:extended] || @options[:artikelstamm])
+        if @options[:calc] && !(@options[:extended] || @options[:artikelstamm] || @options[:firstbase])
           builder.packs = @packs
         elsif @options[:address]
           builder.companies = @companies
@@ -343,7 +343,9 @@ module Oddb2xml
     def files
       unless @the_files
         @the_files = {}
-        @the_files[:calc] = "oddb_calc.xml" if @options[:calc]
+        if @options[:calc]
+          @the_files[:calc] = "oddb_calc.xml"
+        end
         if @options[:artikelstamm]
           @the_files[:artikelstamm] = "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml"
         elsif @options[:address]
