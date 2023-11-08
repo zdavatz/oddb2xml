@@ -55,6 +55,11 @@ module Oddb2xml
       @opts.delete(:increment)
       @opts[:nonpharma] = @opts[:append]
       @opts.delete(:append)
+      if @opts[:firstbase]
+        @opts[:nonpharma] = true
+        # https://github.com/zdavatz/oddb2xml/issues/76
+        @opts[:calc] = true
+      end
       if @opts[:extended]
         @opts[:nonpharma] = true
         @opts[:price] = :zurrose
@@ -63,10 +68,6 @@ module Oddb2xml
       if @opts[:artikelstamm]
         @opts[:extended] = true
         @opts[:price] = :zurrose
-      end
-      if @opts[:firstbase]
-        @opts[:nonpharma] = true
-        @opts[:calc] = true
       end
       @opts[:price] = :zurrose if @opts[:price].is_a?(TrueClass)
       @opts[:price] = @opts[:price].to_sym if @opts[:price]
