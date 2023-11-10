@@ -602,6 +602,10 @@ module Oddb2xml
       return data unless @sheet
       @sheet.each_with_index do |row, i|
         next if i <= 1
+        if row.nil?
+          puts "Empty row (#{i}) in firstbase"
+          next
+        end
         gtin = row[0].value.to_s.gsub(/^0+/, '')
         data[gtin] = {
           gtin: gtin,
