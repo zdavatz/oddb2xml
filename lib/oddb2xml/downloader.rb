@@ -386,7 +386,7 @@ module Oddb2xml
     BASE_URL = "https://www.firstbase.ch"
     include DownloadMethod
     def initialize(type = :orphan, options = {})
-      @url = BASE_URL + "/sites/default/files/2023-11/firstbase_healthcare_public_data-dump%2C%2020231109.xlsx"
+      @url = BASE_URL + "sites/default/files/2023-12/firstbase_healthcare_public_data-dump.xlsx"
     end
 
     def download
