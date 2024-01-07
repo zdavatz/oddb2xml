@@ -383,10 +383,10 @@ module Oddb2xml
   end
 
   class FirstbaseDownloader < Downloader
-    BASE_URL = "https://www.firstbase.ch"
+    BASE_URL = "http://pillbox.oddb.org"
     include DownloadMethod
     def initialize(type = :orphan, options = {})
-      @url = BASE_URL + "/sites/default/files/2023-12/firstbase_healthcare_public_data-dump.xlsx"
+      @url = BASE_URL + "/firstbase.xlsx"
     end
 
     def download
