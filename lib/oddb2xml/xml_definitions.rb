@@ -136,6 +136,7 @@ class PreparationContent
   element :SwissmedicNo5
   element :FlagItLimitation
   element :OrgGenCode
+  element :FlagSB
   element :FlagSB20
   element :CommentDe
   element :CommentFr

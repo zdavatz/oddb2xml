@@ -413,7 +413,7 @@ describe Oddb2xml::Builder do
             <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
             <SL_ENTRY>true</SL_ENTRY>
             <IKSCAT>B</IKSCAT>
-            <DEDUCTIBLE>20</DEDUCTIBLE>
+            <DEDUCTIBLE>40</DEDUCTIBLE>
             <PRODNO>5329001</PRODNO>
         </ITEM>),
              "Kolon with Pharmacode for EAN 7680002780013" => %(<ITEM PHARMATYPE="P">
