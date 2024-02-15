@@ -11,7 +11,7 @@
     <SwissmedicNo5>585</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -147,7 +147,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <SwissmedicNo5>28486</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -294,7 +294,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <AtcCode>V06DF</AtcCode>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -439,7 +439,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <SwissmedicNo5>53662</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode>O</OrgGenCode>
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -547,7 +547,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <SwissmedicNo5>62069</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -661,7 +661,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <SwissmedicNo5>40333</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -786,7 +786,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <SwissmedicNo5>40662</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -964,7 +964,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <SwissmedicNo5>53290</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>Y</FlagSB20> <!-- Manually patched on 2017.12.17 by Niklaus, to hava one Y in examples -->
+    <FlagSB>Y</FlagSB> <!-- Manually patched on 2017.12.17 by Niklaus, to hava one Y in examples -->
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -1078,7 +1078,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <SwissmedicNo5>65856</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -1192,7 +1192,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <SwissmedicNo5>40502</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -1387,7 +1387,7 @@ Lo sconto deve essere fatto usufruire al debitore secondo l’articolo 56 capove
     <SwissmedicNo5>62132</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -1588,7 +1588,7 @@ Il medico curante si impegna a registrare costantemente i necessari dati nell'ap
     <SwissmedicNo5>16105</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -1761,7 +1761,7 @@ Il medico curante si impegna a registrare costantemente i necessari dati nell'ap
     <SwissmedicNo5>35366</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -1939,7 +1939,7 @@ Il medico curante si impegna a registrare costantemente i necessari dati nell'ap
     <SwissmedicNo5>55558</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode>O</OrgGenCode>
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -2070,7 +2070,7 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
     <SwissmedicNo5>55559</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode>O</OrgGenCode>
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -2201,7 +2201,7 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
     <SwissmedicNo5>56352</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -2326,7 +2326,7 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
     <SwissmedicNo5>54534</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -2597,7 +2597,7 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
     <SwissmedicNo5>58734</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -2722,7 +2722,7 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
     <SwissmedicNo5>55561</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -2847,7 +2847,7 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
     <SwissmedicNo5>57724</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -2959,7 +2959,7 @@ delle infezioni da Enterococcus faecium Vancomicina-resistente incluse le batter
     <SwissmedicNo5>65160</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -3098,7 +3098,7 @@ Il medico curante è tenuto a raccogliere costantemente i dati necessari nell’
     <SwissmedicNo5>615</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />
@@ -3236,7 +3236,7 @@ Se il vaccino viene ottentuto al prezzo di serie summenzionato, il medico non pu
     <SwissmedicNo5>44447</SwissmedicNo5>
     <FlagItLimitation>Y</FlagItLimitation>
     <OrgGenCode />
-    <FlagSB20>N</FlagSB20>
+    <FlagSB>N</FlagSB>
     <CommentDe />
     <CommentFr />
     <CommentIt />

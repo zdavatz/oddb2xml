@@ -1649,7 +1649,14 @@ module Oddb2xml
                   xml.LPPV "true" if @lppvs[pkg_gtin.to_s] # detect_nincd
                   if item && item[:deductible]
                     case item[:deductible]
-                      when "Y" then xml.DEDUCTIBLE 20; # 20%
+                      when "Y" then xml.DEDUCTIBLE 40; # 40%
+                      when "N" then xml.DEDUCTIBLE 10; # 10%
+                    end
+                  elsif item && item[:deductible20]
+                    # TODO: Delete deductible20 after 2024/03/01
+                    # https://github.com/zdavatz/oddb2xml/issues/81
+                    case item[:deductible20]
+                      when "Y" then xml.DEDUCTIBLE 40; # 20%
                       when "N" then xml.DEDUCTIBLE 10; # 10%
                     end
                   end
