@@ -1031,10 +1031,12 @@ module Oddb2xml
                 xml.SYN1F obj[:seq][:name_fr] unless obj[:seq][:name_fr].empty?
               end
               if obj[:seq]
-                case obj[:seq][:deductible]
-                when "Y" then xml.SLOPLUS 1; # 20%
-                when "N" then xml.SLOPLUS 2; # 10%
-                else xml.SLOPLUS "" # k.A.
+                if obj[:seq][:deductible] == "Y" || obj[:seq][:deductible20] == "Y"
+                  xml.SLOPLUS 1; # 40%
+                elsif obj[:seq][:deductible] == "N" || obj[:seq][:deductible20] == "N"
+                  xml.SLOPLUS 2; # 10%
+                else
+                  xml.SLOPLUS "" # k.A.
                 end
               end
               # xml.NOPCS
@@ -1656,7 +1658,7 @@ module Oddb2xml
                     # TODO: Delete deductible20 after 2024/03/01
                     # https://github.com/zdavatz/oddb2xml/issues/81
                     case item[:deductible20]
-                      when "Y" then xml.DEDUCTIBLE 40; # 20%
+                      when "Y" then xml.DEDUCTIBLE 40; # 40%
                       when "N" then xml.DEDUCTIBLE 10; # 10%
                     end
                   end

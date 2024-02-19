@@ -11,7 +11,7 @@
       Under http://dev.ywesee.com/Main/Oddb2xml you find more information on how the data is generated.
 
       In this XSD file we refer to the following sources:
-      # swissINDEX 
+      # swissINDEX
       ## Pharma: https://index.ws.e-mediat.net/Swissindex/Pharma/ws_Pharma_V101.asmx?WSDL"
       ## NonPharma https://index.ws.e-mediat.net/Swissindex/NonPharma/ws_NonPharma_V101.asmx?WSDL"
       # Preparations.xml
@@ -42,7 +42,7 @@
       PHAR  Pharmacode: Taken from swissINDEX or ZurRose characters 3..9
       PEXF  Price Ex-Factory (exkl. VAT):  Taken from the ZurRose.dat characters 60..65
       PPUB  Public Price (inkl. VAT):      Taken from the ZurRose.dat characters 66..71
-      SLOPLUS Selbsbehalt/deductilbe, where 1 =>  20%, 2 => 10%, '' => not known
+      SLOPLUS Selbsbehalt/deductilbe, where 1 =>  40%, 2 => 10%, '' => not known
       REF_DATA 1 in oddb_article if coming from a refdata source (migel, bag, swissmedic), else 0
 
       FIRST import all data from swissINDEX
@@ -88,7 +88,7 @@
       * Composition (column 'P') -> Field CompositionSwissmedic in oddb_product.xml
       * Packungsgrösse (column 'L') -> Field PackGrSwissmedic in oddb_article.xml
       * Packungseinheit(column 'L') -> Field EinheitSwissmedic in oddb_article.xml
-      
+
       In oddb_product.xml PRODNO must be exactly 7 digits long. For all drugs appearing in the Packungen.xlsx the
       PRODNO is defined as IKSNR (column A Zulassungsnummer) + SEQ (column b Dosisstärkenummer) and the DSCRD is
       taken vom refdata.
@@ -96,7 +96,7 @@
 
     </xs:documentation>
   </xs:annotation>
-  
+
   <xs:element name="ARTICLE">
     <xs:complexType>
       <xs:sequence>
