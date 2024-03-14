@@ -216,7 +216,7 @@ module Oddb2xml
     include DownloadMethod
     def init
       super
-      @url ||= "http://www.xn--spezialittenliste-yqb.ch/File.axd?file=XMLPublications.zip"
+      @url ||= "http://www.spezialitaetenliste.ch/File.axd?file=XMLPublications.zip"
     end
 
     def download
