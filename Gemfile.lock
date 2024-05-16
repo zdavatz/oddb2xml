@@ -104,7 +104,8 @@ GEM
     rake (13.0.6)
     rdoc (6.3.3)
     regexp_parser (2.8.1)
-    rexml (3.2.6)
+    rexml (3.2.8)
+      strscan (>= 3.0.9)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
       rspec-expectations (~> 3.12.0)
@@ -168,6 +169,7 @@ GEM
       rubocop-performance (~> 1.19.0)
     standardrb (1.0.1)
       standard
+    strscan (3.1.0)
     timecop (0.9.8)
     unf (0.1.4)
       unf_ext
