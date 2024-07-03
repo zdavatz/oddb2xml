@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (2.9.0)
+    oddb2xml (2.9.2)
       htmlentities
       httpi
       mechanize
@@ -99,7 +99,7 @@ GEM
     psych (3.3.4)
     public_suffix (5.0.3)
     racc (1.7.1)
-    rack (3.0.9.1)
+    rack (3.0.11)
     rainbow (3.1.1)
     rake (13.0.6)
     rdoc (6.3.3)
@@ -199,6 +199,7 @@ DEPENDENCIES
   pry-byebug
   pry-doc
   psych (< 4.0.0)
+  rack (= 3.0.11)
   rake
   rdoc (~> 6.3.3)
   rspec

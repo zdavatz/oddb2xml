@@ -8,3 +8,4 @@ group :debugger do
 end
 
 gem "nokogiri", "1.13.9"
+gem "rack", "3.0.11"
