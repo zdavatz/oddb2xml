@@ -1,0 +1,26 @@
+name: Ruby
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    env:
+      BUNDLE_PATH: ".bundle/gems"
+      BUNDLE_WITHOUT: "debugger"
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ruby
+        bundler-cache: true
+    - uses: rubygems/release-gem@v1
+    - uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
