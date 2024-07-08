@@ -39,6 +39,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "webrick"
   spec.add_dependency "rexml"
   spec.add_dependency "standardrb"
+  spec.add_dependency "rack", "3.0.11"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
