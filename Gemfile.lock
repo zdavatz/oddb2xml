@@ -11,6 +11,7 @@ PATH
       optimist
       ox
       parslet
+      rack (= 3.0.11)
       rexml
       rubyXL (~> 3.4.0)
       rubyntlm (= 0.5.1)
