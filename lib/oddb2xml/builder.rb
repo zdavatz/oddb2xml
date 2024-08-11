@@ -605,6 +605,7 @@ module Oddb2xml
       add_missing_products_from_swissmedic
       add_products_from_bag_preparations(true)
       nbr_products = 0
+      added_gtin = Set.new
       Oddb2xml.log "build_product #{@products.size + @missing.size} products"
       a_builder = Nokogiri::XML::Builder.new(encoding: "utf-8") do |xml|
         xml.doc.tag_suffix = @tag_suffix
@@ -614,6 +615,7 @@ module Oddb2xml
             ean = obj[:ean13]
             next unless check_name(obj, :de)
             next unless check_name(obj, :fr)
+            next if added_gtin.include?(ean)
             next if /^Q/i.match?(obj[:atc])
             if obj[:prodno]
               next if emitted.index(obj[:prodno])
@@ -634,26 +636,14 @@ module Oddb2xml
               xml.CompositionSwissmedic obj[:composition_swissmedic] if obj[:composition_swissmedic]
             }
           end
-          @firstbase.each do |ean13, obj|
-            description = obj[:trade_item_description_de]
-            if description.empty?
-              description = obj[:trade_item_description_en]
-            end
-            if !description.empty? || !obj[:trade_item_description_fr].empty?
-              xml.PRD("DT" => "") {
-                xml.GTIN obj[:gtin]
-                xml.CPT
-                xml.DSCRD description
-                xml.DSCRF obj[:trade_item_description_fr]
-              }
-            end
-          end
           @products.sort.to_h.each do |ean13, obj|
             next if /^Q/i.match?(obj[:atc])
             seq = obj[:seq]
             ean = obj[:ean13]
             next unless check_name(obj, :de)
             next unless check_name(obj, :fr)
+            next if added_gtin.include?(ean)
+            added_gtin.add(ean)
             xml.PRD("DT" => obj[:last_change]) do
               nbr_products += 1
               xml.GTIN ean
@@ -764,6 +754,22 @@ module Oddb2xml
               xml.EinheitSwissmedic obj[:eht] unless obj[:eht].empty?
               xml.SubstanceSwissmedic obj[:sub] unless obj[:sub].empty?
               xml.CompositionSwissmedic obj[:comp] unless obj[:comp].empty?
+            end
+          end
+          @firstbase.each do |ean13, obj|
+            description = obj[:trade_item_description_de]
+            if description.empty?
+              description = obj[:trade_item_description_en]
+            end
+            next if added_gtin.include?(obj[:gtin])
+            if !description.empty? || !obj[:trade_item_description_fr].empty?
+              added_gtin.add(obj[:gtin])
+              xml.PRD("DT" => "") {
+                xml.GTIN obj[:gtin]
+                xml.CPT
+                xml.DSCRD description
+                xml.DSCRF obj[:trade_item_description_fr]
+              }
             end
           end
           xml.RESULT {
