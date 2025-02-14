@@ -610,7 +610,7 @@ module Oddb2xml
         gtin = row[0].value.to_s.gsub(/^0+/, '')
         data[gtin] = {
           gtin: gtin,
-          gln: row[1].value.to_s,
+          gtin: row[1]&.value.to_s,
           target_market: row[2] ? row[2].value.to_s: "",
           gpc: row[3] ? row[3].value.to_s: "",
           trade_item_description_de: row[4] ? row[4].value.to_s: "",
