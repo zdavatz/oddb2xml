@@ -241,9 +241,9 @@ module Oddb2xml
   end
 
   class RefdataDownloader < Downloader
+    include DownloadMethod
     def initialize(options = {}, type = :pharma)
-      @type = (type == :pharma ? "Pharma" : "NonPharma")
-      url = "https://refdatabase.refdata.ch/Service/Article.asmx?WSDL"
+      url = "https://files.refdata.ch/simis-public-prod/Articles/1.0/Refdata.Articles.zip"
       super(options, url)
     end
 
@@ -258,46 +258,10 @@ module Oddb2xml
     end
 
     def download
-      begin
-        @file2save = File.join(DOWNLOADS, "refdata_#{@type}.xml")
-        soap = %(<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://refdatabase.refdata.ch/Article_in" xmlns:ns2="http://refdatabase.refdata.ch/">
-  <SOAP-ENV:Body>
-    <ns2:DownloadArticleInput>
-      <ns1:ATYPE>#{@type.upcase}</ns1:ATYPE>
-    </ns2:DownloadArticleInput>
-  </SOAP-ENV:Body>
-  </SOAP-ENV:Envelope>
-</ns1:ATYPE></ns2:DownloadArticleInput></SOAP-ENV:Body>
-)
-        report_download(@url, @file2save)
-        return IO.read(@file2save) if Oddb2xml.skip_download? && File.exist?(@file2save)
-        FileUtils.rm_f(@file2save, verbose: true)
-        response = @client.call(:download, xml: soap)
-        if response.success?
-          if (xml = response.to_xml)
-            xml = File.read(File.join(Oddb2xml::SpecData, File.basename(@file2save))) if defined?(RSpec)
-            response = nil # win
-            FileUtils.makedirs(DOWNLOADS)
-            File.open(@file2save, "w+") { |file| file.write xml }
-            if @options[:artikelstamm]
-              cmd = "xmllint --format --output #{@file2save} #{@file2save}"
-              Oddb2xml.log(cmd)
-              system(cmd)
-            end
-          else
-            # received broken data or internal error
-            raise StandardError
-          end
-        else
-          raise Timeout::Error
-        end
-      rescue HTTPI::SSLError
-        exit # catch me in Cli class
-      rescue Timeout::Error, Errno::ETIMEDOUT
-        retrievable? ? retry : raise
-      end
-      xml
+      filename = "Refdata.Articles.zip"
+      download_as(filename, "w+")
+      content = read_xml_from_zip(/Refdata.Articles.xml/, File.join(DOWNLOADS, filename))
+      content
     end
   end
 

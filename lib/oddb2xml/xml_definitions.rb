@@ -238,29 +238,69 @@ class MedicalInformationsEntry
   element :medicalInformations, class: MedicalInformationsContent
 end
 
-class SwissRegItemContentContent
+class SwissRegProductClassification
   include SAXMachine
-  attribute :DT
-  element :ATYPE
-  element :GTIN
-  element :PHAR
-  element :SWMC_AUTHNR
-  element :NAME_DE
-  element :NAME_FR
-  element :ADDSCR
-  element :ATC
-  element :AUTH_HOLDER_NAME
-  element :AUTH_HOLDER_GLN
+  element :ProductClass
+  element :Atc
 end
 
-class SwissRegArticleContent
+class SwissRegMedicinalProduct
   include SAXMachine
-  attribute :CREATION_DATETIME
-  elements :ITEM, class: SwissRegItemContentContent
+  element :Identifier
+  element :Domain
+  element :LegalStatusOfSupply
+  element :RegulatedAuthorisationIdentifier
+  element :ProductClassification, class: SwissRegProductClassification
 end
 
-class SwissRegArticleEntry
+class SwissRegHolder
   include SAXMachine
-  element :CREATION_DATETIME
-  element :ARTICLE, class: SwissRegArticleContent
+  element :Identifier
+  element :Name
+end
+
+class SwissRegName
+  include SAXMachine
+  element :Language
+  element :FullName
+end
+
+class SwissRegMarketingStatus
+  include SAXMachine
+  element :DateStart
+end
+
+class SwissRegPackagedProduct
+  include SAXMachine
+  element :Identifier
+  element :RegulatedAuthorisationIdentifier
+  element :DataCarrierIdentifier
+  element :Holder, class: SwissRegHolder
+  elements :Name, class: SwissRegName
+  element :MarketingStatus, class: SwissRegMarketingStatus
+end
+
+class SwissRegArticle
+  include SAXMachine
+  element :MedicinalProduct, class: SwissRegMedicinalProduct
+  element :PackagedProduct, class: SwissRegPackagedProduct
+end
+
+class SwissRegDocumentReference
+  include SAXMachine
+  element :Language
+  element :Url
+end
+
+class SwissRegProductPrice
+  include SAXMachine
+  element :RetailPrice
+end
+
+class SwissRegArticles
+  include SAXMachine
+  elements :Article, class: SwissRegArticle
+  elements :DocumentReference, class: SwissRegDocumentReference
+  element :Hpc
+  element :ProductPrice, class: SwissRegProductPrice
 end

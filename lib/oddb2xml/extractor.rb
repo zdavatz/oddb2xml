@@ -208,10 +208,13 @@ module Oddb2xml
 
     def to_hash
       data = {}
-      result = SwissRegArticleEntry.parse(@xml.sub(STRIP_FOR_SAX_MACHINE, ""), lazy: true)
-      items = result.ARTICLE.ITEM
-      items.each do |pac|
-        ean13 = (gtin = pac.GTIN.to_s) ? gtin : "0"
+      result = SwissRegArticles.parse(@xml.sub(STRIP_FOR_SAX_MACHINE, ""), lazy: true)
+      result.Article.each do |article|
+        article_type = article.MedicinalProduct.ProductClassification.ProductClass
+        if article_type != @type
+          next
+        end
+        ean13 = @type == "PHARMA" ? article.PackagedProduct.DataCarrierIdentifier : article.MedicinalProduct.Identifier
         if ean13.size < 13
           puts "Refdata #{@type} use 13 chars not #{ean13.size} for #{ean13}" if $VERBOSE
           ean13 = ean13.rjust(13, "0")
@@ -220,21 +223,29 @@ module Oddb2xml
           puts "Refdata #{@type} remove leading '0' for #{ean13}" if $VERBOSE
           ean13 = ean13[1..-1]
         end
-        # but in refdata_nonPharma we have a about 700 GTINs which are 14 characters and longer
         item = {}
         item[:ean13] = ean13
-        item[:no8] = pac.SWMC_AUTHNR
+        item[:no8] = article.PackagedProduct.RegulatedAuthorisationIdentifier || ""
         item[:data_origin] = "refdata"
         item[:refdata] = true
-        item[:_type] = (typ = pac.ATYPE.downcase.to_sym) ? typ : ""
-        item[:last_change] = (date = Time.parse(pac.DT).to_s) ? date : "" # Date and time of last data change
-        item[:desc_de] = (dscr = pac.NAME_DE) ? dscr : ""
-        item[:desc_fr] = (dscr = pac.NAME_FR) ? dscr : ""
-        item[:desc_it] = item[:desc_de] # refdata has no italian name
-        item[:atc_code] = (code = pac.ATC) ? code.to_s : ""
-        item[:company_name] = (nam = pac.AUTH_HOLDER_NAME) ? nam : ""
-        item[:company_ean] = (gln = pac.AUTH_HOLDER_GLN) ? gln : ""
-        data[item[:ean13]] = item
+        item[:_type] = @type.downcase.to_sym
+        item[:last_change] = "" # TODO: Date and time of last data change
+        item[:desc_de] = ""
+        item[:desc_fr] = ""
+        item[:desc_it] = ""
+        article.PackagedProduct.Name.each do |name|
+          if name.Language == "DE"
+            item[:desc_de] = name.FullName
+          elsif name.Language == "FR"
+            item[:desc_fr] = name.FullName
+          elsif name.Language == "IT"
+            item[:desc_it] = name.FullName
+          end
+        end
+        item[:atc_code] = article.MedicinalProduct.ProductClassification.Atc || ""
+        item[:company_name] = article.PackagedProduct.Holder.Name || ""
+        item[:company_ean] = article.PackagedProduct.Holder.Identifier || ""
+        data[ean13] = item
       end
       data
     end

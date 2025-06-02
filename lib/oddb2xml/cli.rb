@@ -65,7 +65,12 @@ module Oddb2xml
           threads << download(:firstbase) # https://github.com/zdavatz/oddb2xml/issues/63
         end
         types.each do |type|
-          threads << download(:refdata, type) # refdata
+          begin
+            threads << download(:refdata, type) # refdata
+          rescue error
+            # Should continue even when error #102
+            Oddb2xml.log("Error in downloading refdata #{error}")
+          end
         end
       end
       begin
@@ -311,10 +316,15 @@ module Oddb2xml
           end
         end
         @mutex.synchronize do
-          hsh = RefdataExtractor.new(xml, type).to_hash
-          @refdata_types[type] = hsh
-          Oddb2xml.log("RefdataExtractor #{type} added #{hsh.size} keys now #{@refdata_types.keys} items from xml with #{xml.size} bytes")
-          @refdata_types[type]
+          begin
+            hsh = RefdataExtractor.new(xml, type).to_hash
+            @refdata_types[type] = hsh
+            Oddb2xml.log("RefdataExtractor #{type} added #{hsh.size} keys now #{@refdata_types.keys} items from xml with #{xml.size} bytes")
+            @refdata_types[type]
+          rescue error
+            # Should continue even when error https://github.com/zdavatz/oddb2xml/issues/102
+            Oddb2xml.log("Error in RefdataExtractor #{error}")
+          end
         end
 
       when :firstbase
