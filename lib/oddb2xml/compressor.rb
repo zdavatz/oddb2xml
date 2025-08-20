@@ -27,7 +27,7 @@ module Oddb2xml
           tgz = Zlib::GzipWriter.new(File.open(@compress_file, "wb"))
           Minitar.pack(@contents, tgz)
         when /\.zip$/
-          Zip::File.open(@compress_file, Zip::File::CREATE) do |zip|
+          Zip::File.open(@compress_file, create: true) do |zip|
             @contents.each do |file|
               filename = File.basename(file)
               zip.add(filename, file)
