@@ -85,7 +85,7 @@ end
 # Zips input_filenames (using the basename)
 def zip_files(zipfile_name, input_filenames)
   FileUtils.rm_f(zipfile_name)
-  Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+  Zip::File.open(zipfile_name, create: true) do |zipfile|
     input_filenames.each do |filename|
       puts "Add #{filename} #{File.size(filename)} bytes as #{File.basename(filename)} #{Dir.pwd}" if $VERBOSE
       zipfile.add(File.basename(filename), filename)

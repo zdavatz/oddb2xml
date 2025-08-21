@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   # We fix the version of the spec to newer versions only in the third position
   # hoping that these version fix only security/severe bugs
   # Consulted the Gemfile.lock to get
-  spec.add_dependency "rubyzip" # , '~> 1.1.3'
+  spec.add_dependency "rubyzip", '~> 3.0.1'
   spec.add_dependency "minitar" # , '~> 0.5.2'
   spec.add_dependency "mechanize" # , '~> 2.5.1'
   spec.add_dependency "nokogiri", ">= 1.8.2"
