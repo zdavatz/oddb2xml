@@ -22,6 +22,8 @@ module Oddb2xml
         opt :extended, "pharma, non-pharma plus prices and non-pharma from zurrose.
                             Products without EAN-Code will also be listed.
                             File oddb_calc.xml will also be generated"
+        opt :fhir, "Use FHIR NDJSON format from FOPH/BAG instead of XML from Spezialitätenliste", default: false
+        opt :fhir_url, "Specific FHIR NDJSON URL to download (implies --fhir)", type: :string, default: nil
         opt :format, "File format F, default is xml. {xml|dat}
                             If F is given, -o option is ignored.", type: :string, default: "xml"
         opt :include, "Include target option for ean14  for 'dat' format.
@@ -68,6 +70,10 @@ module Oddb2xml
       if @opts[:artikelstamm]
         @opts[:extended] = true
         @opts[:price] = :zurrose
+      end
+      # FHIR URL implies FHIR mode
+      if @opts[:fhir_url]
+        @opts[:fhir] = true
       end
       @opts[:price] = :zurrose if @opts[:price].is_a?(TrueClass)
       @opts[:price] = @opts[:price].to_sym if @opts[:price]

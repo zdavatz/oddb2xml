@@ -60,7 +60,14 @@ module Oddb2xml
         threads << download(:zurrose)
         threads << download(:package) # swissmedic
         threads << download(:lppv) # oddb2xml_files
-        threads << download(:bag) # bag.e-mediat
+        
+        # Use FHIR or XML for BAG data
+        if @options[:fhir]
+          threads << download(:fhir) # FHIR from FOPH/BAG
+        else
+          threads << download(:bag) # XML from bag.e-mediat
+        end
+        
         if @options[:firstbase]
           threads << download(:firstbase) # https://github.com/zdavatz/oddb2xml/issues/63
         end
@@ -272,6 +279,19 @@ module Oddb2xml
           @lppvs = LppvExtractor.new(str).to_hash
           Oddb2xml.log("LppvExtractor added #{@lppvs.size} lppvs")
           @lppvs
+        end
+
+      when :fhir
+        # instead of Thread.new do
+
+        downloader = FhirDownloader.new(@options)
+        fhir_file = downloader.download
+        Oddb2xml.log("FhirDownloader downloaded #{File.size(fhir_file)} bytes")
+        @mutex.synchronize do
+          hsh = FhirExtractor.new(fhir_file).to_hash
+          @items = hsh
+          Oddb2xml.log("FhirExtractor added #{@items.size} items from FHIR")
+          @items
         end
 
       when :bag
