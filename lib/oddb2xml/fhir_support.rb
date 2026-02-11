@@ -18,7 +18,7 @@ module Oddb2xml
 
     def initialize(options = {})
       @options = options
-      @url = determine_fhir_url
+      @url = find_latest_fhir_url
       super(options, @url)
     end
 
@@ -61,74 +61,18 @@ module Oddb2xml
 
     private
 
-    def determine_fhir_url
-      # Strategy:
-      # 1. Try URL from options if provided
-      # 2. Try to find latest export based on date pattern
-      # 3. Fall back to known latest URL
-
-      if @options[:fhir_url]
-        Oddb2xml.log "FhirDownloader: Using URL from options: #{@options[:fhir_url]}"
-        return @options[:fhir_url]
-      end
-
-      # Try to find latest based on date
-      latest_url = find_latest_fhir_url
-      if latest_url
-        Oddb2xml.log "FhirDownloader: Found latest FHIR export: #{latest_url}"
-        return latest_url
-      end
-
-      # Fall back to default
-      default_url = default_fhir_url
-      Oddb2xml.log "FhirDownloader: Using default FHIR URL: #{default_url}"
-      default_url
-    end
-
     def find_latest_fhir_url
-      # Try dates in descending order (today, yesterday, etc.)
-      today = Date.today
-
-      5.times do |days_ago|
-        date = today - days_ago
-        date_str = date.strftime("%Y%m%d")
-        potential_url = "#{BASE_URL}#{STATIC_FHIR_PATH}/foph-sl-export-#{date_str}.ndjson"
-
-        if url_exists?(potential_url)
-          Oddb2xml.log "FhirDownloader: Found FHIR export for #{date}: #{potential_url}"
-          return potential_url
-        end
-      end
-
-      nil
+      agent = Mechanize.new
+      response = agent.get "https://epl.bag.admin.ch/api/sl/public/resources/current"
+      resources = JSON.parse(response.body)
+      "https://epl.bag.admin.ch/static/" + resources["fhir"]["fileUrl"]
     rescue => e
       Oddb2xml.log "FhirDownloader: Error finding latest URL: #{e.message}"
       nil
     end
 
-    def url_exists?(url)
-      # Check if URL exists with HEAD request
-      begin
-        response = @agent.head(url)
-        response.code.to_i == 200
-      rescue Mechanize::ResponseCodeError
-        false
-      rescue => e
-        Oddb2xml.log "FhirDownloader: Error checking URL #{url}: #{e.message}"
-        false
-      end
-    end
-
-    def default_fhir_url
-      # Known latest URL (as of February 2026)
-      "#{BASE_URL}#{STATIC_FHIR_PATH}/foph-sl-export-20260203.ndjson"
-    end
-
     def skip_download?
-      @options[:calc] &&
-        @options[:skip_download] &&
-        File.exist?(@file2save) &&
-        file_age_hours(@file2save) < 24
+        @options[:skip_download] || (File.exist?(@file2save) && file_age_hours(@file2save) < 24)
     end
 
     def file_age_hours(file)
@@ -254,8 +198,7 @@ module Oddb2xml
         @atc_code = resource.dig("classification", 0, "coding", 0, "code")
 
         # Get product classification (generic/reference)
-        @classification = resource.dig("classification", 1, "coding", 0, "display") ||
-          resource.dig("classification", 1, "coding", 0, "code")
+        @classification = resource.dig("classification", 1, "coding", 0, "code")
       end
 
       def name_de
@@ -340,7 +283,7 @@ module Oddb2xml
         ext["extension"]&.each do |sub_ext|
           case sub_ext["url"]
           when "type"
-            price[:type] = sub_ext.dig("valueCodeableConcept", "coding", 0, "display")
+            price[:type] = sub_ext.dig("valueCodeableConcept", "coding", 0, "code")
           when "value"
             price[:value] = sub_ext.dig("valueMoney", "value")
             price[:currency] = sub_ext.dig("valueMoney", "currency")
@@ -456,12 +399,12 @@ module Oddb2xml
         return prices unless reimbursement
 
         reimbursement.prices.each do |price|
-          if price[:type] == "Ex-factory price"
+          if price[:type] == "756002005002"
             exf = OpenStruct.new
             exf.Price = price[:value]
             exf.ValidFromDate = price[:change_date]
             prices.ExFactoryPrice = exf
-          elsif price[:type] == "Retail price"
+          elsif price[:type] == "756002005001"
             pub = OpenStruct.new
             pub.Price = price[:value]
             pub.ValidFromDate = price[:change_date]
@@ -476,9 +419,9 @@ module Oddb2xml
         return nil unless classification
 
         case classification
-        when /Generic/i
+        when "756001003001"
           "G"
-        when /Reference/i, /Original/i
+        when "756001003002"
           "O"
         else
           nil
@@ -523,7 +466,7 @@ module Oddb2xml
       result.Preparations.Preparation.each do |seq|
         next unless seq
         next if seq.SwissmedicNo5 && seq.SwissmedicNo5.eql?("0")
-        
+
         # Build item structure matching BagXmlExtractor
         item = {}
         item[:data_origin] = "fhir"
@@ -544,7 +487,7 @@ module Oddb2xml
         item[:comment_fr] = ""
         item[:comment_it] = ""
         item[:it_code] = ""  # Not available in FHIR
-        
+
         # Build substances array
         item[:substances] = []
         if seq.Substances && seq.Substances.Substance
@@ -557,24 +500,24 @@ module Oddb2xml
             }
           end
         end
-        
+
         item[:pharmacodes] = []
         item[:packages] = {}
-        
+
         # Process packages
         if seq.Packs && seq.Packs.Pack
           seq.Packs.Pack.each do |pac|
             next unless pac.GTIN
-            
+
             ean13 = pac.GTIN.to_s
-            
+
             # Ensure SwissmedicNo8 has leading zeros
             if pac.SwissmedicNo8 && pac.SwissmedicNo8.length < 8
               pac.SwissmedicNo8 = pac.SwissmedicNo8.rjust(8, "0")
             end
-            
+
             Oddb2xml.setEan13forNo8(pac.SwissmedicNo8, ean13) if pac.SwissmedicNo8
-            
+
             # Build price structures
             exf = {price: "", valid_date: "", price_code: ""}
             if pac.Prices && pac.Prices.ExFactoryPrice
@@ -582,14 +525,14 @@ module Oddb2xml
               exf[:valid_date] = pac.Prices.ExFactoryPrice.ValidFromDate if pac.Prices.ExFactoryPrice.ValidFromDate
               exf[:price_code] = ""  # Not in FHIR
             end
-            
+
             pub = {price: "", valid_date: "", price_code: ""}
             if pac.Prices && pac.Prices.PublicPrice
               pub[:price] = pac.Prices.PublicPrice.Price.to_s if pac.Prices.PublicPrice.Price
               pub[:valid_date] = pac.Prices.PublicPrice.ValidFromDate if pac.Prices.PublicPrice.ValidFromDate
               pub[:price_code] = ""  # Not in FHIR
             end
-            
+
             # Build package entry matching BagXmlExtractor structure
             item[:packages][ean13] = {
               ean13: ean13,
@@ -604,11 +547,11 @@ module Oddb2xml
               swissmedic_number8: (num = pac.SwissmedicNo8) ? num : "",
               prices: {exf_price: exf, pub_price: pub}
             }
-            
+
             # Limitations (not available in FHIR, set empty)
             item[:packages][ean13][:limitations] = []
             item[:packages][ean13][:limitation_points] = ""
-            
+
             # Store in data hash with ean13 as key
             data[ean13] = item
           end
