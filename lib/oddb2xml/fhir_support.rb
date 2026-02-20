@@ -185,7 +185,7 @@ module Oddb2xml
     end
 
     class MedicinalProduct
-      attr_reader :names, :atc_code, :classification
+      attr_reader :names, :atc_code, :classification, :it_codes
 
       def initialize(resource)
         @names = {}
@@ -194,11 +194,23 @@ module Oddb2xml
           @names[lang] = name["productName"]
         end
 
-        # Get ATC code
+        # Get ATC code (classification[0])
         @atc_code = resource.dig("classification", 0, "coding", 0, "code")
 
-        # Get product classification (generic/reference)
+        # Get product classification (generic/reference) (classification[1])
         @classification = resource.dig("classification", 1, "coding", 0, "code")
+        
+        # Get IT codes (Index Therapeuticus) from classification with correct system
+        @it_codes = []
+        resource["classification"]&.each do |cls|
+          cls["coding"]&.each do |coding|
+            if coding["system"]&.include?("index-therapeuticus")
+              # Format IT code from "080300" to "08.03.00" or "08.03."
+              it_code = format_it_code(coding["code"])
+              @it_codes << it_code if it_code
+            end
+          end
+        end
       end
 
       def name_de
@@ -211,6 +223,20 @@ module Oddb2xml
 
       def name_it
         @names["it-CH"] || @names["it"]
+      end
+      
+      def it_code
+        # Return first IT code (primary), formatted like "08.03.00"
+        @it_codes.first
+      end
+      
+      private
+      
+      def format_it_code(code)
+        return nil unless code && code.match?(/^\d{6}$/)
+        
+        # Convert "080300" to "08.03.00"
+        "#{code[0..1]}.#{code[2..3]}.#{code[4..5]}"
       end
     end
 
@@ -233,7 +259,7 @@ module Oddb2xml
 
     class Authorization
       attr_reader :identifier, :auth_type, :holder_name, :prices, :foph_dossier_no,
-        :status, :listing_status, :subject_reference
+        :status, :listing_status, :subject_reference, :cost_share, :limitations
 
       def initialize(resource)
         @identifier = resource.dig("identifier", 0, "value")
@@ -244,15 +270,18 @@ module Oddb2xml
         @foph_dossier_no = nil
         @status = nil
         @listing_status = nil
+        @cost_share = nil
+        @limitations = []
 
         # Parse extensions for reimbursement info and prices
         resource["extension"]&.each do |ext|
           if ext["url"]&.include?("reimbursementSL")
             parse_reimbursement_extension(ext)
-          elsif ext["url"]&.include?("productPrice")
-            @prices << parse_price_extension(ext)
           end
         end
+        
+        # Parse indications for limitations
+        parse_indications(resource["indication"])
       end
 
       def marketing_authorization?
@@ -274,6 +303,13 @@ module Oddb2xml
             @status = sub_ext.dig("valueCodeableConcept", "coding", 0, "display")
           when "listingStatus"
             @listing_status = sub_ext.dig("valueCodeableConcept", "coding", 0, "display")
+          when "costShare"
+            @cost_share = sub_ext["valueInteger"]
+          else
+            # Check if this is a productPrice extension (has nested extensions)
+            if sub_ext["url"]&.include?("productPrice")
+              @prices << parse_price_extension(sub_ext)
+            end
           end
         end
       end
@@ -294,6 +330,39 @@ module Oddb2xml
           end
         end
         price
+      end
+      
+      def parse_indications(indications)
+        return unless indications
+        
+        indications.each do |indication|
+          indication["extension"]&.each do |ext|
+            if ext["url"]&.include?("regulatedAuthorization-limitation")
+              @limitations << parse_limitation_extension(ext)
+            end
+          end
+        end
+      end
+      
+      def parse_limitation_extension(ext)
+        limitation = {}
+        ext["extension"]&.each do |sub_ext|
+          case sub_ext["url"]
+          when "status"
+            limitation[:status] = sub_ext.dig("valueCodeableConcept", "coding", 0, "display")
+            limitation[:status_code] = sub_ext.dig("valueCodeableConcept", "coding", 0, "code")
+          when "statusDate"
+            limitation[:status_date] = sub_ext["valueDate"]
+          when "limitationText"
+            limitation[:text] = sub_ext["valueString"]
+          when "period"
+            limitation[:start_date] = sub_ext.dig("valuePeriod", "start")
+            limitation[:end_date] = sub_ext.dig("valuePeriod", "end")
+          when "firstLimitationDate"
+            limitation[:first_date] = sub_ext["valueDate"]
+          end
+        end
+        limitation
       end
     end
 
@@ -349,6 +418,7 @@ module Oddb2xml
         prep.NameIt = mp.name_it
         prep.AtcCode = mp.atc_code
         prep.OrgGenCode = map_org_gen_code(mp.classification)
+        prep.ItCode = mp.it_code  # Add IT code
 
         # Map packages
         prep.Packs = OpenStruct.new
@@ -361,8 +431,12 @@ module Oddb2xml
           pack.DescriptionIt = pkg.description
           pack.SwissmedicCategory = map_legal_status(pkg.legal_status)
 
-          # Find prices for this package
+          # Find prices and additional data for this package
           pack.Prices = create_prices_for_package(bundle, pkg)
+          
+          # Add limitations and cost share
+          pack.Limitations = create_limitations_for_package(bundle, pkg)
+          pack.CostShare = get_cost_share_for_package(bundle, pkg)
 
           pack
         end
@@ -391,9 +465,9 @@ module Oddb2xml
         prices = OpenStruct.new
 
         # Find reimbursement authorization for this package by resource ID
-        package_reference = "PackagedProductDefinition/#{package.resource_id}"
+        # Match by ending with ID to handle both PackagedProductDefinition and CHIDMPPackagedProductDefinition
         reimbursement = bundle.authorizations.find do |auth|
-          auth.reimbursement_sl? && auth.subject_reference == package_reference
+          auth.reimbursement_sl? && auth.subject_reference&.end_with?(package.resource_id)
         end
 
         return prices unless reimbursement
@@ -403,16 +477,55 @@ module Oddb2xml
             exf = OpenStruct.new
             exf.Price = price[:value]
             exf.ValidFromDate = price[:change_date]
+            exf.PriceTypeCode = price[:type]
             prices.ExFactoryPrice = exf
           elsif price[:type] == "756002005001"
             pub = OpenStruct.new
             pub.Price = price[:value]
             pub.ValidFromDate = price[:change_date]
+            pub.PriceTypeCode = price[:type]
             prices.PublicPrice = pub
           end
         end
 
         prices
+      end
+      
+      def create_limitations_for_package(bundle, package)
+        # Find reimbursement authorization for this package
+        reimbursement = bundle.authorizations.find do |auth|
+          auth.reimbursement_sl? && auth.subject_reference&.end_with?(package.resource_id)
+        end
+
+        return nil unless reimbursement
+        return nil if reimbursement.limitations.empty?
+        
+        # Convert FHIR limitations to OpenStruct format
+        limitations = OpenStruct.new
+        limitations.Limitation = reimbursement.limitations.map do |lim|
+          limitation = OpenStruct.new
+          limitation.LimitationCode = ""  # Not in FHIR
+          limitation.LimitationType = ""  # Could derive from status
+          limitation.LimitationNiveau = ""  # Not in FHIR
+          limitation.LimitationValue = ""  # Not in FHIR
+          limitation.DescriptionDe = lim[:text] || ""
+          limitation.DescriptionFr = ""  # May need separate language version
+          limitation.DescriptionIt = ""  # May need separate language version
+          limitation.ValidFromDate = lim[:status_date] || lim[:start_date] || ""
+          limitation.ValidThruDate = lim[:end_date] || ""
+          limitation
+        end
+        
+        limitations
+      end
+      
+      def get_cost_share_for_package(bundle, package)
+        # Find reimbursement authorization for this package
+        reimbursement = bundle.authorizations.find do |auth|
+          auth.reimbursement_sl? && auth.subject_reference&.end_with?(package.resource_id)
+        end
+
+        reimbursement&.cost_share
       end
 
       def map_org_gen_code(classification)
@@ -480,13 +593,13 @@ module Oddb2xml
         item[:name_it] = (name = seq.NameIt) ? name : ""
         item[:swissmedic_number5] = (num5 = seq.SwissmedicNo5) ? num5.to_s.rjust(5, "0") : ""
         item[:org_gen_code] = (orgc = seq.OrgGenCode) ? orgc : ""
-        item[:deductible] = ""  # Not available in FHIR
-        item[:deductible20] = ""  # Not available in FHIR
+        item[:deductible] = ""  # Will be set per package based on cost_share
+        item[:deductible20] = ""  # Will be set per package based on cost_share  
         item[:atc_code] = (atcc = seq.AtcCode) ? atcc : ""
         item[:comment_de] = ""  # Not available in FHIR
         item[:comment_fr] = ""
         item[:comment_it] = ""
-        item[:it_code] = ""  # Not available in FHIR
+        item[:it_code] = (itc = seq.ItCode) ? itc : ""  # NOW available in FHIR!
 
         # Build substances array
         item[:substances] = []
@@ -523,14 +636,14 @@ module Oddb2xml
             if pac.Prices && pac.Prices.ExFactoryPrice
               exf[:price] = pac.Prices.ExFactoryPrice.Price.to_s if pac.Prices.ExFactoryPrice.Price
               exf[:valid_date] = pac.Prices.ExFactoryPrice.ValidFromDate if pac.Prices.ExFactoryPrice.ValidFromDate
-              exf[:price_code] = ""  # Not in FHIR
+              exf[:price_code] = "PEXF"
             end
 
             pub = {price: "", valid_date: "", price_code: ""}
             if pac.Prices && pac.Prices.PublicPrice
               pub[:price] = pac.Prices.PublicPrice.Price.to_s if pac.Prices.PublicPrice.Price
               pub[:valid_date] = pac.Prices.PublicPrice.ValidFromDate if pac.Prices.PublicPrice.ValidFromDate
-              pub[:price_code] = ""  # Not in FHIR
+              pub[:price_code] = "PPUB"
             end
 
             # Build package entry matching BagXmlExtractor structure
@@ -548,9 +661,50 @@ module Oddb2xml
               prices: {exf_price: exf, pub_price: pub}
             }
 
-            # Limitations (not available in FHIR, set empty)
+            # Map limitations from FHIR
             item[:packages][ean13][:limitations] = []
+            if pac.Limitations && pac.Limitations.Limitation
+              pac.Limitations.Limitation.each do |lim|
+                # Calculate is_deleted safely
+                is_deleted = false
+                if lim.ValidThruDate
+                  begin
+                    is_deleted = Date.parse(lim.ValidThruDate) < Date.today
+                  rescue
+                    is_deleted = false
+                  end
+                end
+                
+                item[:packages][ean13][:limitations] << {
+                  it: item[:it_code],
+                  key: :swissmedic_number8,
+                  id: pac.SwissmedicNo8 || "",
+                  code: lim.LimitationCode || "",
+                  type: lim.LimitationType || "",
+                  value: lim.LimitationValue || "",
+                  niv: lim.LimitationNiveau || "",
+                  desc_de: lim.DescriptionDe || "",
+                  desc_fr: lim.DescriptionFr || "",
+                  desc_it: lim.DescriptionIt || "",
+                  vdate: lim.ValidFromDate || "",
+                  del: is_deleted
+                }
+              end
+            end
             item[:packages][ean13][:limitation_points] = ""
+            
+            # Map cost_share to deductible flags
+            if pac.CostShare
+              case pac.CostShare
+              when 10
+                item[:deductible] = "Y"
+              when 20
+                item[:deductible20] = "Y"
+              when 40
+                # New value - might need new field or special handling
+                item[:deductible] = "Y"  # Fallback to standard deductible
+              end
+            end
 
             # Store in data hash with ean13 as key
             data[ean13] = item
