@@ -1,10 +1,8 @@
 require "zlib"
 require "minitar"
 require "zip"
-
 module Oddb2xml
   class Compressor
-    include Archive::Tar
     attr_accessor :contents
     def initialize(prefix = "oddb", options = {})
       @options = options

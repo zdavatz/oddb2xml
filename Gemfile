@@ -9,3 +9,4 @@ end
 
 gem "nokogiri", "1.13.9"
 gem "rack", "3.0.11"
+gem "mutex_m"
