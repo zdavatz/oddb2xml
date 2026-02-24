@@ -738,14 +738,14 @@ class PreparationsEntry
   class << self
     alias_method :original_parse, :parse
 
-    def parse(input)
+    def parse(input, **kwargs)
       # Check if input is a file path ending in .ndjson
       if input.is_a?(String) && File.exist?(input) && input.end_with?(".ndjson")
         # Parse as FHIR
         FhirPreparationsEntry.parse(input)
       else
         # Parse as XML (original behavior)
-        original_parse(input)
+        original_parse(input, **kwargs)
       end
     end
   end

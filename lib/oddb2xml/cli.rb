@@ -74,7 +74,7 @@ module Oddb2xml
         types.each do |type|
           begin
             threads << download(:refdata, type) # refdata
-          rescue error
+          rescue => error
             # Should continue even when error #102
             Oddb2xml.log("Error in downloading refdata #{error}")
           end
@@ -341,7 +341,7 @@ module Oddb2xml
             @refdata_types[type] = hsh
             Oddb2xml.log("RefdataExtractor #{type} added #{hsh.size} keys now #{@refdata_types.keys} items from xml with #{xml.size} bytes")
             @refdata_types[type]
-          rescue error
+          rescue => error
             # Should continue even when error https://github.com/zdavatz/oddb2xml/issues/102
             Oddb2xml.log("Error in RefdataExtractor #{error}")
           end

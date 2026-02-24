@@ -22,30 +22,30 @@ Gem::Specification.new do |spec|
   # Consulted the Gemfile.lock to get
   spec.add_dependency "rubyzip", '~> 3.0.1'
   spec.add_dependency "minitar" # , '~> 0.5.2'
-  spec.add_dependency "mechanize" # , '~> 2.5.1'
-  spec.add_dependency "nokogiri", ">= 1.8.2"
+  spec.add_dependency "mechanize", ">= 2.8.5"
+  spec.add_dependency "nokogiri", ">= 1.19.1"
   spec.add_dependency "savon" , '~> 2.12.0'
   spec.add_dependency "spreadsheet" # , '~> 1.0.0'
   spec.add_dependency "rubyXL", "~> 3.4.0"
   spec.add_dependency "sax-machine" # ,  '~> 0.1.0'
   spec.add_dependency "parslet" # , '~> 1.7.0'
-  spec.add_dependency "rubyntlm", "0.5.1"
+  spec.add_dependency "rubyntlm", ">= 0.6.3"
   spec.add_dependency "multi_json" # , '>= 0.3.2'
   spec.add_dependency "httpi" # , '>= 2.4.1'
   spec.add_dependency "optimist"
   spec.add_dependency "xml-simple"
   spec.add_dependency "ox"
   spec.add_dependency "htmlentities"
-  spec.add_dependency "webrick"
-  spec.add_dependency "rexml"
+  spec.add_dependency "webrick", ">= 1.8.2"
+  spec.add_dependency "rexml", ">= 3.3.9"
   spec.add_dependency "standardrb"
-  spec.add_dependency "rack", "3.0.11"
+  spec.add_dependency "rack", ">= 3.1.20"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
   spec.add_development_dependency "webmock"
-  spec.add_development_dependency "rdoc", "~> 6.3.3" # rdoc 6.4 depends on psych 4.0 which breaks savon!
+  spec.add_development_dependency "rdoc", ">= 6.3.4.1"
   spec.add_development_dependency "vcr"
   spec.add_development_dependency "timecop"
   spec.add_development_dependency "flexmock"
