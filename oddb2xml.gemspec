@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.description = "oddb2xml creates xml files using swissINDEX, BAG-XML and Swissmedic."
   spec.summary = "oddb2xml creates xml files."
   spec.homepage = "https://github.com/zdavatz/oddb2xml"
-  spec.license = "GPL-3.0"
+  spec.license = "GPL-3.0-only"
   spec.files = `git ls-files -z`.split("\x0")
   spec.executables = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files = spec.files.grep(%r{^(test|spec|features)/})
