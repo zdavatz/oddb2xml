@@ -1,0 +1,853 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Articles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://simisinfo.refdata.ch/Articles/1.0/" totalArticles="30" generatedOn="2026-03-09T01:00:07Z">
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001000674-00585</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>0058501</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>J07BK01</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001000674-00585-001</Identifier>
+      <RegulatedAuthorisationIdentifier>00585001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680005850010</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001000674</Identifier>
+        <Name>GlaxoSmithKline AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>VARILRIX Trockensub c Solv Fertspr 0.5 ml</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>VARILRIX subst sèche c solv ser pré 0.5 ml</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001001541-54534</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>5453401</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>N06DX02</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001001541-54534-001</Identifier>
+      <RegulatedAuthorisationIdentifier>54534001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680545340019</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001001541</Identifier>
+        <Name>Schwabe Pharma AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>TEBOKAN Filmtabl 240 mg 30 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>TEBOKAN cpr pell 240 mg 30 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001402539-54015</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>5401501</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>N01BB09</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001402539-54015-011</Identifier>
+      <RegulatedAuthorisationIdentifier>54015011</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680540150118</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001402539</Identifier>
+        <Name>Aspen Pharma Schweiz GmbH</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>NAROPIN Inj Lös 0.2 % 10ml Duofit Amp 5 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>NAROPIN sol inj 0.2 % 10ml amp duofit 5 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001395756-56352</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>5635201</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>B02BD02</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001395756-56352-017</Identifier>
+      <RegulatedAuthorisationIdentifier>56352017</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680563520172</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001395756</Identifier>
+        <Name>Shire Switzerland GmbH</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>ADVATE Trockensub 250 IE c Solv 2 ml Durchstf</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>ADVATE subst sèche 250 UI c solv 2 ml flac</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7612053000000-65856</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>6585601</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>A11CC05</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7612053000000-65856-001</Identifier>
+      <RegulatedAuthorisationIdentifier>65856001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680658560014</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7612053000000</Identifier>
+        <Name>Gebro Pharma AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>DIBASE Tropfen 10000 IE/ml Fl 10 ml</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>DIBASE gouttes 10000 UI/ml fl 10 ml</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001402218-55558</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>5555801</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>J01XX08</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001402218-55558-005</Identifier>
+      <RegulatedAuthorisationIdentifier>55558005</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680555580054</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001402218</Identifier>
+        <Name>Pfizer PFE Switzerland GmbH</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>ZYVOXID Filmtabl 600 mg 10 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>ZYVOXID cpr pell 600 mg 10 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001320451-62069</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>6206901</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>N03AX14</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001320451-62069-008</Identifier>
+      <RegulatedAuthorisationIdentifier>62069008</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680620690084</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001320451</Identifier>
+        <Name>Desitin Pharma GmbH</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001374539-35366</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>3536601</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>B03AE10</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001374539-35366-016</Identifier>
+      <RegulatedAuthorisationIdentifier>35366016</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680353660163</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001374539</Identifier>
+        <Name>Farmaceutica Teofarma Suisse SA</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>KENDURAL Depottabl 30 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>KENDURAL cpr dépôt 30 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001392175-53662</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>5366201</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>J05AF05</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001392175-53662-013</Identifier>
+      <RegulatedAuthorisationIdentifier>53662013</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680536620137</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001392175</Identifier>
+        <Name>ViiV Healthcare GmbH</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>3TC Filmtabl 150 mg 60 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>3TC cpr pell 150 mg 60 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001002258-16105</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>1610501</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>C05BA01</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001002258-16105-058</Identifier>
+      <RegulatedAuthorisationIdentifier>16105058</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680161050583</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001002258</Identifier>
+        <Name>Medinova AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>HIRUDOID Creme 3 mg/g 40 g</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>HIRUDOID crème 3 mg/g 40 g</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001002012-32475</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>3247501</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>A06AA01</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001002012-32475-019</Identifier>
+      <RegulatedAuthorisationIdentifier>32475019</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680324750190</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001002012</Identifier>
+        <Name>Actipharm SA</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>LANSOYL Gel 225 g</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>LANSOYL gel 225 g</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001001121-57323</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>5732301</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>A02BC03</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001001121-57323-001</Identifier>
+      <RegulatedAuthorisationIdentifier>57323001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680573230016</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001001121</Identifier>
+        <Name>Mepha Pharma AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>LANSOPRAZOL Mepha Kaps 15 mg Fl 60 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>LANSOPRAZOL Mepha caps 15 mg fl 60 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001261853-53290</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>5329001</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>A10AB04</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001261853-53290-019</Identifier>
+      <RegulatedAuthorisationIdentifier>53290019</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680532900196</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001261853</Identifier>
+        <Name>Eli Lilly (Suisse) SA</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>HUMALOG Inj Lös 100 IE/ml Durchstf 10 ml</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>HUMALOG sol inj 100 UI/ml flac 10 ml</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7640128710004-00277</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>0027701</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>J06AA99</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7640128710004-00277-001</Identifier>
+      <RegulatedAuthorisationIdentifier>00277001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680002770014</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7640128710004</Identifier>
+        <Name>Serolab SA (succursale de Remaufens)</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>SEROCYTOL Herz-Gefässe Supp 3 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>SEROCYTOL Coeur-Vaisseaux supp 3 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7640128710004-00278</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>0027801</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>J06AA99</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7640128710004-00278-001</Identifier>
+      <RegulatedAuthorisationIdentifier>00278001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680002780013</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7640128710004</Identifier>
+        <Name>Serolab SA (succursale de Remaufens)</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>SEROCYTOL Kolon Supp 3 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>SEROCYTOL Côlon supp 3 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001000902-40662</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>4066201</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>D01AC20</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001000902-40662-014</Identifier>
+      <RegulatedAuthorisationIdentifier>40662014</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680406620144</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001000902</Identifier>
+        <Name>Janssen-Cilag AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>PEVISONE Creme 15 g</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>PEVISONE crème 15 g</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001000902-40662</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>4066201</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>D01AC20</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001000902-40662-022</Identifier>
+      <RegulatedAuthorisationIdentifier>40662022</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680406620229</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001000902</Identifier>
+        <Name>Janssen-Cilag AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>PEVISONE Creme 30 g</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>PEVISONE crème 30 g</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001379947-58734</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>5873401</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>L01CX01</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001379947-58734-001</Identifier>
+      <RegulatedAuthorisationIdentifier>58734001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680587340015</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001379947</Identifier>
+        <Name>PharmaMar AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>YONDELIS Trockensub 0.25 mg Durchstf</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>YONDELIS subst sèche 0.25 mg flac</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001397033-62716</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>6271601</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>R05FB02</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001397033-62716-001</Identifier>
+      <RegulatedAuthorisationIdentifier>62716001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680627160016</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001397033</Identifier>
+        <Name>Coop Vitality Health Care GmbH</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>COOP VITALITY Bronchialpastillen 40 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>COOP VITALITY pastilles bronchiques 40 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001348622-65160</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>6516001</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>L01XX46</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001348622-65160-001</Identifier>
+      <RegulatedAuthorisationIdentifier>65160001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680651600014</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001348622</Identifier>
+        <Name>AstraZeneca AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>LYNPARZA Kaps 50 mg 448 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>LYNPARZA caps 50 mg 448 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001374539-31644</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>3164401</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>B03AA07</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001374539-31644-011</Identifier>
+      <RegulatedAuthorisationIdentifier>31644011</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680316440115</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001374539</Identifier>
+        <Name>Farmaceutica Teofarma Suisse SA</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>FERRO-GRADUMET Depottabl 30 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>FERRO-GRADUMET cpr dépôt 30 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001000674-58158</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>5815801</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>J07BD54</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001000674-58158-001</Identifier>
+      <RegulatedAuthorisationIdentifier>58158001</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680581580011</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001000674</Identifier>
+        <Name>GlaxoSmithKline AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>PRIORIX TETRA Trockensub c Solv Fertspr</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>PRIORIX TETRA subst sèche c solv ser pré</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001308855-44447</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>4444701</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>C07AB02</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001308855-44447-010</Identifier>
+      <RegulatedAuthorisationIdentifier>44447010</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680444470107</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001308855</Identifier>
+        <Name>Daiichi Sankyo (Schweiz) AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>LOPRESOR Retard Divitabs 200 mg 14 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>LOPRESOR Retard Divitabs 200 mg 14 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001308855-44447</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>4444701</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>C07AB02</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001308855-44447-029</Identifier>
+      <RegulatedAuthorisationIdentifier>44447029</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680444470299</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001308855</Identifier>
+        <Name>Daiichi Sankyo (Schweiz) AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>LOPRESOR Retard Divitabs 200 mg 56 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>LOPRESOR Retard Divitabs 200 mg 56 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001000162-15219</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>1521901</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>A01AA01</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001000162-15219-068</Identifier>
+      <RegulatedAuthorisationIdentifier>15219068</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680152190687</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001000162</Identifier>
+        <Name>MEDA Pharma GmbH</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>ZYMAFLUOR Tabl 0.25 mg Ds 400 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>ZYMAFLUOR cpr 0.25 mg bte 400 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>CH-7601001002173-43454</Identifier>
+      <Domain>Human</Domain>
+      <LegalStatusOfSupply>B</LegalStatusOfSupply>
+      <RegulatedAuthorisationIdentifier>4345401</RegulatedAuthorisationIdentifier>
+      <ProductClassification>
+        <ProductClass>PHARMA</ProductClass>
+        <Atc>D03AX99</Atc>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>CH-7601001002173-43454-099</Identifier>
+      <RegulatedAuthorisationIdentifier>43454099</RegulatedAuthorisationIdentifier>
+      <DataCarrierIdentifier>7680434540995</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001002173</Identifier>
+        <Name>Iromedica AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>KAMILLIN Medipharm Bad liq 10 Btl 40 ml</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>KAMILLIN Medipharm bain liq 10 sach 40 ml</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>7611600441020</Identifier>
+      <ProductClassification>
+        <ProductClass>NONPHARMA</ProductClass>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>7611600441020</Identifier>
+      <DataCarrierIdentifier>7611600441020</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001000896</Identifier>
+        <Name>IVF HARTMANN AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>TUBEGAZE Verband weiss Nr 12 20m Finger gross</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>TUBEGAZE pans tubul blanc Nr 12 20m doigts grands</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>00040565124308</Identifier>
+      <ProductClassification>
+        <ProductClass>NONPHARMA</ProductClass>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>00040565124308</Identifier>
+      <DataCarrierIdentifier>00040565124308</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001251861</Identifier>
+        <Name>Smith &amp; Nephew Schweiz AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>ACTICOAT Flex 7 Wundverband 10x12.5cm 5 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>ACTICOAT Flex 7 pansement vulné 10x12.5cm 5 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>00040565124346</Identifier>
+      <ProductClassification>
+        <ProductClass>NONPHARMA</ProductClass>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>00040565124346</Identifier>
+      <DataCarrierIdentifier>00040565124346</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7601001251861</Identifier>
+        <Name>Smith &amp; Nephew Schweiz AG</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>ACTICOAT Flex 7 Wundverband 5x5cm 5 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>ACTICOAT Flex 7 pansement vulné 5x5cm 5 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+  <Article>
+    <MedicinalProduct>
+      <Identifier>68711428066649</Identifier>
+      <ProductClassification>
+        <ProductClass>NONPHARMA</ProductClass>
+      </ProductClassification>
+    </MedicinalProduct>
+    <PackagedProduct>
+      <Identifier>68711428066649</Identifier>
+      <DataCarrierIdentifier>68711428066649</DataCarrierIdentifier>
+      <Holder>
+        <Identifier>7610182000007</Identifier>
+        <Name>3M (Schweiz) GmbH (Professional Health Care)</Name>
+      </Holder>
+      <Name>
+        <Language>DE</Language>
+        <FullName>3M MEDIPORE+PAD Absorbtionsverb 10x15cm 8 x 25 Stk</FullName>
+      </Name>
+      <Name>
+        <Language>FR</Language>
+        <FullName>3M MEDIPORE+PAD compr absorb 10x15cm 8 x 25 pce</FullName>
+      </Name>
+    </PackagedProduct>
+  </Article>
+</Articles>

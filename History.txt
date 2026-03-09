@@ -2,6 +2,10 @@
 * Use raw.githubusercontent.com URL for ATC CSV to avoid 429 Too Many Requests errors
 * Add retry logic with exponential backoff for HTTP 429 errors in uri_open
 * Remove obsolete Ruby version check in uri_open (Ruby >= 2.5 already required)
+* Migrate Refdata from SOAP API to new SwissReg zip download (files.refdata.ch)
+* Fix UTF-8 encoding for German umlauts in SORTD field (e.g. ö → Ö)
+* Restore Italian description fallback to German when not available from Refdata
+* Fix Optimist short option conflict for --fhir and --fhir_url options
 
 === 2.7.9 / 19.09.22
 * Remove newly generated DSCRI when not running --artikelstamm and 

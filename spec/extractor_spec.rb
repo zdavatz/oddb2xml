@@ -74,7 +74,7 @@ describe Oddb2xml::RefdataExtractor do
                   desc_fr: "LEVETIRACETAM DESITIN mini cpr pel 250 mg 30 pce",
                   desc_it: "LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk",
                   atc_code: "N03AX14",
-                  last_change: "2017-12-08 00:00:00 +0000",
+                  last_change: "",
                   company_name: "Desitin Pharma GmbH",
                   company_ean: "7601001320451"}
       expect(item_found).to eq(expected)
@@ -94,8 +94,8 @@ describe Oddb2xml::RefdataExtractor do
       expected = {refdata: true,
                   _type: :nonpharma,
                   ean13: "7611600441020",
-                  no8: nil,
-                  last_change: LAST_CHANGE_2,
+                  no8: "",
+                  last_change: "",
                   data_origin: "refdata",
                   desc_de: "TUBEGAZE Verband weiss Nr 12 20m Finger gross",
                   desc_fr: "TUBEGAZE pans tubul blanc Nr 12 20m doigts grands",

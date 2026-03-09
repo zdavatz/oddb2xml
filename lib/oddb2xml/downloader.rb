@@ -135,6 +135,7 @@ module Oddb2xml
           end
         end
       end
+      xml.force_encoding("UTF-8") if xml.encoding.name != "UTF-8"
       xml
     end
   end
@@ -248,13 +249,7 @@ module Oddb2xml
     end
 
     def init
-      config = {
-        log_level: :info,
-        log: false, # $stdout
-        raise_errors: true,
-        wsdl: @url
-      }
-      @client = Savon::Client.new(config)
+      # No SOAP client needed - we download a zip file directly
     end
 
     def download

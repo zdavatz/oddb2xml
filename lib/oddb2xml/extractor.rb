@@ -202,7 +202,8 @@ module Oddb2xml
 
   class RefdataExtractor < Extractor
     def initialize(xml, type)
-      @type = (type == :pharma ? "PHARMA" : "NONPHARMA")
+      @type = (type.to_s.upcase == "PHARMA" ? "PHARMA" : "NONPHARMA")
+      xml = xml.dup.force_encoding("UTF-8") if xml.encoding.name != "UTF-8"
       super(xml)
     end
 
@@ -242,6 +243,7 @@ module Oddb2xml
             item[:desc_it] = name.FullName
           end
         end
+        item[:desc_it] = item[:desc_de] if item[:desc_it].empty? # refdata has no italian name
         item[:atc_code] = article.MedicinalProduct.ProductClassification.Atc || ""
         item[:company_name] = article.PackagedProduct.Holder.Name || ""
         item[:company_ean] = article.PackagedProduct.Holder.Identifier || ""

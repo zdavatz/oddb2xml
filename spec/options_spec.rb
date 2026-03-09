@@ -17,6 +17,8 @@ Oddb2xml::DEFAULT_OPTS = {
   percent: nil,
   use_ra11zip: nil,
   firstbase: false,
+  fhir: false,
+  fhir_url: nil,
 }
 
 describe Oddb2xml::Options do

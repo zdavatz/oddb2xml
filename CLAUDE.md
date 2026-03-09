@@ -39,7 +39,7 @@ The system follows a **download → extract → build → compress** pipeline:
 
 2. **Downloaders** (`lib/oddb2xml/downloader.rb`) — 11 subclasses of `Downloader`, each fetching from a specific Swiss data source. Files cached in `./downloads/`.
 
-3. **Extractors** (`lib/oddb2xml/extractor.rb`) — Matching extractor classes that parse downloaded files into Ruby hashes. Formats include XML (nokogiri/sax-machine), XLSX (rubyXL), SOAP (savon), CSV, and fixed-width text.
+3. **Extractors** (`lib/oddb2xml/extractor.rb`) — Matching extractor classes that parse downloaded files into Ruby hashes. Formats include XML (nokogiri/sax-machine), XLSX (rubyXL), CSV, and fixed-width text. Refdata uses the new SwissReg XML format from a zip download (`files.refdata.ch`).
 
 4. **Builder** (`lib/oddb2xml/builder.rb`) — The largest file (~1900 lines). Merges extracted data and generates output XML/DAT files. Methods follow `prepare_*` (data assembly) and `build_*` (output generation) naming.
 

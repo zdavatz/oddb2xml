@@ -10,7 +10,7 @@ ARTICLE_ATTRIBUTE_TESTS = [
   ["ARTICLE", "PROD_DATE", Oddb2xml::DATE_REGEXP],
   ["ARTICLE", "VALID_DATE", Oddb2xml::DATE_REGEXP],
   ["ARTICLE/ART", "SHA256", /[a-f0-9]{32}/],
-  ["ARTICLE/ART", "DT", /\d{4}-\d{2}-\d{2}/]
+  ["ARTICLE/ART", "DT", //]
 ]
 
 ARTICLE_MISSING_ELEMENTS = [

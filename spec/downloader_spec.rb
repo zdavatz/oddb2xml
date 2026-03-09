@@ -154,8 +154,8 @@ describe Oddb2xml::RefdataDownloader do
         expect(@xml).to match(XML_VERSION_1_0)
       end
       it "should return valid xml" do
-        expect(@xml).to match(/PHAR/)
-        expect(@xml).to match(/ITEM/)
+        expect(@xml).to match(/PHARMA/)
+        expect(@xml).to match(/Article/)
       end
     end
   end
@@ -173,8 +173,8 @@ describe Oddb2xml::RefdataDownloader do
         expect(@xml).to match(XML_VERSION_1_0)
       end
       it "should return valid xml" do
-        expect(@xml).to match(/NONPHAR/)
-        expect(@xml).to match(/ITEM/)
+        expect(@xml).to match(/NONPHARMA/)
+        expect(@xml).to match(/Article/)
       end
     end
   end

@@ -25,7 +25,7 @@ creates .dat files according to ([IGM-11](http://dev.ywesee.com/uploads/att/IGM.
 * oddb.dat
 * oddb_with_migel.dat
 
-the files are using [swissINDEX](http://www.refdata.ch/downloads/company/download/swissindex_TechnischeBeschreibung.pdf), [BAG-XML](http://bag.e-mediat.net/SL2007.Web.External/Default.aspx?webgrab=ignore) and [Swissmedic](http://www.swissmedic.ch/daten/00080/00251/index.html?lang=de) as sources.
+the files are using [Refdata](https://files.refdata.ch/simis-public-prod/Articles/1.0/Refdata.Articles.zip), [BAG-XML](http://bag.e-mediat.net/SL2007.Web.External/Default.aspx?webgrab=ignore) and [Swissmedic](http://www.swissmedic.ch/daten/00080/00251/index.html?lang=de) as sources.
 
 The following additional data is in the files:
 
@@ -274,16 +274,14 @@ We use the following files:
 
 * https://www.swissmedic.ch/arzneimittel/00156/00221/00222/00230/index.html?lang=de (Präparateliste und zugelassene Packungen)
 * https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/interactions_de_utf8.csv
-* http://refdatabase.refdata.ch/Service/Article.asmx
+* https://files.refdata.ch/simis-public-prod/Articles/1.0/Refdata.Articles.zip
 * http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip
 * https://www.medregbm.admin.ch/Publikation/CreateExcelListBetriebs
 * https://www.medregbm.admin.ch/Publikation/CreateExcelListMedizinalPersons
 * http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat
-* https://index.ws.e-mediat.net/Swissindex/NonPharma/ws_NonPharma_V101.asmx
-* https://index.ws.e-mediat.net/Swissindex/NonPharma/ws_Pharma_V101.asmx
+* https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/NON-Pharma.xls
 * http://download.swissmedicinfo.ch/ (AipsDownload)
 * https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt
-* https://raw.githubusercontent.com/epha/robot/master/data/manual/swissmedic/atc.csv
 * https://raw.githubusercontent.com/zdavatz/cpp2sqlite/master/input/atc_codes_multi_lingual.txt
 
 ## Rules for matching GTIN (aka EAN13), product number and IKSNR

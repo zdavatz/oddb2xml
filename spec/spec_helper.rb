@@ -242,7 +242,8 @@ end
 def mock_downloads
   WebMock.enable!
   {"transfer.zip" => ["transfer.dat"],
-   "XMLPublications.zip" => ["Preparations.xml", "ItCodes.xml", "GL_Diff_SB.xml"]}.each do |zip, entries|
+   "XMLPublications.zip" => ["Preparations.xml", "ItCodes.xml", "GL_Diff_SB.xml"],
+   "Refdata.Articles.zip" => ["Refdata.Articles.xml"]}.each do |zip, entries|
     zip_file = File.join(Oddb2xml::SpecData, zip)
     files = entries.collect { |entry| File.join(Oddb2xml::SpecData, entry) }
     FileUtils.rm(zip_file, verbose: false) if File.exist?(zip_file)
@@ -254,10 +255,11 @@ def mock_downloads
    "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/internetlisten/status_ophan%20Drug.xlsx.download.xlsx/Liste_OrphanDrug_Internet_2019_01_31.xlsx" => "swissmedic_orphan.xlsx",
    "https://www.swissmedic.ch/dam/swissmedic/de/dokumente/internetlisten/zugelassene_packungen_ham.xlsx.download.xlsx/Zugelassene_Packungen%20HAM_31012019.xlsx" => "swissmedic_package.xlsx",
    "http://pillbox.oddb.org/TRANSFER.ZIP" => "transfer.zip",
-   "https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt" => "atc.csv",
+   "https://raw.githubusercontent.com/zdavatz/cpp2sqlite/master/input/atc_codes_multi_lingual.txt" => "atc.csv",
    "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt" => "oddb2xml_files_lppv.txt",
    "http://www.xn--spezialittenliste-yqb.ch/File.axd?file=XMLPublications.zip" => "XMLPublications.zip",
-   #      'http://refdatabase.refdata.ch/Service/Article.asmx?WSDL' => 'refdata_Pharma.xml
+   "https://www.spezialitaetenliste.ch/File.axd?file=XMLPublications.zip" => "XMLPublications.zip",
+   "https://files.refdata.ch/simis-public-prod/Articles/1.0/Refdata.Articles.zip" => "Refdata.Articles.zip",
    "http://www.spezialitaetenliste.ch/varia_De.htm" => "varia_De.htm"}.each do |url, file|
     inhalt = File.read(File.join(Oddb2xml::SpecData, file))
     m = flexmock("open-uri")
