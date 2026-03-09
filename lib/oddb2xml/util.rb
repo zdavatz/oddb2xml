@@ -7,12 +7,20 @@ module Oddb2xml
     sprintf("%05d", iksnr) + sprintf("%02d", seqnr)
   end
 
-  def self.uri_open(url)
-    version = RUBY_VERSION.split(".").map { |x| x.to_i }
-    if (version <=> [2, 5, 0]) >= 0
+  def self.uri_open(url, max_retries: 3)
+    retries = 0
+    begin
       URI.parse(url).open
-    else
-      IO.popen(url)
+    rescue OpenURI::HTTPError => e
+      if e.message.start_with?("429") && retries < max_retries
+        retries += 1
+        delay = 2**retries
+        $stderr.puts "429 Too Many Requests for #{url}, retrying in #{delay}s (attempt #{retries}/#{max_retries})"
+        sleep delay
+        retry
+      else
+        raise
+      end
     end
   end
 
@@ -32,7 +40,7 @@ module Oddb2xml
     DOWNLOADS = "#{Dir.pwd}/downloads"
   end
   @options = {}
-  @atc_csv_origin = "https://github.com/zdavatz/cpp2sqlite/blob/master/input/atc_codes_multi_lingual.txt"
+  @atc_csv_origin = "https://raw.githubusercontent.com/zdavatz/cpp2sqlite/master/input/atc_codes_multi_lingual.txt"
   @atc_csv_content = {}
 
   def self.html_decode(string)
