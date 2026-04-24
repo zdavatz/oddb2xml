@@ -51,7 +51,7 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-    /opt/src/oddb2xml/bin/oddb2xml version 3.0.3
+    /opt/src/oddb2xml/bin/oddb2xml version 3.0.4
     Usage:
     oddb2xml [option]
       produced files are found under data
@@ -85,6 +85,7 @@ see `--help`.
     --log                     log important actions
     -u, --use-ra11zip=<s>     Use the ra11.zip (a zipped transfer.dat from Galexis)
     -b, --firstbase           Build all NONPHARMA articles on firstbase
+                                                          (GS1 Switzerland CSV from id.gs1.ch)
     -v, --version             Print version and exit
     -h, --help                Show this message
 ```
@@ -289,6 +290,7 @@ We use the following files:
 * https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt
 * https://raw.githubusercontent.com/zdavatz/cpp2sqlite/master/input/atc_codes_multi_lingual.txt
 * https://epl.bag.admin.ch/static/fhir/foph-sl-export-latest-{de,fr,it}.ndjson (FHIR NDJSON, used with `--fhir`)
+* https://id.gs1.ch/01/07612345000961 (GS1 Switzerland firstbase CSV — full barcode registry, used with `-b`/`--firstbase`)
 
 ## Rules for matching GTIN (aka EAN13), product number and IKSNR
 

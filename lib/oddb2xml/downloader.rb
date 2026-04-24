@@ -342,14 +342,14 @@ module Oddb2xml
   end
 
   class FirstbaseDownloader < Downloader
-    BASE_URL = "http://pillbox.oddb.org"
+    BASE_URL = "https://id.gs1.ch/01/07612345000961"
     include DownloadMethod
     def initialize(type = :orphan, options = {})
-      @url = BASE_URL + "/firstbase.xlsx"
+      @url = BASE_URL
     end
 
     def download
-      @file2save = File.join(DOWNLOADS, "firstbase.xlsx")
+      @file2save = File.join(DOWNLOADS, "firstbase.csv")
       report_download(@url, @file2save)
       begin
         download_as(@file2save, "w+")

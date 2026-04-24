@@ -1,3 +1,6 @@
+=== 3.0.4 / 24.04.2026
+* Firstbase: switch -b/--firstbase from the deprecated pillbox.oddb.org XLSX to the GS1 Switzerland CSV at https://id.gs1.ch/01/07612345000961 (full firstbase barcode registry, ~189k items). Downloaded file is now firstbase.csv; FirstbaseExtractor now parses CSV with headers instead of XLSX.
+
 === 3.0.3 / 24.04.2026
 * FHIR: download per-language NDJSON files (foph-sl-export-latest-{de,fr,it}.ndjson) so French and Italian product names/descriptions are populated
 * FHIR: map legal status code 756005022008 to Swissmedic category D (in addition to 756005022007)

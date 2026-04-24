@@ -608,32 +608,28 @@ module Oddb2xml
 
   class FirstbaseExtractor < Extractor
     def initialize(file)
-      @sheet = RubyXL::Parser.parse(file).worksheets[0]
+      @file = file
     end
 
     def to_hash
       data = {}
-      return data unless @sheet
-      @sheet.each_with_index do |row, i|
-        next if i <= 1
-        if row.nil?
-          puts "Empty row (#{i}) in firstbase"
-          next
-        end
-        gtin = row[0].value.to_s.gsub(/^0+/, '')
+      return data unless @file && File.exist?(@file)
+      CSV.foreach(@file, headers: true, encoding: "UTF-8") do |row|
+        gtin = row["Gtin"].to_s.gsub(/^0+/, "")
+        next if gtin.empty?
         data[gtin] = {
           gtin: gtin,
-          gln: row[1].value.to_s,
-          target_market: row[2] ? row[2].value.to_s: "",
-          gpc: row[3] ? row[3].value.to_s: "",
-          trade_item_description_de: row[4] ? row[4].value.to_s: "",
-          trade_item_description_en: row[5] ? row[5].value.to_s: "",
-          trade_item_description_fr: row[6] ? row[6].value.to_s: "",
-          trade_item_description_it: row[7] ? row[7].value.to_s: "",
-          manufacturer_name: row[8] ? row[8].value.to_s: "",
-          start_availability_date: row[9] ? row[9].value.to_s: "",
-          gross_weight: row[10] ? row[10].value.to_s: "",
-          net_weight: row[11] ? row[11].value.to_s: "",
+          gln: row["InformationProviderGln"].to_s,
+          target_market: row["TargetMarketCountryCode"].to_s,
+          gpc: row["GpcCategoryCode"].to_s,
+          trade_item_description_de: row["TradeItemDescription_DE"].to_s,
+          trade_item_description_en: "",
+          trade_item_description_fr: row["TradeItemDescription_FR"].to_s,
+          trade_item_description_it: row["TradeItemDescription_IT"].to_s,
+          manufacturer_name: row["InformationProviderPartyName"].to_s,
+          start_availability_date: row["Date_Created_Batch"].to_s,
+          gross_weight: "",
+          net_weight: "",
         }
       end
       data
