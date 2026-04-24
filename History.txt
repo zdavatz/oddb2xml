@@ -1,3 +1,7 @@
+=== 3.0.3 / 24.04.2026
+* FHIR: download per-language NDJSON files (foph-sl-export-latest-{de,fr,it}.ndjson) so French and Italian product names/descriptions are populated
+* FHIR: map legal status code 756005022008 to Swissmedic category D (in addition to 756005022007)
+
 === 3.0.2 / 09.03.2026
 * Use raw.githubusercontent.com URL for ATC CSV to avoid 429 Too Many Requests errors
 * Add retry logic with exponential backoff for HTTP 429 errors in uri_open

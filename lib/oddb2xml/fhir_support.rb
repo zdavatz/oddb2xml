@@ -15,60 +15,67 @@ module Oddb2xml
 
     BASE_URL = "https://epl.bag.admin.ch"
     STATIC_FHIR_PATH = "/static/fhir"
+    LANGUAGES = %w[de fr it].freeze
 
     def initialize(options = {})
       @options = options
-      @url = find_latest_fhir_url
-      super(options, @url)
+      super(options, BASE_URL)
     end
 
+    # Returns either a single file path String (when --fhir_url is used) or a
+    # Hash of { "de" => path, "fr" => path, "it" => path } for per-language
+    # NDJSON files.
     def download
-      filename = File.basename(@url)
+      if @options[:fhir_url]
+        @url = @options[:fhir_url]
+        download_one(@url)
+      else
+        files = {}
+        LANGUAGES.each do |lang|
+          url = "#{BASE_URL}#{STATIC_FHIR_PATH}/foph-sl-export-latest-#{lang}.ndjson"
+          path = download_one(url)
+          files[lang] = path if path
+        end
+        raise "FhirDownloader: no FHIR files downloaded successfully" if files.empty?
+        files
+      end
+    end
+
+    private
+
+    def download_one(url)
+      @url = url
+      filename = File.basename(url)
       file = File.join(WORK_DIR, filename)
       @file2save = File.join(DOWNLOADS, filename)
 
-      report_download(@url, @file2save)
+      report_download(url, @file2save)
 
-      # Check if we should skip download (file exists and is recent)
       if skip_download?
         Oddb2xml.log "FhirDownloader: Skip downloading #{@file2save} (#{format_size(File.size(@file2save))}, less than 24h old)"
         return File.expand_path(@file2save)
       end
 
       begin
-        # Download the file
         download_as(file, "w+")
 
-        # Validate NDJSON format
         if validate_ndjson(@file2save)
           line_count = count_ndjson_lines(@file2save)
-          Oddb2xml.log "FhirDownloader: NDJSON validation successful (#{line_count} bundles, #{format_size(File.size(@file2save))})"
+          Oddb2xml.log "FhirDownloader: NDJSON validation successful for #{filename} (#{line_count} bundles, #{format_size(File.size(@file2save))})"
         else
-          Oddb2xml.log "FhirDownloader: WARNING - NDJSON validation failed!"
+          Oddb2xml.log "FhirDownloader: WARNING - NDJSON validation failed for #{filename}!"
         end
 
         File.expand_path(@file2save)
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
       rescue => error
-        Oddb2xml.log "FhirDownloader: Error downloading FHIR file: #{error.message}"
-        raise
+        Oddb2xml.log "FhirDownloader: Error downloading #{filename}: #{error.message}"
+        nil
       ensure
         Oddb2xml.download_finished(@file2save, false)
         FileUtils.rm_f(file, verbose: true) if File.exist?(file) && file != @file2save
       end
-    end
-
-    private
-
-    def find_latest_fhir_url
-      agent = Mechanize.new
-      response = agent.get "https://epl.bag.admin.ch/api/sl/public/resources/current"
-      resources = JSON.parse(response.body)
-      "https://epl.bag.admin.ch/static/" + resources["fhir"]["fileUrl"]
-    rescue => e
-      Oddb2xml.log "FhirDownloader: Error finding latest URL: #{e.message}"
-      nil
     end
 
     def skip_download?
@@ -552,7 +559,7 @@ module Oddb2xml
           "B"
         when "756005022005"
           "C"
-        when "756005022007"
+        when "756005022007", "756005022008"
           "D"
         when "756005022009"
           "E"
@@ -565,8 +572,16 @@ module Oddb2xml
 
   # FHIR Extractor - Compatible with existing BagXmlExtractor
   class FhirExtractor < Extractor
-    def initialize(fhir_file)
-      @fhir_file = fhir_file
+    # Accepts either a single NDJSON file path (back-compat) or a Hash
+    # { "de" => path, "fr" => path, "it" => path } of per-language files.
+    def initialize(fhir_files)
+      if fhir_files.is_a?(Hash)
+        @fhir_files = fhir_files
+        @fhir_file = fhir_files["de"] || fhir_files.values.first
+      else
+        @fhir_files = {"de" => fhir_files}
+        @fhir_file = fhir_files
+      end
     end
 
     def to_hash
@@ -712,8 +727,53 @@ module Oddb2xml
         end
       end
 
+      # Merge names/descriptions from additional language files
+      @fhir_files.each do |lang, file|
+        next if file == @fhir_file
+        next unless file && File.exist?(file)
+        merge_language(data, file, lang)
+      end
+
       Oddb2xml.log "FhirExtractor: Extracted #{data.size} packages"
       data
+    end
+
+    private
+
+    def merge_language(data, file, lang)
+      Oddb2xml.log "FhirExtractor: Merging #{lang} names/descriptions from #{file}"
+      result = FhirPreparationsEntry.parse(file)
+      name_accessor = "Name#{lang.capitalize}"
+      name_key = "name_#{lang}".to_sym
+      desc_key = "desc_#{lang}".to_sym
+
+      result.Preparations.Preparation.each do |seq|
+        next unless seq && seq.Packs && seq.Packs.Pack
+
+        translated_name = seq.respond_to?(name_accessor) ? seq.send(name_accessor) : nil
+
+        seq.Packs.Pack.each do |pac|
+          next unless pac.GTIN
+          ean13 = pac.GTIN.to_s
+          item = data[ean13]
+          next unless item
+
+          if translated_name && !translated_name.empty?
+            item[name_key] = translated_name
+            if item[:packages][ean13]
+              item[:packages][ean13][name_key] = translated_name
+            end
+          end
+
+          # The FHIR parser assigns pkg.description to all three
+          # Description* fields; in a language-specific file this is the
+          # description in that language.
+          desc = pac.DescriptionDe
+          if desc && !desc.empty? && item[:packages][ean13]
+            item[:packages][ean13][desc_key] = desc
+          end
+        end
+      end
     end
   end
 end

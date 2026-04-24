@@ -285,10 +285,15 @@ module Oddb2xml
         # instead of Thread.new do
 
         downloader = FhirDownloader.new(@options)
-        fhir_file = downloader.download
-        Oddb2xml.log("FhirDownloader downloaded #{File.size(fhir_file)} bytes")
+        fhir_files = downloader.download
+        total_bytes = if fhir_files.is_a?(Hash)
+          fhir_files.values.sum { |f| File.size(f) }
+        else
+          File.size(fhir_files)
+        end
+        Oddb2xml.log("FhirDownloader downloaded #{total_bytes} bytes")
         @mutex.synchronize do
-          hsh = FhirExtractor.new(fhir_file).to_hash
+          hsh = FhirExtractor.new(fhir_files).to_hash
           @items = hsh
           Oddb2xml.log("FhirExtractor added #{@items.size} items from FHIR")
           @items
