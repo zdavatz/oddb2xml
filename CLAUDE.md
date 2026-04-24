@@ -37,7 +37,7 @@ The system follows a **download → extract → build → compress** pipeline:
 
 1. **CLI** (`lib/oddb2xml/cli.rb`) — Entry point. Parses options via Optimist (`options.rb`), orchestrates the pipeline, manages multi-threaded downloads.
 
-2. **Downloaders** (`lib/oddb2xml/downloader.rb`) — 11 subclasses of `Downloader`, each fetching from a specific Swiss data source. Files cached in `./downloads/`.
+2. **Downloaders** — 11 subclasses of `Downloader`, each fetching from a specific Swiss data source. 10 live in `lib/oddb2xml/downloader.rb`; the FHIR downloader lives in `lib/oddb2xml/fhir_support.rb`. Files cached in `./downloads/`.
 
 3. **Extractors** (`lib/oddb2xml/extractor.rb`) — Matching extractor classes that parse downloaded files into Ruby hashes. Formats include XML (nokogiri/sax-machine), XLSX (rubyXL), CSV, and fixed-width text. Refdata uses the new SwissReg XML format from a zip download (`files.refdata.ch`).
 
@@ -46,6 +46,8 @@ The system follows a **download → extract → build → compress** pipeline:
 5. **Calc** (`lib/oddb2xml/calc.rb`) — Composition calculation logic, works with `parslet_compositions.rb` and `compositions_syntax.rb` (Parslet-based PEG parser for drug composition strings).
 
 6. **Compressor** (`lib/oddb2xml/compressor.rb`) — Optional ZIP/TAR.GZ output compression.
+
+7. **FHIR support** (`lib/oddb2xml/fhir_support.rb`) — Self-contained module providing `FhirDownloader` and FHIR NDJSON parsing. Activated via `--fhir` (or `--fhir-url=<URL>`). Downloads per-language NDJSON files (`foph-sl-export-latest-{de,fr,it}.ndjson`) from `epl.bag.admin.ch` to populate French and Italian product names/descriptions. Maps legal status codes `756005022007` and `756005022008` to Swissmedic category D.
 
 ### Key data identifiers
 - **GTIN/EAN13**: Primary article identifier (13-digit barcode)

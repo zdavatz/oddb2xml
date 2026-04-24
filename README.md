@@ -51,7 +51,7 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-    /opt/src/oddb2xml_v5/bin/oddb2xml version 2.4.3
+    /opt/src/oddb2xml/bin/oddb2xml version 3.0.3
     Usage:
     oddb2xml [option]
       produced files are found under data
@@ -61,6 +61,10 @@ see `--help`.
     -e, --extended            pharma, non-pharma plus prices and non-pharma from zurrose.
                                                           Products without EAN-Code will also be listed.
                                                           File oddb_calc.xml will also be generated
+    --fhir                    Use FHIR NDJSON format from FOPH/BAG instead of XML
+                                                          from Spezialitätenliste. Downloads per-language
+                                                          NDJSON files (de, fr, it) from epl.bag.admin.ch.
+    --fhir-url=<s>            Specific FHIR NDJSON URL to download (implies --fhir)
     -f, --format=<s>          File format F, default is xml. {xml|dat}
                                                           If F is given, -o option is ignored. (Default: xml)
     -i, --include             Include target option for ean14  for 'dat' format.
@@ -80,6 +84,7 @@ see `--help`.
                                                           Downloaded files are saved under downloads
     --log                     log important actions
     -u, --use-ra11zip=<s>     Use the ra11.zip (a zipped transfer.dat from Galexis)
+    -b, --firstbase           Build all NONPHARMA articles on firstbase
     -v, --version             Print version and exit
     -h, --help                Show this message
 ```
@@ -106,8 +111,8 @@ FR
 
 ## Supported ruby version
 
-We run tests on travis-ci.org for the Ruby versions mentioned in the .travis.yml file. You will need ruby > 2.5 to work correctly.
-Look at the github actions to see the spec test results. We ignore errors against ruby head, as it is sometimes unstable.
+You will need ruby >= 2.5 to work correctly. Current development happens on Ruby 3.2 (`.ruby-version`).
+CI runs on Ruby 3.0, 3.1 and 3.2 via GitHub Actions — see the badge above for the latest spec results.
 
 
 ## XSD files
@@ -283,6 +288,7 @@ We use the following files:
 * http://download.swissmedicinfo.ch/ (AipsDownload)
 * https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt
 * https://raw.githubusercontent.com/zdavatz/cpp2sqlite/master/input/atc_codes_multi_lingual.txt
+* https://epl.bag.admin.ch/static/fhir/foph-sl-export-latest-{de,fr,it}.ndjson (FHIR NDJSON, used with `--fhir`)
 
 ## Rules for matching GTIN (aka EAN13), product number and IKSNR
 
