@@ -49,6 +49,8 @@ The system follows a **download → extract → build → compress** pipeline:
 
 7. **FHIR support** (`lib/oddb2xml/fhir_support.rb`) — Self-contained module providing `FhirDownloader` and FHIR NDJSON parsing. Activated via `--fhir` (or `--fhir-url=<URL>`). Downloads per-language NDJSON files (`foph-sl-export-latest-{de,fr,it}.ndjson`) from `epl.bag.admin.ch` to populate French and Italian product names/descriptions. Maps legal status codes `756005022007` and `756005022008` to Swissmedic category D.
 
+8. **Refdata cleanup** (`lib/oddb2xml/refdata_cleanup.rb`) — Compensates for known data-quality issues in upstream Refdata.Articles.xml before they reach the output. Each fix is guarded by a Swissmedic-side heuristic (e.g. comma in `substance_swissmedic` to distinguish mono products from real combinations). Currently fixes the doubled-dose template bug (`X mg / X mg / Stk`). Called from `Builder#apply_refdata_description_cleanups!` at the start of `prepare_articles`. See GitHub issue #112 for the catalogue.
+
 ### Key data identifiers
 - **GTIN/EAN13**: Primary article identifier (13-digit barcode)
 - **Pharmacode**: Swiss pharmacy code
@@ -68,4 +70,4 @@ YAML files in `data/` provide manual overrides and mappings: `article_overrides.
 ## Ruby Version
 
 - Minimum: Ruby >= 2.5.0 (gemspec)
-- Current development: Ruby 3.2.0 (`.ruby-version`)
+- Current development: Ruby 3.3.6 (`.ruby-version`)

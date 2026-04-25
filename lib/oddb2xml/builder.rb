@@ -88,12 +88,42 @@ module Oddb2xml
       end
     end
 
+    # Mutates @refdata in place to compensate for known Refdata.Articles.xml
+    # data-quality issues (see GitHub issue #112). Idempotent: subsequent
+    # calls are no-ops within the same Builder instance.
+    def apply_refdata_description_cleanups!
+      return if @refdata_descriptions_cleaned
+      @refdata_descriptions_cleaned = true
+      return if @refdata.nil? || @refdata.empty?
+      double_dose_fixed = 0
+      @refdata.each_value do |item|
+        next unless item.is_a?(Hash)
+        no8 = item[:no8]
+        next if no8.nil? || no8.empty?
+        pack = @packs[no8]
+        next unless pack
+        substance = pack[:substance_swissmedic]
+        [:desc_de, :desc_fr, :desc_it].each do |key|
+          original = item[key]
+          cleaned = RefdataCleanup.fix_double_dose(original, substance)
+          if cleaned != original
+            item[key] = cleaned
+            double_dose_fixed += 1
+          end
+        end
+      end
+      if double_dose_fixed > 0
+        Oddb2xml.log("Refdata cleanup: fixed double-dose pattern in #{double_dose_fixed} description(s)")
+      end
+    end
+
     private_class_method
 
     def prepare_articles(reset = false)
       @articles = nil if reset
       unless @articles
         Oddb2xml.log("prepare_articles starting with #{@articles ? @articles.size : "no"} articles.")
+        apply_refdata_description_cleanups!
         @articles = []
         @refdata.each do |ean13, obj|
           unless SKIP_MIGEL_DOWNLOADER

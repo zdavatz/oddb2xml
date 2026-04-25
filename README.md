@@ -51,7 +51,7 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-    /opt/src/oddb2xml/bin/oddb2xml version 3.0.4
+    /opt/src/oddb2xml/bin/oddb2xml version 3.0.5
     Usage:
     oddb2xml [option]
       produced files are found under data
@@ -112,7 +112,7 @@ FR
 
 ## Supported ruby version
 
-You will need ruby >= 2.5 to work correctly. Current development happens on Ruby 3.2 (`.ruby-version`).
+You will need ruby >= 2.5 to work correctly. Current development happens on Ruby 3.3 (`.ruby-version`).
 CI runs on Ruby 3.0, 3.1 and 3.2 via GitHub Actions — see the badge above for the latest spec results.
 
 
@@ -291,6 +291,27 @@ We use the following files:
 * https://raw.githubusercontent.com/zdavatz/cpp2sqlite/master/input/atc_codes_multi_lingual.txt
 * https://epl.bag.admin.ch/static/fhir/foph-sl-export-latest-{de,fr,it}.ndjson (FHIR NDJSON, used with `--fhir`)
 * https://id.gs1.ch/01/07612345000961 (GS1 Switzerland firstbase CSV — full barcode registry, used with `-b`/`--firstbase`)
+
+## Refdata data-quality compensation
+
+Refdata.Articles.xml from `files.refdata.ch` ships with a number of recurring
+data-quality issues that propagate into downstream systems unchanged. oddb2xml
+applies a small set of conservative cleanups before emitting any output. See
+GitHub issue [#112](https://github.com/zdavatz/oddb2xml/issues/112) for the
+full catalogue and the parallel report sent to Refdata.
+
+Currently active fixes (`lib/oddb2xml/refdata_cleanup.rb`):
+
+* **Doubled dose token** — Refdata sometimes emits the strength twice in
+  `<FullName>`, e.g. `MIRTAZAPIN Sandoz eco 30 mg / 30 mg / 100 Tablette`.
+  When the matching Swissmedic entry shows a single active substance, the
+  duplicate token is collapsed to a single occurrence. Real combination
+  products (e.g. PHESGO 600 mg / 600 mg / 10 ml — pertuzumab + trastuzumab)
+  are detected via the comma in `substance_swissmedic` and left untouched.
+
+The cleanup runs at the start of `prepare_articles` in `Builder` and is
+idempotent. Each rule is guarded by a Swissmedic-side heuristic so genuine
+data is never altered.
 
 ## Rules for matching GTIN (aka EAN13), product number and IKSNR
 
