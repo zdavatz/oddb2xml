@@ -159,7 +159,7 @@ module Oddb2xml
   module FHIR
     # Bundle represents one line in the NDJSON file
     class Bundle
-      attr_reader :medicinal_product, :packages, :authorizations, :ingredients
+      attr_reader :medicinal_product, :packages, :authorizations, :ingredients, :clinical_use_definitions
 
       def initialize(json_line)
         data = JSON.parse(json_line)
@@ -174,6 +174,7 @@ module Oddb2xml
         @packages = []
         @authorizations = []
         @ingredients = []
+        @clinical_use_definitions = []
 
         @entries.each do |entry|
           resource = entry["resource"]
@@ -186,8 +187,29 @@ module Oddb2xml
             @authorizations << Authorization.new(resource)
           when "Ingredient"
             @ingredients << Ingredient.new(resource)
+          when "ClinicalUseDefinition"
+            @clinical_use_definitions << ClinicalUseDefinition.new(resource)
           end
         end
+      end
+    end
+
+    # ClinicalUseDefinition carries one indication. Its `id` ends in ".NN",
+    # the per-indication suffix that combines with the FOPHDossierNumber
+    # (XXXXX) on the reimbursement RegulatedAuthorization to form the
+    # Indikationscode XXXXX.NN required by BAG from 2026-07-01.
+    class ClinicalUseDefinition
+      attr_reader :id, :nn_suffix, :type, :text
+
+      def initialize(resource)
+        @id = resource["id"]
+        @type = resource["type"]
+        @nn_suffix = @id&.[](/\.(\d{2})\z/, 1)
+        @text = resource.dig("indication", "diseaseSymptomProcedure", "concept", "text")
+      end
+
+      def indication?
+        @type == "indication"
       end
     end
 
@@ -427,6 +449,11 @@ module Oddb2xml
         prep.OrgGenCode = map_org_gen_code(mp.classification)
         prep.ItCode = mp.it_code  # Add IT code
 
+        # Indikationscodes (BAG: XXXXX.NN, mandatory on prescriptions/invoices
+        # from 2026-07-01). Build from FOPHDossierNumber (reimbursement auth)
+        # plus each ClinicalUseDefinition's .NN suffix. See issue #113.
+        prep.IndicationCodes = build_indication_codes(bundle)
+
         # Map packages
         prep.Packs = OpenStruct.new
         prep.Packs.Pack = bundle.packages.map do |pkg|
@@ -535,6 +562,21 @@ module Oddb2xml
         reimbursement&.cost_share
       end
 
+      def build_indication_codes(bundle)
+        reimbursement = bundle.authorizations.find(&:reimbursement_sl?)
+        dossier = reimbursement&.foph_dossier_no
+        return [] unless dossier && !bundle.clinical_use_definitions.empty?
+
+        bundle.clinical_use_definitions.each_with_object([]) do |cud, acc|
+          next unless cud.indication? && cud.nn_suffix
+          acc << OpenStruct.new(
+            code: "#{dossier}.#{cud.nn_suffix}",
+            cud_id: cud.id,
+            text: cud.text
+          )
+        end
+      end
+
       def map_org_gen_code(classification)
         return nil unless classification
 
@@ -616,6 +658,13 @@ module Oddb2xml
         item[:comment_it] = ""
         item[:it_code] = (itc = seq.ItCode) ? itc : ""  # NOW available in FHIR!
 
+        # Indikationscodes (BAG XXXXX.NN, see issue #113). Each entry is a
+        # Hash with :code, :cud_id, :text — mandatory on rx/invoices from
+        # 2026-07-01.
+        item[:indication_codes] = Array(seq.IndicationCodes).map do |ic|
+          {code: ic.code, cud_id: ic.cud_id, text: ic.text}
+        end
+
         # Build substances array
         item[:substances] = []
         if seq.Substances && seq.Substances.Substance
@@ -673,7 +722,8 @@ module Oddb2xml
               sl_entry: true,
               swissmedic_category: (cat = pac.SwissmedicCategory) ? cat : "",
               swissmedic_number8: (num = pac.SwissmedicNo8) ? num : "",
-              prices: {exf_price: exf, pub_price: pub}
+              prices: {exf_price: exf, pub_price: pub},
+              indication_codes: item[:indication_codes]
             }
 
             # Map limitations from FHIR

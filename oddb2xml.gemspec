@@ -38,6 +38,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "htmlentities"
   spec.add_dependency "webrick", ">= 1.8.2"
   spec.add_dependency "rexml", ">= 3.3.9"
+  spec.add_dependency "csv"  # bundled with Ruby <= 3.3, gem from 3.4 onwards
   spec.add_dependency "standardrb"
   spec.add_dependency "rack", ">= 3.1.20"
 

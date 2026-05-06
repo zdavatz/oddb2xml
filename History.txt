@@ -1,3 +1,10 @@
+=== 3.0.6 / 06.05.2026
+* FHIR: extract Indikationscode (XXXXX.NN) from ClinicalUseDefinition resources by combining FOPHDossierNumber with each CUD's .NN id-suffix; expose as item[:indication_codes] (and per package) so downstream builders can include it on prescriptions and invoices as required by BAG from 2026-07-01 (issue #113)
+* Declare csv as a runtime dependency in the gemspec (csv was removed from Ruby's default gems in 3.4)
+
+=== 3.0.5 / 25.04.2026
+* Refdata cleanup: compensate the doubled-dose template bug in Refdata.Articles.xml (e.g. "30 mg / 30 mg / 100 Tablette") by collapsing to a single token. Guarded by a Swissmedic-side comma check so real combination products are untouched (issue #112)
+
 === 3.0.4 / 24.04.2026
 * Firstbase: switch -b/--firstbase from the deprecated pillbox.oddb.org XLSX to the GS1 Switzerland CSV at https://id.gs1.ch/01/07612345000961 (full firstbase barcode registry, ~189k items). Downloaded file is now firstbase.csv; FirstbaseExtractor now parses CSV with headers instead of XLSX.
 
