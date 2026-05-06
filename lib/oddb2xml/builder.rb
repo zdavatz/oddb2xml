@@ -780,6 +780,14 @@ module Oddb2xml
               # xml.REMD
               # xml.REMF
               # }
+              # BAG Indikationscode (XXXXX.NN) for SL price-model drugs.
+              # Mandatory on prescriptions/invoices from 2026-07-01 — see
+              # GitHub issue #113.
+              if seq && seq[:indication_codes].is_a?(Array)
+                seq[:indication_codes].each do |ic|
+                  xml.INDICATION_CODE ic[:text].to_s, code: ic[:code], cud_id: ic[:cud_id]
+                end
+              end
               xml.PackGrSwissmedic obj[:siz] unless obj[:siz].empty?
               xml.EinheitSwissmedic obj[:eht] unless obj[:eht].empty?
               xml.SubstanceSwissmedic obj[:sub] unless obj[:sub].empty?

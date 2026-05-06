@@ -1,3 +1,6 @@
+=== 3.0.7 / 06.05.2026
+* oddb_product.xml: emit one <INDICATION_CODE code="XXXXX.NN" cud_id="DRUG.NN">limitation text</INDICATION_CODE> child per indication on each <PRD>. Source: FHIR ClinicalUseDefinition resources joined with the reimbursement RegulatedAuthorization's FOPHDossierNumber. Counted on the live FOPH feed: 539 products carry a total of 1,293 codes; all have non-empty indication text. Resolves the missing wiring between FhirExtractor and Builder noted in 3.0.6 (issue #113).
+
 === 3.0.6 / 06.05.2026
 * FHIR: extract Indikationscode (XXXXX.NN) from ClinicalUseDefinition resources by combining FOPHDossierNumber with each CUD's .NN id-suffix; expose as item[:indication_codes] (and per package) so downstream builders can include it on prescriptions and invoices as required by BAG from 2026-07-01 (issue #113)
 * Declare csv as a runtime dependency in the gemspec (csv was removed from Ruby's default gems in 3.4)

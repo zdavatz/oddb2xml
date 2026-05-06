@@ -2,6 +2,7 @@ require "spec_helper"
 require "oddb2xml/downloader"
 require "oddb2xml/extractor"
 require "oddb2xml/fhir_support"
+require "oddb2xml/builder"
 
 describe "FHIR Indikationscode support" do
   let(:cyramza_fixture) { File.join(Oddb2xml::SpecData, "fhir", "cyramza.ndjson") }
@@ -48,6 +49,37 @@ describe "FHIR Indikationscode support" do
 
       pkg = item[:packages].values.first
       expect(pkg[:indication_codes]).to eq(item[:indication_codes])
+    end
+  end
+
+  describe Oddb2xml::Builder, "PRD INDICATION_CODE emission" do
+    it "emits one <INDICATION_CODE> child per indication on the PRD" do
+      items = Oddb2xml::FhirExtractor.new(cyramza_fixture).to_hash
+      builder = described_class.new
+      builder.instance_variable_set(:@items, items)
+      builder.instance_variable_set(:@refdata, {})
+      builder.instance_variable_set(:@packs, {})
+      builder.instance_variable_set(:@migel, {})
+      builder.instance_variable_set(:@interactions, [])
+      builder.instance_variable_set(:@flags, {})
+      builder.instance_variable_set(:@orphan, [])
+      builder.instance_variable_set(:@firstbase, {})
+      builder.instance_variable_set(:@substances, [])
+      builder.instance_variable_set(:@codes, {})
+      builder.instance_variable_set(:@missing, [])
+      builder.instance_variable_set(:@tag_suffix, nil)
+
+      xml = builder.send(:build_product)
+      expect(xml).to include("<INDICATION_CODE")
+      expect(xml).to include('code="20403.01"')
+      expect(xml).to include('code="20403.02"')
+      expect(xml).to include('cud_id="CYRAMZA.01"')
+      expect(xml).to include('cud_id="CYRAMZA.02"')
+      # The CUD's indication text travels into the element body so
+      # downstream consumers can show the human-readable indication
+      # next to the code.
+      expect(xml).to include("In Kombination mit Paclitaxel")
+      expect(xml).to include("In Kombination mit FOLFIRI")
     end
   end
 end

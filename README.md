@@ -51,7 +51,7 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-    /opt/src/oddb2xml/bin/oddb2xml version 3.0.6
+    /opt/src/oddb2xml/bin/oddb2xml version 3.0.7
     Usage:
     oddb2xml [option]
       produced files are found under data
@@ -295,15 +295,33 @@ We use the following files:
 ## Indikationscode (BAG XXXXX.NN)
 
 In `--fhir` mode, oddb2xml extracts the BAG **Indikationscode** for SL
-price-model drugs and exposes it on each item and package as
-`item[:indication_codes]` (an array of
-`{code:, cud_id:, text:}` hashes).
+price-model drugs and emits one repeated `<INDICATION_CODE>` child per
+indication on each `<PRD>` in `oddb_product.xml`:
+
+```xml
+<PRD DT="...">
+  <GTIN>7680123456789</GTIN>
+  ...
+  <INDICATION_CODE code="20403.01" cud_id="CYRAMZA.01">In Kombination mit Paclitaxel für die Behandlung ...</INDICATION_CODE>
+  <INDICATION_CODE code="20403.02" cud_id="CYRAMZA.02">In Kombination mit FOLFIRI ...</INDICATION_CODE>
+  <PackGrSwissmedic>...</PackGrSwissmedic>
+</PRD>
+```
 
 The code is built per FHIR bundle by combining the
 `FOPHDossierNumber` from the reimbursement `RegulatedAuthorization`
 (`XXXXX`) with the `.NN` suffix of each sibling
 `ClinicalUseDefinition` whose `type == "indication"` (e.g.
-`CYRAMZA.01` / `CYRAMZA.02` → `20403.01` / `20403.02`).
+`CYRAMZA.01` / `CYRAMZA.02` → `20403.01` / `20403.02`).  The element
+body carries the human-readable indication text from
+`indication.diseaseSymptomProcedure.concept.text`.
+
+The same data is also exposed in-memory on each item and package as
+`item[:indication_codes]` (an array of `{code:, cud_id:, text:}`
+hashes) for downstream consumers that build their own emitters.
+
+Counted on the live FOPH feed (`foph-sl-export-latest-de.ndjson`,
+6'775 bundles): **539** products carry a total of **1'293** codes.
 
 Per BAG Rundschreiben vom 19. Februar 2026, the Indikationscode must
 be transmitted with every prescription and invoice for SL price-model
