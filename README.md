@@ -51,7 +51,7 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-    /opt/src/oddb2xml/bin/oddb2xml version 3.0.5
+    /opt/src/oddb2xml/bin/oddb2xml version 3.0.6
     Usage:
     oddb2xml [option]
       produced files are found under data
@@ -291,6 +291,25 @@ We use the following files:
 * https://raw.githubusercontent.com/zdavatz/cpp2sqlite/master/input/atc_codes_multi_lingual.txt
 * https://epl.bag.admin.ch/static/fhir/foph-sl-export-latest-{de,fr,it}.ndjson (FHIR NDJSON, used with `--fhir`)
 * https://id.gs1.ch/01/07612345000961 (GS1 Switzerland firstbase CSV — full barcode registry, used with `-b`/`--firstbase`)
+
+## Indikationscode (BAG XXXXX.NN)
+
+In `--fhir` mode, oddb2xml extracts the BAG **Indikationscode** for SL
+price-model drugs and exposes it on each item and package as
+`item[:indication_codes]` (an array of
+`{code:, cud_id:, text:}` hashes).
+
+The code is built per FHIR bundle by combining the
+`FOPHDossierNumber` from the reimbursement `RegulatedAuthorization`
+(`XXXXX`) with the `.NN` suffix of each sibling
+`ClinicalUseDefinition` whose `type == "indication"` (e.g.
+`CYRAMZA.01` / `CYRAMZA.02` → `20403.01` / `20403.02`).
+
+Per BAG Rundschreiben vom 19. Februar 2026, the Indikationscode must
+be transmitted with every prescription and invoice for SL price-model
+drugs from **2026-07-01**; from **2027-01-01** insurers may reject
+invoices without it. See issue
+[#113](https://github.com/zdavatz/oddb2xml/issues/113).
 
 ## Refdata data-quality compensation
 
