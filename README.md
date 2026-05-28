@@ -51,7 +51,7 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-    /opt/src/oddb2xml/bin/oddb2xml version 3.0.7
+    /opt/src/oddb2xml/bin/oddb2xml version 3.0.8
     Usage:
     oddb2xml [option]
       produced files are found under data
@@ -328,6 +328,30 @@ be transmitted with every prescription and invoice for SL price-model
 drugs from **2026-07-01**; from **2027-01-01** insurers may reject
 invoices without it. See issue
 [#113](https://github.com/zdavatz/oddb2xml/issues/113).
+
+## Limitation texts in `--fhir` mode
+
+In 3.0.8 we fixed empty `<DescriptionDe/Fr/It>` on every `<Limitation>`
+in the FHIR-built output. The live BAG FHIR feed does **not** carry
+limitation text inline on the `regulatedAuthorization-limitation`
+extension. Instead the extension holds a `limitationIndication`
+reference to a `ClinicalUseDefinition` whose
+`indication.diseaseSymptomProcedure.concept.text` is the actual text:
+
+```
+RegulatedAuthorization/65839
+  └─ indication.extension[limitation]
+       ├─ status, statusDate, period, firstLimitationDate
+       └─ limitationIndication → ClinicalUseDefinition/NORDIMET
+                                  └─ concept.text = "Wird nicht ..."
+```
+
+The CUDs are identical in `id` across the three per-language NDJSON
+files (`foph-sl-export-latest-{de,fr,it}.ndjson`); only the
+`concept.text` differs. `FhirExtractor` resolves DE from the primary
+file and merges FR/IT in via the same CUD id. Coverage on the live
+feed went from 0 / 9'108 to 9'108 / 9'108 (100 %). See issue
+[#116](https://github.com/zdavatz/oddb2xml/issues/116).
 
 ## Refdata data-quality compensation
 

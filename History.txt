@@ -1,3 +1,6 @@
+=== 3.0.8 / 28.05.2026
+* FHIR: fix empty <DescriptionDe/Fr/It> on every <Limitation>. The live BAG FHIR feed does not carry limitation text inline; it stores a `limitationIndication` reference to a `ClinicalUseDefinition` whose `indication.diseaseSymptomProcedure.concept.text` holds the actual text (one per language). FR/IT come from the per-language NDJSON files and are merged via the CUD id. Result on the live feed: 9'108 / 9'108 limitations (100%) now carry text, up from 0% (issue #116).
+
 === 3.0.7 / 06.05.2026
 * oddb_product.xml: emit one <INDICATION_CODE code="XXXXX.NN" cud_id="DRUG.NN">limitation text</INDICATION_CODE> child per indication on each <PRD>. Source: FHIR ClinicalUseDefinition resources joined with the reimbursement RegulatedAuthorization's FOPHDossierNumber. Counted on the live FOPH feed: 539 products carry a total of 1,293 codes; all have non-empty indication text. Resolves the missing wiring between FhirExtractor and Builder noted in 3.0.6 (issue #113).
 

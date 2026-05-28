@@ -167,6 +167,16 @@ module Oddb2xml
         parse_entries
       end
 
+      # Lookup map: CUD id (e.g. "NORDIMET" or "GLIVEC.01") => indication text.
+      # Used to resolve limitation texts that are stored as a reference on
+      # the RegulatedAuthorization rather than inline.
+      def cud_text_by_id
+        @cud_text_by_id ||= @clinical_use_definitions.each_with_object({}) do |cud, acc|
+          next unless cud.id && cud.text
+          acc[cud.id] = cud.text
+        end
+      end
+
       private
 
       def parse_entries
@@ -383,7 +393,11 @@ module Oddb2xml
           when "statusDate"
             limitation[:status_date] = sub_ext["valueDate"]
           when "limitationText"
+            # Not present in the live FHIR feed — kept for forward-compat.
             limitation[:text] = sub_ext["valueString"]
+          when "limitationIndication"
+            ref = sub_ext.dig("valueReference", "reference")
+            limitation[:cud_ref] = ref&.sub(%r{\A.*ClinicalUseDefinition/}, "")
           when "period"
             limitation[:start_date] = sub_ext.dig("valuePeriod", "start")
             limitation[:end_date] = sub_ext.dig("valuePeriod", "end")
@@ -467,10 +481,14 @@ module Oddb2xml
 
           # Find prices and additional data for this package
           pack.Prices = create_prices_for_package(bundle, pkg)
-          
+
           # Add limitations and cost share
           pack.Limitations = create_limitations_for_package(bundle, pkg)
           pack.CostShare = get_cost_share_for_package(bundle, pkg)
+
+          # Per-language CUD text map so merge_language can fill in
+          # DescriptionFr / DescriptionIt for limitations without re-parsing.
+          pack.CudTextById = bundle.cud_text_by_id
 
           pack
         end
@@ -533,23 +551,32 @@ module Oddb2xml
 
         return nil unless reimbursement
         return nil if reimbursement.limitations.empty?
-        
+
+        cud_texts = bundle.cud_text_by_id
+
         # Convert FHIR limitations to OpenStruct format
         limitations = OpenStruct.new
         limitations.Limitation = reimbursement.limitations.map do |lim|
+          # The actual limitation text lives in the referenced
+          # ClinicalUseDefinition (limitationIndication reference) — the
+          # `limitationText` sub-extension is absent in the live BAG feed.
+          cud_ref = lim[:cud_ref]
+          text_de = lim[:text] || (cud_ref && cud_texts[cud_ref]) || ""
+
           limitation = OpenStruct.new
           limitation.LimitationCode = ""  # Not in FHIR
           limitation.LimitationType = ""  # Could derive from status
           limitation.LimitationNiveau = ""  # Not in FHIR
           limitation.LimitationValue = ""  # Not in FHIR
-          limitation.DescriptionDe = lim[:text] || ""
-          limitation.DescriptionFr = ""  # May need separate language version
-          limitation.DescriptionIt = ""  # May need separate language version
+          limitation.LimitationCudRef = cud_ref  # carried through for FR/IT resolution
+          limitation.DescriptionDe = text_de
+          limitation.DescriptionFr = ""  # filled by merge_language from FR bundle
+          limitation.DescriptionIt = ""  # filled by merge_language from IT bundle
           limitation.ValidFromDate = lim[:status_date] || lim[:start_date] || ""
           limitation.ValidThruDate = lim[:end_date] || ""
           limitation
         end
-        
+
         limitations
       end
       
@@ -751,6 +778,7 @@ module Oddb2xml
                   desc_de: lim.DescriptionDe || "",
                   desc_fr: lim.DescriptionFr || "",
                   desc_it: lim.DescriptionIt || "",
+                  cud_ref: lim.LimitationCudRef,
                   vdate: lim.ValidFromDate || "",
                   del: is_deleted
                 }
@@ -796,6 +824,7 @@ module Oddb2xml
       name_accessor = "Name#{lang.capitalize}"
       name_key = "name_#{lang}".to_sym
       desc_key = "desc_#{lang}".to_sym
+      lim_desc_key = "desc_#{lang}".to_sym
 
       result.Preparations.Preparation.each do |seq|
         next unless seq && seq.Packs && seq.Packs.Pack
@@ -821,6 +850,19 @@ module Oddb2xml
           desc = pac.DescriptionDe
           if desc && !desc.empty? && item[:packages][ean13]
             item[:packages][ean13][desc_key] = desc
+          end
+
+          # Resolve FR/IT limitation texts via the CUD reference captured
+          # during the DE pass. The CUD id (e.g. "NORDIMET") is identical
+          # across languages; only the text differs.
+          pkg_entry = item[:packages][ean13]
+          cud_texts = pac.respond_to?(:CudTextById) ? pac.CudTextById : nil
+          if pkg_entry && cud_texts && pkg_entry[:limitations]
+            pkg_entry[:limitations].each do |lim|
+              ref = lim[:cud_ref]
+              text = ref && cud_texts[ref]
+              lim[lim_desc_key] = text if text && !text.empty?
+            end
           end
         end
       end

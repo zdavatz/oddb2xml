@@ -1,4 +1,6 @@
 require "spec_helper"
+require "json"
+require "tempfile"
 require "oddb2xml/downloader"
 require "oddb2xml/extractor"
 require "oddb2xml/fhir_support"
@@ -49,6 +51,92 @@ describe "FHIR Indikationscode support" do
 
       pkg = item[:packages].values.first
       expect(pkg[:indication_codes]).to eq(item[:indication_codes])
+    end
+  end
+
+  describe Oddb2xml::FhirExtractor, "limitation text resolution" do
+    # Build language-variant copies of the Cyramza fixture in-memory:
+    # the live FHIR feed never stores limitation text inline, only a
+    # reference to a ClinicalUseDefinition whose `concept.text` differs
+    # per language. We translate the CUD text + MPD product name and
+    # write the modified bundle to a Tempfile so the multi-language
+    # path can be exercised end-to-end.
+    def language_variant(source_path, lang_code, cud_texts, product_name)
+      bundle = JSON.parse(File.read(source_path))
+      bundle["entry"].each do |entry|
+        res = entry["resource"]
+        case res["resourceType"]
+        when "MedicinalProductDefinition"
+          res["name"].each do |name|
+            usage = name.dig("usage", 0, "language", "coding", 0)
+            usage["code"] = lang_code if usage
+            name["productName"] = product_name
+          end
+        when "ClinicalUseDefinition"
+          text = cud_texts[res["id"]]
+          if text
+            res["indication"]["diseaseSymptomProcedure"]["concept"]["text"] = text
+          end
+        end
+      end
+      file = Tempfile.new(["cyramza-#{lang_code}", ".ndjson"])
+      file.write(JSON.generate(bundle))
+      file.flush
+      file
+    end
+
+    let(:fr_file) do
+      language_variant(
+        cyramza_fixture, "fr-CH",
+        {
+          "CYRAMZA.01" => "FR limitation pour CYRAMZA.01",
+          "CYRAMZA.02" => "FR limitation pour CYRAMZA.02"
+        },
+        "Cyramza FR"
+      )
+    end
+
+    let(:it_file) do
+      language_variant(
+        cyramza_fixture, "it-CH",
+        {
+          "CYRAMZA.01" => "IT limitazione per CYRAMZA.01",
+          "CYRAMZA.02" => "IT limitazione per CYRAMZA.02"
+        },
+        "Cyramza IT"
+      )
+    end
+
+    after do
+      [fr_file, it_file].each do |f|
+        f.close
+        f.unlink
+      end
+    end
+
+    it "fills DescriptionDe from the referenced ClinicalUseDefinition" do
+      data = described_class.new(cyramza_fixture).to_hash
+      pkg = data.values.first[:packages].values.first
+      texts = pkg[:limitations].map { |l| l[:desc_de] }
+      expect(texts).to include(start_with("In Kombination mit Paclitaxel"))
+      expect(texts).to include(start_with("In Kombination mit FOLFIRI"))
+      # CUD reference is carried through so merge_language can resolve FR/IT.
+      expect(pkg[:limitations].map { |l| l[:cud_ref] }).to include("CYRAMZA.01", "CYRAMZA.02")
+    end
+
+    it "fills DescriptionFr / DescriptionIt from the language-specific bundles" do
+      files = {"de" => cyramza_fixture, "fr" => fr_file.path, "it" => it_file.path}
+      data = described_class.new(files).to_hash
+      pkg = data.values.first[:packages].values.first
+
+      by_ref = pkg[:limitations].each_with_object({}) { |l, h| h[l[:cud_ref]] = l }
+
+      expect(by_ref["CYRAMZA.01"][:desc_fr]).to eq("FR limitation pour CYRAMZA.01")
+      expect(by_ref["CYRAMZA.02"][:desc_fr]).to eq("FR limitation pour CYRAMZA.02")
+      expect(by_ref["CYRAMZA.01"][:desc_it]).to eq("IT limitazione per CYRAMZA.01")
+      expect(by_ref["CYRAMZA.02"][:desc_it]).to eq("IT limitazione per CYRAMZA.02")
+      # DE text is still there.
+      expect(by_ref["CYRAMZA.01"][:desc_de]).to start_with("In Kombination mit Paclitaxel")
     end
   end
 
