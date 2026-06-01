@@ -51,7 +51,7 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-    /opt/src/oddb2xml/bin/oddb2xml version 3.0.8
+    /opt/src/oddb2xml/bin/oddb2xml version 3.0.9
     Usage:
     oddb2xml [option]
       produced files are found under data
@@ -64,6 +64,8 @@ see `--help`.
     --fhir                    Use FHIR NDJSON format from FOPH/BAG instead of XML
                                                           from Spezialitätenliste. Downloads per-language
                                                           NDJSON files (de, fr, it) from epl.bag.admin.ch.
+                                                          Default ON for -e/--extended and -b/--firstbase
+                                                          since June 2026; disable with --no-fhir.
     --fhir-url=<s>            Specific FHIR NDJSON URL to download (implies --fhir)
     -f, --format=<s>          File format F, default is xml. {xml|dat}
                                                           If F is given, -o option is ignored. (Default: xml)
@@ -97,7 +99,8 @@ $ oddb2xml -t md                        # => md_article.xml, md_product.xml, md_
 $ oddb2xml -a nonpharma -t md -c tar.gz # => md_xml_dd.mm.yyyy_hh.mm.tar.gz
 $ oddb2xml -f dat                       # => oddb.dat
 $ oddb2xml -f dat -a nonpharma          # => oddb_with_migel.dat
-$ oddb2xml -e                           # => oddb_article.xml
+$ oddb2xml -e                           # => oddb_article.xml (FHIR source by default since June 2026)
+$ oddb2xml -e --no-fhir                  # => oddb_article.xml using the old BAG-XML Spezialitätenliste
 ```
 
 output.

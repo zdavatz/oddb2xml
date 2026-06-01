@@ -1,3 +1,6 @@
+=== 3.0.9 / 01.06.2026
+* FHIR is now the default source for -e/--extended and -b/--firstbase. As of June 2026, running oddb2xml -e or oddb2xml -b downloads the FOPH/BAG FHIR NDJSON feed instead of the BAG-XML Spezialitätenliste. Plain runs are unchanged. Opt out with --no-fhir; explicit --fhir/--fhir-url still work.
+
 === 3.0.8 / 28.05.2026
 * FHIR: fix empty <DescriptionDe/Fr/It> on every <Limitation>. The live BAG FHIR feed does not carry limitation text inline; it stores a `limitationIndication` reference to a `ClinicalUseDefinition` whose `indication.diseaseSymptomProcedure.concept.text` holds the actual text (one per language). FR/IT come from the per-language NDJSON files and are merged via the CUD id. Result on the live feed: 9'108 / 9'108 limitations (100%) now carry text, up from 0% (issue #116).
 

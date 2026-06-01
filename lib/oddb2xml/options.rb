@@ -22,7 +22,7 @@ module Oddb2xml
         opt :extended, "pharma, non-pharma plus prices and non-pharma from zurrose.
                             Products without EAN-Code will also be listed.
                             File oddb_calc.xml will also be generated"
-        opt :fhir, "Use FHIR NDJSON format from FOPH/BAG instead of XML from Spezialitätenliste", default: false, short: :none
+        opt :fhir, "Use FHIR NDJSON format from FOPH/BAG instead of XML from Spezialitätenliste. Default ON for -e/--extended and -b/--firstbase since June 2026; disable with --no-fhir", default: false, short: :none
         opt :fhir_url, "Specific FHIR NDJSON URL to download (implies --fhir)", type: :string, default: nil, short: :none
         opt :format, "File format F, default is xml. {xml|dat}
                             If F is given, -o option is ignored.", type: :string, default: "xml"
@@ -70,6 +70,11 @@ module Oddb2xml
       if @opts[:artikelstamm]
         @opts[:extended] = true
         @opts[:price] = :zurrose
+      end
+      # From June 2026, -e/--extended and -b/--firstbase default to the FHIR
+      # (FOPH/BAG NDJSON) source. Users can still opt out with --no-fhir.
+      if (@opts[:extended] || @opts[:firstbase]) && !@opts[:fhir_given]
+        @opts[:fhir] = true
       end
       # FHIR URL implies FHIR mode
       if @opts[:fhir_url]
