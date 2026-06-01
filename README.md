@@ -51,7 +51,7 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-    /opt/src/oddb2xml/bin/oddb2xml version 3.0.9
+    /opt/src/oddb2xml/bin/oddb2xml version 3.0.10
     Usage:
     oddb2xml [option]
       produced files are found under data
@@ -311,13 +311,18 @@ indication on each `<PRD>` in `oddb_product.xml`:
 </PRD>
 ```
 
-The code is built per FHIR bundle by combining the
-`FOPHDossierNumber` from the reimbursement `RegulatedAuthorization`
-(`XXXXX`) with the `.NN` suffix of each sibling
-`ClinicalUseDefinition` whose `type == "indication"` (e.g.
-`CYRAMZA.01` / `CYRAMZA.02` → `20403.01` / `20403.02`).  The element
-body carries the human-readable indication text from
-`indication.diseaseSymptomProcedure.concept.text`.
+Since 3.0.10 the code is read directly from the explicit
+`indicationCode` extension carried on each limitation
+(`RegulatedAuthorization.indication[].extension[regulatedAuthorization-limitation]`),
+introduced in the BAG SL FHIR export ≥ v2.0.5 (e.g. `20403.01` /
+`20403.02`). The BAG changelog states that the limitation code
+(`ClinicalUseDefinition.id`) and the indication code are **independent**
+fields, so the previous reconstruction from `FOPHDossierNumber` + the
+`.NN` CUD-id suffix is no longer used (it is kept only as a fallback for
+older feeds without the extension). `cud_id` still carries the
+`limitationIndication` reference, and the element body carries the
+human-readable indication text from the referenced
+`ClinicalUseDefinition`'s `indication.diseaseSymptomProcedure.concept.text`.
 
 The same data is also exposed in-memory on each item and package as
 `item[:indication_codes]` (an array of `{code:, cud_id:, text:}`

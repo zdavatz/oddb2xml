@@ -32,11 +32,46 @@ describe "FHIR Indikationscode support" do
   end
 
   describe Oddb2xml::FHIR::PreparationsParser do
-    it "constructs XXXXX.NN indication codes from FOPHDossierNumber + CUD suffix" do
+    it "reads the explicit indicationCode (XXXXX.NN) from each limitation" do
       parser = described_class.new(cyramza_fixture)
       prep = parser.preparations.first
       codes = prep.IndicationCodes.map(&:code)
       expect(codes).to include("20403.01", "20403.02")
+      # cud_id still carries the CUD reference so the text can be resolved.
+      expect(prep.IndicationCodes.map(&:cud_id)).to include("CYRAMZA.01", "CYRAMZA.02")
+    end
+
+    it "uses the explicit indicationCode field, not a dossier+CUD-suffix derivation" do
+      # The BAG changelog (>= v2.0.5) states the limitation code (CUD id) and
+      # the indication code are independent. Rewrite the explicit indicationCode
+      # values so they no longer correspond to FOPHDossierNumber + CUD suffix,
+      # and confirm the parser surfaces the explicit values verbatim.
+      bundle = JSON.parse(File.read(cyramza_fixture))
+      bundle["entry"].each do |entry|
+        res = entry["resource"]
+        next unless res["resourceType"] == "RegulatedAuthorization"
+        Array(res["indication"]).each do |ind|
+          Array(ind["extension"]).each do |ext|
+            next unless ext["url"].to_s.include?("regulatedAuthorization-limitation")
+            Array(ext["extension"]).each do |sub|
+              sub["valueString"] = "99999.77" if sub["url"] == "indicationCode"
+            end
+          end
+        end
+      end
+
+      file = Tempfile.new(["cyramza-indc", ".ndjson"])
+      begin
+        file.write(JSON.generate(bundle))
+        file.flush
+        parser = described_class.new(file.path)
+        codes = parser.preparations.first.IndicationCodes.map(&:code)
+        expect(codes).to all(eq("99999.77"))
+        expect(codes).not_to include("20403.01", "20403.02")
+      ensure
+        file.close
+        file.unlink
+      end
     end
   end
 

@@ -395,6 +395,11 @@ module Oddb2xml
           when "limitationText"
             # Not present in the live FHIR feed — kept for forward-compat.
             limitation[:text] = sub_ext["valueString"]
+          when "indicationCode"
+            # Authoritative BAG Indikationscode XXXXX.NN (feed >= v2.0.5).
+            # Independent of the CUD id, so it must be read here rather than
+            # reconstructed from FOPHDossierNumber + CUD suffix.
+            limitation[:indication_code] = sub_ext["valueString"]
           when "limitationIndication"
             ref = sub_ext.dig("valueReference", "reference")
             limitation[:cud_ref] = ref&.sub(%r{\A.*ClinicalUseDefinition/}, "")
@@ -591,7 +596,30 @@ module Oddb2xml
 
       def build_indication_codes(bundle)
         reimbursement = bundle.authorizations.find(&:reimbursement_sl?)
-        dossier = reimbursement&.foph_dossier_no
+        return [] unless reimbursement
+
+        cud_texts = bundle.cud_text_by_id
+
+        # Preferred (BAG feed >= v2.0.5): read the explicit `indicationCode`
+        # carried on each limitation. The changelog warns that the limitation
+        # code (CUD id) and the indication code are independent, so we must NOT
+        # reconstruct XXXXX.NN from the CUD id suffix. Text is resolved via the
+        # limitationIndication reference (cud_ref) into the CUD's text.
+        from_ext = reimbursement.limitations.each_with_object([]) do |lim, acc|
+          code = lim[:indication_code]
+          next unless code && !code.empty?
+          cud_ref = lim[:cud_ref]
+          acc << OpenStruct.new(
+            code: code,
+            cud_id: cud_ref,
+            text: (cud_ref && cud_texts[cud_ref]) || lim[:text]
+          )
+        end
+        return from_ext unless from_ext.empty?
+
+        # Fallback for older feeds without the indicationCode extension:
+        # derive XXXXX.NN from FOPHDossierNumber + each indication CUD's suffix.
+        dossier = reimbursement.foph_dossier_no
         return [] unless dossier && !bundle.clinical_use_definitions.empty?
 
         bundle.clinical_use_definitions.each_with_object([]) do |cud, acc|
