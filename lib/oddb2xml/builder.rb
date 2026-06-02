@@ -96,6 +96,7 @@ module Oddb2xml
       @refdata_descriptions_cleaned = true
       return if @refdata.nil? || @refdata.empty?
       double_dose_fixed = 0
+      galenic_fixed = 0
       @refdata.each_value do |item|
         next unless item.is_a?(Hash)
         no8 = item[:no8]
@@ -110,10 +111,19 @@ module Oddb2xml
             item[key] = cleaned
             double_dose_fixed += 1
           end
+          original = item[key]
+          cleaned = RefdataCleanup.normalize_galenic_form(original)
+          if cleaned != original
+            item[key] = cleaned
+            galenic_fixed += 1
+          end
         end
       end
       if double_dose_fixed > 0
         Oddb2xml.log("Refdata cleanup: fixed double-dose pattern in #{double_dose_fixed} description(s)")
+      end
+      if galenic_fixed > 0
+        Oddb2xml.log("Refdata cleanup: normalised galenic form in #{galenic_fixed} description(s)")
       end
     end
 

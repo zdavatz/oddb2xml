@@ -1,3 +1,6 @@
+=== 3.0.14 / 02.06.2026
+* Refdata cleanup: normalise the spelled-out German galenic form "Retardtabletten" to the Refdata house-style abbreviation "Ret Tabl" (issue #112 case #13, e.g. RINVOQ). Only 3 of the ~940 retard-tablet descriptions deviated from the convention; the fix is a narrow, German-only word-boundary substitution (RefdataCleanup.normalize_galenic_form, wired into Builder#apply_refdata_description_cleanups!). Legitimate brand suffixes ("TRAMAL retard", "XANAX retard", "MELATONIN Spirig HC retard") and Mepha's "Lactab" are left untouched.
+
 === 3.0.13 / 02.06.2026
 * Security: bump the nokogiri floor to >= 1.19.3. Fixes two GitHub/Dependabot advisories against nokogiri < 1.19.3: a high-severity ReDoS (regular expression backtracking) in the CSS selector tokenizer, and a medium-severity memory leak in the XSLT transform.
 

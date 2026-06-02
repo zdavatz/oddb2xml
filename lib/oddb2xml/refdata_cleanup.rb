@@ -30,5 +30,23 @@ module Oddb2xml
       return desc unless single_substance?(swissmedic_substance)
       desc.sub(DOUBLE_DOSE_RE, '\1 / ')
     end
+
+    # Case #13 (issue #112): a handful of products spell the galenic form out
+    # in full ("RINVOQ Retardtabletten 30 mg 28 Stk") while the Refdata house
+    # style abbreviates it everywhere else ("Ret Tabl", 940 other DE names).
+    # Normalise the spelled-out form to the abbreviation so the outliers match
+    # the convention. The keys are German-only words (FR/IT use "comprimé …" /
+    # "compresse …"), so applying this to FR/IT descriptions is a safe no-op.
+    GALENIC_NORMALISATIONS = {
+      /\bRetardtabletten\b/ => "Ret Tabl"
+    }.freeze
+
+    # Normalises spelled-out German galenic forms to the Refdata house-style
+    # abbreviation. Returns the cleaned description, or the original string if
+    # no rule applies.
+    def self.normalize_galenic_form(desc)
+      return desc if desc.nil? || desc.empty?
+      GALENIC_NORMALISATIONS.reduce(desc) { |result, (re, repl)| result.gsub(re, repl) }
+    end
   end
 end

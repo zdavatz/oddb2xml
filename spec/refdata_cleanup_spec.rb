@@ -62,6 +62,36 @@ describe Oddb2xml::RefdataCleanup do
       expect(described_class.fix_double_dose(input, combo)).to eq input
     end
   end
+
+  describe ".normalize_galenic_form" do
+    it "abbreviates the spelled-out 'Retardtabletten' to 'Ret Tabl' (issue #112 #13)" do
+      input = "RINVOQ Retardtabletten 30 mg 28 Stk"
+      expected = "RINVOQ Ret Tabl 30 mg 28 Stk"
+      expect(described_class.normalize_galenic_form(input)).to eq expected
+    end
+
+    it "leaves the already-abbreviated house style untouched" do
+      input = "TRAMAL retard Ret Tabl 100 mg 30 Stk"
+      expect(described_class.normalize_galenic_form(input)).to eq input
+    end
+
+    it "is a no-op for FR/IT names (different galenic words)" do
+      fr = "RINVOQ comprimé à libération prolong. 30 mg 28 pce"
+      it_ = "RINVOQ compresse a rilascio prolungato 30 mg 28 pz"
+      expect(described_class.normalize_galenic_form(fr)).to eq fr
+      expect(described_class.normalize_galenic_form(it_)).to eq it_
+    end
+
+    it "is a no-op for nil or empty descriptions" do
+      expect(described_class.normalize_galenic_form(nil)).to be_nil
+      expect(described_class.normalize_galenic_form("")).to eq ""
+    end
+
+    it "does not touch 'Retardtabletten' embedded in a longer word" do
+      input = "FOO Retardtablettenspender 1 Stk"
+      expect(described_class.normalize_galenic_form(input)).to eq input
+    end
+  end
 end
 
 describe Oddb2xml::Builder do
@@ -146,6 +176,28 @@ describe Oddb2xml::Builder do
       builder.apply_refdata_description_cleanups!
 
       expect(builder.refdata["7680694750066"][:desc_de]).to eq input
+    end
+
+    it "normalises the galenic form on the German name only (RINVOQ, issue #112 #13)" do
+      builder.packs = {
+        "67257003" => {substance_swissmedic: "upadacitinibum"}
+      }
+      builder.refdata = {
+        "7680672570037" => {
+          ean13: "7680672570037",
+          no8: "67257003",
+          desc_de: "RINVOQ Retardtabletten 30 mg 28 Stk",
+          desc_fr: "RINVOQ comprimé à libération prolong. 30 mg 28 pce",
+          desc_it: "RINVOQ compresse a rilascio prolungato 30 mg 28 pz"
+        }
+      }
+
+      builder.apply_refdata_description_cleanups!
+
+      item = builder.refdata["7680672570037"]
+      expect(item[:desc_de]).to eq "RINVOQ Ret Tabl 30 mg 28 Stk"
+      expect(item[:desc_fr]).to eq "RINVOQ comprimé à libération prolong. 30 mg 28 pce"
+      expect(item[:desc_it]).to eq "RINVOQ compresse a rilascio prolungato 30 mg 28 pz"
     end
   end
 end
