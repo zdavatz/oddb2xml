@@ -1,3 +1,6 @@
+=== 3.0.13 / 02.06.2026
+* Security: bump the nokogiri floor to >= 1.19.3. Fixes two GitHub/Dependabot advisories against nokogiri < 1.19.3: a high-severity ReDoS (regular expression backtracking) in the CSS selector tokenizer, and a medium-severity memory leak in the XSLT transform.
+
 === 3.0.12 / 02.06.2026
 * Artikelstamm: fix FHIR limitations collapsing into a single empty <LIMITATION>. FHIR has no native BAG limitation code (LIMCD), so every limitation was emitted with an empty LIMNAMEBAG. The Artikelstamm groups its <LIMITATIONS> section by code, so all of them collapsed into one entry with an empty name, losing every other limitation text. The CUD id (the limitationIndication reference that already identifies each text) is now used as the limitation code / LIMNAMEBAG, so each distinct limitation is emitted and referenced correctly.
 * check_artikelstamm: fix crash "no implicit conversion of Symbol into Integer" in SemanticCheck. Ox (:hash_no_attrs) collapses a section containing exactly one child element (e.g. a single <LIMITATION>) into a Hash instead of an Array, and an empty section into nil; get_items now normalises every section to an Array so the checks no longer crash on one-element or empty PRODUCTS/LIMITATIONS/ITEMS.

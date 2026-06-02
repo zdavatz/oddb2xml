@@ -1,14 +1,14 @@
 PATH
   remote: .
   specs:
-    oddb2xml (3.0.12)
+    oddb2xml (3.0.13)
       csv
       htmlentities
       httpi
       mechanize (>= 2.8.5)
       minitar
       multi_json
-      nokogiri (>= 1.19.1)
+      nokogiri (>= 1.19.3)
       optimist
       ox
       parslet
@@ -89,10 +89,10 @@ GEM
     net-http-persistent (4.0.8)
       connection_pool (>= 2.2.4, < 4)
     nkf (0.2.0)
-    nokogiri (1.19.2)
+    nokogiri (1.19.3)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.19.2-arm64-darwin)
+    nokogiri (1.19.3-arm64-darwin)
       racc (~> 1.4)
     nori (2.7.1)
       bigdecimal
@@ -220,7 +220,7 @@ DEPENDENCIES
   bundler
   flexmock
   mutex_m
-  nokogiri (>= 1.19.1)
+  nokogiri (>= 1.19.3)
   oddb2xml!
   pry-byebug
   pry-doc
