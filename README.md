@@ -51,7 +51,7 @@ HIN (http://hin.ch) creates daily the actual file. They can be downloaded from `
 see `--help`.
 
 ```
-    /opt/src/oddb2xml/bin/oddb2xml version 3.0.11
+    /opt/src/oddb2xml/bin/oddb2xml version 3.0.12
     Usage:
     oddb2xml [option]
       produced files are found under data

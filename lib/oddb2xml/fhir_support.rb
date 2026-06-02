@@ -569,7 +569,14 @@ module Oddb2xml
           text_de = lim[:text] || (cud_ref && cud_texts[cud_ref]) || ""
 
           limitation = OpenStruct.new
-          limitation.LimitationCode = ""  # Not in FHIR
+          # FHIR has no native BAG limitation code (LIMCD). The CUD id
+          # (limitationIndication reference) uniquely identifies each limitation
+          # text, so use it as the LIMNAMEBAG key. Without this, every FHIR
+          # limitation shares an empty code: the Artikelstamm builder groups its
+          # <LIMITATIONS> section by code, collapsing all of them into a single
+          # <LIMITATION> with an empty <LIMNAMEBAG> and losing every other text
+          # (and crashing the semantic checker on the resulting lone element).
+          limitation.LimitationCode = cud_ref || ""
           limitation.LimitationType = ""  # Could derive from status
           limitation.LimitationNiveau = ""  # Not in FHIR
           limitation.LimitationValue = ""  # Not in FHIR

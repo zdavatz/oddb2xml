@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Regression fixture for the Ox single-element collapse: exactly one PRODUCT,
+    one LIMITATION and one ITEM. Ox(:hash_no_attrs) returns a single Hash (not an
+    Array) for each such section, which crashed SemanticCheck before the get_items
+    normalisation. See Jenkins "everyReferencedLimitationIsIncluded" TypeError.-->
+<ARTIKELSTAMM xmlns="http://elexis.ch/Elexis_Artikelstamm_v5" CREATION_DATETIME="2026-06-02T11:00:00.000+01:00" BUILD_DATETIME="2026-06-02T11:00:00.000+01:00" DATA_SOURCE="oddb2xml">
+    <PRODUCTS>
+        <PRODUCT>
+            <PRODNO>2848601</PRODNO>
+            <SALECD>A</SALECD>
+            <DSCR>Ancopir Inj Lös</DSCR>
+            <DSCRF>Ancopir sol inj</DSCRF>
+            <ATC>A11DB</ATC>
+            <LIMNAMEBAG>070240</LIMNAMEBAG>
+            <SUBSTANCE>Verschiedene Kombinationen</SUBSTANCE>
+        </PRODUCT>
+    </PRODUCTS>
+    <LIMITATIONS>
+        <LIMITATION>
+            <LIMNAMEBAG>070240</LIMNAMEBAG>
+            <DSCR>Gesamthaft zugelassen: &lt;b&gt;40&lt;/b&gt; Punkte</DSCR>
+            <DSCRF>Prescription limitée au maximum à: &lt;b&gt;40&lt;/b&gt; points</DSCRF>
+            <LIMITATION_PTS>40</LIMITATION_PTS>
+        </LIMITATION>
+    </LIMITATIONS>
+    <ITEMS>
+        <ITEM PHARMATYPE="P">
+            <GTIN>7680284860144</GTIN>
+            <PHAR>0177804</PHAR>
+            <SALECD>A</SALECD>
+            <DSCR>Ancopir, Injektionslösung</DSCR>
+            <DSCRF>--missing--</DSCRF>
+            <COMP>
+                <NAME>Dr. Grossmann AG, Pharmaca</NAME>
+                <GLN/>
+            </COMP>
+            <PEXF>3.89</PEXF>
+            <PPUB>8.55</PPUB>
+            <PKG_SIZE>5</PKG_SIZE>
+            <MEASURE>Ampulle(n)</MEASURE>
+            <MEASUREF>Ampulle(n)</MEASUREF>
+            <DOSAGE_FORM>Injektionslösung</DOSAGE_FORM>
+            <DOSAGE_FORMF>Solution injectable</DOSAGE_FORMF>
+            <SL_ENTRY>true</SL_ENTRY>
+            <IKSCAT>B</IKSCAT>
+            <DEDUCTIBLE>10</DEDUCTIBLE>
+            <PRODNO>2848601</PRODNO>
+        </ITEM>
+    </ITEMS>
+</ARTIKELSTAMM>

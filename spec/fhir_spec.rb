@@ -157,6 +157,10 @@ describe "FHIR Indikationscode support" do
       expect(texts).to include(start_with("In Kombination mit FOLFIRI"))
       # CUD reference is carried through so merge_language can resolve FR/IT.
       expect(pkg[:limitations].map { |l| l[:cud_ref] }).to include("CYRAMZA.01", "CYRAMZA.02")
+      # FHIR has no native LIMCD, so the CUD id becomes the limitation code
+      # (LIMNAMEBAG). Without this every limitation shares an empty code and the
+      # Artikelstamm collapses them into one entry, losing all other texts.
+      expect(pkg[:limitations].map { |l| l[:code] }).to include("CYRAMZA.01", "CYRAMZA.02")
     end
 
     it "fills DescriptionFr / DescriptionIt from the language-specific bundles" do

@@ -31,7 +31,17 @@ module Oddb2xml
       # of the whole spec suite
       xx = @hash[:ARTIKELSTAMM] || @hash["ARTIKELSTAMM"]
       comps = xx[component_name.to_sym] || xx[component_name]
-      comps.values.first
+      return [] unless comps.is_a?(Hash)
+      res = comps.values.first
+      # Ox (:hash_no_attrs) collapses a section that contains exactly one child
+      # element (e.g. a single <LIMITATION>) into a single Hash instead of an
+      # Array, and an empty section (<LIMITATIONS/>) into nil/"". Normalise so
+      # callers always iterate over an Array of Hashes.
+      case res
+      when Array then res
+      when Hash then [res]
+      else []
+      end
     end
 
     def load_file(name)
