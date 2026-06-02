@@ -95,8 +95,7 @@ module Oddb2xml
       return if @refdata_descriptions_cleaned
       @refdata_descriptions_cleaned = true
       return if @refdata.nil? || @refdata.empty?
-      double_dose_fixed = 0
-      galenic_fixed = 0
+      counts = Hash.new(0)
       @refdata.each_value do |item|
         next unless item.is_a?(Hash)
         no8 = item[:no8]
@@ -104,26 +103,34 @@ module Oddb2xml
         pack = @packs[no8]
         next unless pack
         substance = pack[:substance_swissmedic]
+        composition = pack[:composition_swissmedic]
         [:desc_de, :desc_fr, :desc_it].each do |key|
           original = item[key]
-          cleaned = RefdataCleanup.fix_double_dose(original, substance)
-          if cleaned != original
-            item[key] = cleaned
-            double_dose_fixed += 1
+          next if original.nil? || original.empty?
+          desc = original
+          # Applied in order so later fixes see the output of earlier ones.
+          pipeline = [
+            [:double_dose, ->(d) { RefdataCleanup.fix_double_dose(d, substance) }],
+            [:galenic, ->(d) { RefdataCleanup.normalize_galenic_form(d) }],
+            [:combo_dose, ->(d) { RefdataCleanup.fix_missing_combo_dose(d, substance, composition, no8) }],
+            [:missing_dose, ->(d) { RefdataCleanup.fix_missing_dose(d, substance, composition, no8) }],
+            [:volume, ->(d) { RefdataCleanup.fix_missing_volume(d, composition, no8) }]
+          ]
+          pipeline.each do |rule, fix|
+            cleaned = fix.call(desc)
+            if cleaned != desc
+              desc = cleaned
+              counts[rule] += 1
+            end
           end
-          original = item[key]
-          cleaned = RefdataCleanup.normalize_galenic_form(original)
-          if cleaned != original
-            item[key] = cleaned
-            galenic_fixed += 1
-          end
+          item[key] = desc if desc != original
         end
       end
-      if double_dose_fixed > 0
-        Oddb2xml.log("Refdata cleanup: fixed double-dose pattern in #{double_dose_fixed} description(s)")
-      end
-      if galenic_fixed > 0
-        Oddb2xml.log("Refdata cleanup: normalised galenic form in #{galenic_fixed} description(s)")
+      labels = {double_dose: "double-dose pattern", galenic: "galenic form",
+                combo_dose: "missing combo 2nd dose", missing_dose: "missing strength",
+                volume: "missing injection volume"}
+      counts.each do |rule, n|
+        Oddb2xml.log("Refdata cleanup: fixed #{labels[rule]} in #{n} description(s)") if n > 0
       end
     end
 

@@ -92,6 +92,99 @@ describe Oddb2xml::RefdataCleanup do
       expect(described_class.normalize_galenic_form(input)).to eq input
     end
   end
+
+  describe ".dose_for_substance" do
+    let(:comp) { "atovaquonum 250 mg, proguanili hydrochloridum 100 mg, cellulosum microcristallinum" }
+
+    it "returns the dose of the named active, normalised to '<n> <unit>'" do
+      expect(described_class.dose_for_substance(comp, "atovaquonum")).to eq "250 mg"
+      expect(described_class.dose_for_substance(comp, "proguanili hydrochloridum")).to eq "100 mg"
+    end
+
+    it "ignores excipient doses outside the substance's segment" do
+      cetirizin = "cetirizini dihydrochloridum 10 mg, lactosum monohydricum 65 mg"
+      expect(described_class.dose_for_substance(cetirizin, "cetirizini dihydrochloridum")).to eq "10 mg"
+    end
+
+    it "returns nil when the substance is absent" do
+      expect(described_class.dose_for_substance(comp, "ibuprofenum")).to be_nil
+      expect(described_class.dose_for_substance(nil, "atovaquonum")).to be_nil
+    end
+  end
+
+  describe ".fix_missing_combo_dose (issue #112 #6)" do
+    let(:combo) { "atovaquonum, proguanili hydrochloridum" }
+    let(:comp) { "atovaquonum 250 mg, proguanili hydrochloridum 100 mg, cellulosum microcristallinum" }
+
+    it "appends the 2nd combo component dose for the catalogued IKSNR (ATOVAQUON, 65280)" do
+      input = "ATOVAQUON PLUS Spirig HC Filmtabl 250 mg 12 Stk"
+      expect(described_class.fix_missing_combo_dose(input, combo, comp, "65280001"))
+        .to eq "ATOVAQUON PLUS Spirig HC Filmtabl 250 mg / 100 mg 12 Stk"
+    end
+
+    it "is a no-op for non-catalogued registrations (avoids the KEPPRA sodium misfire)" do
+      input = "KEPPRA Filmtabl 1000 mg 100 Stk"
+      keppra_comp = "levetiracetamum 1000 mg, ... corresp. natrium 2.8 mg"
+      expect(described_class.fix_missing_combo_dose(input, "levetiracetamum, natrium", keppra_comp, "29152001"))
+        .to eq input
+    end
+
+    it "is a no-op when the 2nd dose is already present" do
+      input = "ATOVAQUON PLUS Spirig HC Filmtabl 250 mg / 100 mg 12 Stk"
+      expect(described_class.fix_missing_combo_dose(input, combo, comp, "65280001")).to eq input
+    end
+
+    it "is a no-op for mono products" do
+      input = "X 250 mg 12 Stk"
+      expect(described_class.fix_missing_combo_dose(input, "atovaquonum", comp, "65280001")).to eq input
+    end
+  end
+
+  describe ".fix_missing_dose (issue #112 #4)" do
+    let(:comp) { "cetirizini dihydrochloridum 10 mg, lactosum monohydricum 65 mg, talcum" }
+    let(:sub) { "cetirizini dihydrochloridum" }
+
+    it "inserts the strength before the pack count for the catalogued IKSNR (CETIRIZIN, 62568)" do
+      expect(described_class.fix_missing_dose("CETIRIZIN Spirig HC Filmtabl 30 Stk", sub, comp, "62568007"))
+        .to eq "CETIRIZIN Spirig HC Filmtabl 10 mg 30 Stk"
+    end
+
+    it "works on French/Italian pack-count units" do
+      expect(described_class.fix_missing_dose("CETIRIZINE Spirig HC cpr pellic 30 pce", sub, comp, "62568007"))
+        .to eq "CETIRIZINE Spirig HC cpr pellic 10 mg 30 pce"
+      expect(described_class.fix_missing_dose("CETIRIZINA Spirig HC cpr riv 30 pz", sub, comp, "62568007"))
+        .to eq "CETIRIZINA Spirig HC cpr riv 10 mg 30 pz"
+    end
+
+    it "is a no-op for non-catalogued registrations (avoids the IMPORTAL powder misfire)" do
+      expect(described_class.fix_missing_dose("IMPORTAL Pulver Btl 50 Stk", "lactitolum", "lactitolum monohydricum 10 g", "43414001"))
+        .to eq "IMPORTAL Pulver Btl 50 Stk"
+    end
+
+    it "is a no-op when a strength is already present" do
+      input = "CETIRIZIN Spirig HC Filmtabl 10 mg 30 Stk"
+      expect(described_class.fix_missing_dose(input, sub, comp, "62568007")).to eq input
+    end
+  end
+
+  describe ".fix_missing_volume (issue #112 #7)" do
+    let(:comp) { "tirzepatidum 7.5 mg, ... ad solutionem pro 0.6 ml corresp. natrium 0.6 mg." }
+
+    it "appends the per-pen volume for the catalogued IKSNR (MOUNJARO, 69696)" do
+      expect(described_class.fix_missing_volume("MOUNJARO KwikPen Inj Lös 7.5 mg 1 Stk", comp, "69696003"))
+        .to eq "MOUNJARO KwikPen Inj Lös 7.5 mg/0.6 ml 1 Stk"
+    end
+
+    it "is a no-op for non-catalogued registrations (avoids the CIMZIA concentration misfire)" do
+      input = "CIMZIA AutoClicks 200 mg/ml Fertpen 2 Stk"
+      expect(described_class.fix_missing_volume(input, "... pro 1 ml ...", "58277001")).to eq input
+    end
+
+    it "never double-appends a volume that is already present" do
+      input = "MOUNJARO KwikPen Inj Lös 7.5 mg/0.6 ml 1 Stk"
+      expect(described_class.fix_missing_volume(input, comp, "69696003")).to eq input
+    end
+  end
 end
 
 describe Oddb2xml::Builder do
@@ -198,6 +291,31 @@ describe Oddb2xml::Builder do
       expect(item[:desc_de]).to eq "RINVOQ Ret Tabl 30 mg 28 Stk"
       expect(item[:desc_fr]).to eq "RINVOQ comprimé à libération prolong. 30 mg 28 pce"
       expect(item[:desc_it]).to eq "RINVOQ compresse a rilascio prolungato 30 mg 28 pz"
+    end
+
+    it "reconstructs missing dose info from Swissmedic for catalogued articles (issue #112 #4/#6/#7)" do
+      builder.packs = {
+        "65280001" => {substance_swissmedic: "atovaquonum, proguanili hydrochloridum",
+                       composition_swissmedic: "atovaquonum 250 mg, proguanili hydrochloridum 100 mg, cellulosum"},
+        "62568007" => {substance_swissmedic: "cetirizini dihydrochloridum",
+                       composition_swissmedic: "cetirizini dihydrochloridum 10 mg, lactosum monohydricum 65 mg"},
+        "69696003" => {substance_swissmedic: "tirzepatidum",
+                       composition_swissmedic: "tirzepatidum 7.5 mg, ad solutionem pro 0.6 ml corresp. natrium"}
+      }
+      builder.refdata = {
+        "7680652800017" => {ean13: "7680652800017", no8: "65280001",
+                            desc_de: "ATOVAQUON PLUS Spirig HC Filmtabl 250 mg 12 Stk", desc_fr: "", desc_it: ""},
+        "7680625680073" => {ean13: "7680625680073", no8: "62568007",
+                            desc_de: "CETIRIZIN Spirig HC Filmtabl 30 Stk", desc_fr: "", desc_it: ""},
+        "7680696960036" => {ean13: "7680696960036", no8: "69696003",
+                            desc_de: "MOUNJARO KwikPen Inj Lös 7.5 mg 1 Stk", desc_fr: "", desc_it: ""}
+      }
+
+      builder.apply_refdata_description_cleanups!
+
+      expect(builder.refdata["7680652800017"][:desc_de]).to eq "ATOVAQUON PLUS Spirig HC Filmtabl 250 mg / 100 mg 12 Stk"
+      expect(builder.refdata["7680625680073"][:desc_de]).to eq "CETIRIZIN Spirig HC Filmtabl 10 mg 30 Stk"
+      expect(builder.refdata["7680696960036"][:desc_de]).to eq "MOUNJARO KwikPen Inj Lös 7.5 mg/0.6 ml 1 Stk"
     end
   end
 end
