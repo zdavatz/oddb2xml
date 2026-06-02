@@ -185,6 +185,49 @@ describe Oddb2xml::RefdataCleanup do
       expect(described_class.fix_missing_volume(input, comp, "69696003")).to eq input
     end
   end
+
+  describe ".fix_truncated_metoject (issue #112 #1)" do
+    it "rebuilds the DE name from the prefix plus the Swissmedic size" do
+      expect(described_class.fix_truncated_metoject("METOJECT Autoinjektor 10 mg/0.2 ml Inj Lös 10 mg 1", "65672106", "1"))
+        .to eq "METOJECT Autoinjektor 10 mg/0.2 ml Fertpen 1 Stk"
+    end
+
+    it "localises French (stylo pré/pce) and Italian (penna preriempita/pz)" do
+      expect(described_class.fix_truncated_metoject("METOJECT Autoinjektor 10 mg/0.2 ml inj sol 10 mg 1", "65672106", "1"))
+        .to eq "METOJECT Autoinjektor 10 mg/0.2 ml stylo pré 1 pce"
+      expect(described_class.fix_truncated_metoject("METOJECT Autoinjektor 10 mg/0.2 ml sol inj 10 mg 1", "65672106", "1"))
+        .to eq "METOJECT Autoinjektor 10 mg/0.2 ml penna preriempita 1 pz"
+    end
+
+    it "uses the Swissmedic size even when the truncated count was cut off" do
+      expect(described_class.fix_truncated_metoject("METOJECT Autoinjektor 12.5 mg/0.25 ml Inj Lös 12.5", "65672111", "12"))
+        .to eq "METOJECT Autoinjektor 12.5 mg/0.25 ml Fertpen 12 Stk"
+    end
+
+    it "is a no-op for other registrations and without a size" do
+      other = "FOO Autoinjektor 10 mg/0.2 ml Inj Lös 10 mg 1"
+      expect(described_class.fix_truncated_metoject(other, "99999001", "1")).to eq other
+      keep = "METOJECT Autoinjektor 10 mg/0.2 ml Inj Lös 10 mg 1"
+      expect(described_class.fix_truncated_metoject(keep, "65672106", nil)).to eq keep
+    end
+  end
+
+  describe ".fix_truncated_volume_unit (issue #112 #3)" do
+    it "restores the truncated 'ml' for the VERACTIV Vitamin D3 registration" do
+      expect(described_class.fix_truncated_volume_unit("VERACTIV Vitamin D3 Wild Huile Trp 20'000 U.I. 10m", "57690004"))
+        .to eq "VERACTIV Vitamin D3 Wild Huile Trp 20'000 U.I. 10ml"
+    end
+
+    it "is a no-op when the volume already ends in 'ml'" do
+      input = "VERACTIV Vitamin D3 Wild Huile Trp 20'000 U.I. 10ml"
+      expect(described_class.fix_truncated_volume_unit(input, "57690004")).to eq input
+    end
+
+    it "is a no-op for other registrations" do
+      input = "FOO Tropfen 10m"
+      expect(described_class.fix_truncated_volume_unit(input, "12345001")).to eq input
+    end
+  end
 end
 
 describe Oddb2xml::Builder do
@@ -316,6 +359,29 @@ describe Oddb2xml::Builder do
       expect(builder.refdata["7680652800017"][:desc_de]).to eq "ATOVAQUON PLUS Spirig HC Filmtabl 250 mg / 100 mg 12 Stk"
       expect(builder.refdata["7680625680073"][:desc_de]).to eq "CETIRIZIN Spirig HC Filmtabl 10 mg 30 Stk"
       expect(builder.refdata["7680696960036"][:desc_de]).to eq "MOUNJARO KwikPen Inj Lös 7.5 mg/0.6 ml 1 Stk"
+    end
+
+    it "rebuilds truncated names from Swissmedic for catalogued articles (issue #112 #1/#3)" do
+      builder.packs = {
+        "65672106" => {substance_swissmedic: "methotrexatum", composition_swissmedic: "", size: "1"},
+        "57690004" => {substance_swissmedic: "colecalciferolum", composition_swissmedic: "", size: "1"}
+      }
+      builder.refdata = {
+        "7680656721066" => {ean13: "7680656721066", no8: "65672106",
+                            desc_de: "METOJECT Autoinjektor 10 mg/0.2 ml Inj Lös 10 mg 1",
+                            desc_fr: "METOJECT Autoinjektor 10 mg/0.2 ml inj sol 10 mg 1",
+                            desc_it: "METOJECT Autoinjektor 10 mg/0.2 ml sol inj 10 mg 1"},
+        "7680576900046" => {ean13: "7680576900046", no8: "57690004",
+                            desc_de: "VERACTIV Vitamin D3 Wild Huile Trp 20'000 U.I. 10m", desc_fr: "", desc_it: ""}
+      }
+
+      builder.apply_refdata_description_cleanups!
+
+      met = builder.refdata["7680656721066"]
+      expect(met[:desc_de]).to eq "METOJECT Autoinjektor 10 mg/0.2 ml Fertpen 1 Stk"
+      expect(met[:desc_fr]).to eq "METOJECT Autoinjektor 10 mg/0.2 ml stylo pré 1 pce"
+      expect(met[:desc_it]).to eq "METOJECT Autoinjektor 10 mg/0.2 ml penna preriempita 1 pz"
+      expect(builder.refdata["7680576900046"][:desc_de]).to eq "VERACTIV Vitamin D3 Wild Huile Trp 20'000 U.I. 10ml"
     end
   end
 end

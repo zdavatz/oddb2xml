@@ -151,5 +151,48 @@ module Oddb2xml
       return desc unless m
       desc.sub(m[0], "#{m[0]}/#{vol} ml")
     end
+
+    METOJECT_IKSNR = %w[65672].freeze  # #1 METOJECT Autoinjektor
+
+    # Localised "<pen> … <count> <unit>" suffix, selected by the galenic-form
+    # token Refdata uses per language. The "<brand> Autoinjektor <dose>/<vol>"
+    # prefix is identical across DE/FR/IT, so only the suffix is localised.
+    METOJECT_SUFFIX = {
+      /\bInj Lös\b/ => ["Fertpen", "Stk"],         # DE
+      /\binj sol\b/ => ["stylo pré", "pce"],       # FR
+      /\bsol inj\b/ => ["penna preriempita", "pz"] # IT
+    }.freeze
+
+    # Case #1: every METOJECT Autoinjektor name is truncated at Refdata's
+    # 50-char limit, carrying a redundant strength in the (often cut) tail
+    # ("METOJECT Autoinjektor 10 mg/0.2 ml Inj Lös 10 mg 1"). Rebuild from the
+    # intact prefix plus the authoritative Swissmedic pack size →
+    # "METOJECT Autoinjektor 10 mg/0.2 ml Fertpen 1 Stk" (localised for FR/IT).
+    # Scoped to the METOJECT registration; idempotent once Refdata stops
+    # truncating (the rebuilt name no longer carries the redundant tail).
+    def self.fix_truncated_metoject(desc, no8, size)
+      return desc if desc.nil? || desc.empty?
+      return desc unless METOJECT_IKSNR.include?(iksnr_of(no8))
+      return desc if size.nil? || size.to_s.empty?
+      m = desc.match(%r{\A(METOJECT Autoinjektor \d[\d.]* mg/\d[\d.]* ml)\b})
+      return desc unless m
+      suffix = METOJECT_SUFFIX.find { |re, _| re.match?(desc) }
+      return desc unless suffix
+      pen, unit = suffix.last
+      "#{m[1]} #{pen} #{size} #{unit}"
+    end
+
+    VERACTIV_VITD3_IKSNR = %w[57690].freeze  # #3 VERACTIV Vitamin D3 Wild
+
+    # Case #3 (partial): the VERACTIV Vitamin D3 drops are truncated at 50
+    # chars, losing the final "l" of the volume ("… 20'000 U.I. 10m" → "10ml").
+    # Restore it. The French wording ("Huile", drop-form codes) in the German
+    # name is a separate upstream issue and is left untouched. Scoped to the
+    # registration; a no-op once the volume already ends in "ml".
+    def self.fix_truncated_volume_unit(desc, no8)
+      return desc if desc.nil? || desc.empty?
+      return desc unless VERACTIV_VITD3_IKSNR.include?(iksnr_of(no8))
+      desc.sub(/(\d)\s*m\z/, '\1ml')
+    end
   end
 end

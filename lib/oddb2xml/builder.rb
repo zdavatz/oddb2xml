@@ -104,12 +104,15 @@ module Oddb2xml
         next unless pack
         substance = pack[:substance_swissmedic]
         composition = pack[:composition_swissmedic]
+        size = pack[:size]
         [:desc_de, :desc_fr, :desc_it].each do |key|
           original = item[key]
           next if original.nil? || original.empty?
           desc = original
           # Applied in order so later fixes see the output of earlier ones.
           pipeline = [
+            [:metoject, ->(d) { RefdataCleanup.fix_truncated_metoject(d, no8, size) }],
+            [:veractiv_vol, ->(d) { RefdataCleanup.fix_truncated_volume_unit(d, no8) }],
             [:double_dose, ->(d) { RefdataCleanup.fix_double_dose(d, substance) }],
             [:galenic, ->(d) { RefdataCleanup.normalize_galenic_form(d) }],
             [:combo_dose, ->(d) { RefdataCleanup.fix_missing_combo_dose(d, substance, composition, no8) }],
@@ -126,7 +129,8 @@ module Oddb2xml
           item[key] = desc if desc != original
         end
       end
-      labels = {double_dose: "double-dose pattern", galenic: "galenic form",
+      labels = {metoject: "truncated METOJECT name", veractiv_vol: "truncated volume unit",
+                double_dose: "double-dose pattern", galenic: "galenic form",
                 combo_dose: "missing combo 2nd dose", missing_dose: "missing strength",
                 volume: "missing injection volume"}
       counts.each do |rule, n|
