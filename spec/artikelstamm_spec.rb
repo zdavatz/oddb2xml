@@ -38,7 +38,11 @@ describe Oddb2xml::Builder do
   context "when artikelstamm option is given" do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.parse(["--artikelstamm"]) # , '--log'])
+      # --no-fhir: these fixtures (chapter-70 fake GTINs, BAG-XML preparations)
+      # exercise the legacy pipeline. Since 3.0.9 --artikelstamm defaults to the
+      # FHIR feed, which has no VCR cassette here and skips the chapter-70 hack
+      # (issue #118), so the suite must opt out to keep testing legacy output.
+      options = Oddb2xml::Options.parse(["--artikelstamm", "--no-fhir"]) # , '--log'])
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
       Oddb2xml::Cli.new(options).run # to debug
       @artikelstamm_name = File.join(Oddb2xml::WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml")
@@ -503,10 +507,24 @@ Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorge
     end
     it "parsing" do
       require "oddb2xml/chapter_70_hack"
+      # Stub explicitly so this test is independent of example ordering
+      # (the SPA test below re-stubs the same URL).
+      url = "http://www.spezialitaetenliste.ch/varia_De.htm"
+      stub_request(:any, url).to_return(body: File.read(File.join(Oddb2xml::SpecData, "varia_De.htm")))
       result = Oddb2xml::Chapter70xtractor.parse
       expect(result.class).to eq Array
       expect(result.first).to eq ["2069562", "70.01.10", "Urtinktur", "1--10 g/ml", "13.40", ""]
       expect(result.last).to eq ["6516727", "70.02", "Allergenorum extractum varium / Inj. Susp. \n\tFortsetzungsbehandlung", "1 Durchstfl 1.5 ml", "311.85", "L"]
+    end
+    it "degrades gracefully when varia page is a JavaScript SPA (issue #118)" do
+      require "oddb2xml/chapter_70_hack"
+      spa = File.read(File.join(Oddb2xml::SpecData, "varia_De_spa.htm"))
+      url = "http://www.spezialitaetenliste.ch/varia_De.htm"
+      stub_request(:any, url).to_return(body: spa)
+      result = nil
+      expect { result = Oddb2xml::Chapter70xtractor.parse }.not_to raise_error
+      expect(result).to eq []
+      expect(Oddb2xml::Chapter70xtractor.items).to eq({})
     end
   end
 end

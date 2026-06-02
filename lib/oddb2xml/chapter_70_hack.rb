@@ -39,12 +39,31 @@ module Oddb2xml
         effort: :tolerant,
         smart: true
       }
-      res = Ox.load(Oddb2xml.uri_open(html_file).read, mode: :hash_no_attrs).values.first["body"]
+      parsed = Ox.load(Oddb2xml.uri_open(html_file).read, mode: :hash_no_attrs)
+      res = parsed.values.first["body"] if parsed.respond_to?(:values) && parsed.values.first.is_a?(Hash)
       result = []
       idx = 0
       @@items = {}
-      res.values.last.each do |item|
-        item.values.first.each do |sub_elem|
+      unless res.respond_to?(:values)
+        warn "Chapter70: varia page has no <body> to parse (got #{res.class}); skipping"
+        return []
+      end
+      # The varia page used to expose the chapter-70 table as static HTML. It
+      # is now a JavaScript single-page app whose <body> only contains an empty
+      # <sl-root> shell, so there is no data table to walk. Each entry yielded
+      # by iterating a Hash is a [tag, content] pair; a real row carries a Hash
+      # of cells, while stray nodes (e.g. <script>) carry an Array. Skip the
+      # latter so a redesigned/empty page degrades to "no items" instead of
+      # raising NoMethodError. See GitHub issue #118.
+      rows = res.values.last
+      unless rows.respond_to?(:each)
+        warn "Chapter70: varia page has no parseable rows (got #{rows.class}); skipping"
+        return []
+      end
+      rows.each do |item|
+        cells = item.is_a?(Hash) ? item.values.first : nil
+        next unless cells.respond_to?(:each)
+        cells.each do |sub_elem|
           what = Chapter70xtractor.parse_td(sub_elem)
           idx += 1
           puts "#{idx}: xx #{what}" if $VERBOSE
@@ -52,6 +71,7 @@ module Oddb2xml
         end
       end
       result2 = result.find_all { |x| (x.is_a?(Array) && x.first.is_a?(String)) && x.first.to_i > 100 }
+      warn "Chapter70: varia page yielded no chapter-70 products; skipping" if result2.empty?
       result2.each do |entry|
         data = {}
         pharma_code = entry.first

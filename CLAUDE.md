@@ -51,6 +51,8 @@ The system follows a **download → extract → build → compress** pipeline:
 
 8. **Refdata cleanup** (`lib/oddb2xml/refdata_cleanup.rb`) — Compensates for known data-quality issues in upstream Refdata.Articles.xml before they reach the output. Each fix is guarded by a Swissmedic-side heuristic (e.g. comma in `substance_swissmedic` to distinguish mono products from real combinations). Currently fixes the doubled-dose template bug (`X mg / X mg / Stk`). Called from `Builder#apply_refdata_description_cleanups!` at the start of `prepare_articles`. See GitHub issue #112 for the catalogue.
 
+9. **Chapter-70 hack** (`lib/oddb2xml/chapter_70_hack.rb`) — Legacy scraper for the SL "Komplementärarzneimittel" products (homeopathic/anthroposophic/phytotherapeutic), called only from `Builder#build_artikelstamm`. **Deprecated / non-FHIR only (3.0.11 onwards):** the source page `varia_De.htm` was rebuilt as a JavaScript SPA with no static data table, so the scraper now returns nothing there. These products + limitations now come through the FHIR feed (SL classification `20. KOMPLEMENTÄRARZNEIMITTEL`, 221 products on the live DE feed with real GTINs and limitation texts), so `build_artikelstamm` **skips the scraper entirely when `@options[:fhir]`** (the default for `--artikelstamm` since 3.0.9). In `--no-fhir` mode the scraper degrades gracefully (skips non-row/`<script>` nodes and empty tables, warns, returns `[]`) instead of raising `NoMethodError`. See GitHub issue #118.
+
 ### Key data identifiers
 - **GTIN/EAN13**: Primary article identifier (13-digit barcode)
 - **Pharmacode**: Swiss pharmacy code

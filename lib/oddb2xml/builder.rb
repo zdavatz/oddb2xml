@@ -1742,7 +1742,7 @@ module Oddb2xml
               # Set the pharmatype to 'Y' for outdated products, which are no longer found
               # in refdata/packungen
               chap70 = nil
-              if @chapter70items.values.find { |x| x[:pharmacode]&.eql?(obj[:pharmacode]) }
+              if @chapter70items&.values&.find { |x| x[:pharmacode]&.eql?(obj[:pharmacode]) }
                 Oddb2xml.log "found chapter #{obj[:pharmacode]}" if $VERBOSE
                 chap70 = true
               end
@@ -1804,9 +1804,17 @@ module Oddb2xml
         end
       end
       unless @prepared
-        require "oddb2xml/chapter_70_hack"
-        Oddb2xml::Chapter70xtractor.parse
-        @chapter70items = Oddb2xml::Chapter70xtractor.items
+        # The chapter-70 ("Komplementärarzneimittel") products and their
+        # limitations now arrive through the FHIR feed (SL classification
+        # "20. KOMPLEMENTÄRARZNEIMITTEL"), so the legacy varia_De.htm scraper
+        # is redundant in FHIR mode. The varia page itself has been rebuilt as
+        # a JavaScript SPA that no longer ships the data table, so the scraper
+        # can only fail there now. See GitHub issue #118.
+        unless @options[:fhir]
+          require "oddb2xml/chapter_70_hack"
+          Oddb2xml::Chapter70xtractor.parse
+          @chapter70items = Oddb2xml::Chapter70xtractor.items
+        end
         prepare_limitations
         prepare_articles
         prepare_products
