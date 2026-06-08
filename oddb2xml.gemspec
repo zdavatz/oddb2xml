@@ -23,7 +23,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "rubyzip", '~> 3.0.1'
   spec.add_dependency "minitar" # , '~> 0.5.2'
   spec.add_dependency "mechanize", ">= 2.8.5"
-  spec.add_dependency "nokogiri", ">= 1.19.3"
+  # Lower bound only (no upper cap) so each Ruby resolves to its best nokogiri:
+  # Ruby >= 3.2 still gets the security-fixed 1.19.3 (nokogiri 1.19.x needs Ruby >= 3.2),
+  # while Ruby 3.1 (EOL but still in production) can install 1.18.10, the newest 3.1-compatible
+  # release. oddb2xml uses no nokogiri 1.19-only API and no CSS/XSLT/C14N on untrusted input.
+  spec.add_dependency "nokogiri", ">= 1.18.10"
   spec.add_dependency "savon" , '~> 2.12.0'
   spec.add_dependency "spreadsheet" # , '~> 1.0.0'
   spec.add_dependency "rubyXL", "~> 3.4.0"

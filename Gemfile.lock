@@ -1,14 +1,14 @@
 PATH
   remote: .
   specs:
-    oddb2xml (3.0.16)
+    oddb2xml (3.0.17)
       csv
       htmlentities
       httpi
       mechanize (>= 2.8.5)
       minitar
       multi_json
-      nokogiri (>= 1.19.3)
+      nokogiri (>= 1.18.10)
       optimist
       ox
       parslet
@@ -220,7 +220,7 @@ DEPENDENCIES
   bundler
   flexmock
   mutex_m
-  nokogiri (>= 1.19.3)
+  nokogiri (>= 1.18.10)
   oddb2xml!
   pry-byebug
   pry-doc
