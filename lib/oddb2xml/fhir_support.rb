@@ -79,7 +79,12 @@ module Oddb2xml
     end
 
     def skip_download?
-        @options[:skip_download] || (File.exist?(@file2save) && file_age_hours(@file2save) < 24)
+      # Only skip when the target file actually exists on disk. The bare
+      # @options[:skip_download] flag is not enough: each oddb2xml run uses its
+      # own ./downloads dir, so a flag-only short-circuit made download_one call
+      # File.size on a missing NDJSON and crash with Errno::ENOENT (issue #121).
+      return false unless File.exist?(@file2save)
+      @options[:skip_download] || file_age_hours(@file2save) < 24
     end
 
     def file_age_hours(file)

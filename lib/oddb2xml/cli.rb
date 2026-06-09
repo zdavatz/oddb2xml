@@ -3,6 +3,7 @@ require "oddb2xml/downloader"
 require "oddb2xml/extractor"
 require "oddb2xml/compressor"
 require "oddb2xml/options"
+require "oddb2xml/proxy_check"
 require "oddb2xml/util"
 require "rubyXL"
 require "date" # for today
@@ -38,6 +39,7 @@ module Oddb2xml
     def run
       threads = []
       start_time = Time.now
+      ProxyCheck.run(@options)
       files2rm = Dir.glob(File.join(DOWNLOADS, "*"))
       FileUtils.rm_f(files2rm, verbose: true) if (files2rm.size > 0) && !Oddb2xml.skip_download?
       if @options[:calc] && !(@options[:extended] || @options[:firstbase])
