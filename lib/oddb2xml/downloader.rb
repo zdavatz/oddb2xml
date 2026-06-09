@@ -279,13 +279,21 @@ module Oddb2xml
     def download
       @file2save = File.join(DOWNLOADS, "swissmedic_#{@type}.xlsx")
       report_download(@url, @file2save)
-      if @options[:calc] && @options[:skip_download] && File.exist?(@file2save) && ((Time.now - File.ctime(@file2save)).to_i < 24 * 60 * 60)
+      if @options[:calc] && @options[:skip_download] && File.exist?(@file2save) && ((Time.now - File.ctime(@file2save)).to_i < 24 * 60 * 60) && Oddb2xml.valid_zip?(@file2save)
         Oddb2xml.log "SwissmedicDownloader #{__LINE__}: Skip downloading #{@file2save} #{File.size(@file2save)} bytes"
         return File.expand_path(@file2save)
       end
       begin
         @url = @direct_url_link
         download_as(@file2save, "w+")
+        # The Swissmedic file is an .xlsx (a ZIP). Downloads through scanning
+        # proxies are sometimes truncated (valid header, missing EOCD), which
+        # would later crash RubyXL with a cryptic rubyzip error. Verify the
+        # archive is complete and just fetch it again if not. (issue #121)
+        unless Oddb2xml.valid_zip?(@file2save)
+          raise Oddb2xml::IncompleteDownloadError,
+            "Swissmedic #{@type} xlsx is empty or truncated (#{File.size(@file2save)} bytes)"
+        end
         if @options[:artikelstamm]
           # ssconvert is in the package gnumeric (Debian)
           cmd = "ssconvert '#{@file2save}' '#{File.join(DOWNLOADS, File.basename(@file2save).sub(/\.xls.*/, ".csv"))}' 2> /dev/null"
@@ -293,8 +301,12 @@ module Oddb2xml
           system(cmd)
         end
         return File.expand_path(@file2save)
-      rescue Timeout::Error, Errno::ETIMEDOUT
-        retrievable? ? retry : raise
+      rescue Timeout::Error, Errno::ETIMEDOUT, Oddb2xml::IncompleteDownloadError => error
+        if retrievable?
+          Oddb2xml.log("Retrying Swissmedic #{@type} download: #{error.message}")
+          retry
+        end
+        raise
       ensure
         Oddb2xml.download_finished(@file2save, false)
       end

@@ -1,3 +1,6 @@
+=== 3.0.20 / 09.06.2026
+* Bugfix/robustness: handle truncated or failed Swissmedic .xlsx downloads instead of crashing later in the parser (issue #121). A download through a scanning/allow-list proxy can return an incomplete .xlsx -- a valid ZIP/Excel header (so `file` still reports "Microsoft Excel 2007+") but a missing end-of-central-directory record -- which made RubyXL die deep in rubyzip with the cryptic "Zip end of central directory signature not found". New Oddb2xml.valid_zip? verifies an archive is complete (PK header + EOCD signature in the tail). SwissmedicDownloader now validates the downloaded file and automatically re-fetches it (up to the normal retry count) when it is empty or truncated, and no longer reuses a cached broken file under --skip-download. As a last resort SwissmedicExtractor raises a clear, actionable error (pointing at connectivity / "oddb2xml --proxy-check") instead of the rubyzip backtrace.
+
 === 3.0.19 / 09.06.2026
 * New option --proxy-check: probe connectivity/proxy reachability for every host oddb2xml could need, print a full OK/BLOCKED/UNREACHABLE report (honouring http(s)_proxy) and exit without downloading or building. Exits 0 if all hosts are reachable, 1 otherwise — handy for cron/deploy preflight on allow-list proxies (e.g. "oddb2xml --proxy-check"). Reuses the 3.0.18 proxy checker; checks run concurrently.
 

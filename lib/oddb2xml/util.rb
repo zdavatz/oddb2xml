@@ -3,8 +3,27 @@ require "htmlentities"
 
 module Oddb2xml
   FAKE_GTIN_START = "999999"
+
+  # Raised when a downloaded archive (zip/xlsx) is empty or truncated, so the
+  # caller can retry the download instead of crashing later in the parser.
+  class IncompleteDownloadError < StandardError; end
+
   def self.gen_prodno(iksnr, seqnr)
     sprintf("%05d", iksnr) + sprintf("%02d", seqnr)
+  end
+
+  # True only for a *complete* ZIP/xlsx: a valid local-file header (PK) plus the
+  # End Of Central Directory record (PK\x05\x06) near the end. A truncated
+  # download keeps the header (so `file` still says "Microsoft Excel 2007+") but
+  # loses the EOCD, which makes rubyzip fail with the cryptic "end of central
+  # directory signature not found". See issue #121.
+  def self.valid_zip?(file)
+    return false unless file && File.exist?(file)
+    size = File.size(file)
+    return false unless size > 100
+    return false unless File.binread(file, 2) == "PK"
+    offset = [size - 66_000, 0].max
+    File.binread(file, size - offset, offset).include?("PK\x05\x06".b)
   end
 
   def self.uri_open(url, max_retries: 3)

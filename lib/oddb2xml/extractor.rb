@@ -260,6 +260,14 @@ module Oddb2xml
       @type = type
       Oddb2xml.log("SwissmedicExtractor #{@filename} #{File.size(@filename)} bytes")
       return unless File.exist?(@filename)
+      unless Oddb2xml.valid_zip?(@filename)
+        raise "SwissmedicExtractor: '#{@filename}' is not a usable .xlsx " \
+          "(#{File.size(@filename)} bytes). The Swissmedic '#{@type}' download failed or was " \
+          "truncated -- the file is empty, an HTML error/proxy page, or an incomplete ZIP " \
+          "(valid header but missing end-of-central-directory). Check connectivity to " \
+          "www.swissmedic.ch (run 'oddb2xml --proxy-check'); a too-small file usually means " \
+          "the proxy cut off a large download."
+      end
       @sheet = RubyXL::Parser.parse(File.expand_path(@filename)).worksheets[0]
     end
 
