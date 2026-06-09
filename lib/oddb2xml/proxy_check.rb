@@ -43,6 +43,46 @@ module Oddb2xml
       hosts
     end
 
+    # Full union of every host any run could need, regardless of options.
+    # Used by --proxy-check so the report covers everything in one go.
+    def all_hosts
+      BASE_HOSTS.merge(
+        "epl.bag.admin.ch" => "BAG FHIR data (--fhir)",
+        "id.gs1.ch" => "GS1 NONPHARMA (--firstbase / -b)",
+        "www.spezialitaetenliste.ch" => "BAG Spezialitätenliste",
+        "www.medregbm.admin.ch" => "Medizinalberuferegister (-x address)"
+      )
+    end
+
+    # Probe every host and print a full OK/BLOCKED/UNREACHABLE table.
+    # Returns true when all hosts are reachable. Used by `oddb2xml --proxy-check`.
+    def report(_options = {})
+      proxy = proxy_uri
+      results = all_hosts.map do |host, desc|
+        Thread.new { [host, desc, check_host(host, proxy)] }
+      end.map(&:value).sort_by { |(host, _desc, _status)| host }
+
+      header = "oddb2xml connectivity check"
+      header += proxy ? " (via proxy #{proxy.host}:#{proxy.port})" : " (no proxy configured)"
+      puts header
+      results.each do |(host, desc, status)|
+        tag = case status
+        when :ok then "OK     "
+        when :blocked then "BLOCKED" # proxy returned 407
+        else "UNREACH"
+        end
+        puts format("  [%s] %-28s %s", tag, host, desc)
+      end
+      unreachable = results.reject { |(_host, _desc, status)| status == :ok }
+      if unreachable.empty?
+        puts "All #{results.size} hosts reachable."
+        true
+      else
+        puts "#{unreachable.size} of #{results.size} host(s) NOT reachable -- downloads using them will fail."
+        false
+      end
+    end
+
     # Returns :ok, :blocked (proxy 407) or :unreachable for a single host.
     def check_host(host, proxy)
       http =
@@ -85,24 +125,24 @@ module Oddb2xml
 
     def warn_about(problems, proxy)
       line = "=" * 72
-      $stderr.puts line
-      $stderr.puts " oddb2xml CONNECTIVITY WARNING"
-      $stderr.puts " The following hosts could not be reached -- the corresponding"
-      $stderr.puts " downloads will FAIL or produce incomplete data:"
+      warn line
+      warn " oddb2xml CONNECTIVITY WARNING"
+      warn " The following hosts could not be reached -- the corresponding"
+      warn " downloads will FAIL or produce incomplete data:"
       problems.each do |(host, desc, status)|
         tag = (status == :blocked) ? "BLOCKED by proxy (407)" : "UNREACHABLE          "
-        $stderr.puts format("   [%s] %-26s %s", tag, host, desc)
+        warn format("   [%s] %-26s %s", tag, host, desc)
       end
       if proxy
-        $stderr.puts ""
-        $stderr.puts " Proxy in use: #{proxy.host}:#{proxy.port}"
+        warn ""
+        warn " Proxy in use: #{proxy.host}:#{proxy.port}"
         if problems.any? { |(_h, _d, s)| s == :blocked }
-          $stderr.puts " This looks like an allow-list proxy. Ask your admin to allow the"
-          $stderr.puts " hosts above (HTTPS/443), or set credentials in http(s)_proxy."
+          warn " This looks like an allow-list proxy. Ask your admin to allow the"
+          warn " hosts above (HTTPS/443), or set credentials in http(s)_proxy."
         end
       end
-      $stderr.puts " (Set ODDB2XML_SKIP_PROXY_CHECK=1 to silence this check.)"
-      $stderr.puts line
+      warn " (Set ODDB2XML_SKIP_PROXY_CHECK=1 to silence this check.)"
+      warn line
     end
   end
 end

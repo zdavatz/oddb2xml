@@ -39,6 +39,11 @@ module Oddb2xml
     def run
       threads = []
       start_time = Time.now
+      if @options[:proxy_check]
+        ok = ProxyCheck.report(@options)
+        exit(ok ? 0 : 1) unless defined?(RSpec)
+        return ok
+      end
       ProxyCheck.run(@options)
       files2rm = Dir.glob(File.join(DOWNLOADS, "*"))
       FileUtils.rm_f(files2rm, verbose: true) if (files2rm.size > 0) && !Oddb2xml.skip_download?

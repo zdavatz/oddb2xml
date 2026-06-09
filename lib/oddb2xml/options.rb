@@ -46,6 +46,7 @@ module Oddb2xml
         opt :use_ra11zip, "Use the ra11.zip (a zipped transfer.dat from Galexis)",
           default: File.exist?("ra11.zip") ? "ra11.zip" : nil, type: :string
         opt :firstbase, "Build all NONPHARMA articles on firstbase (GS1 Switzerland CSV from id.gs1.ch)", short: "b", default: false
+        opt :proxy_check, "Only probe connectivity/proxy reachability for every required host, print a report and exit (no download/build). Honours http(s)_proxy. Exits 0 if all reachable, 1 otherwise.", short: :none, default: false
       end
 
       @opts[:percent] = @opts[:increment]

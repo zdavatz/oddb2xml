@@ -19,6 +19,7 @@ Oddb2xml::DEFAULT_OPTS = {
   firstbase: false,
   fhir: false,
   fhir_url: nil,
+  proxy_check: false,
 }
 
 describe Oddb2xml::Options do
@@ -75,6 +76,7 @@ describe Oddb2xml::Options do
     expected[:nonpharma] = true
     expected[:calc] = true
     expected[:price] = :zurrose
+    expected[:fhir] = true
     specify { expect(test_opts).to eq expected }
   end
 
@@ -86,6 +88,7 @@ describe Oddb2xml::Options do
     expected[:calc] = true
     expected[:price] = :zurrose
     expected[:percent] = 80
+    expected[:fhir] = true
     specify { expect(test_opts).to eq expected }
   end
 
@@ -165,6 +168,7 @@ describe Oddb2xml::Options do
     expected[:price] = :zurrose
     expected[:extended] = true
     expected[:artikelstamm] = true
+    expected[:fhir] = true
     specify { expect(test_opts).to eq expected }
   end
 
