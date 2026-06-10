@@ -43,6 +43,7 @@ module Oddb2xml
     attr_accessor :subject, :refdata, :items, :flags, :lppvs,
       :actions, :migel, :orphan,
       :infos, :packs, :infos_zur_rose, :firstbase,
+      :weleda_sl,
       :ean14, :tag_suffix,
       :companies, :people,
       :xsd
@@ -57,6 +58,7 @@ module Oddb2xml
       @packs = {}
       @migel = {}
       @infos_zur_rose ||= {}
+      @weleda_sl ||= {}
       @firstbase ||= {}
       @actions = []
       @orphan = []
@@ -1690,6 +1692,15 @@ module Oddb2xml
                       ppub ||= zur_rose_detail[:pub_price]
                     end
                   end
+                  # Kapitel-70 item missing from the FHIR feed but registered in
+                  # Swissmedic Packungen.xlsx (so it enters here, via @packs):
+                  # fill the BAG public price from the Weleda list + BAG SL
+                  # group-price table when nothing else priced it (issue #121).
+                  pkg_weleda = @weleda_sl[pkg_gtin.to_s.rjust(13, "0")]
+                  if pkg_weleda && ppub.nil? && pkg_weleda[:price]
+                    xml.comment "PPUB #{pkg_weleda[:price]} from BAG SL group price #{pkg_weleda[:csl]} (#{pkg_weleda[:abgabe]})"
+                    ppub = pkg_weleda[:price]
+                  end
                   xml.PEXF pexf if pexf
                   xml.PPUB ppub if ppub
                   measure = ""
@@ -1710,7 +1721,7 @@ module Oddb2xml
                     xml.DOSAGE_FORMF info.galenic_form.descriptions["fr"] if info.galenic_form.descriptions["fr"]
                     xml.DOSAGE_FORMI info.galenic_form.descriptions["it"] if info.galenic_form.descriptions["it"]
                   end
-                  xml.SL_ENTRY "true" if sl_gtins.index(pkg_gtin)
+                  xml.SL_ENTRY "true" if sl_gtins.index(pkg_gtin) || pkg_weleda
                   xml.IKSCAT package[:swissmedic_category][0] if package[:swissmedic_category] && package[:swissmedic_category].length > 0
                   xml.GENERIC_TYPE sequence[:org_gen_code] if sequence[:org_gen_code] && !sequence[:org_gen_code].empty?
                   xml.LPPV "true" if @lppvs[pkg_gtin.to_s] # detect_nincd
@@ -1767,7 +1778,12 @@ module Oddb2xml
                 Oddb2xml.log "found chapter #{obj[:pharmacode]}" if $VERBOSE
                 chap70 = true
               end
-              patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, "0")) || chap70 ? "P" : "N")
+              # Kapitel-70 complementary medicine missing from the FHIR feed,
+              # recovered from the Weleda list + BAG SL group-price table
+              # (issue #121). Mirror the old chapter-70 hack: emit it as a
+              # Pharma item with the SL flag (and the BAG public price below).
+              weleda = @weleda_sl[ean13.to_s.rjust(13, "0")] unless @items[ean13]
+              patched_pharma_type = (/^7680/.match(ean13.to_s.rjust(13, "0")) || chap70 || weleda ? "P" : "N")
               next if /^#{Oddb2xml::FAKE_GTIN_START}/o.match?(ean13.to_s)
               next if obj[:data_origin].eql?("zur_rose") && /^7680/.match(ean13) # must skip inactiv items
               xml.ITEM({"PHARMATYPE" => patched_pharma_type}) do
@@ -1803,13 +1819,24 @@ module Oddb2xml
                     xml.PEXF(pexf = zur_rose_detail[:price])
                   end
                 end
-                if obj[:pub_price] && !obj[:pub_price].empty?
+                if obj[:pub_price] && !obj[:pub_price].empty? && !obj[:pub_price].eql?("0.00")
                   xml.PPUB(ppub = obj[:pub_price])
                 elsif zur_rose_detail
                   if zur_rose_detail[:pub_price] && !zur_rose_detail[:pub_price].empty? && !zur_rose_detail[:pub_price].eql?("0.00")
                     # Oddb2xml.log "NonPharma: #{ean13} adding PPUB #{zur_rose_detail[:pub_price]} #{description}"
                     xml.PPUB(ppub = zur_rose_detail[:pub_price])
                   end
+                end
+                # SL flag + BAG public price for the recovered Kapitel-70 item.
+                # The FHIR/ZurRose price always wins -- the BAG SL group price
+                # only fills a gap (ppub still nil here means ZurRose blanked it,
+                # issue #117). See Oddb2xml::WeledaSL.
+                if weleda && !chap70
+                  if ppub.nil? && weleda[:price]
+                    xml.comment "PPUB #{weleda[:price]} from BAG SL group price #{weleda[:csl]} (#{weleda[:abgabe]})"
+                    xml.PPUB(ppub = weleda[:price])
+                  end
+                  xml.SL_ENTRY "true"
                 end
                 @csv_file << [ean13, description, "", "", pexf, ppub, "", "", "", "", "", ""]
                 if chap70

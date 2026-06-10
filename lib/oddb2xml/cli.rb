@@ -4,6 +4,7 @@ require "oddb2xml/extractor"
 require "oddb2xml/compressor"
 require "oddb2xml/options"
 require "oddb2xml/proxy_check"
+require "oddb2xml/weleda_sl"
 require "oddb2xml/util"
 require "rubyXL"
 require "date" # for today
@@ -151,6 +152,9 @@ module Oddb2xml
           %w[actions orphan migel infos_zur_rose firstbase].each do |addition|
             builder.send("#{addition}=".intern, instance_variable_get("@#{addition}"))
           end
+          # SL flag + BAG public price for Kapitel-70 medicines missing from the
+          # FHIR feed (issue #121). Only the Artikelstamm output consumes it.
+          builder.weleda_sl = @options[:artikelstamm] ? Oddb2xml::WeledaSL.load(@options) : {}
         end
         builder.tag_suffix = @options[:tag_suffix]
       end

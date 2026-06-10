@@ -167,6 +167,26 @@ module Oddb2xml
     end
   end
 
+  # Weleda "Kapitel 70" article list (GTIN, Abgabekategorie/SL flag,
+  # Pharma-Gruppen-Code). See Oddb2xml::WeledaSL.
+  class WeledaDownloader < Downloader
+    include DownloadMethod
+    def download
+      @url ||= "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/weleda_arzneimittel.csv"
+      download_as("weleda_arzneimittel.csv", "w+")
+    end
+  end
+
+  # BAG SL Pharma-Gruppen-Code -> public price table, extracted from the BAG SL
+  # definition PDF "Homoeopathica, Anthroposophica, Allergene". See WeledaSL.
+  class BagSlGroupPricesDownloader < Downloader
+    include DownloadMethod
+    def download
+      @url ||= "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/bag_sl_group_prices.csv"
+      download_as("bag_sl_group_prices.csv", "w+")
+    end
+  end
+
   class ZurroseDownloader < Downloader
     include DownloadMethod
     def download

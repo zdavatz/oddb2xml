@@ -79,6 +79,17 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
+    # issue #121: Kapitel-70 complementary medicine that is absent from the FHIR
+    # feed and arrives via ZurRose (GTIN 7611916162404, csl 2069591) with a
+    # blanked public price. WeledaSL must add the SL flag and the BAG SL group
+    # price (CHF 26.95).
+    it "should add the SL flag and BAG public price to a Weleda Kapitel-70 item" do
+      block = @inhalt[%r{<ITEM PHARMATYPE="P">\s*<GTIN>7611916162404</GTIN>.*?</ITEM>}m]
+      expect(block).not_to be_nil
+      expect(block).to include("<SL_ENTRY>true</SL_ENTRY>")
+      expect(block).to include("<PPUB>26.95</PPUB>")
+    end
+
     it "should have a DSCRF and ATC for product PRIORIX TETRA" do
       expected = %(<PRODUCT>
             <PRODNO>5815801</PRODNO>
