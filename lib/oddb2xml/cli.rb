@@ -153,8 +153,14 @@ module Oddb2xml
             builder.send("#{addition}=".intern, instance_variable_get("@#{addition}"))
           end
           # SL flag + BAG public price for Kapitel-70 medicines missing from the
-          # FHIR feed (issue #121). Only the Artikelstamm output consumes it.
-          builder.weleda_sl = @options[:artikelstamm] ? Oddb2xml::WeledaSL.load(@options) : {}
+          # FHIR feed (issue #121). Consumed by the Artikelstamm output
+          # (SL_ENTRY + PPUB) and by oddb_article.xml (ARTPRI BAGPUB) for the
+          # -e/--extended and -b/--firstbase product feeds.
+          builder.weleda_sl = if @options[:extended] || @options[:firstbase] || @options[:artikelstamm]
+            Oddb2xml::WeledaSL.load(@options)
+          else
+            {}
+          end
         end
         builder.tag_suffix = @options[:tag_suffix]
       end

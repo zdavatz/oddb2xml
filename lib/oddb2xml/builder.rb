@@ -1170,6 +1170,17 @@ module Oddb2xml
                   }
                 end
               end
+              # BAG SL public price for a Kapitel-70 medicine missing from the
+              # FHIR feed (issue #121); see Oddb2xml::WeledaSL. The FHIR price
+              # wins, so this is only added when the GTIN is absent from the SL
+              # items. Emitted as a separate PTYP so the raw ZURROSEPUB (often a
+              # blanked 0.00, issue #117) is preserved alongside it.
+              if (weleda = @weleda_sl[ean.to_s.rjust(13, "0")]) && weleda[:price] && !@items[ean]
+                xml.ARTPRI {
+                  xml.PTYP "BAGPUB"
+                  xml.PRICE weleda[:price]
+                }
+              end
               nincd = detect_nincd(obj)
               if nincd
                 xml.ARTINS {
