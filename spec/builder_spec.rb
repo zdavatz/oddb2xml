@@ -796,13 +796,15 @@ describe Oddb2xml::Builder do
     end
 
     # issue #121: a Kapitel-70 medicine missing from the FHIR feed (GTIN
-    # 7611916162404) gets the BAG SL public price added to oddb_article.xml as
-    # an ARTPRI BAGPUB entry, while the raw (blanked) ZURROSEPUB is preserved.
-    it "should add an ARTPRI BAGPUB with the BAG SL public price for a Weleda Kapitel-70 article" do
+    # 7611916162404) gets the BAG SL public price filled into the standard
+    # public-price tag (ARTPRI PPUB) in oddb_article.xml, while the raw
+    # (blanked) ZURROSEPUB is preserved.
+    it "should fill the standard ARTPRI PPUB with the BAG SL public price for a Weleda Kapitel-70 article" do
       doc = REXML::Document.new File.new(checkAndGetArticleXmlName)
       art = checkAndGetArticleWithGTIN(doc, "7611916162404")
       expect(art).not_to be_nil
-      expect(art.elements["ARTPRI[PTYP='BAGPUB']/PRICE"].text).to eq "26.95"
+      expect(art.elements["ARTPRI[PTYP='PPUB']/PRICE"].text).to eq "26.95"
+      expect(art.elements["ARTPRI[PTYP='ZURROSEPUB']/PRICE"].text).to eq "0.00"
     end
 
     it "should generate the flag ORPH for orphan" do
