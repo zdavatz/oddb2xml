@@ -24,6 +24,44 @@ RSpec.describe Oddb2xml::WeledaSL do
     CSV
   }
 
+  # ";"-separated, leading BOM, header columns carry trailing spaces — exactly
+  # the live wala_arzneimittel.csv layout.
+  let(:wala_csv) {
+    "﻿" + <<~CSV
+      EAN-Code;Pharmacode;Bezeichnung ;Galenische Form | PGR;KAT ;CSL-Code*;CSL 70.01.
+      7680687430012;1098334;Aconit comp. Schmerzöl;Öl 50 ml;D;;
+      7640187361278;4228473;Aconitum comp.;Globuli velati 20 g;D;2070358;18.35
+      7640187360974;4227315;Aconitum comp.;Solutio ad inj. 10 x 1 ml;B;2070588;39
+      7640187360011;4926556;Aconitum/Camphora comp.;Oleum 100 ml;D;2070513;24.8
+    CSV
+  }
+
+  describe ".build_wala_map" do
+    subject(:map) { described_class.build_wala_map(wala_csv) }
+
+    it "includes only rows carrying a CSL-Code, keyed by 13-digit GTIN" do
+      expect(map.keys).to contain_exactly(
+        "7640187361278", "7640187360974", "7640187360011"
+      )
+      expect(map).not_to have_key("7680687430012") # no CSL-Code => not SL
+    end
+
+    it "takes the inline package price verbatim (multiplier already applied)" do
+      expect(map["7640187361278"][:price]).to eq "18.35"
+      expect(map["7640187360974"][:price]).to eq "39.00" # 10 x 1 ml pack
+      expect(map["7640187360011"][:price]).to eq "24.80"
+    end
+
+    it "carries the Abgabekategorie and the group code" do
+      expect(map["7640187360974"]).to include(sl: true, csl: "2070588", abgabe: "B")
+    end
+
+    it "returns {} for blank input" do
+      expect(described_class.build_wala_map("")).to eq({})
+      expect(described_class.build_wala_map(nil)).to eq({})
+    end
+  end
+
   describe ".parse_prices" do
     it "maps group code to price" do
       prices = described_class.parse_prices(prices_csv)
@@ -85,10 +123,12 @@ RSpec.describe Oddb2xml::WeledaSL do
   describe ".load with bundled fallback" do
     it "loads the bundled data files when the download yields nothing" do
       flexmock(Oddb2xml::WeledaDownloader).new_instances.should_receive(:download).and_return(nil)
+      flexmock(Oddb2xml::WalaDownloader).new_instances.should_receive(:download).and_return(nil)
       flexmock(Oddb2xml::BagSlGroupPricesDownloader).new_instances.should_receive(:download).and_return(nil)
       map = described_class.load({})
       expect(map.size).to be > 400
-      expect(map["7611916162404"]).to include(sl: true, price: "26.95")
+      expect(map["7611916162404"]).to include(sl: true, price: "26.95") # Weleda
+      expect(map["7640187360974"]).to include(sl: true, price: "39.00") # WALA
     end
   end
 end

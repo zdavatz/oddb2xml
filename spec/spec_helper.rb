@@ -258,6 +258,7 @@ def mock_downloads
    "https://raw.githubusercontent.com/zdavatz/cpp2sqlite/master/input/atc_codes_multi_lingual.txt" => "atc.csv",
    "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt" => "oddb2xml_files_lppv.txt",
    "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/weleda_arzneimittel.csv" => "weleda_arzneimittel.csv",
+   "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/wala_arzneimittel.csv" => "wala_arzneimittel.csv",
    "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/bag_sl_group_prices.csv" => "bag_sl_group_prices.csv",
    "http://www.xn--spezialittenliste-yqb.ch/File.axd?file=XMLPublications.zip" => "XMLPublications.zip",
    "https://www.spezialitaetenliste.ch/File.axd?file=XMLPublications.zip" => "XMLPublications.zip",

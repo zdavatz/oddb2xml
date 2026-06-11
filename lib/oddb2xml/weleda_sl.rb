@@ -23,9 +23,19 @@ module Oddb2xml
   #                               incl. MWST). Extracted from the BAG SL
   #                               definition PDF "Homoeopathica, Anthroposophica,
   #                               Allergene.pdf" — the authoritative price source.
+  #   * wala_arzneimittel.csv     The same gap for WALA products (GTIN prefix
+  #                               7640187…). Different layout (";"-separated,
+  #                               BOM): a row is SL when it carries a CSL-Code
+  #                               (Kapitel-70.01 group code) and the public
+  #                               package price is given *inline* in the
+  #                               "CSL 70.01." column — already multiplied for
+  #                               the pack size (the multiplier lives only in the
+  #                               galenic-form text, e.g. "Solutio ad inj.
+  #                               10 x 1 ml"), so it is used verbatim rather than
+  #                               re-joined against bag_sl_group_prices.csv.
   #
-  # Join: GTIN -> csl -> price. The csl may carry a package multiplier in the
-  # form "N x <code>" (e.g. "8x2070631"), meaning the package holds N units
+  # Weleda join: GTIN -> csl -> price. The csl may carry a package multiplier in
+  # the form "N x <code>" (e.g. "8x2070631"), meaning the package holds N units
   # priced at <code> each, so the public price is N * price[<code>].
   #
   # The FHIR feed always wins: this enrichment is only applied to GTINs that
@@ -42,7 +52,12 @@ module Oddb2xml
     def load(options = {})
       prices = parse_prices(source(BagSlGroupPricesDownloader, options, "bag_sl_group_prices.csv"))
       map = build_map(source(WeledaDownloader, options, "weleda_arzneimittel.csv"), prices)
-      Oddb2xml.log "WeledaSL: #{map.size} SL products with prices loaded"
+      weleda_size = map.size
+      build_wala_map(source(WalaDownloader, options, "wala_arzneimittel.csv")).each do |gtin, entry|
+        map[gtin] ||= entry # Weleda wins on the (unlikely) GTIN collision
+      end
+      Oddb2xml.log "WeledaSL: #{map.size} SL products with prices loaded " \
+        "(Weleda #{weleda_size}, WALA #{map.size - weleda_size})"
       map
     rescue => error
       Oddb2xml.log "WeledaSL: disabled (#{error.class}: #{error.message})"
@@ -94,6 +109,34 @@ module Oddb2xml
           price: price,
           csl: row["csl"].to_s.strip,
           abgabe: row["abgabekategorie"].to_s.strip
+        }
+      end
+      map
+    end
+
+    # WALA layout: ";"-separated, BOM, header columns carry trailing spaces.
+    # A row is an SL product when it has a CSL-Code (Kapitel-70.01 group code);
+    # the public package price is taken verbatim from the inline "CSL 70.01."
+    # column (already multiplied for the pack size). Keyed by 13-digit GTIN.
+    def build_wala_map(csv_string)
+      map = {}
+      return map if csv_string.nil? || csv_string.strip.empty?
+      content = csv_string.sub("﻿", "")
+      table = CSV.parse(content, headers: true, col_sep: ";")
+      col = {}
+      table.headers.compact.each { |h| col[h.to_s.strip] = h }
+      table.each do |row|
+        csl = row[col["CSL-Code*"]].to_s.strip
+        next if csl.empty? # no group code => not an SL product
+        gtin = row[col["EAN-Code"]].to_s.strip.rjust(13, "0")
+        next unless gtin =~ /\A\d{13}\z/
+        raw_price = row[col["CSL 70.01."]].to_s.strip
+        next if raw_price.empty?
+        map[gtin] = {
+          sl: true,
+          price: sprintf("%.2f", raw_price.tr(",", ".").to_f),
+          csl: csl,
+          abgabe: row[col["KAT"]].to_s.strip
         }
       end
       map

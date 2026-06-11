@@ -177,6 +177,16 @@ module Oddb2xml
     end
   end
 
+  # WALA "Kapitel 70" article list (GTIN, Abgabekategorie, Pharma-Gruppen-Code
+  # and the inline BAG SL 70.01 package price). See Oddb2xml::WeledaSL.
+  class WalaDownloader < Downloader
+    include DownloadMethod
+    def download
+      @url ||= "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/wala_arzneimittel.csv"
+      download_as("wala_arzneimittel.csv", "w+")
+    end
+  end
+
   # BAG SL Pharma-Gruppen-Code -> public price table, extracted from the BAG SL
   # definition PDF "Homoeopathica, Anthroposophica, Allergene". See WeledaSL.
   class BagSlGroupPricesDownloader < Downloader
