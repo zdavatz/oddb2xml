@@ -25,6 +25,25 @@ module Oddb2xml
 
     TIMEOUT = 6 # seconds, per host (open + read); checks run concurrently
 
+    # Representative resource path per host -- the actual file the downloader
+    # fetches, NOT "/". Probing "/" gives misleading host redirects (e.g.
+    # raw.githubusercontent.com/ -> github.com, while the real raw file path
+    # returns 200), whereas the genuine download paths reveal the real
+    # forwarder chain the proxy must allow (id.gs1.ch -> id.gs1.org ->
+    # apitools.gs1.ch; www.spezialitaetenliste.ch/File.axd -> sl.bag.admin.ch).
+    PROBE_PATHS = {
+      "files.refdata.ch" => "/simis-public-prod/Articles/1.0/Refdata.Articles.zip",
+      "raw.githubusercontent.com" => "/zdavatz/oddb2xml_files/master/LPPV.txt",
+      "id.gs1.ch" => "/01/07612345000961",
+      "id.gs1.org" => "/01/07612345000961",
+      "www.spezialitaetenliste.ch" => "/File.axd?file=XMLPublications.zip",
+      "www.medregbm.admin.ch" => "/Publikation/"
+    }.freeze
+
+    def probe_path(host)
+      PROBE_PATHS[host] || "/"
+    end
+
     def proxy_uri
       env = ENV["https_proxy"] || ENV["HTTPS_PROXY"] || ENV["http_proxy"] || ENV["HTTP_PROXY"]
       return nil if env.nil? || env.empty?
@@ -34,10 +53,25 @@ module Oddb2xml
       nil
     end
 
+    # Redirect targets ("forwarders") that an allow-list proxy must permit in
+    # addition to the host we actually request. id.gs1.ch 301-redirects every
+    # path to the global resolver id.gs1.org, so allowing only id.gs1.ch is not
+    # enough -- the firstbase download follows the redirect and dies on the
+    # blocked target. The real firstbase chain is id.gs1.ch -> id.gs1.org ->
+    # apitools.gs1.ch, so the redirect is followed dynamically too (see
+    # check_host); this list just guarantees the known target is probed even
+    # when the redirect probe is short-circuited.
+    FORWARDERS = {
+      "id.gs1.org" => "GS1 global resolver (id.gs1.ch redirect target, --firstbase / -b)"
+    }.freeze
+
     def hosts_for(options = {})
       hosts = BASE_HOSTS.dup
       hosts["epl.bag.admin.ch"] = "BAG FHIR data (--fhir)" if options[:fhir]
-      hosts["id.gs1.ch"] = "GS1 NONPHARMA (--firstbase / -b)" if options[:firstbase]
+      if options[:firstbase]
+        hosts["id.gs1.ch"] = "GS1 NONPHARMA (--firstbase / -b)"
+        hosts["id.gs1.org"] = FORWARDERS["id.gs1.org"]
+      end
       hosts["www.spezialitaetenliste.ch"] = "BAG Spezialitätenliste" unless options[:fhir]
       hosts["www.medregbm.admin.ch"] = "Medizinalberuferegister (-x address)" if options[:address]
       hosts
@@ -51,7 +85,7 @@ module Oddb2xml
         "id.gs1.ch" => "GS1 NONPHARMA (--firstbase / -b)",
         "www.spezialitaetenliste.ch" => "BAG Spezialitätenliste",
         "www.medregbm.admin.ch" => "Medizinalberuferegister (-x address)"
-      )
+      ).merge(FORWARDERS)
     end
 
     # Probe every host and print a full OK/BLOCKED/UNREACHABLE table.
@@ -59,32 +93,40 @@ module Oddb2xml
     def report(_options = {})
       proxy = proxy_uri
       results = all_hosts.map do |host, desc|
-        Thread.new { [host, desc, check_host(host, proxy)] }
+        Thread.new { [host, desc, check_host(host, proxy, probe_path(host))] }
       end.map(&:value).sort_by { |(host, _desc, _status)| host }
 
       header = "oddb2xml connectivity check"
       header += proxy ? " (via proxy #{proxy.host}:#{proxy.port})" : " (no proxy configured)"
       puts header
       results.each do |(host, desc, status)|
-        tag = case status
+        tag = case status[:result]
         when :ok then "OK     "
         when :blocked then "BLOCKED" # proxy returned 407
         else "UNREACH"
         end
-        puts format("  [%s] %-28s %s", tag, host, desc)
+        label = status[:via] ? "#{host} -> #{status[:via]}" : host
+        puts format("  [%s] %-36s %s", tag, label, desc)
       end
-      unreachable = results.reject { |(_host, _desc, status)| status == :ok }
+      unreachable = results.reject { |(_host, _desc, status)| status[:result] == :ok }
       if unreachable.empty?
         puts "All #{results.size} hosts reachable."
         true
       else
         puts "#{unreachable.size} of #{results.size} host(s) NOT reachable -- downloads using them will fail."
+        results.select { |(_host, _desc, status)| status[:via] }.each do |(host, _desc, status)|
+          puts "  note: #{host} redirects to #{status[:via]} -- that host must be on the proxy allow-list too."
+        end
         false
       end
     end
 
-    # Returns :ok, :blocked (proxy 407) or :unreachable for a single host.
-    def check_host(host, proxy)
+    # Probe a host (following HTTP redirects to other hosts) and return a Hash:
+    #   { result: :ok | :blocked | :unreachable, via: "final.host" | nil }
+    # `:via` is set only when the host redirected to a *different* host, so the
+    # caller can surface that the redirect target (e.g. id.gs1.ch -> id.gs1.org)
+    # must be reachable too -- a 301 to a blocked host used to be reported as OK.
+    def check_host(host, proxy, path = "/", hops = 4, origin = nil)
       http =
         if proxy
           Net::HTTP.new(host, 443, proxy.host, proxy.port, proxy.user, proxy.password)
@@ -96,14 +138,27 @@ module Oddb2xml
       http.open_timeout = TIMEOUT
       http.read_timeout = TIMEOUT
       http.start do |h|
-        res = h.head("/")
-        return :blocked if res.code.to_s == "407"
-        return :ok # any HTTP answer (200/301/403/404/...) means the host is reachable
+        res = h.head(path)
+        return {result: :blocked, via: via_for(origin, host)} if res.code.to_s == "407"
+        if res.code.to_s.start_with?("3") && res["location"] && hops > 0
+          loc = URI.parse(res["location"])
+          if loc.host && loc.host != host
+            next_path = (loc.respond_to?(:request_uri) && loc.request_uri) ? loc.request_uri : "/"
+            return check_host(loc.host, proxy, next_path, hops - 1, origin || host)
+          end
+        end
+        # any other HTTP answer (200/403/404/...) means this host is reachable
+        return {result: :ok, via: via_for(origin, host)}
       end
     rescue => error
       msg = error.message.to_s.downcase
-      return :blocked if msg.include?("407") || msg.include?("authenticationrequired") || msg.include?("proxy")
-      :unreachable
+      blocked = msg.include?("407") || msg.include?("authenticationrequired") || msg.include?("proxy")
+      {result: blocked ? :blocked : :unreachable, via: via_for(origin, host)}
+    end
+
+    # The final host reached, but only when it differs from where we started.
+    def via_for(origin, host)
+      (origin && origin != host) ? host : nil
     end
 
     # Probe all relevant hosts concurrently and warn about any that fail.
@@ -114,10 +169,10 @@ module Oddb2xml
       proxy = proxy_uri
       hosts = hosts_for(options)
       results = hosts.map do |host, desc|
-        Thread.new { [host, desc, check_host(host, proxy)] }
+        Thread.new { [host, desc, check_host(host, proxy, probe_path(host))] }
       end.map(&:value)
 
-      problems = results.reject { |(_host, _desc, status)| status == :ok }
+      problems = results.reject { |(_host, _desc, status)| status[:result] == :ok }
       return if problems.empty?
 
       warn_about(problems, proxy)
@@ -130,8 +185,9 @@ module Oddb2xml
       warn " The following hosts could not be reached -- the corresponding"
       warn " downloads will FAIL or produce incomplete data:"
       problems.each do |(host, desc, status)|
-        tag = (status == :blocked) ? "BLOCKED by proxy (407)" : "UNREACHABLE          "
-        warn format("   [%s] %-26s %s", tag, host, desc)
+        tag = (status[:result] == :blocked) ? "BLOCKED by proxy (407)" : "UNREACHABLE          "
+        label = status[:via] ? "#{host} -> #{status[:via]}" : host
+        warn format("   [%s] %-34s %s", tag, label, desc)
       end
       if proxy
         warn ""
