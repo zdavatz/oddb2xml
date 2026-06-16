@@ -18,7 +18,13 @@ module Oddb2xml
       data = nil
       FileUtils.makedirs(File.dirname(file), verbose: true)
       if Oddb2xml.skip_download(file)
-        io = File.open(file, option)
+        # The file has just been restored from the download cache. Open it
+        # read-only: a write mode like "w+" would truncate the cached file to
+        # zero bytes before the read, silently emptying it (e.g. it blanked
+        # epha_interactions.csv on every --skip-download run). Preserve any
+        # encoding suffix (e.g. "w+:iso-8859-1:utf-8" -> "r:iso-8859-1:utf-8").
+        read_option = option.sub(/\A[wa]\+?/, "r")
+        io = File.open(file, read_option)
         data = io.read
       else
         begin
