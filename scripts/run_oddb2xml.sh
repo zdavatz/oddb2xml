@@ -15,25 +15,29 @@
 #   <OUT_DIR>/50/        oddb_*.xml built with +50 %
 #   <OUT_DIR>/55/        oddb_*.xml built with +55 %
 #   <OUT_DIR>/default/   oddb_*.xml built with no increment
-#   <OUT_DIR>/build/     working dir (shared downloads/ cache + transient zip)
 # Each destination dir also keeps the source archive as oddb2xml.zip.
+# The working dir ($BUILD_DIR, default <OUT_DIR>-build) holds the shared
+# downloads/ cache and the transient zip; it lives OUTSIDE $OUT_DIR so the
+# transfer's `scp -r $OUT_DIR/*` never uploads the multi-hundred-MB cache.
 #
 # Configurable via environment:
 #   OUT_DIR           destination root          (default /home/zdavatz/oddb2xml)
+#   BUILD_DIR         working dir               (default <OUT_DIR>-build)
 #   INCREMENTS        space-separated percents   (default "45 50 55")
 #   ODDB2XML_BIN      oddb2xml executable        (default oddb2xml)
 #   SKIP_GEM_INSTALL  set to 1 to skip `gem install oddb2xml`
-#   RUN_TRANSFER      set to 1 to run the Aspectra transfer at the end
-#   TRANSFER_CMD      transfer command
-#                     (default: sudo /opt/aspectra-bin/ywesee_transfer/transfer.sh)
+#   RUN_TRANSFER      set to 1 to run the transfer (scripts/transfer.sh) at the end
+#   TRANSFER_CMD      transfer command (default: sudo, preserving
+#                     ODDB2XML_TRANSFER_DIR, scripts/transfer.sh next to this file)
 #
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUT_DIR="${OUT_DIR:-/home/zdavatz/oddb2xml}"
+BUILD_DIR="${BUILD_DIR:-${OUT_DIR%/}-build}"
 INCREMENTS="${INCREMENTS:-45 50 55}"
 ODDB2XML_BIN="${ODDB2XML_BIN:-oddb2xml}"
-BUILD_DIR="$OUT_DIR/build"
-TRANSFER_CMD="${TRANSFER_CMD:-sudo /opt/aspectra-bin/ywesee_transfer/transfer.sh}"
+TRANSFER_CMD="${TRANSFER_CMD:-$SCRIPT_DIR/transfer.sh}"
 
 log() { printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
 
@@ -88,6 +92,7 @@ build_one "" "default"           # final run with no increment
 # 3. Optional hand-off to the Aspectra transfer.
 if [[ "${RUN_TRANSFER:-0}" == "1" ]]; then
   log "Running transfer: $TRANSFER_CMD"
+  export ODDB2XML_TRANSFER_DIR="$OUT_DIR"   # keep transfer.sh in sync with OUT_DIR
   $TRANSFER_CMD
 fi
 
