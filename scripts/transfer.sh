@@ -10,13 +10,14 @@
 #   AIPS2SQLITE_DIR        aips2sqlite output dir
 #                          (default /home/zdavatz/software/aips2sqlite/jars/output)
 #   SSH_KEY                scp identity file        (default ~/.ssh/id_rsa)
-#   SCP_DEST               scp destination base
-#                          (default webadm@172.16.10.31:/var/www/download.hin.ch/htdocs/download)
+#   SCP_DEST               scp destination base, e.g. user@host:/path/download
+#                          (REQUIRED — no default yet; set the new download server)
 
 ODDB2XML_TRANSFER_DIR="${ODDB2XML_TRANSFER_DIR:-/home/zdavatz/oddb2xml}"
 AIPS2SQLITE_DIR="${AIPS2SQLITE_DIR:-/home/zdavatz/software/aips2sqlite/jars/output}"
 SSH_KEY="${SSH_KEY:-$HOME/.ssh/id_rsa}"
-SCP_DEST="${SCP_DEST:-webadm@172.16.10.31:/var/www/download.hin.ch/htdocs/download}"
+# TODO: set the new download-server destination.
+SCP_DEST="${SCP_DEST:?set SCP_DEST to the scp target, e.g. user@host:/var/www/.../download}"
 
 ###
 ### ODDB2XML

@@ -89,7 +89,7 @@ for inc in $INCREMENTS; do
 done
 build_one "" "default"           # final run with no increment
 
-# 3. Optional hand-off to the Aspectra transfer.
+# 3. Optional hand-off to the transfer step (scripts/transfer.sh).
 if [[ "${RUN_TRANSFER:-0}" == "1" ]]; then
   log "Running transfer: $TRANSFER_CMD"
   export ODDB2XML_TRANSFER_DIR="$OUT_DIR"   # keep transfer.sh in sync with OUT_DIR
