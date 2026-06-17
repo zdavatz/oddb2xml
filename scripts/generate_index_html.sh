@@ -34,6 +34,33 @@ nonpharma="—"
 stand=$(date '+%d.%m.%Y %H:%M')
 
 mkdir -p "$DOCROOT"
+
+# Logo (self-contained SVG): brand-blue rounded badge, white pharma/Swiss cross
+# flanked by XML angle brackets "< >". Written atomically next to index.html and
+# used both as the top-right header image and as the favicon.
+logo_tmp="${DOCROOT%/}/.logo.svg.$$"
+cat > "$logo_tmp" <<'SVG'
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="oddb2xml">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1a6dff"/>
+      <stop offset="1" stop-color="#0a3d8f"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#g)"/>
+  <g stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".6">
+    <polyline points="15,24 9,32 15,40"/>
+    <polyline points="49,24 55,32 49,40"/>
+  </g>
+  <g fill="#ffffff">
+    <rect x="26.5" y="18" width="11" height="28" rx="2.5"/>
+    <rect x="18" y="26.5" width="28" height="11" rx="2.5"/>
+  </g>
+</svg>
+SVG
+chmod 644 "$logo_tmp"
+mv -f "$logo_tmp" "${DOCROOT%/}/logo.svg"
+
 # Write atomically via temp + mv so the page can be refreshed regardless of who
 # owns the existing index.html (setup runs as root, run_oddb2xml.sh as the user);
 # mv only needs write on the directory, which both have.
@@ -48,6 +75,7 @@ cat > "$tmp" <<HTML
   <!-- open every link in a new tab -->
   <base target="_blank">
   <meta name="referrer" content="strict-origin-when-cross-origin">
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
   <style>
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
            max-width: 820px; margin: 2.5rem auto; padding: 0 1.2rem; color: #1a1a1a; line-height: 1.5; }
@@ -67,11 +95,19 @@ cat > "$tmp" <<HTML
     footer { margin-top: 3rem; color: #888; font-size: .85rem; }
     ul.firms { columns: 2; column-gap: 2rem; }
     ul.firms li { margin: .25rem 0; break-inside: avoid; }
+    .topbar { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+    .topbar .title h1 { margin: 0 0 .2rem; }
+    .topbar .logo { width: 64px; height: 64px; flex: 0 0 auto; }
   </style>
 </head>
 <body>
-  <h1>oddb2xml &amp; aips2sqlite Downloads</h1>
-  <p class="sub">Schweizer Arzneimitteldaten — täglich aktualisiert (01:00 Uhr). Stand: ${stand}</p>
+  <header class="topbar">
+    <div class="title">
+      <h1>oddb2xml &amp; aips2sqlite Downloads</h1>
+      <p class="sub">Schweizer Arzneimitteldaten — täglich aktualisiert (01:00 Uhr). Stand: ${stand}</p>
+    </div>
+    <img class="logo" src="logo.svg" alt="oddb2xml Logo" width="64" height="64">
+  </header>
 
   <div class="stats">
     <div class="stat"><div class="n">$(group "$pharma")</div><div class="l">Medikamente (PHARMA)</div></div>
