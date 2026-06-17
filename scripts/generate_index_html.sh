@@ -94,7 +94,12 @@ cat > "$tmp" <<HTML
 
   <h2>aips2sqlite — Fachinformationen &amp; AmiKo-Datenbanken</h2>
   <ul>
-    <li><a href="/aips2sqlite/">/aips2sqlite/</a> <span class="desc">— FI-XML (<code>fis/</code>), AmiKo-Datenbanken (<code>amiko_db_full_idx_{de,fr}.db</code>), <code>oddb2xml_swissmedic_sequences.csv</code></span></li>
+    <li><a href="/aips2sqlite/fis/">fis/</a> <span class="desc">— Fachinformationen als XML/HTML (DE/FR/IT)</span></li>
+    <li><a href="/aips2sqlite/amiko_db_full_idx_de.db">amiko_db_full_idx_de.db</a> <span class="desc">— AmiKo-Datenbank Deutsch</span></li>
+    <li><a href="/aips2sqlite/amiko_db_full_idx_fr.db">amiko_db_full_idx_fr.db</a> <span class="desc">— AmiKo-Datenbank Französisch</span></li>
+    <li><a href="/aips2sqlite/oddb2xml_swissmedic_sequences.csv">oddb2xml_swissmedic_sequences.csv</a> <span class="desc">— Swissmedic-Sequenzen</span></li>
+    <li><a href="/aips2sqlite/atc_codes_used_set.txt">atc_codes_used_set.txt</a> <span class="desc">— verwendete ATC-Codes</span></li>
+    <li><a href="/aips2sqlite/">/aips2sqlite/</a> <span class="desc">— gesamtes Verzeichnis durchsuchen</span></li>
   </ul>
 
   <h2>MediUpdate XML bei HIN</h2>
