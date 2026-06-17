@@ -48,7 +48,7 @@ cat > "$logo_tmp" <<'SVG'
     </linearGradient>
   </defs>
   <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <g stroke="#ffffff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".6">
+  <g stroke="#e2231a" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <polyline points="15,24 9,32 15,40"/>
     <polyline points="49,24 55,32 49,40"/>
   </g>
