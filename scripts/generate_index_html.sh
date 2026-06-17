@@ -106,7 +106,7 @@ cat > "$tmp" <<HTML
       <h1>oddb2xml &amp; aips2sqlite Downloads</h1>
       <p class="sub">Schweizer Arzneimitteldaten — täglich aktualisiert (01:00 Uhr). Stand: ${stand}</p>
     </div>
-    <img class="logo" src="logo.svg" alt="oddb2xml Logo" width="64" height="64">
+    <a href="mailto:zdavatz@ywesee.com" title="Fragen? zdavatz at ywesee dot com"><img class="logo" src="logo.svg" alt="oddb2xml Logo" width="64" height="64"></a>
   </header>
 
   <div class="stats">
