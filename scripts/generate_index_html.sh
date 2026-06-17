@@ -22,6 +22,9 @@ ARTICLE_XML="${DOCROOT%/}/default/oddb_article.xml"
 # Swiss-style thousands separator (192807 -> 192'807); "—" passes through.
 group() { [[ "$1" =~ ^[0-9]+$ ]] && printf "%s" "$1" | sed -re ":a;s/([0-9])([0-9]{3})($|[^0-9])/\1'\2\3/;ta" || printf "%s" "$1"; }
 
+total="—"
+[[ -f "$ARTICLE_XML" ]] && total=$(grep -c '<ART ' "$ARTICLE_XML" || true)
+
 pharma="—"
 [[ -f "$ARTICLE_XML" ]] && pharma=$(grep -c '<SMNO>' "$ARTICLE_XML" || true)
 
@@ -71,6 +74,7 @@ cat > "$tmp" <<HTML
   <p class="sub">Schweizer Arzneimitteldaten — täglich aktualisiert (01:00 Uhr). Stand: ${stand}</p>
 
   <div class="stats">
+    <div class="stat"><div class="n">$(group "$total")</div><div class="l">Artikel total (<code>oddb_article.xml</code>)</div></div>
     <div class="stat"><div class="n">$(group "$pharma")</div><div class="l">Medikamente (PHARMA)</div></div>
     <div class="stat"><div class="n"><a href="https://id.gs1.ch/01/07612345000961">$(group "$nonpharma")</a></div><div class="l">Firstbase-Produkte (NONPHARMA)</div></div>
   </div>
