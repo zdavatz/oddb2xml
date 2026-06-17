@@ -42,6 +42,9 @@ cat > "$tmp" <<HTML
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>mediupdatexml.oddb.org — Downloads</title>
+  <!-- open every link in a new tab -->
+  <base target="_blank">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <style>
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
            max-width: 820px; margin: 2.5rem auto; padding: 0 1.2rem; color: #1a1a1a; line-height: 1.5; }
