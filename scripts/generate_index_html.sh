@@ -74,9 +74,9 @@ cat > "$tmp" <<HTML
   <p class="sub">Schweizer Arzneimitteldaten — täglich aktualisiert (01:00 Uhr). Stand: ${stand}</p>
 
   <div class="stats">
-    <div class="stat"><div class="n">$(group "$total")</div><div class="l">Artikel total (<code>oddb_article.xml</code>)</div></div>
     <div class="stat"><div class="n">$(group "$pharma")</div><div class="l">Medikamente (PHARMA)</div></div>
     <div class="stat"><div class="n"><a href="https://id.gs1.ch/01/07612345000961">$(group "$nonpharma")</a></div><div class="l">Firstbase-Produkte (NONPHARMA)</div></div>
+    <div class="stat"><div class="n">$(group "$total")</div><div class="l">Artikel total (<code>oddb_article.xml</code>)</div></div>
   </div>
 
   <h2>oddb2xml — Artikel-/Produkt-Feeds (<code>-b</code> firstbase)</h2>
