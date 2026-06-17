@@ -82,9 +82,15 @@ cat > "$tmp" <<HTML
     <li><a href="50/">50/</a> <span class="desc">— Wiederverkaufspreis +50&nbsp;%</span></li>
     <li><a href="55/">55/</a> <span class="desc">— Wiederverkaufspreis +55&nbsp;%</span></li>
   </ul>
-  <p class="desc">Jedes Verzeichnis enthält <code>oddb_article.xml</code>, <code>oddb_product.xml</code>,
-  <code>oddb_calc.xml</code>, <code>oddb_interaction.xml</code>, <code>oddb_limitation.xml</code>,
-  <code>oddb_substance.xml</code>, <code>oddb_code.xml</code> sowie <code>oddb2xml.zip</code> (alle Dateien gepackt).</p>
+  <p class="desc">Jedes Verzeichnis enthält die gleichen Dateien (Direktlinks zum <code>default/</code>-Feed):
+  <a href="default/oddb_article.xml">oddb_article.xml</a>,
+  <a href="default/oddb_product.xml">oddb_product.xml</a>,
+  <a href="default/oddb_calc.xml">oddb_calc.xml</a>,
+  <a href="default/oddb_interaction.xml">oddb_interaction.xml</a>,
+  <a href="default/oddb_limitation.xml">oddb_limitation.xml</a>,
+  <a href="default/oddb_substance.xml">oddb_substance.xml</a>,
+  <a href="default/oddb_code.xml">oddb_code.xml</a> sowie
+  <a href="default/oddb2xml.zip">oddb2xml.zip</a> (alle Dateien gepackt).</p>
 
   <h2>aips2sqlite — Fachinformationen &amp; AmiKo-Datenbanken</h2>
   <ul>
