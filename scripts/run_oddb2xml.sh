@@ -89,6 +89,14 @@ for inc in $INCREMENTS; do
 done
 build_one "" "default"           # final run with no increment
 
+# 2b. Refresh the download landing page with the live PHARMA/NONPHARMA counts
+#     (PHARMA from default/oddb_article.xml, NONPHARMA from the GS1 firstbase CSV).
+if [[ -x "$SCRIPT_DIR/generate_index_html.sh" ]]; then
+  log "Refreshing landing page index.html"
+  "$SCRIPT_DIR/generate_index_html.sh" "$OUT_DIR" "$BUILD_DIR/downloads/firstbase.csv" || \
+    log "WARNING: could not regenerate index.html"
+fi
+
 # 3. Optional hand-off to the transfer step (scripts/transfer.sh).
 if [[ "${RUN_TRANSFER:-0}" == "1" ]]; then
   log "Running transfer: $TRANSFER_CMD"
