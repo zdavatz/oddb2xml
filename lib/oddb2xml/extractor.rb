@@ -622,7 +622,10 @@ module Oddb2xml
     def to_hash
       data = {}
       return data unless @file && File.exist?(@file)
-      CSV.foreach(@file, headers: true, encoding: "UTF-8") do |row|
+      # The GS1 firstbase CSV is served with a UTF-8 BOM. Without "bom|" the BOM
+      # glues onto the first header ("﻿Gtin"), so row["Gtin"] is nil and every
+      # row is skipped — dropping all -b/firstbase NONPHARMA articles.
+      CSV.foreach(@file, headers: true, encoding: "bom|utf-8") do |row|
         gtin = row["Gtin"].to_s.gsub(/^0+/, "")
         next if gtin.empty?
         data[gtin] = {
