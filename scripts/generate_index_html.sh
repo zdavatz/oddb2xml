@@ -95,27 +95,27 @@ cat > "$tmp" <<HTML
 
   <h2>Softwarehäuser, die oddb2xml einsetzen</h2>
   <ul class="firms">
-    <li>Advanced Concepts AG</li>
-    <li>Bluecare AG</li>
-    <li>Corona Informatik AG</li>
-    <li>derma2go AG</li>
-    <li>Diagnosia Internetservices GmbH</li>
-    <li>Elexis</li>
-    <li>emedSwiss SA</li>
-    <li>Gartenmann Software AG</li>
-    <li>Hexabit GmbH</li>
-    <li>Institut für Hausarztmedizin</li>
-    <li>ITW INFORMATIK AG</li>
-    <li>Lama Media</li>
-    <li>MEDAB</li>
-    <li>Pharmed Solutions GmbH</li>
-    <li>Praxinova AG</li>
-    <li>seantis gmbh</li>
-    <li>Siplus SA – Eyesoft</li>
-    <li>SMR – Swiss Medical Record GmbH</li>
-    <li>Triboni AG</li>
-    <li>Vitabyte AG</li>
-    <li>zollsoft GmbH</li>
+    <li><a href="https://www.advancedconcepts.ch/">Advanced Concepts AG</a></li>
+    <li><a href="https://www.bluecare.ch/">Bluecare AG</a></li>
+    <li><a href="https://corona.ch/">Corona Informatik AG</a></li>
+    <li><a href="https://www.derma2go.com/de/">derma2go AG</a></li>
+    <li><a href="https://www.diagnosia.com/">Diagnosia Internetservices GmbH</a></li>
+    <li><a href="https://elexis.ch/glp/index.html">Elexis</a></li>
+    <li><a href="https://www.emedswiss.ch/">emedSwiss SA</a></li>
+    <li><a href="https://gartenmann.ch/">Gartenmann Software AG</a></li>
+    <li><a href="https://hexabit.ch/">Hexabit GmbH</a></li>
+    <li><a href="https://www.hausarztmedizin.uzh.ch/de.html">Institut für Hausarztmedizin</a></li>
+    <li><a href="https://www.itw-informatik.ch/de/">ITW INFORMATIK AG</a></li>
+    <li><a href="https://www.lama-media.com/">Lama Media</a></li>
+    <li><a href="https://medab.org/country/ch">MEDAB</a></li>
+    <li><a href="https://www.pharmedsolutions.ch/">Pharmed Solutions GmbH</a></li>
+    <li><a href="https://praxinova.ch/">Praxinova AG</a></li>
+    <li><a href="https://seantis.ch/">seantis gmbh</a></li>
+    <li><a href="https://www.geteyesoft.ch/">Siplus SA – Eyesoft</a></li>
+    <li><a href="https://swiss-mr.ch/">SMR – Swiss Medical Record GmbH</a></li>
+    <li><a href="https://triboni.com/site/">Triboni AG</a></li>
+    <li><a href="https://www.vitabyte.ch/">Vitabyte AG</a></li>
+    <li><a href="https://zollsoft.de/">zollsoft GmbH</a></li>
   </ul>
 
   <footer>
