@@ -116,7 +116,7 @@ cat > "${DOCROOT}/index.html" <<'HTML'
   </ul>
 
   <footer>
-    <a href="https://github.com/zdavatz/oddb2xml">github.com/zdavatz/oddb2xml</a>
+    Fragen: zdavatz at ywesee dot com &middot; Tel: 043 540 05 50
   </footer>
 </body>
 </html>
