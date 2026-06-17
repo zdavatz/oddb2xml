@@ -59,6 +59,8 @@ cat > "$tmp" <<HTML
     .stat .n { font-size: 1.5rem; font-weight: 600; color: #0a58ca; }
     .stat .l { color: #555; font-size: .85rem; }
     footer { margin-top: 3rem; color: #888; font-size: .85rem; }
+    ul.firms { columns: 2; column-gap: 2rem; }
+    ul.firms li { margin: .25rem 0; break-inside: avoid; }
   </style>
 </head>
 <body>
@@ -84,6 +86,36 @@ cat > "$tmp" <<HTML
   <h2>aips2sqlite — Fachinformationen &amp; AmiKo-Datenbanken</h2>
   <ul>
     <li><a href="/aips2sqlite/">/aips2sqlite/</a> <span class="desc">— FI-XML (<code>fis/</code>), AmiKo-Datenbanken (<code>amiko_db_full_idx_{de,fr}.db</code>), <code>oddb2xml_swissmedic_sequences.csv</code></span></li>
+  </ul>
+
+  <h2>MediUpdate XML bei HIN</h2>
+  <ul>
+    <li><a href="https://www.hin.ch/de/services/mediupdate-xml.cfm">www.hin.ch/de/services/mediupdate-xml.cfm</a></li>
+  </ul>
+
+  <h2>Softwarehäuser, die oddb2xml einsetzen</h2>
+  <ul class="firms">
+    <li>Advanced Concepts AG</li>
+    <li>Bluecare AG</li>
+    <li>Corona Informatik AG</li>
+    <li>derma2go AG</li>
+    <li>Diagnosia Internetservices GmbH</li>
+    <li>Elexis</li>
+    <li>emedSwiss SA</li>
+    <li>Gartenmann Software AG</li>
+    <li>Hexabit GmbH</li>
+    <li>Institut für Hausarztmedizin</li>
+    <li>ITW INFORMATIK AG</li>
+    <li>Lama Media</li>
+    <li>MEDAB</li>
+    <li>Pharmed Solutions GmbH</li>
+    <li>Praxinova AG</li>
+    <li>seantis gmbh</li>
+    <li>Siplus SA – Eyesoft</li>
+    <li>SMR – Swiss Medical Record GmbH</li>
+    <li>Triboni AG</li>
+    <li>Vitabyte AG</li>
+    <li>zollsoft GmbH</li>
   </ul>
 
   <footer>
