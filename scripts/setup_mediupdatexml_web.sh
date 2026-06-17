@@ -116,7 +116,7 @@ cat > "${DOCROOT}/index.html" <<'HTML'
   </ul>
 
   <footer>
-    Fragen: zdavatz at ywesee dot com &middot; Tel: 043 540 05 50
+    Fragen: <a href="mailto:zdavatz@ywesee.com">zdavatz at ywesee dot com</a> &middot; Tel: 043 540 05 50
   </footer>
 </body>
 </html>
