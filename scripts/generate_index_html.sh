@@ -15,9 +15,15 @@
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DOCROOT="${1:-/home/zdavatz/oddb2xml}"
 FIRSTBASE_CSV="${2:-${DOCROOT%/}-build/downloads/firstbase.csv}"
 ARTICLE_XML="${DOCROOT%/}/default/oddb_article.xml"
+
+# Apache combined access log(s) for the visitors/region graph (last STATS_DAYS).
+# Readable by the user only if it is in the "adm" group (sudo usermod -aG adm <user>).
+ACCESS_LOG_GLOB="${ACCESS_LOG_GLOB:-/var/log/apache2/mediupdatexml.oddb.org_access.log*}"
+STATS_DAYS="${STATS_DAYS:-14}"
 
 # Swiss-style thousands separator (192807 -> 192'807); "—" passes through.
 group() { [[ "$1" =~ ^[0-9]+$ ]] && printf "%s" "$1" | sed -re ":a;s/([0-9])([0-9]{3})($|[^0-9])/\1'\2\3/;ta" || printf "%s" "$1"; }
@@ -32,6 +38,16 @@ nonpharma="—"
 [[ -f "$FIRSTBASE_CSV" ]] && nonpharma=$(( $(wc -l < "$FIRSTBASE_CSV") - 1 ))
 
 stand=$(date '+%d.%m.%Y %H:%M')
+
+# Visitors/sessions/region graph as a ready-to-embed inline-SVG HTML fragment.
+# Self-contained (pure Python stdlib + cached DB-IP country CSV). Stays empty
+# when the access log is unreadable or has no data, so the page degrades to
+# simply omitting the section.
+stats_fragment=""
+if [[ -f "$SCRIPT_DIR/visitor_stats.py" ]]; then
+  stats_fragment=$(python3 "$SCRIPT_DIR/visitor_stats.py" \
+    "$ACCESS_LOG_GLOB" "$(dirname "$FIRSTBASE_CSV")" "$STATS_DAYS" 2>/dev/null || true)
+fi
 
 mkdir -p "$DOCROOT"
 
@@ -171,6 +187,8 @@ cat > "$tmp" <<HTML
     <li><a href="https://www.vitabyte.ch/">Vitabyte AG</a></li>
     <li><a href="https://zollsoft.de/">zollsoft GmbH</a></li>
   </ul>
+
+  ${stats_fragment}
 
   <footer>
     Fragen: <a href="mailto:zdavatz@ywesee.com">zdavatz at ywesee dot com</a> &middot; Tel: 043 540 05 50
