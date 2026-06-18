@@ -64,6 +64,18 @@ The system follows a **download → extract → build → compress** pipeline:
 ### Static data overrides
 YAML files in `data/` provide manual overrides and mappings: `article_overrides.yaml`, `product_overrides.yaml`, `gtin2ignore.yaml`, `gal_forms.yaml`, `gal_groups.yaml`.
 
+## Deployment (`scripts/`) — the mediupdatexml.oddb.org download site
+
+These scripts run the public download server at `https://mediupdatexml.oddb.org` (Apache on this host) and are **not** part of the gem itself.
+
+- **`run_oddb2xml.sh`** — nightly build driver (cron: `0 1 * * * zdavatz`). Downloads the upstream sources **once**, then builds the `-b`/firstbase feed at price increments `45/50/55` plus `default` (no increment) into `$OUT_DIR` (`/home/zdavatz/oddb2xml`, one subdir each). The shared `downloads/` cache and transient zip live in `$BUILD_DIR` (`<OUT_DIR>-build`), **outside** `$OUT_DIR` so the transfer never uploads the multi-hundred-MB cache. Final step ("2b") regenerates the landing page.
+- **`generate_index_html.sh DOCROOT [FIRSTBASE_CSV]`** — single source of truth for the landing page. Writes `index.html` + a self-contained `logo.svg` **atomically** (temp + `mv`, so either owner — root from setup, `zdavatz` from cron — can refresh it). Computes live counts: PHARMA = `<SMNO>` count in `default/oddb_article.xml`, NONPHARMA = firstbase CSV rows − 1, total ART = `<ART ` count. Also runs **`visitor_stats.py`** and embeds its graph. Re-run standalone any time (it only reads already-built files); a separate cron line refreshes it **hourly** (`5 * * * * zdavatz`) so counts + graph stay current between nightly builds.
+- **`visitor_stats.py LOG_GLOB CACHE_DIR [DAYS]`** — emits the visitors/sessions/region graph as an inline-SVG HTML **fragment** (last `DAYS`, default 14): Besucher = distinct IPs/day, Sitzungen = 30-min-inactivity sessions per `(IP, User-Agent)`, plus a top-6 country breakdown by IP. Bots are filtered by User-Agent. Region lookup is **fully self-contained** — pure Python stdlib + the free **DB-IP country-lite CSV** (CC-BY, no licence key) cached in the build `downloads/` dir and refreshed monthly; **no apt package, no gem, no system GeoIP DB**. Prints nothing (page degrades to omitting the section) when the Apache log is unreadable or empty. Reading `/var/log/apache2` requires the cron user to be in the **`adm`** group (`sudo usermod -aG adm zdavatz`).
+- **`transfer.sh`** — optional hand-off (scp) of `$OUT_DIR` to the HIN host; `SCP_DEST` is required-but-unset until the HIN host is known.
+- **`setup_mediupdatexml_web.sh`** — one-time root setup of the Apache vhost + initial page.
+
+Only the scripts are git-tracked; the generated `index.html`/`logo.svg` and the `downloads/` cache are not.
+
 ## Testing
 
 - Framework: RSpec with flexmock (mocking), webmock + VCR (HTTP recording/playback)
