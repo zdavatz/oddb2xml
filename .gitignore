@@ -33,3 +33,5 @@ tmp
 /missing_in_refdata.txt
 /oddb2xml_files_nonpharma.xls
 /oddb_calc.csv
+# Python bytecode cache (scripts/visitor_stats.py)
+__pycache__/
