@@ -432,6 +432,29 @@ You can also run
 for your currently open Terminal to download and set the Certificate.
 
 
+## Troubleshooting downloads
+
+oddb2xml runs a connectivity precheck and prints an `oddb2xml CONNECTIVITY
+WARNING` listing any source host it cannot reach; set
+`ODDB2XML_SKIP_PROXY_CHECK=1` to silence it.
+
+A source host may finish the TLS handshake and then **reset the connection
+before sending any HTTP response** (`Errno::ECONNRESET` / "Connection reset by
+peer"; `wget` reports "Read error (Error in the pull function.) in headers").
+When this happens for only one host while everything else is reachable, and a
+normal browser still opens the site, it is usually an **anti-bot gateway (WAF)
+that blocks by TLS fingerprint or source-IP reputation** rather than an outage
+— a User-Agent change does not help. Mitigations: retry later from the same
+host, run the download from a different egress IP, fetch the affected file with
+a browser-grade client (a TLS-impersonating downloader or a headless browser)
+into `downloads/` and continue with `--skip-download`, or ask the source to
+allow-list the host.
+
+The deployment driver `scripts/run_oddb2xml.sh` already retries the whole build
+a few times on such transient failures (`ODDB2XML_RETRIES`,
+`ODDB2XML_RETRY_DELAY`); a persistent per-host block still needs one of the
+mitigations above.
+
 ## Testing
 
 * Calling rake spec runs spec tests.
