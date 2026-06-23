@@ -38,8 +38,34 @@ BUILD_DIR="${BUILD_DIR:-${OUT_DIR%/}-build}"
 INCREMENTS="${INCREMENTS:-45 50 55}"
 ODDB2XML_BIN="${ODDB2XML_BIN:-oddb2xml}"
 TRANSFER_CMD="${TRANSFER_CMD:-$SCRIPT_DIR/transfer.sh}"
+# Transient upstream download failures (e.g. Swissmedic resetting the
+# connection, Errno::ECONNRESET) used to abort the whole nightly run under
+# `set -e`. Retry the oddb2xml build a few times before giving up.
+ODDB2XML_RETRIES="${ODDB2XML_RETRIES:-3}"
+ODDB2XML_RETRY_DELAY="${ODDB2XML_RETRY_DELAY:-120}"
 
 log() { printf '%s %s\n' "$(date '+%Y-%m-%d %H:%M:%S')" "$*"; }
+
+# run_with_retry <description> -- <command...>
+# Retry a flaky command up to ODDB2XML_RETRIES times, sleeping
+# ODDB2XML_RETRY_DELAY seconds between attempts. Running the command as the
+# `until` condition keeps it exempt from `set -e`, so a failed attempt retries
+# instead of killing the script; the final failure is propagated via return.
+run_with_retry() {
+  local desc="$1"; shift
+  [[ "${1:-}" == "--" ]] && shift
+  local attempt=1 rc=0
+  until "$@"; do
+    rc=$?
+    if [[ $attempt -ge $ODDB2XML_RETRIES ]]; then
+      log "ERROR: $desc failed after $attempt attempts (last exit $rc)"
+      return $rc
+    fi
+    log "WARNING: $desc failed (exit $rc), attempt $attempt/$ODDB2XML_RETRIES; retrying in ${ODDB2XML_RETRY_DELAY}s"
+    sleep "$ODDB2XML_RETRY_DELAY"
+    attempt=$((attempt + 1))
+  done
+}
 
 # 1. Install / update the published gem unless told otherwise.
 if [[ "${SKIP_GEM_INSTALL:-0}" != "1" ]]; then
@@ -69,7 +95,10 @@ build_one() {
 
   log "Building increment '${inc:-none}' -> $dest"
   rm -f oddb*.zip
-  "$ODDB2XML_BIN" "${dl_opt[@]}" -b "${inc_opt[@]}" -c zip
+  # On a retry the first build re-downloads from scratch (dl_opt empty), which
+  # also clears any partial download left by the failed attempt.
+  run_with_retry "oddb2xml build '${inc:-none}'" -- \
+    "$ODDB2XML_BIN" "${dl_opt[@]}" -b "${inc_opt[@]}" -c zip
 
   shopt -s nullglob
   local zips=(oddb*.zip)
