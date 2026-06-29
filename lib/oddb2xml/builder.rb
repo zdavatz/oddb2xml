@@ -1562,9 +1562,47 @@ module Oddb2xml
       end
     end
 
+    # Normalise a BAG validity date to an xs:dateTime for <VDAT>/<VTDAT>.
+    # A bare date (YYYY-MM-DD) gets midnight appended (unzoned, still a valid
+    # xs:dateTime); a full timestamp is passed through; blank -> nil.
+    def elexis_datetime(str)
+      s = str.to_s.strip
+      return nil if s.empty?
+      s = "#{s}T00:00:00" if /\A\d{4}-\d{2}-\d{2}\z/.match?(s)
+      s
+    end
+
+    # Emit the v6 <ARTSL> block for one ITEM: one <ARTLIM> per limitation that
+    # carries a BAG Indikationscode (INDCD). Mandatory on prescriptions/invoices
+    # for SL price-model drugs from 2026-07-01 (issue #113). <PM> is "true"
+    # because the BAG indication code is required only for price-model SL drugs,
+    # which is exactly the set of items that reach this block.
+    def append_artsl(xml, limitations)
+      artlims = (limitations || []).select { |lim| lim[:indcd] && !lim[:indcd].to_s.empty? }
+      artlims = artlims.uniq { |lim| [lim[:code], lim[:indcd]] }
+      return if artlims.empty?
+      xml.ARTSL do
+        xml.PM "true"
+        xml.ARTLIMS do
+          artlims.each do |lim|
+            xml.ARTLIM do
+              xml.LIMCD lim[:code].to_s
+              xml.INDCD lim[:indcd].to_s
+              if (vdat = elexis_datetime(lim[:vdate]))
+                xml.VDAT vdat
+              end
+              if (vtdat = elexis_datetime(lim[:vtdate]))
+                xml.VTDAT vtdat
+              end
+            end
+          end
+        end
+      end
+    end
+
     def build_artikelstamm
-      @@emitted_v5_gtins = []
-      @csv_file = CSV.open(File.join(WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.csv"), "w+")
+      @@emitted_v6_gtins = []
+      @csv_file = CSV.open(File.join(WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v6.csv"), "w+")
       @csv_file << ["gtin", "name", "pkg_size", "galenic_form", "price_ex_factory", "price_public", "prodno", "atc_code", "active_substance", "original", "it-code", "sl-liste"]
       @csv_file.sync = true
       variant = "build_artikelstamm"
@@ -1649,10 +1687,10 @@ module Oddb2xml
                   end
                 end
                 info = @calc_items[pkg_gtin]
-                if @@emitted_v5_gtins.index(pkg_gtin)
+                if @@emitted_v6_gtins.index(pkg_gtin)
                   next
                 else
-                  @@emitted_v5_gtins << pkg_gtin.clone
+                  @@emitted_v6_gtins << pkg_gtin.clone
                 end
                 options = {"PHARMATYPE" => "P"}
                 xml.ITEM(options) do
@@ -1771,6 +1809,8 @@ module Oddb2xml
                     end
                   end
                   xml.PRODNO prodno if prodno
+                  # v6 <ARTSL>: per-article BAG Indikationscodes (issue #113).
+                  append_artsl(xml, package[:limitations])
                   @csv_file << [pkg_gtin, name, package[:unit], measure,
                     pexf || "",
                     ppub || "",
@@ -1780,10 +1820,10 @@ module Oddb2xml
                 end
               end
             else # non pharma
-              if @@emitted_v5_gtins.index(ean13)
+              if @@emitted_v6_gtins.index(ean13)
                 next
               else
-                @@emitted_v5_gtins << ean13.clone
+                @@emitted_v6_gtins << ean13.clone
               end
               # Set the pharmatype to 'Y' for outdated products, which are no longer found
               # in refdata/packungen
@@ -1896,7 +1936,7 @@ module Oddb2xml
         elexis_strftime_format = "%FT%T\.%L%:z"
         @@cumul_ver = (Date.today.year - 2013) * 12 + Date.today.month
         options_xml = {
-          "xmlns" => "http://elexis.ch/Elexis_Artikelstamm_v5",
+          "xmlns" => "http://elexis.ch/Elexis_Artikelstamm_v6",
           "CREATION_DATETIME" => Time.new.strftime(elexis_strftime_format),
           "BUILD_DATETIME" => Time.new.strftime(elexis_strftime_format),
           "DATA_SOURCE" => "oddb2xml"
@@ -2008,7 +2048,7 @@ module Oddb2xml
           end
         end
       end
-      Oddb2xml.log "#{variant}. Done #{nr_products} of #{@products.size} products, #{@limitations.size} limitations and #{nr_articles}/#{@nr_articles} articles. @@emitted_v5_gtins #{@@emitted_v5_gtins.size}"
+      Oddb2xml.log "#{variant}. Done #{nr_products} of #{@products.size} products, #{@limitations.size} limitations and #{nr_articles}/#{@nr_articles} articles. @@emitted_v6_gtins #{@@emitted_v6_gtins.size}"
       # we don't add a SHA256 hash for each element in the article
       # Oddb2xml.add_hash(a_builder.to_xml)
       # doc = REXML::Document.new( source, { :raw => :all })
@@ -2018,13 +2058,13 @@ module Oddb2xml
       lines << "  - #{sprintf("%5d", @limitations.size)} limitations"
       lines << "  - #{sprintf("%5d", @nr_articles)} articles"
       lines << "  - #{sprintf("%5d", @@gtin2ignore.size)} ignored GTINS"
-      @@articlestamm_v5_info_lines = lines
+      @@articlestamm_v6_info_lines = lines
       a_builder.to_xml({indent: 4, encoding: "UTF-8"})
     end
 
     private_class_method
-    def self.articlestamm_v5_info_lines
-      @@articlestamm_v5_info_lines
+    def self.articlestamm_v6_info_lines
+      @@articlestamm_v6_info_lines
     end
   end
 end

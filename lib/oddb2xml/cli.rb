@@ -103,8 +103,8 @@ module Oddb2xml
       end
       build
       if @options[:artikelstamm] && system("which xmllint")
-        elexis_v5_xsd = File.expand_path(File.join(__FILE__, "..", "..", "..", "Elexis_Artikelstamm_v5.xsd"))
-        cmd = "xmllint --noout --schema #{elexis_v5_xsd} #{@the_files[:artikelstamm]}"
+        elexis_v6_xsd = File.expand_path(File.join(__FILE__, "..", "..", "..", "Elexis_Artikelstamm_v6.xsd"))
+        cmd = "xmllint --noout --schema #{elexis_v6_xsd} #{@the_files[:artikelstamm]}"
         if system(cmd)
           puts "Validatied #{@the_files[:artikelstamm]}"
         else
@@ -399,7 +399,7 @@ module Oddb2xml
           @the_files[:calc] = "oddb_calc.xml"
         end
         if @options[:artikelstamm]
-          @the_files[:artikelstamm] = "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml"
+          @the_files[:artikelstamm] = "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v6.xml"
         elsif @options[:address]
           @the_files[:company] = "#{prefix}_betrieb.xml"
           @the_files[:person] = "#{prefix}_medizinalperson.xml"
@@ -438,7 +438,7 @@ module Oddb2xml
       end
       if @options[:artikelstamm]
         lines << "Generated artikelstamm.xml for Elexis"
-        lines += Builder.articlestamm_v5_info_lines
+        lines += Builder.articlestamm_v6_info_lines
       elsif @options[:address]
         {
           "Betrieb" => :@companies,

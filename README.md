@@ -56,7 +56,7 @@ see `--help`.
     oddb2xml [option]
       produced files are found under data
     -a, --append              Additional target nonpharma
-    -r, --artikelstamm        Create Artikelstamm Version 3 and 5 for Elexis >= 3.1
+    -r, --artikelstamm        Create Artikelstamm Version 6 for Elexis >= 3.1
     -c, --compress-ext=<s>    format F. {tar.gz|zip}
     -e, --extended            pharma, non-pharma plus prices and non-pharma from zurrose.
                                                           Products without EAN-Code will also be listed.
@@ -336,6 +336,40 @@ be transmitted with every prescription and invoice for SL price-model
 drugs from **2026-07-01**; from **2027-01-01** insurers may reject
 invoices without it. See issue
 [#113](https://github.com/zdavatz/oddb2xml/issues/113).
+
+Since 3.0.26 the same codes are also carried per article in the
+**Elexis Artikelstamm v6** output (`--artikelstamm`). Each SL
+price-model `<ITEM>` gains an `<ARTSL>` block with one `<ARTLIM>` per
+limitation:
+
+```xml
+<ITEM PHARMATYPE="P">
+  <GTIN>7680543780251</GTIN>
+  ...
+  <PRODNO>58398</PRODNO>
+  <ARTSL>
+    <PM>true</PM>
+    <ARTLIMS>
+      <ARTLIM>
+        <LIMCD>MABTHERA.01</LIMCD>   <!-- BAG limitation code -->
+        <INDCD>17079.01</INDCD>       <!-- Indikationscode XXXXX.NN -->
+        <VDAT>2023-05-01T00:00:00</VDAT>
+      </ARTLIM>
+      <ARTLIM>
+        <LIMCD>MABTHERA.04</LIMCD>
+        <INDCD>17079.03</INDCD>
+        <VDAT>2026-05-01T00:00:00</VDAT>
+        <VTDAT>2026-06-30T00:00:00</VTDAT>
+      </ARTLIM>
+    </ARTLIMS>
+  </ARTSL>
+</ITEM>
+```
+
+The output bumps from Artikelstamm v5 to **v6** (namespace
+`http://elexis.ch/Elexis_Artikelstamm_v6`, file
+`artikelstamm_DDMMYYYY_v6.xml`, validated against the bundled
+`Elexis_Artikelstamm_v6.xsd`); consumers must switch to the v6 file.
 
 ## Limitation texts in `--fhir` mode
 

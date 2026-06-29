@@ -586,6 +586,10 @@ module Oddb2xml
           limitation.LimitationNiveau = ""  # Not in FHIR
           limitation.LimitationValue = ""  # Not in FHIR
           limitation.LimitationCudRef = cud_ref  # carried through for FR/IT resolution
+          # BAG Indikationscode (XXXXX.NN): the v6 Artikelstamm <ARTSL>/<ARTLIM>
+          # block carries it per article (issue #113). Independent of the CUD id
+          # (= LimitationCode), so read the explicit indicationCode extension.
+          limitation.IndicationCode = lim[:indication_code] || ""
           limitation.DescriptionDe = text_de
           limitation.DescriptionFr = ""  # filled by merge_language from FR bundle
           limitation.DescriptionIt = ""  # filled by merge_language from IT bundle
@@ -819,7 +823,9 @@ module Oddb2xml
                   desc_fr: lim.DescriptionFr || "",
                   desc_it: lim.DescriptionIt || "",
                   cud_ref: lim.LimitationCudRef,
+                  indcd: lim.IndicationCode || "",
                   vdate: lim.ValidFromDate || "",
+                  vtdate: lim.ValidThruDate || "",
                   del: is_deleted
                 }
               end

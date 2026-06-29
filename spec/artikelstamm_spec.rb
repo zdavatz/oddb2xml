@@ -20,12 +20,12 @@ describe Oddb2xml::Builder do
     @saved_dir = Dir.pwd
     @oddb2xml_xsd = File.expand_path(File.join(File.dirname(__FILE__), "..", "oddb2xml.xsd"))
     @oddb_calc_xsd = File.expand_path(File.join(File.dirname(__FILE__), "..", "oddb_calc.xsd"))
-    @elexis_v5_xsd = File.expand_path(File.join(__FILE__, "..", "..", "Elexis_Artikelstamm_v5.xsd"))
-    @elexis_v5_csv = File.join(Oddb2xml::WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.csv")
+    @elexis_v6_xsd = File.expand_path(File.join(__FILE__, "..", "..", "Elexis_Artikelstamm_v6.xsd"))
+    @elexis_v6_csv = File.join(Oddb2xml::WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v6.csv")
 
     expect(File.exist?(@oddb2xml_xsd)).to eq true
     expect(File.exist?(@oddb_calc_xsd)).to eq true
-    expect(File.exist?(@elexis_v5_xsd)).to eq true
+    expect(File.exist?(@elexis_v6_xsd)).to eq true
     cleanup_directories_before_run
     FileUtils.makedirs(Oddb2xml::WORK_DIR)
     Dir.chdir(Oddb2xml::WORK_DIR)
@@ -45,7 +45,7 @@ describe Oddb2xml::Builder do
       options = Oddb2xml::Options.parse(["--artikelstamm", "--no-fhir"]) # , '--log'])
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
       Oddb2xml::Cli.new(options).run # to debug
-      @artikelstamm_name = File.join(Oddb2xml::WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml")
+      @artikelstamm_name = File.join(Oddb2xml::WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v6.xml")
       @doc = Nokogiri::XML(File.open(@artikelstamm_name))
       # @rexml = REXML::Document.new File.read(@artikelstamm_name)
       @inhalt = IO.read(@artikelstamm_name)
@@ -101,20 +101,20 @@ describe Oddb2xml::Builder do
       expect(@inhalt.index(expected)).not_to be nil
     end
 
-    it "should produce a Elexis_Artikelstamm_v5.csv" do
-      expect(File.exist?(@elexis_v5_csv)).to eq true
-      inhalt = File.open(@elexis_v5_csv, "r+").read
+    it "should produce a Elexis_Artikelstamm_v6.csv" do
+      expect(File.exist?(@elexis_v6_csv)).to eq true
+      inhalt = File.open(@elexis_v6_csv, "r+").read
       expect(inhalt.size).to be > 0
       expect(inhalt).to match(/7680284860144/)
     end
 
     it "should NOT generate a v3 nonpharma xml" do
-      v3_name = @artikelstamm_name.sub("_v5.xml", "_v3.xml").sub("artikelstamm_", "artikelstamm_N_")
+      v3_name = @artikelstamm_name.sub("_v6.xml", "_v3.xml").sub("artikelstamm_", "artikelstamm_N_")
       expect(File.exist?(v3_name)).to eq false
     end
 
     it "should NOT generate a vx pharma xml" do
-      v3_name = @artikelstamm_name.sub("_v5.xml", "_v3.xml").sub("artikelstamm_", "artikelstamm_P_")
+      v3_name = @artikelstamm_name.sub("_v6.xml", "_v3.xml").sub("artikelstamm_", "artikelstamm_P_")
       expect(File.exist?(v3_name)).to eq false
     end
 
@@ -123,8 +123,8 @@ describe Oddb2xml::Builder do
     end
 
     it "should find price from Preparations.xml by setting" do
-      expect(File.exist?(@elexis_v5_csv)).to eq true
-      inhalt = File.open(@elexis_v5_csv, "r+").read
+      expect(File.exist?(@elexis_v6_csv)).to eq true
+      inhalt = File.open(@elexis_v6_csv, "r+").read
       expected = %(7680658560014,Dibase 10'000 Tropfen 10000 IE/ml Fl 10 ml,,Flasche(n),5,9.25,6585601,A11CC05,,"",,SL)
       expect(inhalt.index(expected)).to be > 0
     end
@@ -141,8 +141,8 @@ describe Oddb2xml::Builder do
     end
 
     it "should have a price for Lynparza" do
-      expect(File.exist?(@elexis_v5_csv)).to eq true
-      inhalt = File.open(@elexis_v5_csv, "r+").read
+      expect(File.exist?(@elexis_v6_csv)).to eq true
+      inhalt = File.open(@elexis_v6_csv, "r+").read
       expect(inhalt.index('7680651600014,Lynparza Kaps 50 mg 448 Stk,,Kapsel(n),5562.48,5947.55,6516001,L01XX46,,"",,S')).not_to be nil
     end
     it "should trim the ean13 to 13 length" do
@@ -240,7 +240,7 @@ describe Oddb2xml::Builder do
       # Should also check for price!
     end
     it "should validate against artikelstamm.xsd" do
-      validate_via_xsd(@elexis_v5_xsd, @artikelstamm_name)
+      validate_via_xsd(@elexis_v6_xsd, @artikelstamm_name)
     end
     tests = {"item 7680403330459 CARBADERM only in Preparations(SL) with public price" =>
       %(<ITEM PHARMATYPE="P">

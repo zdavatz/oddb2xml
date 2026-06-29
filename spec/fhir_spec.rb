@@ -87,6 +87,19 @@ describe "FHIR Indikationscode support" do
       pkg = item[:packages].values.first
       expect(pkg[:indication_codes]).to eq(item[:indication_codes])
     end
+
+    it "carries the indication code (INDCD) and validity dates on each package limitation" do
+      data = described_class.new(cyramza_fixture).to_hash
+      pkg = data.values.first[:packages].values.first
+      by_code = pkg[:limitations].each_with_object({}) { |l, h| h[l[:code]] = l }
+
+      # INDCD is the BAG Indikationscode, independent of the CUD id (= LIMCD).
+      expect(by_code["CYRAMZA.01"][:indcd]).to eq("20403.01")
+      expect(by_code["CYRAMZA.02"][:indcd]).to eq("20403.02")
+      # Validity dates feed <VDAT>/<VTDAT> in the v6 <ARTSL> block.
+      expect(by_code["CYRAMZA.01"][:vdate]).to eq("2024-10-01")
+      expect(by_code["CYRAMZA.02"][:vtdate]).to eq("2027-09-30")
+    end
   end
 
   describe Oddb2xml::FhirExtractor, "limitation text resolution" do
@@ -207,6 +220,40 @@ describe "FHIR Indikationscode support" do
       # next to the code.
       expect(xml).to include("In Kombination mit Paclitaxel")
       expect(xml).to include("In Kombination mit FOLFIRI")
+    end
+  end
+
+  describe Oddb2xml::Builder, "v6 ARTSL/INDCD emission" do
+    def artsl_xml(limitations)
+      builder = described_class.new
+      Nokogiri::XML::Builder.new(encoding: "utf-8") do |xml|
+        builder.send(:append_artsl, xml, limitations)
+      end.to_xml
+    end
+
+    it "emits an <ARTSL> block with one <ARTLIM> per indication code" do
+      data = Oddb2xml::FhirExtractor.new(cyramza_fixture).to_hash
+      lims = data.values.first[:packages].values.first[:limitations]
+      xml = artsl_xml(lims)
+
+      expect(xml).to include("<ARTSL>")
+      # PM is true because the BAG indication code is required only for SL
+      # price-model drugs, which is exactly what reaches this block.
+      expect(xml).to include("<PM>true</PM>")
+      expect(xml).to include("<LIMCD>CYRAMZA.01</LIMCD>")
+      expect(xml).to include("<INDCD>20403.01</INDCD>")
+      expect(xml).to include("<VDAT>2024-10-01T00:00:00</VDAT>")
+      expect(xml).to include("<LIMCD>CYRAMZA.02</LIMCD>")
+      expect(xml).to include("<INDCD>20403.02</INDCD>")
+      # End date present only for CYRAMZA.02 -> only that ARTLIM gets a <VTDAT>.
+      expect(xml).to include("<VTDAT>2027-09-30T00:00:00</VTDAT>")
+      expect(xml.scan("<VTDAT>").size).to eq(1)
+    end
+
+    it "omits <ARTSL> when no limitation carries an indication code" do
+      expect(artsl_xml([{code: "X", indcd: "", vdate: "2020-01-01"}])).not_to include("<ARTSL>")
+      expect(artsl_xml([])).not_to include("<ARTSL>")
+      expect(artsl_xml(nil)).not_to include("<ARTSL>")
     end
   end
 end
