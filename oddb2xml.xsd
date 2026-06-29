@@ -169,9 +169,23 @@
         <xs:element ref="ns1:ARTBAR"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:ARTPRI"/>
         <xs:element minOccurs="0" ref="ns1:ARTINS"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:INDICATION_CODE"/>
       </xs:sequence>
       <xs:attribute name="DT" use="required"/>
       <xs:attribute type="xs:string" name="SHA256" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="INDICATION_CODE">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="code" type="xs:string"/>
+          <xs:attribute name="cud_id" type="xs:string"/>
+          <xs:attribute name="limcd" type="xs:string"/>
+          <xs:attribute name="vdat" type="xs:string"/>
+          <xs:attribute name="vtdat" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
     </xs:complexType>
   </xs:element>
   <xs:element name="PHAR" type="xs:integer"/>
@@ -853,6 +867,7 @@
         <xs:element minOccurs="0" ref="ns1:IT"/>
         <xs:element minOccurs="0" ref="ns1:ORPH"/>
         <xs:element ref="ns1:CPT"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ns1:INDICATION_CODE"/>
         <xs:element minOccurs="0" ref="ns1:PackGrSwissmedic"/>
         <xs:element minOccurs="0" ref="ns1:EinheitSwissmedic"/>
         <xs:element minOccurs="0" ref="ns1:SubstanceSwissmedic"/>

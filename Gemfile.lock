@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (3.0.26)
+    oddb2xml (3.0.27)
       csv
       htmlentities
       httpi

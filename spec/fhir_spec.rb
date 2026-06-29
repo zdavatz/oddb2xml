@@ -256,4 +256,56 @@ describe "FHIR Indikationscode support" do
       expect(artsl_xml(nil)).not_to include("<ARTSL>")
     end
   end
+
+  describe Oddb2xml::Builder, "per-article INDICATION_CODE (-e / -b feed)" do
+    def indication_xml(limitations)
+      builder = described_class.new
+      Nokogiri::XML::Builder.new(encoding: "utf-8") do |xml|
+        xml.ART do
+          builder.send(:append_indication_codes, xml, limitations)
+        end
+      end.to_xml
+    end
+
+    it "emits one <INDICATION_CODE> per indication with limcd + validity dates" do
+      data = Oddb2xml::FhirExtractor.new(cyramza_fixture).to_hash
+      lims = data.values.first[:packages].values.first[:limitations]
+      xml = indication_xml(lims)
+
+      expect(xml.scan("<INDICATION_CODE").size).to eq(2)
+      expect(xml).to include('code="20403.01"')
+      expect(xml).to include('cud_id="CYRAMZA.01"')
+      expect(xml).to include('limcd="CYRAMZA.01"')
+      expect(xml).to include('vdat="2024-10-01T00:00:00"')
+      # CYRAMZA.02 has an end date -> non-empty vtdat; CYRAMZA.01 has none.
+      expect(xml).to include('vtdat="2027-09-30T00:00:00"')
+      expect(xml).to include('vtdat=""')
+      # The limitation text travels in the element body.
+      expect(xml).to include("In Kombination mit Paclitaxel")
+    end
+
+    it "emits nothing when no limitation carries an indication code" do
+      expect(indication_xml([{code: "X", indcd: "", vdate: "2020-01-01"}])).not_to include("<INDICATION_CODE")
+      expect(indication_xml(nil)).not_to include("<INDICATION_CODE")
+    end
+
+    it "produces an oddb_article.xml that validates against oddb2xml.xsd" do
+      items = Oddb2xml::FhirExtractor.new(cyramza_fixture).to_hash
+      builder = described_class.new
+      {
+        "@items" => items, "@refdata" => {}, "@packs" => {}, "@migel" => {},
+        "@interactions" => [], "@flags" => {}, "@orphan" => [], "@firstbase" => {},
+        "@substances" => [], "@codes" => {}, "@missing" => [], "@tag_suffix" => nil,
+        "@infos_zur_rose" => {}, "@lppvs" => {}, "@articles" => nil, "@weleda_sl" => {}
+      }.each { |k, v| builder.instance_variable_set(k.to_sym, v) }
+
+      xml = builder.send(:build_article)
+      expect(xml.scan("<INDICATION_CODE").size).to be >= 1
+
+      xsd_path = File.expand_path(File.join(File.dirname(__FILE__), "..", "oddb2xml.xsd"))
+      xsd = Nokogiri::XML::Schema(File.read(xsd_path))
+      errors = xsd.validate(Nokogiri::XML(xml))
+      expect(errors.map(&:message)).to eq([])
+    end
+  end
 end

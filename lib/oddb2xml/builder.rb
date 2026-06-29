@@ -1190,6 +1190,9 @@ module Oddb2xml
                   xml.NINCD nincd
                 }
               end
+              # BAG Indikationscodes for SL price-model drugs (issue #113),
+              # mirroring the v6 Artikelstamm <ARTSL> data in oddb_article.xml.
+              append_indication_codes(xml, pac && pac[:limitations])
             end
           end
           xml.RESULT {
@@ -1597,6 +1600,25 @@ module Oddb2xml
             end
           end
         end
+      end
+    end
+
+    # Emit per-article BAG Indikationscodes for the -e/--extended and
+    # -b/--firstbase article feed (oddb_article.xml), one <INDICATION_CODE> per
+    # limitation that carries an INDCD. Same data as the v6 <ARTSL> block, but
+    # in the flat <INDICATION_CODE> shape already used on <PRD> in
+    # oddb_product.xml — enriched here with the limitation code (LIMCD) and the
+    # validity dates (VDAT/VTDAT). See issue #113.
+    def append_indication_codes(xml, limitations)
+      ics = (limitations || []).select { |lim| lim[:indcd] && !lim[:indcd].to_s.empty? }
+      ics = ics.uniq { |lim| [lim[:code], lim[:indcd]] }
+      ics.each do |lim|
+        xml.INDICATION_CODE lim[:desc_de].to_s,
+          code: lim[:indcd].to_s,
+          cud_id: lim[:cud_ref].to_s,
+          limcd: lim[:code].to_s,
+          vdat: elexis_datetime(lim[:vdate]) || "",
+          vtdat: elexis_datetime(lim[:vtdate]) || ""
       end
     end
 

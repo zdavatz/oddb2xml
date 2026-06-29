@@ -371,6 +371,22 @@ The output bumps from Artikelstamm v5 to **v6** (namespace
 `artikelstamm_DDMMYYYY_v6.xml`, validated against the bundled
 `Elexis_Artikelstamm_v6.xsd`); consumers must switch to the v6 file.
 
+Since 3.0.27 the same indication codes are also carried per article in
+the `-e`/`--extended` and `-b`/`--firstbase` feeds: each SL price-model
+`<ART>` in `oddb_article.xml` gets one `<INDICATION_CODE>` child per
+indication — the flat shape already used on `<PRD>` in
+`oddb_product.xml`, enriched with the limitation code and validity
+dates:
+
+```xml
+<ART DT="...">
+  ...
+  <INDICATION_CODE code="17079.01" cud_id="MABTHERA.01"
+      limcd="MABTHERA.01" vdat="2023-05-01T00:00:00"
+      vtdat="">In Kombination ...</INDICATION_CODE>
+</ART>
+```
+
 ## Limitation texts in `--fhir` mode
 
 In 3.0.8 we fixed empty `<DescriptionDe/Fr/It>` on every `<Limitation>`
