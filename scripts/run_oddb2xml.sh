@@ -11,10 +11,12 @@
 # silently re-downloaded everything each time.
 #
 # Output layout (under $OUT_DIR, default /home/zdavatz/oddb2xml):
-#   <OUT_DIR>/45/        oddb_*.xml built with +45 %
-#   <OUT_DIR>/50/        oddb_*.xml built with +50 %
-#   <OUT_DIR>/55/        oddb_*.xml built with +55 %
-#   <OUT_DIR>/default/   oddb_*.xml built with no increment
+#   <OUT_DIR>/45/           oddb_*.xml built with +45 %
+#   <OUT_DIR>/50/           oddb_*.xml built with +50 %
+#   <OUT_DIR>/55/           oddb_*.xml built with +55 %
+#   <OUT_DIR>/default/      oddb_*.xml built with no increment
+#   <OUT_DIR>/artikelstamm/ Elexis Artikelstamm v6 + legacy v5 (xml + csv),
+#                           served at https://mediupdatexml.oddb.org/artikelstamm
 # Each destination dir also keeps the source archive as oddb2xml.zip.
 # The working dir ($BUILD_DIR, default <OUT_DIR>-build) holds the shared
 # downloads/ cache and the transient zip; it lives OUTSIDE $OUT_DIR so the
@@ -113,10 +115,34 @@ build_one() {
   log "Staged $dest"
 }
 
+# build_artikelstamm — build the Elexis Artikelstamm (v6 + legacy v5) and stage
+# it at $OUT_DIR/artikelstamm, served at
+# https://mediupdatexml.oddb.org/artikelstamm. Re-uses the shared downloads/
+# cache (--skip-download), so it adds no extra upstream fetch beyond the few
+# sources the firstbase builds don't pull (e.g. the ZurRose transfer.dat).
+build_artikelstamm() {
+  local dest="$OUT_DIR/artikelstamm"
+  log "Building Artikelstamm (v6 + v5) -> $dest"
+  rm -f artikelstamm_*.xml artikelstamm_*.csv
+  run_with_retry "oddb2xml artikelstamm" -- \
+    "$ODDB2XML_BIN" --skip-download --artikelstamm --artikelstamm-v5
+
+  shopt -s nullglob
+  local out=(artikelstamm_*.xml artikelstamm_*.csv)
+  shopt -u nullglob
+  [[ ${#out[@]} -ge 1 ]] || { log "ERROR: no artikelstamm output produced"; exit 1; }
+
+  rm -rf "$dest"
+  mkdir -p "$dest"
+  cp -p "${out[@]}" "$dest/"
+  log "Staged ${#out[@]} file(s) to $dest"
+}
+
 for inc in $INCREMENTS; do
   build_one "$inc" "$inc"
 done
 build_one "" "default"           # final run with no increment
+build_artikelstamm               # Elexis Artikelstamm (v6 + legacy v5)
 
 # 2b. Refresh the download landing page with the live PHARMA/NONPHARMA counts
 #     (PHARMA from default/oddb_article.xml, NONPHARMA from the GS1 firstbase CSV).

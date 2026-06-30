@@ -512,6 +512,36 @@ Der behandelnde Arzt ist verpflichtet, die erforderlichen Daten laufend im vorge
       end
     end
   end
+  context "when artikelstamm-v5 option is given" do
+    before(:all) do
+      common_run_init
+      options = Oddb2xml::Options.parse(["--artikelstamm-v5", "--no-fhir"])
+      Oddb2xml::Cli.new(options).run
+      @v6_name = File.join(Oddb2xml::WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v6.xml")
+      @v5_name = File.join(Oddb2xml::WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml")
+    end
+
+    it "emits both the v6 and the legacy v5 file" do
+      expect(File.exist?(@v6_name)).to eq true
+      expect(File.exist?(@v5_name)).to eq true
+    end
+
+    it "uses the v5 namespace in the v5 file and the v6 namespace in the v6 file" do
+      expect(IO.read(@v5_name)).to include("http://elexis.ch/Elexis_Artikelstamm_v5")
+      expect(IO.read(@v6_name)).to include("http://elexis.ch/Elexis_Artikelstamm_v6")
+    end
+
+    it "validates the v5 file against Elexis_Artikelstamm_v5.xsd" do
+      xsd = File.expand_path(File.join(__FILE__, "..", "..", "Elexis_Artikelstamm_v5.xsd"))
+      schema = Nokogiri::XML::Schema(File.read(xsd))
+      doc = Nokogiri::XML(File.read(@v5_name))
+      expect(schema.validate(doc)).to eq []
+    end
+
+    it "never emits an <ARTSL> block in the v5 file" do
+      expect(IO.read(@v5_name)).not_to include("<ARTSL>")
+    end
+  end
   context "chapter 70 hack" do
     before(:all) do
       mock_downloads

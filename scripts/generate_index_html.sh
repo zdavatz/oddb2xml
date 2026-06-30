@@ -148,6 +148,11 @@ cat > "$tmp" <<HTML
   <a href="default/oddb_code.xml">oddb_code.xml</a> sowie
   <a href="default/oddb2xml.zip">oddb2xml.zip</a> (alle Dateien gepackt).</p>
 
+  <h2>Elexis Artikelstamm</h2>
+  <ul>
+    <li><a href="artikelstamm/">artikelstamm/</a> <span class="desc">— Elexis Artikelstamm v6 (mit BAG-Indikationscodes) und Legacy-v5, je als XML und CSV, täglich aktualisiert</span></li>
+  </ul>
+
   <h2>aips2sqlite — Fachinformationen &amp; AmiKo-Datenbanken</h2>
   <ul>
     <li><a href="/aips2sqlite/fis/">fis/</a> <span class="desc">— Fachinformationen als XML/HTML (DE/FR/IT)</span></li>

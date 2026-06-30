@@ -1622,9 +1622,17 @@ module Oddb2xml
       end
     end
 
-    def build_artikelstamm
+    # Legacy entry point: emit the Artikelstamm in the older Version 5 format
+    # (Elexis_Artikelstamm_v5, no per-ITEM <ARTSL> indication-code block).
+    # Reached via subject :artikelstamm_v5 when --artikelstamm-v5 is set.
+    def build_artikelstamm_v5
+      build_artikelstamm(version: 5)
+    end
+
+    def build_artikelstamm(version: 6)
       @@emitted_v6_gtins = []
-      @csv_file = CSV.open(File.join(WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v6.csv"), "w+")
+      @artikelstamm_version = version
+      @csv_file = CSV.open(File.join(WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v#{version}.csv"), "w+")
       @csv_file << ["gtin", "name", "pkg_size", "galenic_form", "price_ex_factory", "price_public", "prodno", "atc_code", "active_substance", "original", "it-code", "sl-liste"]
       @csv_file.sync = true
       variant = "build_artikelstamm"
@@ -1832,7 +1840,8 @@ module Oddb2xml
                   end
                   xml.PRODNO prodno if prodno
                   # v6 <ARTSL>: per-article BAG Indikationscodes (issue #113).
-                  append_artsl(xml, package[:limitations])
+                  # The legacy v5 schema has no <ARTSL> element, so skip it there.
+                  append_artsl(xml, package[:limitations]) if @artikelstamm_version != 5
                   @csv_file << [pkg_gtin, name, package[:unit], measure,
                     pexf || "",
                     ppub || "",
@@ -1958,7 +1967,7 @@ module Oddb2xml
         elexis_strftime_format = "%FT%T\.%L%:z"
         @@cumul_ver = (Date.today.year - 2013) * 12 + Date.today.month
         options_xml = {
-          "xmlns" => "http://elexis.ch/Elexis_Artikelstamm_v6",
+          "xmlns" => "http://elexis.ch/Elexis_Artikelstamm_v#{@artikelstamm_version}",
           "CREATION_DATETIME" => Time.new.strftime(elexis_strftime_format),
           "BUILD_DATETIME" => Time.new.strftime(elexis_strftime_format),
           "DATA_SOURCE" => "oddb2xml"

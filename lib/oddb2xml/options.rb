@@ -18,6 +18,7 @@ module Oddb2xml
         EOS
         opt :append, "Additional target nonpharma", default: false
         opt :artikelstamm, "Create Artikelstamm Version 6 for Elexis >= 3.1"
+        opt :artikelstamm_v5, "Additionally create the legacy Artikelstamm Version 5 (without the <ARTSL> BAG indication codes). Implies --artikelstamm.", short: :none, default: false
         opt :compress_ext, "format F. {tar.gz|zip}", type: :string, default: nil, short: "c"
         opt :extended, "pharma, non-pharma plus prices and non-pharma from zurrose.
                             Products without EAN-Code will also be listed.
@@ -67,6 +68,11 @@ module Oddb2xml
         @opts[:nonpharma] = true
         @opts[:price] = :zurrose
         @opts[:calc] = true
+      end
+      # --artikelstamm-v5 additionally emits the legacy v5 file; it requires the
+      # full Artikelstamm build, so it implies --artikelstamm (which yields v6).
+      if @opts[:artikelstamm_v5]
+        @opts[:artikelstamm] = true
       end
       if @opts[:artikelstamm]
         @opts[:extended] = true

@@ -57,6 +57,9 @@ see `--help`.
       produced files are found under data
     -a, --append              Additional target nonpharma
     -r, --artikelstamm        Create Artikelstamm Version 6 for Elexis >= 3.1
+    --artikelstamm-v5         Additionally create the legacy Artikelstamm Version 5
+                                                          (without the <ARTSL> BAG indication codes).
+                                                          Implies --artikelstamm.
     -c, --compress-ext=<s>    format F. {tar.gz|zip}
     -e, --extended            pharma, non-pharma plus prices and non-pharma from zurrose.
                                                           Products without EAN-Code will also be listed.
@@ -370,6 +373,14 @@ The output bumps from Artikelstamm v5 to **v6** (namespace
 `http://elexis.ch/Elexis_Artikelstamm_v6`, file
 `artikelstamm_DDMMYYYY_v6.xml`, validated against the bundled
 `Elexis_Artikelstamm_v6.xsd`); consumers must switch to the v6 file.
+
+Consumers that have not yet migrated can keep receiving the **legacy v5
+file** by adding `--artikelstamm-v5` (implies `--artikelstamm`). This writes
+`artikelstamm_DDMMYYYY_v5.xml`/`.csv` *in addition to* the v6 files, in the
+older v5 format (namespace `http://elexis.ch/Elexis_Artikelstamm_v5`, no
+`<ARTSL>` block, validated against the bundled `Elexis_Artikelstamm_v5.xsd`).
+The download and data-preparation phase runs only once, so both versions are
+produced from a single build.
 
 Since 3.0.27 the same indication codes are also carried per article in
 the `-e`/`--extended` and `-b`/`--firstbase` feeds: each SL price-model

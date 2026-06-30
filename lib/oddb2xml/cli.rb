@@ -103,14 +103,21 @@ module Oddb2xml
       end
       build
       if @options[:artikelstamm] && system("which xmllint")
-        elexis_v6_xsd = File.expand_path(File.join(__FILE__, "..", "..", "..", "Elexis_Artikelstamm_v6.xsd"))
-        cmd = "xmllint --noout --schema #{elexis_v6_xsd} #{@the_files[:artikelstamm]}"
-        if system(cmd)
-          puts "Validatied #{@the_files[:artikelstamm]}"
-        else
-          puts "Validating failed using #{cmd}"
-          require'pry'; binding.pry
-          raise "Validating failed using #{cmd}"
+        to_validate = {"Elexis_Artikelstamm_v6.xsd" => @the_files[:artikelstamm]}
+        if @options[:artikelstamm_v5] && @the_files[:artikelstamm_v5]
+          to_validate["Elexis_Artikelstamm_v5.xsd"] = @the_files[:artikelstamm_v5]
+        end
+        to_validate.each_pair do |xsd_name, xml_file|
+          xsd = File.expand_path(File.join(__FILE__, "..", "..", "..", xsd_name))
+          cmd = "xmllint --noout --schema #{xsd} #{xml_file}"
+          if system(cmd)
+            puts "Validatied #{xml_file}"
+          else
+            puts "Validating failed using #{cmd}"
+            require "pry"
+            binding.pry
+            raise "Validating failed using #{cmd}"
+          end
         end
       end
       compress if @options[:compress_ext]
@@ -400,6 +407,9 @@ module Oddb2xml
         end
         if @options[:artikelstamm]
           @the_files[:artikelstamm] = "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v6.xml"
+          if @options[:artikelstamm_v5]
+            @the_files[:artikelstamm_v5] = "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v5.xml"
+          end
         elsif @options[:address]
           @the_files[:company] = "#{prefix}_betrieb.xml"
           @the_files[:person] = "#{prefix}_medizinalperson.xml"
