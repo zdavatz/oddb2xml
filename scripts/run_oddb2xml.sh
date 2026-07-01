@@ -134,7 +134,13 @@ build_artikelstamm() {
 
   rm -rf "$dest"
   mkdir -p "$dest"
-  cp -p "${out[@]}" "$dest/"
+  # Publish under date-less, stable names so the download URLs never change:
+  # artikelstamm_01072026_v6.xml -> artikelstamm_v6.xml (same for _v5 / .csv).
+  local f base
+  for f in "${out[@]}"; do
+    base="$(basename "$f" | sed -E 's/_[0-9]{8}_/_/')"
+    cp -p "$f" "$dest/$base"
+  done
   log "Staged ${#out[@]} file(s) to $dest"
 }
 
