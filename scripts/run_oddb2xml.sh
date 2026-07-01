@@ -132,8 +132,11 @@ build_artikelstamm() {
   shopt -u nullglob
   [[ ${#out[@]} -ge 1 ]] || { log "ERROR: no artikelstamm output produced"; exit 1; }
 
-  rm -rf "$dest"
   mkdir -p "$dest"
+  # Remove only oddb2xml's own top-level files; keep sub-directories such as
+  # rust2xml/ (published independently by rust2xml's own cron at 03:00) intact.
+  # A plain `rm -rf "$dest"` used to wipe that sibling output every night.
+  rm -f "$dest"/artikelstamm_*.xml "$dest"/artikelstamm_*.csv
   # Publish under date-less, stable names so the download URLs never change:
   # artikelstamm_01072026_v6.xml -> artikelstamm_v6.xml (same for _v5 / .csv).
   local f base
