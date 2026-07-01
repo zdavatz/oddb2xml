@@ -138,11 +138,13 @@ build_artikelstamm() {
   log "Staged ${#out[@]} file(s) to $dest"
 }
 
-for inc in $INCREMENTS; do
-  build_one "$inc" "$inc"
-done
-build_one "" "default"           # final run with no increment
+# Build order: default first (it downloads the shared sources), then the
+# Artikelstamm right after so it is published early, then the price increments.
+build_one "" "default"           # first run: downloads sources, no increment
 build_artikelstamm               # Elexis Artikelstamm (v6 + legacy v5)
+for inc in $INCREMENTS; do
+  build_one "$inc" "$inc"        # price increments re-use the cached downloads/
+done
 
 # 2b. Refresh the download landing page with the live PHARMA/NONPHARMA counts
 #     (PHARMA from default/oddb_article.xml, NONPHARMA from the GS1 firstbase CSV).
