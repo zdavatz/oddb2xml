@@ -150,7 +150,8 @@ cat > "$tmp" <<HTML
 
   <h2>Elexis Artikelstamm</h2>
   <ul>
-    <li><a href="artikelstamm/">artikelstamm/</a> <span class="desc">— Elexis Artikelstamm v6 (mit BAG-Indikationscodes) und Legacy-v5, je als XML und CSV, täglich aktualisiert</span></li>
+    <li><a href="artikelstamm/">artikelstamm/</a> <span class="desc">— Elexis Artikelstamm v6 (mit BAG-Indikationscodes) und Legacy-v5, je als XML und CSV, täglich aktualisiert (erzeugt mit oddb2xml)</span></li>
+    <li><a href="artikelstamm/rust2xml/">artikelstamm/rust2xml/</a> <span class="desc">— derselbe Artikelstamm v6 + v5, erzeugt mit <a href="https://github.com/zdavatz/rust2xml">rust2xml</a> (Rust-Port), täglich um 03:00 aus denselben Live-Quellen</span></li>
   </ul>
 
   <h2>aips2sqlite — Fachinformationen &amp; AmiKo-Datenbanken</h2>
