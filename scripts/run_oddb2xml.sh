@@ -81,6 +81,24 @@ rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
+# 3. Seed the ZurRose transfer.zip from the local get_transfer mirror.
+# get_transfer.sh (crontab 00:30) downloads transfer.dat straight from
+# zurrose.ch on THIS host and uploads the zip to pillbox.oddb.org — so the
+# pillbox HTTP fetch is a needless detour back to our own file. Placing the
+# zip in downloads/ makes oddb2xml's skip_download reuse it and the build no
+# longer depends on pillbox being up (2026-07-02: pillbox refused connections
+# during the 01:00 run and all three retries died, killing the whole nightly
+# build). If the seed file is missing, oddb2xml falls back to the normal
+# pillbox download as before.
+GET_TRANSFER_ZIP="${GET_TRANSFER_ZIP:-/home/zdavatz/software/get_transfer/TRANSFER.ZIP}"
+if [[ -s "$GET_TRANSFER_ZIP" ]]; then
+  mkdir -p "$BUILD_DIR/downloads"
+  cp -p "$GET_TRANSFER_ZIP" "$BUILD_DIR/downloads/transfer.zip"
+  log "Seeded ZurRose transfer.zip from $GET_TRANSFER_ZIP ($(date -r "$GET_TRANSFER_ZIP" '+%Y-%m-%d %H:%M'), no pillbox fetch needed)"
+else
+  log "WARNING: $GET_TRANSFER_ZIP missing - falling back to pillbox.oddb.org download"
+fi
+
 first=1
 
 # build_one <increment-percent|""> <destination-subdir>
