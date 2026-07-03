@@ -35,7 +35,13 @@ pharma="—"
 [[ -f "$ARTICLE_XML" ]] && pharma=$(grep -c '<SMNO>' "$ARTICLE_XML" || true)
 
 nonpharma="—"
-[[ -f "$FIRSTBASE_CSV" ]] && nonpharma=$(( $(wc -l < "$FIRSTBASE_CSV") - 1 ))
+# Only count when the CSV actually has data rows. An empty firstbase.csv (the
+# GS1 firstbase dump upstream returns 403/empty from time to time) would make a
+# naive `rows - 1` render "-1"; keep the "—" fallback instead.
+if [[ -s "$FIRSTBASE_CSV" ]]; then
+  fb_rows=$(wc -l < "$FIRSTBASE_CSV")
+  (( fb_rows > 1 )) && nonpharma=$(( fb_rows - 1 ))
+fi
 
 stand=$(date '+%d.%m.%Y %H:%M')
 

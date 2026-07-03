@@ -396,14 +396,53 @@ module Oddb2xml
       @url = BASE_URL
     end
 
+    # A valid firstbase export is a non-empty CSV. When GS1 is unavailable it
+    # answers with an HTML error page (the GetFirstbaseHealthcare endpoint has
+    # been returning "403 - Forbidden: Access is denied") or open-uri raises.
+    # The old "w+" download truncated firstbase.csv to zero bytes on any such
+    # failure, silently dropping every NONPHARMA article. Reject non-CSV bodies
+    # so the caller can keep the previous good firstbase.csv instead.
+    def firstbase_csv?(text)
+      return false if text.nil?
+      head = text[0, 512].to_s.strip.downcase
+      return false if head.empty?
+      return false if head.start_with?("<!doctype", "<html", "<?xml")
+      return false if head.include?("403 - forbidden") || head.include?("access is denied")
+      true
+    end
+
     def download
       @file2save = File.join(DOWNLOADS, "firstbase.csv")
       report_download(@url, @file2save)
-      begin
-        download_as(@file2save, "w+")
+      # Price-increment / Artikelstamm runs (--skip-download) reuse the cached
+      # firstbase.csv. Do NOT skip merely because the file exists: the nightly
+      # deploy seeds a last-good copy so a GS1 outage does not blank the feed,
+      # and we still want a fresh download attempt on the first (downloading)
+      # build so a recovered GS1 refreshes the data.
+      if Oddb2xml.skip_download? && File.size?(@file2save)
+        Oddb2xml.log "FirstbaseDownloader: --skip-download, reusing cached #{@file2save} (#{File.size(@file2save)} bytes)"
         return File.expand_path(@file2save)
+      end
+      begin
+        data = Oddb2xml.uri_open(@url).read
+        if firstbase_csv?(data)
+          File.write(@file2save, data)
+          Oddb2xml.log "FirstbaseDownloader: fetched fresh firstbase.csv (#{data.bytesize} bytes)"
+        elsif File.size?(@file2save)
+          Oddb2xml.log "FirstbaseDownloader: GS1 returned no CSV (#{data.to_s.bytesize} bytes); keeping existing #{@file2save} (#{File.size(@file2save)} bytes)"
+        else
+          Oddb2xml.log "FirstbaseDownloader: GS1 returned no CSV and there is no cached firstbase.csv to fall back to"
+        end
       rescue Timeout::Error, Errno::ETIMEDOUT
         retrievable? ? retry : raise
+      rescue => error
+        # 403 / blocked / unreachable: keep any existing firstbase.csv (e.g. the
+        # last-good copy the deploy script seeds) rather than truncating it.
+        if File.size?(@file2save)
+          Oddb2xml.log "FirstbaseDownloader: download failed (#{error.class}: #{error}); keeping existing #{@file2save} (#{File.size(@file2save)} bytes)"
+        else
+          Oddb2xml.log "FirstbaseDownloader: download failed (#{error.class}: #{error}) and no cached firstbase.csv to fall back to"
+        end
       ensure
         Oddb2xml.download_finished(@file2save, false)
       end

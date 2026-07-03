@@ -99,6 +99,23 @@ else
   log "WARNING: $GET_TRANSFER_ZIP missing - falling back to pillbox.oddb.org download"
 fi
 
+# 3b. Firstbase (GS1 NONPHARMA) fallback. The GS1 GetFirstbaseHealthcare
+# endpoint has been answering "403 - Forbidden", which blanked firstbase.csv and
+# dropped every NONPHARMA article from the -b feed. Keep the last successful
+# firstbase.csv in a persistent cache OUTSIDE $BUILD_DIR (it survives the nightly
+# `rm -rf`) and seed it into downloads/ so the gem's FirstbaseDownloader falls
+# back to yesterday's file when today's download fails. A recovered GS1 still
+# refreshes the data: the first (downloading) build always retries the live
+# fetch and only keeps the seed when that fetch yields no CSV.
+FIRSTBASE_CACHE="${FIRSTBASE_CACHE:-${OUT_DIR%/}-state/firstbase.csv}"
+if [[ -s "$FIRSTBASE_CACHE" ]]; then
+  mkdir -p "$BUILD_DIR/downloads"
+  cp -p "$FIRSTBASE_CACHE" "$BUILD_DIR/downloads/firstbase.csv"
+  log "Seeded firstbase.csv from last-good cache $FIRSTBASE_CACHE ($(($(wc -l < "$FIRSTBASE_CACHE") - 1)) rows, $(date -r "$FIRSTBASE_CACHE" '+%Y-%m-%d %H:%M'))"
+else
+  log "No firstbase last-good cache at $FIRSTBASE_CACHE yet - relying on live GS1 download"
+fi
+
 first=1
 
 # build_one <increment-percent|""> <destination-subdir>
@@ -168,6 +185,21 @@ build_artikelstamm() {
 # Build order: default first (it downloads the shared sources), then the
 # Artikelstamm right after so it is published early, then the price increments.
 build_one "" "default"           # first run: downloads sources, no increment
+
+# Refresh the last-good firstbase.csv cache after the downloading build. When
+# GS1 answered, downloads/firstbase.csv now holds fresh data; when it 403'd, the
+# gem kept the seeded copy - either way a non-empty file is worth caching so the
+# next run can fall back to it. An empty file means both today's download AND the
+# seed were missing, so leave the previous cache untouched.
+FIRSTBASE_LIVE="$BUILD_DIR/downloads/firstbase.csv"
+if [[ -s "$FIRSTBASE_LIVE" ]]; then
+  mkdir -p "$(dirname "$FIRSTBASE_CACHE")"
+  cp -p "$FIRSTBASE_LIVE" "$FIRSTBASE_CACHE"
+  log "Cached firstbase.csv as last-good ($(($(wc -l < "$FIRSTBASE_LIVE") - 1)) rows) -> $FIRSTBASE_CACHE"
+else
+  log "WARNING: firstbase.csv is empty after the build (GS1 403 and no cache) - NONPHARMA missing this run"
+fi
+
 build_artikelstamm               # Elexis Artikelstamm (v6 + legacy v5)
 for inc in $INCREMENTS; do
   build_one "$inc" "$inc"        # price increments re-use the cached downloads/
