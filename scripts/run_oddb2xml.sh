@@ -81,61 +81,69 @@ rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
 
-# 3. Seed the ZurRose transfer.zip from the local get_transfer mirror.
-# get_transfer.sh (crontab 00:30) downloads transfer.dat straight from
-# zurrose.ch on THIS host and uploads the zip to pillbox.oddb.org — so the
-# pillbox HTTP fetch is a needless detour back to our own file. Placing the
-# zip in downloads/ makes oddb2xml's skip_download reuse it and the build no
-# longer depends on pillbox being up (2026-07-02: pillbox refused connections
-# during the 01:00 run and all three retries died, killing the whole nightly
-# build). If the seed file is missing, oddb2xml falls back to the normal
-# pillbox download as before.
+# 3. ZurRose transfer.zip source. get_transfer.sh (crontab 00:30) downloads
+# transfer.dat straight from zurrose.ch on THIS host and mirrors the zip locally
+# (it also uploads it to http://pillbox.oddb.org/TRANSFER.ZIP). The build seeds
+# this local copy into a fresh downloads/ (see seed_downloads below) so the first
+# build reuses it via --skip-download instead of fetching pillbox — which refused
+# connections around 01:00 every night from 2026-07-04 on and aborted the whole
+# run at the ZurRose step (downloader.rb:221, transfer.dat ENOENT). Everything
+# else is still fetched fresh: --skip-download only reuses files already present
+# in downloads/ and downloads the rest.
 GET_TRANSFER_ZIP="${GET_TRANSFER_ZIP:-/home/zdavatz/software/get_transfer/TRANSFER.ZIP}"
-if [[ -s "$GET_TRANSFER_ZIP" ]]; then
-  mkdir -p "$BUILD_DIR/downloads"
-  cp -p "$GET_TRANSFER_ZIP" "$BUILD_DIR/downloads/transfer.zip"
-  log "Seeded ZurRose transfer.zip from $GET_TRANSFER_ZIP ($(date -r "$GET_TRANSFER_ZIP" '+%Y-%m-%d %H:%M'), no pillbox fetch needed)"
-else
-  log "WARNING: $GET_TRANSFER_ZIP missing - falling back to pillbox.oddb.org download"
-fi
+[[ -s "$GET_TRANSFER_ZIP" ]] || log "WARNING: $GET_TRANSFER_ZIP missing - ZurRose will fall back to pillbox.oddb.org"
 
-# 3b. Firstbase (GS1 NONPHARMA) fallback. The GS1 GetFirstbaseHealthcare
-# endpoint has been answering "403 - Forbidden", which blanked firstbase.csv and
-# dropped every NONPHARMA article from the -b feed. Keep the last successful
-# firstbase.csv in a persistent cache OUTSIDE $BUILD_DIR (it survives the nightly
-# `rm -rf`) and seed it into downloads/ so the gem's FirstbaseDownloader falls
-# back to yesterday's file when today's download fails. A recovered GS1 still
-# refreshes the data: the first (downloading) build always retries the live
-# fetch and only keeps the seed when that fetch yields no CSV.
+# 3b. Firstbase (GS1 NONPHARMA) last-good cache. Because the first build now runs
+# with --skip-download (to keep the ZurRose seed, see above), firstbase.csv must
+# NOT be pre-seeded into downloads/: under --skip-download a present firstbase.csv
+# would be reused verbatim and never refreshed from GS1. Instead firstbase is
+# fetched fresh every run (GS1's id.gs1.ch route works) and the fresh file is
+# archived to this persistent cache after the build for reference / recovery.
 FIRSTBASE_CACHE="${FIRSTBASE_CACHE:-${OUT_DIR%/}-state/firstbase.csv}"
-if [[ -s "$FIRSTBASE_CACHE" ]]; then
+
+# seed_downloads — reset downloads/ so it contains only the ZurRose transfer.zip
+# seed. A following --skip-download build reuses that zip (no pillbox fetch) and
+# downloads every other source fresh. Called before each attempt of the first
+# build, so a retry restarts from a clean cache (clearing any partial download)
+# while preserving the seed.
+seed_downloads() {
+  rm -rf "$BUILD_DIR/downloads"
   mkdir -p "$BUILD_DIR/downloads"
-  cp -p "$FIRSTBASE_CACHE" "$BUILD_DIR/downloads/firstbase.csv"
-  log "Seeded firstbase.csv from last-good cache $FIRSTBASE_CACHE ($(($(wc -l < "$FIRSTBASE_CACHE") - 1)) rows, $(date -r "$FIRSTBASE_CACHE" '+%Y-%m-%d %H:%M'))"
-else
-  log "No firstbase last-good cache at $FIRSTBASE_CACHE yet - relying on live GS1 download"
-fi
+  if [[ -s "$GET_TRANSFER_ZIP" ]]; then
+    cp -p "$GET_TRANSFER_ZIP" "$BUILD_DIR/downloads/transfer.zip"
+    log "Seeded ZurRose transfer.zip from $GET_TRANSFER_ZIP ($(date -r "$GET_TRANSFER_ZIP" '+%Y-%m-%d %H:%M'))"
+  fi
+}
+
+# first_build_attempt — seed downloads/, then run the first (downloading) build.
+# Wrapped in run_with_retry so each retry re-seeds and re-downloads cleanly.
+first_build_attempt() {
+  seed_downloads
+  "$ODDB2XML_BIN" --skip-download -b "$@" -c zip
+}
 
 first=1
 
 # build_one <increment-percent|""> <destination-subdir>
 build_one() {
   local inc="$1" name="$2" dest="$OUT_DIR/$2"
-  local inc_opt=() dl_opt=()
+  local inc_opt=()
   [[ -n "$inc" ]] && inc_opt=(-I "$inc")
-
-  if [[ $first -eq 1 ]]; then
-    first=0                      # first build downloads the sources
-  else
-    dl_opt=(--skip-download)     # the rest re-use the cached downloads/
-  fi
 
   log "Building increment '${inc:-none}' -> $dest"
   rm -f oddb*.zip
-  # On a retry the first build re-downloads from scratch (dl_opt empty), which
-  # also clears any partial download left by the failed attempt.
-  run_with_retry "oddb2xml build '${inc:-none}'" -- \
-    "$ODDB2XML_BIN" "${dl_opt[@]}" -b "${inc_opt[@]}" -c zip
+  if [[ $first -eq 1 ]]; then
+    first=0
+    # First build: seed the ZurRose zip into a clean downloads/, then fetch every
+    # other source fresh. Runs with --skip-download so cli.rb does not wipe
+    # downloads/ and the seeded transfer.zip survives (no pillbox fetch).
+    run_with_retry "oddb2xml build '${inc:-none}'" -- first_build_attempt "${inc_opt[@]}"
+  else
+    # Subsequent increments re-use the fully-populated downloads/ cache (firstbase
+    # and everything else were downloaded once by the first build).
+    run_with_retry "oddb2xml build '${inc:-none}'" -- \
+      "$ODDB2XML_BIN" --skip-download -b "${inc_opt[@]}" -c zip
+  fi
 
   shopt -s nullglob
   local zips=(oddb*.zip)
