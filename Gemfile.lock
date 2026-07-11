@@ -89,10 +89,10 @@ GEM
     net-http-persistent (4.0.8)
       connection_pool (>= 2.2.4, < 4)
     nkf (0.2.0)
-    nokogiri (1.19.3)
+    nokogiri (1.19.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.19.3-arm64-darwin)
+    nokogiri (1.19.4-arm64-darwin)
       racc (~> 1.4)
     nori (2.7.1)
       bigdecimal
@@ -210,7 +210,7 @@ GEM
     webrobots (0.1.2)
     xml-simple (1.1.9)
       rexml
-    yard (0.9.43)
+    yard (0.9.44)
 
 PLATFORMS
   arm64-darwin-25
