@@ -5,6 +5,8 @@ Oddb2xml::DEFAULT_OPTS = {
   fi: false,
   address: false,
   artikelstamm: false,
+  artikelstamm_v5: false,
+  rogger: false,
   nonpharma: false,
   extended: false,
   compress_ext: nil,
@@ -53,6 +55,18 @@ describe Oddb2xml::Options do
     expected[:compress_ext] = "tar.gz"
     expected[:skip_download] = true
     specify { expect(test_opts).to eq expected }
+  end
+
+  context "when -r is given" do
+    test_opts = Oddb2xml::Options.parse("-r")
+    expected = Oddb2xml::DEFAULT_OPTS.clone
+    expected[:rogger] = true
+    specify { expect(test_opts).to eq expected }
+  end
+
+  context "when --rogger is given" do
+    test_opts = Oddb2xml::Options.parse("--rogger")
+    specify { expect(test_opts[:rogger]).to eq true }
   end
 
   context "when -a is given" do

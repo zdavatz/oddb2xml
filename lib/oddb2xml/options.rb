@@ -36,6 +36,9 @@ module Oddb2xml
                             Forces -f dat -p zurrose.", type: :int, default: nil, short: "I"
         opt :fi, "Optional fachinfo output.", short: "o"
         opt :price, "Price source (transfer.dat) from ZurRose", default: nil
+        opt :rogger, "Prefer the German article names from the Rogger list
+                            (Vitabyte/Zur Rose name-conflict corrections, fetched
+                            directly from the shared 'Rogger Mediliste' Google Sheet)", short: "r", default: false
         opt :tag_suffix, "XML tag suffix S. Default is none. [A-z0-9]
                             If S is given, it is also used as prefix of filename.", type: :string, short: "t"
         opt :context, "{product|address}. product is default.", default: "product", type: :string, short: "x"

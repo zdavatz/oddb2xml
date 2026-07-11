@@ -43,7 +43,7 @@ module Oddb2xml
     attr_accessor :subject, :refdata, :items, :flags, :lppvs,
       :actions, :migel, :orphan,
       :infos, :packs, :infos_zur_rose, :firstbase,
-      :weleda_sl,
+      :weleda_sl, :rogger_names,
       :ean14, :tag_suffix,
       :companies, :people,
       :xsd
@@ -59,6 +59,7 @@ module Oddb2xml
       @migel = {}
       @infos_zur_rose ||= {}
       @weleda_sl ||= {}
+      @rogger_names ||= {}
       @firstbase ||= {}
       @actions = []
       @orphan = []
@@ -138,6 +139,24 @@ module Oddb2xml
       counts.each do |rule, n|
         Oddb2xml.log("Refdata cleanup: fixed #{labels[rule]} in #{n} description(s)") if n > 0
       end
+      apply_rogger_name_overrides!
+    end
+
+    # -r/--rogger: replace the German description with the preferred name from
+    # the Rogger list (see Oddb2xml::RoggerNames) for every listed GTIN. Runs
+    # after the issue-#112 cleanups so the list always wins. The list is
+    # German-only, FR/IT descriptions are left untouched.
+    def apply_rogger_name_overrides!
+      return if @rogger_names.nil? || @rogger_names.empty?
+      count = 0
+      @refdata.each_value do |item|
+        next unless item.is_a?(Hash)
+        name = @rogger_names[item[:ean13].to_s.rjust(13, "0")]
+        next if name.nil? || name.empty? || item[:desc_de] == name
+        item[:desc_de] = name
+        count += 1
+      end
+      Oddb2xml.log("RoggerNames: overrode #{count} German description(s)") if count > 0
     end
 
     private_class_method

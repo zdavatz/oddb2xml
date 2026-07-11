@@ -203,6 +203,20 @@ module Oddb2xml
     end
   end
 
+  # "Rogger Mediliste": GTIN -> preferred German article name (Vitabyte/Zur
+  # Rose name-conflict corrections). Fetched directly as the CSV export of the
+  # shared Google Sheet (the source of truth Frau Rogger maintains), so edits
+  # there reach the feeds without any release step. The sheet must be shared
+  # as "anyone with the link can view". See Oddb2xml::RoggerNames.
+  class RoggerDownloader < Downloader
+    include DownloadMethod
+    ROGGER_SHEET_ID = "1NXJZ8KYzVsX0OQU767tl_AwCyvFVieHWnTWXqhflwdc"
+    def download
+      @url ||= "https://docs.google.com/spreadsheets/d/#{ROGGER_SHEET_ID}/export?format=csv&gid=0"
+      download_as("rogger_liste.csv", "w+")
+    end
+  end
+
   class ZurroseDownloader < Downloader
     include DownloadMethod
     def download

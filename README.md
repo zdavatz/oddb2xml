@@ -81,6 +81,9 @@ see `--help`.
                                                           Forces -f dat -p zurrose.
     -o, --fi                  Optional fachinfo output.
     -p, --price               Price source (transfer.dat) from ZurRose
+    -r, --rogger              Prefer the German article names from the Rogger list
+                                                          (Vitabyte/Zur Rose name-conflict corrections, fetched
+                                                          directly from the shared 'Rogger Mediliste' Google Sheet)
     -t, --tag-suffix=<s>      XML tag suffix S. Default is none. [A-z0-9]
                                                           If S is given, it is also used as prefix of filename.
     -x, --context=<s>         {product|address}. product is default. (Default: product)
@@ -104,6 +107,7 @@ $ oddb2xml -f dat                       # => oddb.dat
 $ oddb2xml -f dat -a nonpharma          # => oddb_with_migel.dat
 $ oddb2xml -e                           # => oddb_article.xml (FHIR source by default since June 2026)
 $ oddb2xml -e --no-fhir                  # => oddb_article.xml using the old BAG-XML Spezialitätenliste
+$ oddb2xml -e -r                        # => oddb_article.xml with the Rogger-list article names
 ```
 
 output.

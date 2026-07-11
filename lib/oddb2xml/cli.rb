@@ -5,6 +5,7 @@ require "oddb2xml/compressor"
 require "oddb2xml/options"
 require "oddb2xml/proxy_check"
 require "oddb2xml/weleda_sl"
+require "oddb2xml/rogger_names"
 require "oddb2xml/util"
 require "rubyXL"
 require "date" # for today
@@ -168,6 +169,10 @@ module Oddb2xml
           else
             {}
           end
+          # -r/--rogger: preferred German article names from the Rogger list
+          # (Vitabyte/Zur Rose name-conflict corrections). Applied at the end
+          # of Builder#apply_refdata_description_cleanups!.
+          builder.rogger_names = @options[:rogger] ? Oddb2xml::RoggerNames.load(@options) : {}
         end
         builder.tag_suffix = @options[:tag_suffix]
       end
