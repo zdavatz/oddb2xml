@@ -6,31 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 oddb2xml is a Ruby gem that downloads Swiss pharmaceutical data from 10+ sources (Swissmedic, BAG, Refdata, ZurRose, EPha, etc.), parses multiple formats (XML, XLSX, CSV, SOAP, fixed-width DAT), merges/deduplicates them, and generates standardized XML/DAT output files for healthcare systems. It also supports the Elexis EHR Artikelstamm format.
 
-## Common Commands
-
-```bash
-# Install dependencies
-bundle install
-
-# Run full test suite
-bundle exec rake spec
-
-# Run a single test file
-bundle exec rspec spec/builder_spec.rb
-
-# Run a single test by line number
-bundle exec rspec spec/builder_spec.rb:42
-
-# Lint with StandardRB
-bundle exec standardrb
-
-# Auto-fix lint issues
-bundle exec standardrb --fix
-
-# Build the gem
-bundle exec rake build
-```
-
 ## Architecture
 
 The system follows a **download → extract → build → compress** pipeline:
@@ -85,8 +60,3 @@ Only the scripts are git-tracked; the generated `index.html`/`logo.svg` and the 
 - Test fixtures: `spec/data/` (sample files), `spec/fixtures/vcr_cassettes/` (recorded HTTP responses)
 - `spec/spec_helper.rb` defines test constants (GTINs) and configures VCR to avoid real HTTP calls during tests
 - CI runs on Ruby 3.0, 3.1, 3.2
-
-## Ruby Version
-
-- Minimum: Ruby >= 2.5.0 (gemspec)
-- Current development: Ruby 3.3.6 (`.ruby-version`)
