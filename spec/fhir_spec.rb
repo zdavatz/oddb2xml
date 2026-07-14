@@ -102,6 +102,53 @@ describe "FHIR Indikationscode support" do
     end
   end
 
+  describe Oddb2xml::FhirExtractor, "Selbstbehalt (costShare)" do
+    # deductible "N" => SLOPLUS 2 / DEDUCTIBLE 10 (ordinary 10% Selbstbehalt),
+    # "Y" => SLOPLUS 1 / DEDUCTIBLE 40 (erhoehter Selbstbehalt).
+    def extract_with_cost_share(percent)
+      bundle = JSON.parse(File.read(cyramza_fixture))
+      bundle["entry"].each do |entry|
+        res = entry["resource"]
+        next unless res["resourceType"] == "RegulatedAuthorization"
+        Array(res["extension"]).each do |ext|
+          next unless ext["url"].to_s.include?("reimbursementSL")
+          Array(ext["extension"]).each do |sub|
+            sub["valueInteger"] = percent if sub["url"] == "costShare"
+          end
+        end
+      end
+
+      file = Tempfile.new(["cyramza-costshare", ".ndjson"])
+      begin
+        file.write(JSON.generate(bundle))
+        file.flush
+        described_class.new(file.path).to_hash.values.first
+      ensure
+        file.close
+        file.unlink
+      end
+    end
+
+    it "maps the ordinary 10% Selbstbehalt to deductible N" do
+      # The live BAG feed carries costShare 10 for ~97% of all packages, so a
+      # 10 that ends up as "Y" makes every article claim a 40% Selbstbehalt.
+      item = extract_with_cost_share(10)
+      expect(item[:deductible]).to eq("N")
+      expect(item[:deductible20]).to eq("")
+    end
+
+    it "maps the raised 40% Selbstbehalt to deductible Y" do
+      item = extract_with_cost_share(40)
+      expect(item[:deductible]).to eq("Y")
+      expect(item[:deductible20]).to eq("")
+    end
+
+    it "maps the transitional 20% Selbstbehalt to deductible20 Y" do
+      item = extract_with_cost_share(20)
+      expect(item[:deductible20]).to eq("Y")
+    end
+  end
+
   describe Oddb2xml::FhirExtractor, "limitation text resolution" do
     # Build language-variant copies of the Cyramza fixture in-memory:
     # the live FHIR feed never stores limitation text inline, only a

@@ -832,16 +832,19 @@ module Oddb2xml
             end
             item[:packages][ean13][:limitation_points] = ""
             
-            # Map cost_share to deductible flags
+            # Map the BAG costShare percentage to the deductible flags. "Y"
+            # means *erhoehter* Selbstbehalt (40%, SLOPLUS 1 / DEDUCTIBLE 40),
+            # "N" the ordinary one (10%, SLOPLUS 2 / DEDUCTIBLE 10) -- the same
+            # semantics FlagSB carries in the legacy BAG Preparations.xml.
             if pac.CostShare
               case pac.CostShare
-              when 10
+              when 40
                 item[:deductible] = "Y"
               when 20
+                # Transitional 20% rate, see issue #81. Kept for old feeds.
                 item[:deductible20] = "Y"
-              when 40
-                # New value - might need new field or special handling
-                item[:deductible] = "Y"  # Fallback to standard deductible
+              else # 10 (the vast majority) and anything unexpected
+                item[:deductible] = "N"
               end
             end
 
