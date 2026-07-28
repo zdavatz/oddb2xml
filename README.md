@@ -520,6 +520,38 @@ a few times on such transient failures (`ODDB2XML_RETRIES`,
 `ODDB2XML_RETRY_DELAY`); a persistent per-host block still needs one of the
 mitigations above.
 
+## Deployment (the mediupdatexml.oddb.org download site)
+
+The `scripts/` directory automates the public download site
+<https://mediupdatexml.oddb.org>. These scripts are not part of the gem, but
+they are the reference setup for running oddb2xml unattended.
+
+* `run_oddb2xml.sh` — nightly driver (cron 01:00). Downloads the sources once,
+  then builds the `-b` feed at price increments 45/50/55 plus `default` (no
+  increment) and the Artikelstamm (v6 + legacy v5), retrying transient download
+  failures (`ODDB2XML_RETRIES`, `ODDB2XML_RETRY_DELAY`).
+* `swissmedic_watch.sh` — every 30 min. While Swissmedic blocks this host it is
+  a silent no-op; the moment the site answers again it launches one build (at
+  most once per day).
+* `generate_index_html.sh` and `visitor_stats.py` — landing page with live
+  article counts and a visitor graph, refreshed hourly.
+* `setup_new_server.sh` — provisions a bare Debian host in one command:
+  packages, user permissions, the build/output directories,
+  `/etc/cron.d/mediupdatexml`, logrotate, then the Apache vhost and Let's
+  Encrypt certificate via `setup_mediupdatexml_web.sh`. Run as root; idempotent.
+* `setup_rust2xml.sh` — installs the Rust toolchain and builds
+  [rust2xml](https://github.com/zdavatz/rust2xml) for the 03:00 Artikelstamm
+  job. Run as the build user, not root.
+* `transfer.sh` — optional scp hand-off of the output tree.
+
+One Debian-specific pitfall worth knowing when running oddb2xml from cron: with
+the system Ruby, `gem install oddb2xml` as an unprivileged user cannot write
+`/var/lib/gems` and falls back to a user install under
+`~/.local/share/gem/ruby/X.Y.0/bin`, which is on no default PATH — the build
+then fails with `oddb2xml: command not found`. `run_oddb2xml.sh` and
+`swissmedic_watch.sh` add that directory and `/usr/local/bin` to `PATH`
+themselves.
+
 ## Testing
 
 * Calling rake spec runs spec tests.
