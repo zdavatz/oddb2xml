@@ -70,9 +70,17 @@ run_with_retry() {
 }
 
 # 1. Install / update the published gem unless told otherwise.
+# Under Debian's system Ruby an unprivileged `gem install` cannot write
+# /var/lib/gems and silently falls back to a user install, whose bin dir is on
+# nobody's PATH — so the freshly installed gem is unreachable and the build dies
+# with exit 127. Put both candidate dirs on PATH, user install first, so
+# $ODDB2XML_BIN resolves to whatever this step just installed.
 if [[ "${SKIP_GEM_INSTALL:-0}" != "1" ]]; then
   log "Installing oddb2xml gem"
   gem install oddb2xml
+  GEM_USER_BIN="$(ruby -e 'print Gem.user_dir' 2>/dev/null)/bin"
+  [[ -d "$GEM_USER_BIN" ]] && export PATH="$GEM_USER_BIN:$PATH"
+  case ":$PATH:" in */usr/local/bin:*) ;; *) export PATH="/usr/local/bin:$PATH" ;; esac
 fi
 
 # 2. Fresh working dir (keeps a shared downloads/ cache across increments).

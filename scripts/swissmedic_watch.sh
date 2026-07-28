@@ -27,10 +27,20 @@ STATE_DIR="${STATE_DIR:-${OUT_DIR%/}-watch}"
 ARTICLE_XML="$OUT_DIR/default/oddb_article.xml"
 CANARY_URL="https://www.swissmedic.ch/swissmedic/de/home/services/listen_neu.html"
 
-# Match the nightly cron's rbenv environment (the repo's .ruby-version points at
-# a Ruby that isn't installed here; cron pins RBENV_VERSION instead).
-export RBENV_VERSION="${RBENV_VERSION:-3.4.5}"
-export PATH="/home/zdavatz/.rbenv/shims:/usr/bin:/bin"
+# Cron hands us a minimal PATH, so spell out where the oddb2xml binstub can be,
+# covering every way this host might have installed it: Debian's system Ruby
+# puts a root `gem install` in /usr/local/bin, an unprivileged one in
+# ~/.local/share/gem/ruby/X.Y.0/bin, and the pre-2026-07 box used rbenv shims.
+# Getting this wrong is silent until build time — the watcher launched a run on
+# the rebuilt server with an rbenv-only PATH and it died with exit 127.
+export PATH="/usr/local/bin:/usr/bin:/bin"
+HOME_DIR="${HOME:-/home/zdavatz}"
+if [[ -d "$HOME_DIR/.rbenv/shims" ]]; then
+  export RBENV_VERSION="${RBENV_VERSION:-3.4.5}"
+  export PATH="$HOME_DIR/.rbenv/shims:$PATH"
+fi
+GEM_USER_BIN="$(ruby -e 'print Gem.user_dir' 2>/dev/null)/bin"
+[[ -d "$GEM_USER_BIN" ]] && export PATH="$GEM_USER_BIN:$PATH"
 
 mkdir -p "$STATE_DIR"
 LOG="$STATE_DIR/swissmedic_watch.log"
