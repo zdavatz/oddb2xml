@@ -22,6 +22,7 @@
 #   OUT_DIR    published download root    (default /home/<RUN_USER>/oddb2xml)
 #   SKIP_WEB   set to 1 to skip the Apache/certbot step
 #   SKIP_GEM   set to 1 to skip `gem install oddb2xml`
+#   SKIP_AIPS  set to 1 to skip the aips2sqlite provisioning
 #
 set -euo pipefail
 
@@ -35,6 +36,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(dirname "$SCRIPT_DIR")"
 RUST2XML_DIR="${RUST2XML_DIR:-${RUN_HOME}/software/rust2xml}"
 GET_TRANSFER_DIR="${GET_TRANSFER_DIR:-${RUN_HOME}/software/get_transfer}"
+AIPS_DIR="${AIPS_DIR:-${RUN_HOME}/software/aips2sqlite}"
 
 step() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
 
@@ -113,6 +115,10 @@ MAILTO=$RUN_USER
 # 03:00  rust2xml's own Artikelstamm, published under /artikelstamm/rust2xml/.
 0 3 * * *    $RUN_USER  [ -x $RUST2XML_DIR/scripts/run_artikelstamm.sh ] && $RUST2XML_DIR/scripts/run_artikelstamm.sh >> $STATE_DIR/run_artikelstamm.log 2>&1
 
+# 04:30  aips2sqlite Fachinfo XMLs + AmiKo DBs + Swissmedic sequences,
+#        published under /aips2sqlite/.
+30 4 * * *   $RUN_USER  [ -x $AIPS_DIR/scripts/generate_aips_fi ] && $AIPS_DIR/scripts/generate_aips_fi >> $STATE_DIR/generate_aips_fi.log 2>&1
+
 # hourly  Refresh the landing page (live counts + visitor graph).
 5 * * * *    $RUN_USER  $SCRIPT_DIR/generate_index_html.sh $OUT_DIR >> $STATE_DIR/index_html.log 2>&1
 
@@ -136,7 +142,15 @@ $STATE_DIR/*.log $WATCH_DIR/*.log {
 EOF
 chmod 644 /etc/logrotate.d/mediupdatexml
 
-# --- 6. Apache vhost + HTTPS -------------------------------------------------
+# --- 6. aips2sqlite (JRE, checkout, /aips2sqlite alias target) ----------------
+# The landing page links a whole section of aips2sqlite output; without this the
+# alias target is missing and every /aips2sqlite/ link answers 403.
+if [[ "${SKIP_AIPS:-0}" != "1" ]]; then
+  step "Provisioning aips2sqlite (setup_aips2sqlite.sh)"
+  SKIP_CRON=1 "$SCRIPT_DIR/setup_aips2sqlite.sh"   # cron entry already written above
+fi
+
+# --- 7. Apache vhost + HTTPS -------------------------------------------------
 if [[ "${SKIP_WEB:-0}" != "1" ]]; then
   step "Provisioning the Apache vhost (setup_mediupdatexml_web.sh)"
   "$SCRIPT_DIR/setup_mediupdatexml_web.sh"
@@ -149,7 +163,8 @@ cat <<EOF
 Next steps (as $RUN_USER, not root):
   1. Rust toolchain for the 03:00 job:   $SCRIPT_DIR/setup_rust2xml.sh
   2. First build (takes ~1-2 h):         $SCRIPT_DIR/run_oddb2xml.sh
-  3. Landing page:                       $SCRIPT_DIR/generate_index_html.sh $OUT_DIR
+  3. First Fachinfo run (takes ~1 h):    $AIPS_DIR/scripts/generate_aips_fi
+  4. Landing page:                       $SCRIPT_DIR/generate_index_html.sh $OUT_DIR
 
 Check the schedule with:  cat /etc/cron.d/mediupdatexml
 EOF

@@ -542,6 +542,12 @@ they are the reference setup for running oddb2xml unattended.
 * `setup_rust2xml.sh` — installs the Rust toolchain and builds
   [rust2xml](https://github.com/zdavatz/rust2xml) for the 03:00 Artikelstamm
   job. Run as the build user, not root.
+* `setup_aips2sqlite.sh` — installs the Java runtime, restores the
+  [aips2sqlite](https://github.com/zdavatz/aips2sqlite) checkout and creates
+  `jars/output`, the target of the `/aips2sqlite/` Apache alias, plus the 04:30
+  cron entry that regenerates the Fachinformationen. Run as root; idempotent.
+  Without it every `/aips2sqlite/` link answers 403, because Apache denies a
+  path that does not exist.
 * `transfer.sh` — optional scp hand-off of the output tree.
 
 One Debian-specific pitfall worth knowing when running oddb2xml from cron: with
