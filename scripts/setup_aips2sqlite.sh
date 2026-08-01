@@ -55,13 +55,23 @@ fi
 # aips2sqlite ships a prebuilt fat jar (jars/aips2sqlite.jar), so a JRE is
 # enough — no JDK and no Gradle unless the jar itself is rebuilt. README asks
 # for Java 21+; Debian 13 has both 21 and 25, pin 21 to match what the jar was
-# built and tested against. Headless is deliberate: the only AWT user is
-# BarCode.java (barcode4j), which is not on the Fachinfo path and renders
-# offscreen anyway.
-step "Installing the Java runtime (openjdk-21-jre-headless)"
+# built and tested against.
+#
+# The font libraries are NOT optional, even though Debian lists them as mere
+# Recommends of the headless JRE: every Fachinfo carries a rendered EAN13
+# barcode (RealExpertInfo.updateSectionPackungen -> BarCode.encode -> barcode4j),
+# and drawing its digits loads libfontmanager.so. Installing the JRE with
+# --no-install-recommends therefore gets through the whole download phase and
+# then dies on the first medicine with
+#   UnsatisfiedLinkError: libfontmanager.so: libharfbuzz.so.0: cannot open ...
+# so they are listed explicitly here rather than left to apt's recommends
+# handling. fonts-dejavu-core gives fontconfig an actual font to find.
+step "Installing the Java runtime (openjdk-21-jre-headless + font stack)"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
-apt-get install -y --no-install-recommends openjdk-21-jre-headless
+apt-get install -y --no-install-recommends \
+  openjdk-21-jre-headless \
+  libfreetype6 libharfbuzz0b libfontconfig1 fonts-dejavu-core
 java -version
 
 # --- 2. Checkout -------------------------------------------------------------
@@ -117,4 +127,17 @@ Optional: export REFDATA_API_KEY (developer.refdata.ch) to also fetch the
 Refdata Partner GLN data. It is only consumed by the Takeda partner export,
 so the Fachinfo/sequences output is complete without it — the run just logs
 one download exception.
+
+Known upstream gap: BAG's resource index
+https://epl.bag.admin.ch/api/sl/public/resources/current currently reports
+"fhir": {"fileUrl": null}, so aips2sqlite's FHIR download resolves to
+/static/null and the run parses 0 preparations (no SL flags, no prices). The
+export itself is alive at the fixed path oddb2xml uses:
+
+    https://epl.bag.admin.ch/static/fhir/foph-sl-export-latest-de.ndjson
+
+Until the jar learns that fallback, seed it before the run:
+
+    cp <oddb2xml downloads>/foph-sl-export-latest-de.ndjson \\
+       $AIPS_DIR/jars/downloads/fhir-sl.ndjson
 EOF
