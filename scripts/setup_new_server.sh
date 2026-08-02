@@ -89,11 +89,19 @@ fi
 # BUILD_DIR  shared downloads/ cache; wiped at the start of every build
 # STATE_DIR  last-good firstbase.csv + cron logs; must survive the wipe
 # WATCH_DIR  swissmedic_watch.sh stamps and log
-step "Creating $OUT_DIR, $BUILD_DIR, $STATE_DIR, $WATCH_DIR"
-for d in "$OUT_DIR" "$BUILD_DIR" "$STATE_DIR" "$WATCH_DIR"; do
+# GET_TRANSFER_DIR  local ZurRose mirror (TRANSFER.ZIP), seeded into the build
+step "Creating $OUT_DIR, $BUILD_DIR, $STATE_DIR, $WATCH_DIR, $GET_TRANSFER_DIR"
+for d in "$OUT_DIR" "$BUILD_DIR" "$STATE_DIR" "$WATCH_DIR" "$GET_TRANSFER_DIR"; do
   mkdir -p "$d"
   chown "$RUN_USER:$RUN_USER" "$d"
 done
+
+# The ZurRose mirror script used to exist only in $GET_TRANSFER_DIR on the old
+# server, so deleting that host lost both the script and its download URL, and
+# the cron line below — guarded by [ -x ] — went quietly dead. Symlink the
+# tracked copy instead, so a rebuild restores the mirror from the checkout.
+ln -sfn "$SCRIPT_DIR/get_transfer.sh" "$GET_TRANSFER_DIR/get_transfer.sh"
+chown -h "$RUN_USER:$RUN_USER" "$GET_TRANSFER_DIR/get_transfer.sh"
 
 # --- 5. Cron -----------------------------------------------------------------
 # One /etc/cron.d file instead of the old scattered per-user crontab, so the
@@ -161,10 +169,15 @@ cat <<EOF
 ==> Host provisioning done.
 
 Next steps (as $RUN_USER, not root):
-  1. Rust toolchain for the 03:00 job:   $SCRIPT_DIR/setup_rust2xml.sh
-  2. First build (takes ~1-2 h):         $SCRIPT_DIR/run_oddb2xml.sh
-  3. First Fachinfo run (takes ~1 h):    $AIPS_DIR/scripts/generate_aips_fi
-  4. Landing page:                       $SCRIPT_DIR/generate_index_html.sh $OUT_DIR
+  1. ZurRose mirror (needed by step 3):  $GET_TRANSFER_DIR/get_transfer.sh
+  2. Rust toolchain for the 03:00 job:   $SCRIPT_DIR/setup_rust2xml.sh
+  3. First build (takes ~1-2 h):         $SCRIPT_DIR/run_oddb2xml.sh
+  4. First Fachinfo run (takes ~1 h):    $AIPS_DIR/scripts/generate_aips_fi
+  5. Landing page:                       $SCRIPT_DIR/generate_index_html.sh $OUT_DIR
+
+Step 1 before step 3: without $GET_TRANSFER_DIR/TRANSFER.ZIP the build falls
+back to http://pillbox.oddb.org/TRANSFER.ZIP, which is itself only a mirror of
+this job and has gone stale (and refused connections at 01:00) before.
 
 Check the schedule with:  cat /etc/cron.d/mediupdatexml
 EOF

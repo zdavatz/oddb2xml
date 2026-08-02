@@ -294,7 +294,7 @@ We use the following files:
 * http://bag.e-mediat.net/SL2007.Web.External/File.axd?file=XMLPublications.zip
 * https://www.medregbm.admin.ch/Publikation/CreateExcelListBetriebs
 * https://www.medregbm.admin.ch/Publikation/CreateExcelListMedizinalPersons
-* http://zurrose.com/fileadmin/main/lib/download.php?file=/fileadmin/user_upload/downloads/ProduktUpdate/IGM11_mit_MwSt/Vollstamm/transfer.dat
+* https://www.zurrose.ch/sites/default/files/media/downloads/medi/produktupdate/igm11/de/transfer.dat (ZurRose IGM11 Vollstamm; mirrored by `scripts/get_transfer.sh`, which the gem then reads via `http://pillbox.oddb.org/TRANSFER.ZIP` or a local seed. The former `zurrose.com/fileadmin/main/lib/download.php?file=…` path now redirects to the marketing homepage.)
 * https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/NON-Pharma.xls
 * http://download.swissmedicinfo.ch/ (AipsDownload)
 * https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt
@@ -526,6 +526,13 @@ The `scripts/` directory automates the public download site
 <https://mediupdatexml.oddb.org>. These scripts are not part of the gem, but
 they are the reference setup for running oddb2xml unattended.
 
+* `get_transfer.sh` — mirrors the ZurRose IGM11 Vollstamm (`transfer.dat`) to
+  `/home/zdavatz/software/get_transfer/TRANSFER.ZIP` (cron 00:30), which the
+  nightly build seeds into its `downloads/` cache instead of fetching
+  `pillbox.oddb.org` — that host is only a mirror of this same job. Validates
+  the fixed-width record shape (98 bytes per record) before publishing, and
+  keeps the previous zip when the download fails, so a ZurRose outage cannot
+  abort the 01:00 build. Override the source with `TRANSFER_URL`.
 * `run_oddb2xml.sh` — nightly driver (cron 01:00). Downloads the sources once,
   then builds the `-b` feed at price increments 45/50/55 plus `default` (no
   increment) and the Artikelstamm (v6 + legacy v5), retrying transient download
