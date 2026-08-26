@@ -80,6 +80,51 @@ describe Oddb2xml::RefdataExtractor do
       expect(item_found).to eq(expected)
     end
   end
+  context "when Refdata omits the barcode (issue #122)" do
+    # The Swiss Red Cross blood products under the collective registration 99999
+    # arrived in August 2026 with no <DataCarrierIdentifier> at all. The nil used
+    # to blow up the whole extraction -- and Cli#download_as rescues that into a
+    # silent Oddb2xml.log, so every Refdata PHARMA article disappeared from the
+    # feeds while the build still reported success.
+    let(:xml) do
+      <<~XML
+        <?xml version="1.0" encoding="utf-8"?>
+        <Articles xmlns="https://simisinfo.refdata.ch/Articles/1.0/" totalArticles="2">
+          <Article>
+            <MedicinalProduct>
+              <Identifier>CH-7601001320451-62069</Identifier>
+              <ProductClassification><ProductClass>PHARMA</ProductClass><Atc>N03AX14</Atc></ProductClassification>
+            </MedicinalProduct>
+            <PackagedProduct>
+              <RegulatedAuthorisationIdentifier>62069008</RegulatedAuthorisationIdentifier>
+              <DataCarrierIdentifier>#{Oddb2xml::LEVETIRACETAM_GTIN}</DataCarrierIdentifier>
+              <Holder><Identifier>7601001320451</Identifier><Name>Desitin Pharma GmbH</Name></Holder>
+              <Name><Language>DE</Language><FullName>LEVETIRACETAM DESITIN Mini Filmtab 250 mg 30 Stk</FullName></Name>
+            </PackagedProduct>
+          </Article>
+          <Article>
+            <MedicinalProduct>
+              <Identifier>CH-7601002120890-9999900</Identifier>
+              <ProductClassification><ProductClass>PHARMA</ProductClass><Atc>Z00Z000</Atc></ProductClassification>
+            </MedicinalProduct>
+            <PackagedProduct>
+              <RegulatedAuthorisationIdentifier>99999001</RegulatedAuthorisationIdentifier>
+              <Holder><Identifier>7601002120890</Identifier><Name>Schweizerisches Rotes Kreuz - SRK</Name></Holder>
+              <Name><Language>DE</Language><FullName>Erythrozytenkonzentrat (EK)</FullName></Name>
+            </PackagedProduct>
+          </Article>
+        </Articles>
+      XML
+    end
+
+    it "skips the barcode-less article instead of losing every other one" do
+      items = Oddb2xml::RefdataExtractor.new(xml, "PHARMA").to_hash
+      expect(items.size).to eq 1
+      expect(items.keys).to eq [Oddb2xml::LEVETIRACETAM_GTIN.to_s]
+      expect(items.values.first[:no8]).to eq "62069008"
+    end
+  end
+
   context "should handle nonpharma articles" do
     subject do
       @downloader = Oddb2xml::RefdataDownloader.new({}, :nonpharma)

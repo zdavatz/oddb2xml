@@ -216,6 +216,18 @@ module Oddb2xml
           next
         end
         ean13 = @type == "PHARMA" ? article.PackagedProduct.DataCarrierIdentifier : article.MedicinalProduct.Identifier
+        if ean13.nil? || ean13.empty?
+          # Refdata publishes a handful of PHARMA articles that carry no barcode at
+          # all -- e.g. the Swiss Red Cross blood products under the collective
+          # registration 99999 (Erythrozytenkonzentrat & co), which appeared in
+          # August 2026. They have no article identifier we could key on, so skip
+          # them. Before this guard the nil blew up the whole extraction, and
+          # Cli#download_as rescues that error into a silent Oddb2xml.log call, so
+          # *every* Refdata PHARMA article vanished from the feeds while the build
+          # still reported success. See GitHub issue #122.
+          puts "Refdata #{@type} skipping #{article.MedicinalProduct.Identifier} without an EAN13" if $VERBOSE
+          next
+        end
         if ean13.size < 13
           puts "Refdata #{@type} use 13 chars not #{ean13.size} for #{ean13}" if $VERBOSE
           ean13 = ean13.rjust(13, "0")

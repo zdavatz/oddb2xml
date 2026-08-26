@@ -85,6 +85,8 @@ module Oddb2xml
             threads << download(:refdata, type) # refdata
           rescue => error
             # Should continue even when error #102
+            $stderr.puts "WARNING: Refdata #{type} download failed (#{error.class}: #{error})"
+            $stderr.flush
             Oddb2xml.log("Error in downloading refdata #{error}")
           end
         end
@@ -377,6 +379,12 @@ module Oddb2xml
             @refdata_types[type]
           rescue => error
             # Should continue even when error https://github.com/zdavatz/oddb2xml/issues/102
+            # ...but say so loudly: without the Refdata articles the feeds lose every
+            # Swissmedic-registered medicine, and Oddb2xml.log is a no-op unless --log
+            # is given, so this used to fail completely silently. See issue #122.
+            $stderr.puts "WARNING: RefdataExtractor #{type} failed (#{error.class}: #{error}) -- " \
+              "no #{type} articles from Refdata in this run!"
+            $stderr.flush
             Oddb2xml.log("Error in RefdataExtractor #{error}")
           end
         end
