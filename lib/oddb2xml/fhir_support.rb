@@ -14,7 +14,17 @@ module Oddb2xml
     include DownloadMethod
 
     BASE_URL = "https://epl.bag.admin.ch"
-    STATIC_FHIR_PATH = "/static/fhir"
+    # BAG moved the export on 24.08.2026 and announced it the next evening:
+    # /static/fhir/foph-sl-export-* became
+    # /static/sl/publication/fhir/foph-sl-publication-*.
+    #
+    # The old -latest- alias answers 404 while the old dated snapshots stay in
+    # place, so this fails by downloading nothing rather than by crashing.
+    # There is no language-less default any more; per BAG each URL must name
+    # de, fr or it. A preliminary publication now exists in parallel under
+    # /static/sl/preliminary/fhir/foph-sl-preliminary-*, which this does not use.
+    STATIC_FHIR_PATH = "/static/sl/publication/fhir"
+    FILE_PREFIX = "foph-sl-publication"
     LANGUAGES = %w[de fr it].freeze
 
     def initialize(options = {})
@@ -32,7 +42,7 @@ module Oddb2xml
       else
         files = {}
         LANGUAGES.each do |lang|
-          url = "#{BASE_URL}#{STATIC_FHIR_PATH}/foph-sl-export-latest-#{lang}.ndjson"
+          url = "#{BASE_URL}#{STATIC_FHIR_PATH}/#{FILE_PREFIX}-latest-#{lang}.ndjson"
           path = download_one(url)
           files[lang] = path if path
         end

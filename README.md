@@ -299,7 +299,7 @@ We use the following files:
 * http://download.swissmedicinfo.ch/ (AipsDownload)
 * https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/LPPV.txt
 * https://raw.githubusercontent.com/zdavatz/cpp2sqlite/master/input/atc_codes_multi_lingual.txt
-* https://epl.bag.admin.ch/static/fhir/foph-sl-export-latest-{de,fr,it}.ndjson (FHIR NDJSON, used with `--fhir`)
+* https://epl.bag.admin.ch/static/sl/publication/fhir/foph-sl-publication-latest-{de,fr,it}.ndjson (FHIR NDJSON, used with `--fhir`)
 * https://id.gs1.ch/01/07612345000961 (GS1 Switzerland firstbase CSV — full barcode registry, used with `-b`/`--firstbase`)
 
 ## Indikationscode (BAG XXXXX.NN)
@@ -335,7 +335,7 @@ The same data is also exposed in-memory on each item and package as
 `item[:indication_codes]` (an array of `{code:, cud_id:, text:}`
 hashes) for downstream consumers that build their own emitters.
 
-Counted on the live FOPH feed (`foph-sl-export-latest-de.ndjson`,
+Counted on the live FOPH feed (`foph-sl-publication-latest-de.ndjson`,
 6'775 bundles): **539** products carry a total of **1'293** codes.
 
 Per BAG Rundschreiben vom 19. Februar 2026, the Indikationscode must
@@ -420,7 +420,7 @@ RegulatedAuthorization/65839
 ```
 
 The CUDs are identical in `id` across the three per-language NDJSON
-files (`foph-sl-export-latest-{de,fr,it}.ndjson`); only the
+files (`foph-sl-publication-latest-{de,fr,it}.ndjson`); only the
 `concept.text` differs. `FhirExtractor` resolves DE from the primary
 file and merges FR/IT in via the same CUD id. Coverage on the live
 feed went from 0 / 9'108 to 9'108 / 9'108 (100 %). See issue

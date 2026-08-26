@@ -134,10 +134,10 @@ https://epl.bag.admin.ch/api/sl/public/resources/current currently reports
 /static/null and the run parses 0 preparations (no SL flags, no prices). The
 export itself is alive at the fixed path oddb2xml uses:
 
-    https://epl.bag.admin.ch/static/fhir/foph-sl-export-latest-de.ndjson
+    https://epl.bag.admin.ch/static/sl/publication/fhir/foph-sl-publication-latest-de.ndjson
 
 Until the jar learns that fallback, seed it before the run:
 
-    cp <oddb2xml downloads>/foph-sl-export-latest-de.ndjson \\
+    cp <oddb2xml downloads>/foph-sl-publication-latest-de.ndjson \\
        $AIPS_DIR/jars/downloads/fhir-sl.ndjson
 EOF

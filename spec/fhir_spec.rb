@@ -356,3 +356,32 @@ describe "FHIR Indikationscode support" do
     end
   end
 end
+
+# BAG moved the export on 24.08.2026 and announced it the next evening. The old
+# -latest- alias answers 404 while the old dated snapshots stay in place, so the
+# failure is an import that quietly downloads nothing - the same shape that let
+# ch.oddb.org run for twelve mornings reporting exit 0 and importing nothing.
+describe Oddb2xml::FhirDownloader do
+  it "builds the per-language urls under the publication path" do
+    base = Oddb2xml::FhirDownloader::BASE_URL
+    path = Oddb2xml::FhirDownloader::STATIC_FHIR_PATH
+    prefix = Oddb2xml::FhirDownloader::FILE_PREFIX
+
+    expect(path).to eq "/static/sl/publication/fhir"
+    expect(prefix).to eq "foph-sl-publication"
+    expect(Oddb2xml::FhirDownloader::LANGUAGES).to eq %w[de fr it]
+
+    url = "#{base}#{path}/#{prefix}-latest-de.ndjson"
+    expect(url).to eq "https://epl.bag.admin.ch/static/sl/publication/fhir/" \
+                      "foph-sl-publication-latest-de.ndjson"
+  end
+
+  it "no longer points at the retired export path" do
+    combined = [
+      Oddb2xml::FhirDownloader::STATIC_FHIR_PATH,
+      Oddb2xml::FhirDownloader::FILE_PREFIX
+    ].join(" ")
+    expect(combined).not_to include "foph-sl-export"
+    expect(combined).not_to eq "/static/fhir"
+  end
+end
