@@ -573,3 +573,47 @@ themselves.
 ** Removing the directory fixtures and running @bundle exec rspec spec/downloader_spec.rb@ gets the actual content from the different servers
 ** To minimize the downloaded size we use several @before_record@ hooks to select the desired content, eg. only the 5 items from EPha.
 
+
+## Releasing a new version
+
+1. Bump `Oddb2xml::VERSION` in `lib/oddb2xml/version.rb` and the `oddb2xml (X.Y.Z)`
+   line in `Gemfile.lock`.
+2. Prepend an entry to `History.txt` (`=== X.Y.Z / DD.MM.YYYY`).
+3. Commit, then tag and push:
+
+   ```bash
+   git tag -a vX.Y.Z -m "Version X.Y.Z"
+   git push origin master && git push origin vX.Y.Z
+   ```
+
+   The tag triggers `.github/workflows/release.yml`, which builds the gem and
+   publishes a GitHub release with the `.gem` attached. It does **not** push to
+   rubygems.org — that step is manual.
+4. Build and push the gem:
+
+   ```bash
+   gem build oddb2xml.gemspec
+   gem push oddb2xml-X.Y.Z.gem --otp <code>
+   ```
+
+The push needs an API key in the file that `ruby -e 'require "rubygems"; puts
+Gem.configuration.credentials_path'` reports — on Debian with the system Ruby
+that is `~/.local/share/gem/credentials`, not the `~/.gem/credentials` most
+documentation names. Create it with `gem signin`, or write it by hand as
+
+```yaml
+---
+:rubygems_api_key: rubygems_...
+```
+
+and `chmod 600` it. Multi-factor authentication is enabled on this gem, so
+`--otp` is required **in addition to** the API key; a missing key reports
+`Invalid credentials / code: 401` rather than anything about the OTP, which is
+easy to misread as an expired code.
+
+Finally, update the download server, which runs the released gem rather than
+this checkout:
+
+```bash
+sudo gem install oddb2xml
+```
