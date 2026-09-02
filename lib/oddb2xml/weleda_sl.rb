@@ -78,9 +78,17 @@ module Oddb2xml
         bundled = File.join(DATA_DIR, basename)
         if File.exist?(bundled)
           Oddb2xml.log "WeledaSL: using bundled #{basename}"
-          content = File.read(bundled)
+          content = File.read(bundled, encoding: "UTF-8")
         end
       end
+      # All three lists carry non-ASCII (umlauts in the product names, the "−"
+      # in the group-price table). A downloader that hands back ASCII-8BIT --
+      # webmock does, and so does any body served without a charset -- makes
+      # the first comparison against a UTF-8 literal raise
+      # Encoding::CompatibilityError, which load's rescue turns into an empty
+      # map: the whole Weleda/WALA SL recovery then vanishes silently. Pin the
+      # encoding here, as RoggerNames#parse does.
+      content = content.dup.force_encoding(Encoding::UTF_8) if content && content.encoding != Encoding::UTF_8
       content
     end
 
