@@ -52,12 +52,15 @@ Ready-made files are built nightly and published on
 [Deployment](#deployment-the-mediupdatexmloddborg-download-site) for what the
 site publishes and how it is generated.
 
-HIN's [MEDIupdate XML](https://www.hin.ch/de/services/mediupdate-xml.cfm) mirror
-at `https://download.hin.ch/download/oddb2xml` used to be refreshed daily, but
-has not been updated since June 2026 (it still serves the build of 22.06.2026,
-`GENERATED_BY="oddb2xml 3.0.25"`) — the job feeding it stopped together with the
-old server. Use mediupdatexml.oddb.org for current data, see
-[issue #127](https://github.com/zdavatz/oddb2xml/issues/127).
+HIN's [MEDIupdate XML](https://www.hin.ch/de/services/mediupdate-xml.cfm#section_2)
+page links straight to those URLs — it does not host a copy of its own.
+
+The old mirror at `https://download.hin.ch/download/oddb2xml` is **not linked
+from anywhere any more** and has not been updated since June 2026 (it still
+serves the build of 22.06.2026, `GENERATED_BY="oddb2xml 3.0.25"`) — the job
+feeding it stopped with the old server. It still answers `200` with
+plausible-looking data, which is exactly what makes it dangerous. Don't use it,
+see [issue #127](https://github.com/zdavatz/oddb2xml/issues/127).
 
 see `--help`.
 
@@ -567,11 +570,11 @@ they are the reference setup for running oddb2xml unattended.
   Without it every `/aips2sqlite/` link answers 403, because Apache denies a
   path that does not exist.
 * `transfer.sh` — optional scp hand-off of the output tree to the HIN
-  download server. **Not wired up**: `SCP_DEST` has no default and the
-  script is not in `/etc/cron.d/mediupdatexml`, so nothing has been pushed
-  to `download.hin.ch` since the old server was deleted — that mirror has
-  been serving the build of 22.06.2026 ever since
-  ([issue #127](https://github.com/zdavatz/oddb2xml/issues/127)).
+  download server. **Obsolete, and deliberately not wired up**: `SCP_DEST` has
+  no default and the script is not in `/etc/cron.d/mediupdatexml`. HIN links
+  this site's URLs directly, so there is nothing left to copy; the unfed mirror
+  it used to push to is
+  [issue #127](https://github.com/zdavatz/oddb2xml/issues/127).
 
 One Debian-specific pitfall worth knowing when running oddb2xml from cron: with
 the system Ruby, `gem install oddb2xml` as an unprivileged user cannot write
