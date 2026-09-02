@@ -2,7 +2,6 @@ require "net/ntlm/version" # needed to avoid error: uninitialized constant Net::
 require "rubyntlm"
 require "mechanize"
 require "zip"
-require "savon"
 require "open-uri"
 
 SKIP_MIGEL_DOWNLOADER = true # https://github.com/zdavatz/oddb2xml_files/raw/master/NON-Pharma.xls
@@ -49,7 +48,6 @@ module Oddb2xml
       @options = options
       @url = url
       @retry_times = 3
-      HTTPI.log = false # disable httpi warning
       Oddb2xml.log "Downloader from #{@url} for #{self.class}"
       init
     end
