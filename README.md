@@ -136,8 +136,9 @@ FR
 
 ## Supported ruby version
 
-You will need ruby >= 2.5 to work correctly. Current development happens on Ruby 3.3 (`.ruby-version`).
-CI runs on Ruby 3.0, 3.1 and 3.2 via GitHub Actions — see the badge above for the latest spec results.
+You will need Ruby >= 3.2. Current development happens on Ruby 3.3 (`.ruby-version`).
+CI runs on Ruby 3.2 and 3.3 via GitHub Actions — see the badge above for the latest spec results.
+Ruby 3.0 and 3.1 dropped out with the dependency update of February 2026 (`public_suffix` 7 needs 3.2), and both are end-of-life.
 
 
 ## XSD files

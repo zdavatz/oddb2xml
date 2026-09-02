@@ -260,6 +260,15 @@ def mock_downloads
    "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/weleda_arzneimittel.csv" => "weleda_arzneimittel.csv",
    "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/wala_arzneimittel.csv" => "wala_arzneimittel.csv",
    "https://raw.githubusercontent.com/zdavatz/oddb2xml_files/master/bag_sl_group_prices.csv" => "bag_sl_group_prices.csv",
+   # The FHIR NDJSON, default SL source for -e/-b since June 2026. It was never
+   # stubbed: webmock refused epl.bag.admin.ch, FhirExtractor added 0 items and
+   # Builder called Kernel#exit 2, which killed rspec mid-run with a summary
+   # line reading "0 failures". One real bundle keeps the extractor non-empty;
+   # specs asserting on SL prices/limitations pass --no-fhir and use
+   # Preparations.xml instead.
+   "https://epl.bag.admin.ch/static/sl/publication/fhir/foph-sl-publication-latest-de.ndjson" => "fhir/cyramza.ndjson",
+   "https://epl.bag.admin.ch/static/sl/publication/fhir/foph-sl-publication-latest-fr.ndjson" => "fhir/cyramza.ndjson",
+   "https://epl.bag.admin.ch/static/sl/publication/fhir/foph-sl-publication-latest-it.ndjson" => "fhir/cyramza.ndjson",
    "http://www.xn--spezialittenliste-yqb.ch/File.axd?file=XMLPublications.zip" => "XMLPublications.zip",
    "https://www.spezialitaetenliste.ch/File.axd?file=XMLPublications.zip" => "XMLPublications.zip",
    "https://files.refdata.ch/simis-public-prod/Articles/1.0/Refdata.Articles.zip" => "Refdata.Articles.zip",

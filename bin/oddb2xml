@@ -38,6 +38,9 @@ begin
   ui.run
 rescue Interrupt
   exit
+rescue Oddb2xml::NoSubstancesError => e
+  warn "oddb2xml: #{e.message}"
+  exit 2
 end
 diff = (Time.now - start_time).to_i
 puts "#{Time.now}: #{__LINE__} done. Took #{diff} seconds"

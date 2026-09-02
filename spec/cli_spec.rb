@@ -184,7 +184,9 @@ describe Oddb2xml::Cli do
   context "when  -e and -f dat option is given" do
     before(:all) do
       cleanup_directories_before_run
-      options = Oddb2xml::Options.parse("-e -f dat")
+      # --no-fhir: the assertions below come from the stubbed BAG Preparations.xml;
+      # the FHIR stub in mock_downloads is a single bundle (see spec_helper).
+      options = Oddb2xml::Options.parse("-e -f dat --no-fhir")
       @cli = Oddb2xml::Cli.new(options)
       @cli_output = buildr_capture(:stdout) { @cli.run }
     end

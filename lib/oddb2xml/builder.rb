@@ -277,7 +277,10 @@ module Oddb2xml
         @substances.uniq!
         @substances.sort!
         Oddb2xml.log("prepare_substances done. Total #{@substances.size} from #{@items.size} items")
-        exit 2 if (@options[:extended] || @options[:artikelstamm]) && (@substances.size == 0)
+        if (@options[:extended] || @options[:artikelstamm]) && @substances.empty?
+          raise NoSubstancesError, "prepare_substances: no substances from #{@items.size} items -- " \
+            "the SL source (FHIR NDJSON or BAG Preparations.xml) yielded nothing, refusing to write an empty feed"
+        end
       end
     end
 
@@ -417,7 +420,9 @@ module Oddb2xml
           XML_OPTIONS
         ) {
           Oddb2xml.log "build_substance #{@substances.size} substances"
-          exit 2 if (@options[:extended] || @options[:artikelstamm]) && (@substances.size == 0)
+            if (@options[:extended] || @options[:artikelstamm]) && @substances.empty?
+            raise NoSubstancesError, "build_substance: no substances to write"
+          end
           nbr_records = 0
           @substances.each_with_index do |sub_name, i|
             xml.SB("DT" => "") do

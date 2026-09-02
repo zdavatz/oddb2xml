@@ -451,7 +451,9 @@ def checkProductXml(nbr_record = -1)
   expect(hirudoid.elements["ATC"].text).to eq("C05BA01") # modified by atc.csv!
 end
 
-NR_EXTENDED_ARTICLES = 80
+# 81 since 3.0.21: spec/data/transfer.dat gained the Weleda Kapitel-70 record
+# 7611916162404 (issue #121), which -e emits as a ZurRose-only article.
+NR_EXTENDED_ARTICLES = 81
 NR_SUBSTANCES = 28
 NR_LIMITATIONS = 15
 
@@ -685,7 +687,9 @@ describe Oddb2xml::Builder do
   context "when --append -I 80 -e is given" do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.parse("--append -I 80 -e")
+      # --no-fhir: the assertions below come from the stubbed BAG Preparations.xml;
+      # the FHIR stub in mock_downloads is a single bundle (see spec_helper).
+      options = Oddb2xml::Options.parse("--append -I 80 -e --no-fhir")
       Oddb2xml::Cli.new(options).run
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
     end
@@ -734,7 +738,9 @@ describe Oddb2xml::Builder do
   context "when option -e is given" do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.parse("-e")
+      # --no-fhir: the assertions below come from the stubbed BAG Preparations.xml;
+      # the FHIR stub in mock_downloads is a single bundle (see spec_helper).
+      options = Oddb2xml::Options.parse("-e --no-fhir")
       puts options
       @cli = Oddb2xml::Cli.new(options)
       if RUN_ALL
@@ -853,7 +859,7 @@ describe Oddb2xml::Builder do
       dscrds = REXML::XPath.match(doc, "//ART")
       expect(dscrds.size).to eq(NR_EXTENDED_ARTICLES)
       expect(REXML::XPath.match(doc, "//PHAR").count { |x| x.text.match("0000000") }).to eq(0) # 0 is not a valid pharmacode
-      expect(REXML::XPath.match(doc, "//PHAR").count { |x| x.text.match(/\d+/) }).to eq 66
+      expect(REXML::XPath.match(doc, "//PHAR").count { |x| x.text.match(/\d+/) }).to eq 67 # 66 + the Weleda record
     end
 
     it "should have a correct NBR_RECORD in oddb_limitation.xml" do
@@ -912,7 +918,9 @@ describe Oddb2xml::Builder do
   context "testing -e -I 80 option" do
     before(:all) do
       common_run_init
-      options = Oddb2xml::Options.parse("-e -I 80 --log")
+      # --no-fhir: the assertions below come from the stubbed BAG Preparations.xml;
+      # the FHIR stub in mock_downloads is a single bundle (see spec_helper).
+      options = Oddb2xml::Options.parse("-e -I 80 --log --no-fhir")
       # @res = buildr_capture(:stdout){ Oddb2xml::Cli.new(options).run }
       @res = Oddb2xml::Cli.new(options).run
     end

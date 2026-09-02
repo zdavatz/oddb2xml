@@ -7,6 +7,14 @@ module Oddb2xml
   # Raised when a downloaded archive (zip/xlsx) is empty or truncated, so the
   # caller can retry the download instead of crashing later in the parser.
   class IncompleteDownloadError < StandardError; end
+  # Raised by Builder when an -e/--extended or --artikelstamm build ends up with
+  # no substances at all: the SL source (FHIR NDJSON or BAG Preparations.xml)
+  # came back empty, so the feed would be useless. bin/oddb2xml turns it into
+  # exit status 2; under RSpec it is an ordinary exception. Builder used to call
+  # Kernel#exit here, which killed the host process -- inside rspec that ended
+  # the run after a random number of examples with a summary line reading
+  # "0 failures", so the suite looked green for months while exiting 2.
+  class NoSubstancesError < StandardError; end
 
   def self.gen_prodno(iksnr, seqnr)
     sprintf("%05d", iksnr) + sprintf("%02d", seqnr)
