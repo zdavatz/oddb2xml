@@ -587,6 +587,12 @@ module Oddb2xml
         ean13_to_product[ean13] = obj
         obj[:pharmacode] ||= @refdata[ean13][:pharmacode] if @refdata[ean13]
       }
+      # The CLI creates WORK_DIR before building, but Builder is also driven
+      # directly (fhir_spec), and then this was the first write into it --
+      # Errno::ENOENT whenever the random spec order got here before any CLI
+      # example had created the directory. ZurroseExtractor guards its own
+      # WORK_DIR write the same way.
+      FileUtils.makedirs(WORK_DIR)
       ausgabe = File.open(File.join(WORK_DIR, "missing_in_refdata.txt"), "w+")
       size_old = ean13_to_product.size
       @missing = []
@@ -1656,6 +1662,7 @@ module Oddb2xml
     def build_artikelstamm(version: 6)
       @@emitted_v6_gtins = []
       @artikelstamm_version = version
+      FileUtils.makedirs(WORK_DIR) # same guard as add_missing_products_from_swissmedic
       @csv_file = CSV.open(File.join(WORK_DIR, "artikelstamm_#{Date.today.strftime("%d%m%Y")}_v#{version}.csv"), "w+")
       @csv_file << ["gtin", "name", "pkg_size", "galenic_form", "price_ex_factory", "price_public", "prodno", "atc_code", "active_substance", "original", "it-code", "sl-liste"]
       @csv_file.sync = true
