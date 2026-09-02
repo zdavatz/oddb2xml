@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    oddb2xml (3.0.34)
+    oddb2xml (3.0.35)
       csv
       htmlentities
       mechanize (>= 2.8.5)
