@@ -6,7 +6,6 @@ PATH
       htmlentities
       mechanize (>= 2.8.5)
       minitar
-      multi_json
       nokogiri (>= 1.18.10)
       optimist
       ox
@@ -14,7 +13,6 @@ PATH
       rack (>= 3.1.20)
       rexml (>= 3.3.9)
       rubyXL (~> 3.4.0)
-      rubyntlm (>= 0.6.3)
       rubyzip (~> 3.0.1)
       sax-machine
       spreadsheet
@@ -70,7 +68,6 @@ GEM
     mime-types-data (3.2026.0203)
     mini_portile2 (2.8.9)
     minitar (1.1.0)
-    multi_json (1.19.1)
     mutex_m (0.3.0)
     net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.8)

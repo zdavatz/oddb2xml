@@ -1,5 +1,3 @@
-require "net/ntlm/version" # needed to avoid error: uninitialized constant Net::NTLM::VERSION
-require "rubyntlm"
 require "mechanize"
 require "zip"
 require "open-uri"
