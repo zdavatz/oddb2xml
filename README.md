@@ -570,6 +570,14 @@ they are the reference setup for running oddb2xml unattended.
   cron entry that regenerates the Fachinformationen. Run as root; idempotent.
   Without it every `/aips2sqlite/` link answers 403, because Apache denies a
   path that does not exist.
+  The job's output is only as robust as its side files: when one of the
+  `/aips2sqlite/` files goes stale or tiny, look at the timestamps and sizes in
+  `jars/output/` first (a `amiko_db_full_idx_de.db` of a few kB means the
+  `--lang=de` step died) and then at `generate_aips_fi.log` -- twice now an
+  upstream file changed shape (Refdata articles without barcode, 08/2026;
+  SwissDRG serving an HTML page for a retired xlsx id, 09/2026) and the Java
+  side crashed instead of skipping. Both are fixed in aips2sqlite; the rule
+  there is that a missing side file costs its data, never the run.
 * `transfer.sh` — optional scp hand-off of the output tree to the HIN
   download server. **Obsolete, and deliberately not wired up**: `SCP_DEST` has
   no default and the script is not in `/etc/cron.d/mediupdatexml`. HIN links
