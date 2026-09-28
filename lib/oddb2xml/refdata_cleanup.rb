@@ -194,5 +194,30 @@ module Oddb2xml
       return desc unless VERACTIV_VITD3_IKSNR.include?(iksnr_of(no8))
       desc.sub(/(\d)\s*m\z/, '\1ml')
     end
+
+    # Refdata sometimes carries a wrong pack volume in the German name only,
+    # while the French and Italian names of the same article agree with each
+    # other and with ZurRose/BAG. Seen September 2026 (reported by zollsoft):
+    #   7680583140053 DE "PRIVIGEN 10% Inf Lös 200 ml Dfl"   FR/IT "400 ml"
+    #   7680578510052 DE "FERINJECT … 1000 mg 10 ml …"       FR/IT "20 ml"
+    #   7680693600058 VIYANA, 7680694120050 FERYXA           same as FERINJECT
+    # A scan of all 16'971 Refdata articles found exactly these four, all
+    # confirmed wrong by ZurRose transfer.dat. The guard is strict: each name
+    # must carry exactly one standalone "<n> ml" (a concentration like
+    # "mg/ml" or "1000 mg/20ml" is not standalone), FR and IT must agree, and
+    # only the number in DE is replaced.
+    ML_TOKEN = %r{(?<![/\d.,])(\d+(?:[.,]\d+)?)(\s*ml)\b}i
+
+    def self.fix_german_volume_from_fr_it(de, fr, it)
+      return de if [de, fr, it].any? { |d| d.nil? || d.empty? }
+      de_ml = de.scan(ML_TOKEN)
+      fr_ml = fr.scan(ML_TOKEN)
+      it_ml = it.scan(ML_TOKEN)
+      return de unless de_ml.size == 1 && fr_ml.size == 1 && it_ml.size == 1
+      want = fr_ml.first.first.tr(",", ".")
+      return de unless it_ml.first.first.tr(",", ".") == want
+      return de if de_ml.first.first.tr(",", ".") == want
+      de.sub(ML_TOKEN) { "#{fr_ml.first.first}#{$2}" }
+    end
   end
 end

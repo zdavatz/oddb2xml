@@ -457,6 +457,14 @@ Currently active fixes (`lib/oddb2xml/refdata_cleanup.rb`):
   duplicate token is collapsed to a single occurrence. Real combination
   products (e.g. PHESGO 600 mg / 600 mg / 10 ml — pertuzumab + trastuzumab)
   are detected via the comma in `substance_swissmedic` and left untouched.
+* **German pack volume disagreeing with French and Italian** — Refdata
+  sometimes carries a wrong volume in the German name only, e.g.
+  `PRIVIGEN 10% Inf Lös 200 ml Dfl` for the 400 ml pack (GTIN 7680583140053)
+  while the French and Italian names say 400 ml. When the French and Italian
+  names agree on a single standalone `<n> ml` and the German one differs, the
+  German number is replaced. Concentrations such as `mg/ml` are ignored. On
+  the September 2026 file this changes exactly four articles (PRIVIGEN 400 ml,
+  FERINJECT, VIYANA and FERYXA 1000 mg 20 ml), all confirmed by ZurRose.
 
 The cleanup runs at the start of `prepare_articles` in `Builder` and is
 idempotent. Each rule is guarded by a Swissmedic-side heuristic so genuine

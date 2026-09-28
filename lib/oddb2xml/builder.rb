@@ -131,11 +131,17 @@ module Oddb2xml
           end
           item[key] = desc if desc != original
         end
+        fixed_de = RefdataCleanup.fix_german_volume_from_fr_it(item[:desc_de], item[:desc_fr], item[:desc_it])
+        if fixed_de != item[:desc_de]
+          item[:desc_de] = fixed_de
+          counts[:de_volume] += 1
+        end
       end
       labels = {metoject: "truncated METOJECT name", veractiv_vol: "truncated volume unit",
                 double_dose: "double-dose pattern", galenic: "galenic form",
                 combo_dose: "missing combo 2nd dose", missing_dose: "missing strength",
-                volume: "missing injection volume"}
+                volume: "missing injection volume",
+                de_volume: "German pack volume disagreeing with FR/IT"}
       counts.each do |rule, n|
         Oddb2xml.log("Refdata cleanup: fixed #{labels[rule]} in #{n} description(s)") if n > 0
       end

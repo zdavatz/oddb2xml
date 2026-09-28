@@ -384,4 +384,47 @@ describe Oddb2xml::Builder do
       expect(builder.refdata["7680576900046"][:desc_de]).to eq "VERACTIV Vitamin D3 Wild Huile Trp 20'000 U.I. 10ml"
     end
   end
+
+  describe ".fix_german_volume_from_fr_it" do
+    let(:fix) { ->(de, fr, it) { Oddb2xml::RefdataCleanup.fix_german_volume_from_fr_it(de, fr, it) } }
+
+    it "takes the volume from FR/IT when DE disagrees (PRIVIGEN 400 ml, zollsoft 09/2026)" do
+      expect(fix.call("PRIVIGEN 10% Inf Lös 200 ml Dfl", "PRIVIGEN 10% sol perf 400 ml flac",
+        "PRIVIGEN 10% sol inf 400 ml flac")).to eq "PRIVIGEN 10% Inf Lös 400 ml Dfl"
+    end
+
+    it "fixes FERINJECT 1000 mg 10 ml -> 20 ml" do
+      expect(fix.call("FERINJECT Disp Inj/Inf 1000 mg 10 ml 1 Flasche", "FERINJECT disp inj/pf 1000 mg 20 ml 1 flacon",
+        "FERINJECT disp inj/inf 1000 mg 20 ml 1 flacone")).to eq "FERINJECT Disp Inj/Inf 1000 mg 20 ml 1 Flasche"
+    end
+
+    it "leaves DE alone when FR and IT disagree with each other" do
+      de = "X Inf Lös 200 ml Dfl"
+      expect(fix.call(de, "X sol perf 400 ml flac", "X sol inf 300 ml flac")).to eq de
+    end
+
+    it "ignores concentrations such as mg/ml or 1000 mg/20ml" do
+      de = "CIMZIA Inj Lös 200 mg/ml Fertspr 2 Stk"
+      expect(fix.call(de, "CIMZIA sol inj 200 mg/2ml ser pré 2 pce", "CIMZIA sol inj 200 mg/2ml sir pre 2 pz")).to eq de
+    end
+
+    it "does nothing with more than one volume in a name" do
+      de = "Y 5 ml + 10 ml"
+      expect(fix.call(de, "Y 5 ml + 20 ml", "Y 5 ml + 20 ml")).to eq de
+    end
+
+    it "does nothing when a language is missing" do
+      expect(fix.call("Z 10 ml", "", "Z 20 ml")).to eq "Z 10 ml"
+    end
+
+    it "is applied by Builder#apply_refdata_description_cleanups!" do
+      builder = Oddb2xml::Builder.new
+      builder.packs = {"58314053" => {}}
+      builder.refdata = {"7680583140053" => {ean13: "7680583140053", no8: "58314053",
+        desc_de: "PRIVIGEN 10% Inf Lös 200 ml Dfl", desc_fr: "PRIVIGEN 10% sol perf 400 ml flac",
+        desc_it: "PRIVIGEN 10% sol inf 400 ml flac"}}
+      builder.apply_refdata_description_cleanups!
+      expect(builder.refdata["7680583140053"][:desc_de]).to eq "PRIVIGEN 10% Inf Lös 400 ml Dfl"
+    end
+  end
 end
