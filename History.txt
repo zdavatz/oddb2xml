@@ -1,4 +1,4 @@
-=== unreleased
+=== 3.0.36 / 28.09.2026
 * Bugfix (Refdata cleanup): correct the German pack volume when Refdata's German name disagrees with its own French and Italian names. Reported by zollsoft for PRIVIGEN 10% 400 ml (GTIN 7680583140053), whose German description in oddb_product.xml and oddb_article.xml read "200 ml" -- the German name of the 200 ml pack -- while French, Italian, ZurRose and the BAG FHIR feed all say 400 ml. The same Refdata defect affects FERINJECT, VIYANA and FERYXA 1000 mg (German "10 ml", correct 20 ml). The fix changes exactly these four articles on the September 2026 Refdata file; concentrations such as mg/ml are never touched. Suite: 1646 examples, 0 failures.
 * Builder creates WORK_DIR before writing missing_in_refdata.txt and the Artikelstamm CSV (order-dependent spec failure, seed 17155).
 * Dependencies: multi_json and the direct rubyntlm pin removed (SOAP-era leftovers, no references); rubyntlm stays as a dependency of mechanize.
